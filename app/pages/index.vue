@@ -4,6 +4,14 @@
       Nuxt UI - Starter
     </h1>
 
+    <ClientOnly>
+      <TestPapi />
+
+      <template #fallback>
+        <p>Loading . . .</p>
+      </template>
+    </ClientOnly>
+
     <div class="flex items-center gap-2">
       <UButton
         label="Documentation"
