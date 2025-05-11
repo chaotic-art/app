@@ -1,14 +1,22 @@
 <template>
   <div class="flex flex-col items-center justify-center gap-4 h-screen">
     <h1 class="font-bold text-2xl text-(--ui-primary)">
-      Nuxt UI v3
+      Nuxt UI - Starter
     </h1>
+
+    <ClientOnly>
+      <TestPapi />
+
+      <template #fallback>
+        <p>Loading . . .</p>
+      </template>
+    </ClientOnly>
 
     <div class="flex items-center gap-2">
       <UButton
         label="Documentation"
         icon="i-lucide-square-play"
-        to="https://ui3.nuxt.dev/getting-started/installation/nuxt"
+        to="https://ui.nuxt.com/getting-started/installation/nuxt"
         target="_blank"
       />
 

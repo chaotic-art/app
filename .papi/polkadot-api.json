@@ -1,0 +1,16 @@
+{
+  "version": 0,
+  "descriptorPath": ".papi/descriptors",
+  "entries": {
+    "ahp": {
+      "chain": "polkadot_asset_hub",
+      "metadata": ".papi/metadata/ahp.scale",
+      "genesis": "0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f"
+    },
+    "ahk": {
+      "chain": "ksmcc3_asset_hub",
+      "metadata": ".papi/metadata/ahk.scale",
+      "genesis": "0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a"
+    }
+  }
+}
