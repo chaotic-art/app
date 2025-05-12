@@ -7,7 +7,6 @@ Design: https://www.figma.com/design/XTcZsQREdo9574lTzqkMDL/Chaotic
 Make sure to install the dependencies:
 
 ```bash
-# pnpm
 pnpm install
 ```
 
@@ -16,7 +15,6 @@ pnpm install
 Start the development server on `http://localhost:9090`:
 
 ```bash
-# pnpm
 pnpm run dev
 ```
 
@@ -25,13 +23,11 @@ pnpm run dev
 Build the application for production:
 
 ```bash
-# pnpm
 pnpm run build
 ```
 
 Locally preview production build:
 
 ```bash
-# pnpm
 pnpm run preview
 ```
