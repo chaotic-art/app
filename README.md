@@ -10,6 +10,19 @@ Make sure to install the dependencies:
 pnpm install
 ```
 
+### Generate Polkadot API Descriptors
+
+This project uses local `@polkadot-api/descriptors` which require generation before the app will work properly. If you encounter an error like `Failed to resolve entry for package "@polkadot-api/descriptors"`, run:
+
+```bash
+pnpm dlx polkadot-api
+```
+
+This command will:
+1. Read the metadata from `.papi/polkadot-api.json`
+2. Generate the necessary descriptor files in `.papi/descriptors/dist/`
+3. Make the local package ready for import
+
 ## Development Server
 
 Start the development server on `http://localhost:9090`:
