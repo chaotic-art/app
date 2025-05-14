@@ -8,6 +8,8 @@ export default defineNuxtConfig({
     port: 9090,
   },
 
+  rootDir: 'app',
+
   runtimeConfig: {
     public: {
       baseUrl: process.env.BASE_URL || 'http://localhost:9090',
@@ -30,10 +32,18 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/icon',
+    '@nuxtjs/i18n',
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
   ],
+
+  i18n: {
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json' },
+    ],
+    defaultLocale: 'en',
+  },
 
   eslint: {
     config: {

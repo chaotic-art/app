@@ -1,12 +1,11 @@
 <script lang="ts" setup>
-
 </script>
 
 <template>
   <div>
     <div class="flex flex-col items-center justify-center gap-4 h-screen">
       <h1 class="font-bold text-2xl text-(--ui-primary)">
-        Landing Page
+        Landing Page {{ $t('test_i18n') }}
       </h1>
 
       <ClientOnly>
