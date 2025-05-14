@@ -1,9 +1,28 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import process from 'node:process'
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
   devServer: {
     port: 9090,
+  },
+
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.BASE_URL || 'http://localhost:9090',
+    },
+  },
+
+  // Auto import components
+  components: {
+    dirs: [
+      {
+        path: '~/components',
+        extensions: ['vue'],
+        pathPrefix: false,
+      },
+    ],
   },
 
   modules: [
