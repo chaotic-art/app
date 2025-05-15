@@ -17,13 +17,7 @@ useHead({
   <div class="min-h-full flex flex-col overflow-hidden">
     <!-- <Navbar /> -->
     <main class="grow">
-      <Error
-        v-if="$nuxt.isOffline"
-        :has-img="false"
-        error-title="Offline Detected"
-        error-subtitle="Please check your network connections"
-      />
-      <NuxtPage v-else />
+      <slot />
     </main>
     <LazyFooter />
   </div>
