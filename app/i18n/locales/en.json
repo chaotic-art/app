@@ -1,3 +1,12 @@
 {
-  "test_i18n": "test i18n"
+  "brand": {
+    "name": "Chaotic"
+  },
+  "wallet": {
+    "connect": "Connect wallet"
+  },
+  "landing": {
+    "title": "Your Polkadot NFT Marketplace",
+    "subtitle": "Create, Collect, Sell NFTs"
+  }
 }

@@ -1,13 +1,22 @@
 <script lang="ts" setup>
-import Articles from './Articles.vue'
 </script>
 
 <template>
   <div>
+    <!-- <img
+      src="/img/landing/landing-bg.png" alt="Landing Background" class="w-full h-full object-cover bg-transparent opacity-[10%] mix-blend-exclusion"
+    > -->
+    <Navbar />
+
     <UContainer>
-      <h1 class="font-bold text-2xl text-(--ui-primary)">
-        Landing Page {{ $t('test_i18n') }}
-      </h1>
+      <div class="flex flex-col items-center justify-center mt-[25px] mb-[35px]">
+        <div class="font-bold text-[51px] capitalize font-serif italic">
+          {{ $t('landing.title') }}
+        </div>
+        <div class="text-xl capitalize opacity-[0.66]">
+          {{ $t('landing.subtitle') }}
+        </div>
+      </div>
 
       <ClientOnly>
         <TestPapi />

@@ -5,7 +5,6 @@ const route = useRoute()
 useHead({
   link: [
     {
-      hid: 'canonical',
       rel: 'canonical',
       href: $config.public.baseUrl + route.path,
     },
@@ -15,7 +14,6 @@ useHead({
 
 <template>
   <div class="min-h-full flex flex-col overflow-hidden">
-    <!-- <Navbar /> -->
     <main class="grow">
       <slot />
     </main>
