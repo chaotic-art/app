@@ -10,7 +10,7 @@
 
     <UContainer>
       <div class="flex flex-col items-center justify-center mt-[25px] mb-[35px]">
-        <div class="font-bold text-[51px] capitalize font-serif italic">
+        <div class="font-medium text-[51px] capitalize font-serif italic">
           {{ $t('landing.title') }}
         </div>
         <div class="text-xl capitalize opacity-[0.66]">
@@ -18,8 +18,10 @@
         </div>
       </div>
 
+      <LandingDropBanner />
+
       <ClientOnly>
-        <TestPapi />
+        <TestPapi class="mt-[100px]" />
 
         <template #fallback>
           <p>Loading . . .</p>
