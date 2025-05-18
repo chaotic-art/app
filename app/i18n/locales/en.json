@@ -1,0 +1,12 @@
+{
+  "brand": {
+    "name": "Chaotic"
+  },
+  "wallet": {
+    "connect": "Connect wallet"
+  },
+  "landing": {
+    "title": "Your Polkadot NFT Marketplace",
+    "subtitle": "Create, Collect, Sell NFTs"
+  }
+}

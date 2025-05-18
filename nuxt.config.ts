@@ -1,6 +1,6 @@
-/* eslint-disable node/prefer-global/process */
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import process from 'node:process'
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
@@ -10,8 +10,21 @@ export default defineNuxtConfig({
     port: 9090,
   },
 
+  rootDir: 'app',
+
   imports: {
-    dirs: ['./app/utils'],
+    dirs: ['./utils'],
+  },
+
+  // Auto import components
+  components: {
+    dirs: [
+      {
+        path: '~/components',
+        extensions: ['vue'],
+        pathPrefix: false,
+      },
+    ],
   },
 
   modules: [
@@ -19,6 +32,7 @@ export default defineNuxtConfig({
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/icon',
+    '@nuxtjs/i18n',
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
@@ -29,6 +43,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
+      baseUrl: process.env.BASE_URL || 'http://localhost:9090',
       walletConnectProjectId:
         process.env.WALLET_CONNECT_PROJECT_ID
         || '4483dd2f5c3049479618d611e8a1087a',
@@ -36,7 +51,14 @@ export default defineNuxtConfig({
   },
 
   pinia: {
-    storesDirs: ['./app/stores'],
+    storesDirs: ['./stores'],
+  },
+
+  i18n: {
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json' },
+    ],
+    defaultLocale: 'en',
   },
 
   eslint: {
