@@ -45,6 +45,11 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
   },
 
+  ui: {
+    // todo: dark mode
+    colorMode: false,
+  },
+
   eslint: {
     config: {
       standalone: false,

@@ -38,7 +38,7 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
         <UNavigationMenu
           :items="navItems"
         />
-        <UButton :label="$t('wallet.connect')" variant="solid" class="bg-black text-white rounded-full px-6 text-base cursor-pointer" />
+        <UButton :label="$t('wallet.connect')" variant="solid" class="text-white rounded-full px-6 text-base cursor-pointer" />
       </div>
     </nav>
   </UContainer>
