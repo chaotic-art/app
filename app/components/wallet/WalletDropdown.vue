@@ -40,7 +40,7 @@ const items = computed<DropdownMenuItem[]>(() => [
         v-if="!getIsEvmConnected && !getIsSubstrateConnected"
         :label="$t('wallet.connect')"
         variant="solid"
-        class="bg-black text-white rounded-full px-6 text-base cursor-pointer"
+        class="text-white rounded-full px-6 text-base cursor-pointer"
       />
 
       <ConnectedWallets v-else @click="isDropdownOpen = !isDropdownOpen" />
