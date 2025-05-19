@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { SetWalletParams } from '@/stores/wallet'
+import type { ChainVM } from '@kodadot1/static';
 
 const props = defineProps<{
-  initialWalletType?: 'EVM' | 'SUB'
+  initialWalletType?: ChainVM
 }>()
 
 const emit = defineEmits(['select'])
@@ -19,7 +20,7 @@ function onSelectAccount({ vm, account }: SetWalletParams) {
     <template #header>
       <div class="flex justify-between items-center">
         <div class="text-xl font-bold">
-          Connect Wallet
+          {{ $t('wallet.connectWallet') }}
         </div>
       </div>
     </template>

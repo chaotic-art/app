@@ -3,7 +3,18 @@
     "name": "Chaotic"
   },
   "wallet": {
-    "connect": "Connect wallet"
+    "connect": "Connect wallet",
+    "connectEvm": "Connect EVM Wallet",
+    "connectSubstrate": "Connect Substrate Wallet",
+    "connectWallet": "Connect Wallet",
+    "connectedAccount": "Connected Account",
+    "backToWalletSelection": "Back To Wallet Selection",
+    "connect_with": "Connect {name}",
+    "availableAccounts": "Available Accounts:",
+    "searchAccountsPlaceholder": "Search accounts by name",
+    "unknownAccount": "Unknown Account",
+    "disconnect": "Disconnect",
+    "connected": "Connected"
   },
   "landing": {
     "title": "Your Polkadot NFT Marketplace",

@@ -49,14 +49,14 @@ watchEffect(() => {
         block
         @click="open"
       >
-        Connect EVM Wallet
+        {{ $t('wallet.connectEvm') }}
       </UButton>
 
       <UCard v-if="accountData?.address" class="mt-4">
         <div class="flex items-center justify-between">
           <div>
             <div class="font-medium">
-              Connected Account
+              {{ $t('wallet.connectedAccount') }}
             </div>
             <div class="text-xs text-gray-500 mt-1">
               {{ accountData.address }}

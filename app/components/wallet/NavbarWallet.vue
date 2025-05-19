@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { SetWalletParams } from '@/stores/wallet'
+import type { ChainVM } from '@kodadot1/static'
 
 const walletStore = useWalletStore()
 const isWalletModalOpen = ref(false)
-const selectedWalletType = ref<'EVM' | 'SUB' | undefined>(undefined)
+const selectedWalletType = ref<ChainVM | undefined>(undefined)
 
-function openWalletModal(type?: 'EVM' | 'SUB') {
+function openWalletModal(type: ChainVM) {
   selectedWalletType.value = type
   isWalletModalOpen.value = true
 }
 
-function onWalletTypeSelected(type: 'EVM' | 'SUB') {
+function onWalletTypeSelected(type: ChainVM) {
   selectedWalletType.value = type
   openWalletModal(type)
 }
@@ -24,11 +25,9 @@ function onSelectAccount({ vm, account }: SetWalletParams) {
 <template>
   <div>
     <client-only>
-      <div>
-        <WalletDropdown
-          @select-wallet-type="onWalletTypeSelected"
-        />
-      </div>
+      <WalletDropdown
+        @select-wallet-type="onWalletTypeSelected"
+      />
     </client-only>
 
     <!-- Wallet Modal -->

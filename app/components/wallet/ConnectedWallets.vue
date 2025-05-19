@@ -13,7 +13,7 @@ const hasConnectedWallet = computed(() => evmConnected.value || subConnected.val
     v-if="hasConnectedWallet"
     class="flex items-center bg-gray-100 dark:bg-gray-800 rounded-full py-1 px-3"
   >
-    <WalletConnectedWalletBadge
+    <ConnectedWalletBadge
       v-if="evmConnected"
       wallet-type="EVM"
       :wallet="wallets.EVM"
@@ -24,7 +24,7 @@ const hasConnectedWallet = computed(() => evmConnected.value || subConnected.val
       class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2"
     />
 
-    <WalletConnectedWalletBadge
+    <ConnectedWalletBadge
       v-if="subConnected"
       wallet-type="SUB"
       :wallet="wallets.SUB"

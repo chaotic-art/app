@@ -1,89 +1,49 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
+import type { ChainVM } from '@kodadot1/static'
+import type { DropdownMenuItem } from '@nuxt/ui'
 
 const emit = defineEmits(['selectWalletType'])
+const { t } = useI18n()
 
 const walletStore = useWalletStore()
-const {
-  getIsEvmConnected,
-  getIsSubstrateConnected,
-} = storeToRefs(walletStore)
+const { getIsEvmConnected, getIsSubstrateConnected } = walletStore
 
 const isDropdownOpen = ref(false)
 
-function toggleDropdown() {
-  isDropdownOpen.value = !isDropdownOpen.value
-}
-
-function selectWalletType(type: 'EVM' | 'SUB') {
+function selectWalletType(type: ChainVM) {
   emit('selectWalletType', type)
   isDropdownOpen.value = false
 }
 
-function closeDropdown() {
-  isDropdownOpen.value = false
-}
-
-const targetRef = ref(null)
-
-onClickOutside(targetRef, () => {
-  closeDropdown()
-})
+const items = computed<DropdownMenuItem[]>(() => [
+  {
+    label: t('wallet.connectEvm'),
+    icon: 'i-lucide-link',
+    onSelect: () => selectWalletType('EVM')
+  },
+  {
+    label: t('wallet.connectSubstrate'),
+    icon: 'i-lucide-link',
+    onSelect: () => selectWalletType('SUB')
+  }
+])
 </script>
 
 <template>
-  <div ref="targetRef" class="relative">
-    <UButton
-      v-if="!getIsEvmConnected && !getIsSubstrateConnected"
-      color="primary"
-      variant="ghost"
-      icon="i-lucide-wallet"
-      @click="toggleDropdown"
+  <div>
+    <UDropdownMenu
+      v-model:open="isDropdownOpen"
+      :items="items"
+      :ui="{ content: 'w-48' }"
     >
-      Connect Wallet
-    </UButton>
+      <UButton
+        v-if="!getIsEvmConnected && !getIsSubstrateConnected"
+        :label="$t('wallet.connect')"
+        variant="solid"
+        class="bg-black text-white rounded-full px-6 text-base cursor-pointer"
+      />
 
-    <WalletConnectedWallets v-else @click="toggleDropdown" />
-
-    <Transition name="dropdown">
-      <div
-        v-if="isDropdownOpen"
-        class="absolute right-0 top-full mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
-      >
-        <div class="py-1">
-          <div
-            class="px-4 py-2 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-            @click="selectWalletType('EVM')"
-          >
-            <span class="mr-2">
-              <UIcon name="i-lucide-link" />
-            </span>
-            Connect EVM Wallet
-          </div>
-          <div
-            class="px-4 py-2 text-sm font-medium cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-            @click="selectWalletType('SUB')"
-          >
-            <span class="mr-2">
-              <UIcon name="i-lucide-link" />
-            </span>
-            Connect Substrate Wallet
-          </div>
-        </div>
-      </div>
-    </Transition>
+      <ConnectedWallets v-else @click="isDropdownOpen = !isDropdownOpen" />
+    </UDropdownMenu>
   </div>
 </template>
-
-<style scoped>
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
-}
-
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-</style>

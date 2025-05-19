@@ -97,7 +97,7 @@ function disconnectWallet() {
                   color="primary"
                   size="xs"
                 >
-                  Connected
+                  {{ $t('wallet.connected') }}
                 </UBadge>
               </div>
             </div>
@@ -130,7 +130,7 @@ function disconnectWallet() {
             variant="ghost"
             @click="resetWalletSelection"
           >
-            Back To Wallet Selection
+            {{ $t('wallet.backToWalletSelection') }}
           </UButton>
         </div>
         <div v-if="selectedWallet" class="flex items-center">
@@ -161,7 +161,7 @@ function disconnectWallet() {
               class="w-5 h-5 mr-2 object-contain"
             >
             <UIcon v-else name="i-lucide-link" class="mr-2" />
-            <span>Connect {{ selectedWallet }}</span>
+            <span>{{ $t('wallet.connect_with', { name: selectedWallet }) }}</span>
           </div>
         </UButton>
 
@@ -173,12 +173,12 @@ function disconnectWallet() {
         >
           <div class="flex items-center justify-between mb-3">
             <div class="font-medium text-sm text-gray-700 dark:text-gray-300">
-              Available Accounts:
+              {{ $t('wallet.availableAccounts') }}
             </div>
             <UInput
               v-model="searchQuery"
               icon="i-lucide-search"
-              placeholder="Search accounts by name"
+              :placeholder="$t('wallet.searchAccountsPlaceholder')"
               size="sm"
               class="max-w-xs"
             />
@@ -196,7 +196,7 @@ function disconnectWallet() {
               <div class="flex items-center justify-between">
                 <div>
                   <div class="font-medium">
-                    {{ account.name || 'Unknown Account' }}
+                    {{ account.name || $t('wallet.unknownAccount') }}
                   </div>
                   <div class="text-xs text-gray-500 mt-1">
                     {{ account.address }}
@@ -221,7 +221,7 @@ function disconnectWallet() {
           >
             <div class="flex items-center justify-center">
               <UIcon name="i-lucide-unlink" class="mr-2" />
-              <span>Disconnect</span>
+              <span>{{ $t('wallet.disconnect') }}</span>
             </div>
           </UButton>
         </div>
