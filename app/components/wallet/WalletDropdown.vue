@@ -5,8 +5,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 const emit = defineEmits(['selectWalletType'])
 const { t } = useI18n()
 
-const walletStore = useWalletStore()
-const { getIsEvmConnected, getIsSubstrateConnected } = walletStore
+const { getIsEvmConnected, getIsSubstrateConnected } = storeToRefs(useWalletStore())
 
 const isDropdownOpen = ref(false)
 
@@ -37,13 +36,13 @@ const items = computed<DropdownMenuItem[]>(() => [
       :ui="{ content: 'w-48' }"
     >
       <UButton
-        v-if="!getIsEvmConnected && !getIsSubstrateConnected"
+        v-if="!getIsEvmConnected || !getIsSubstrateConnected"
         :label="$t('wallet.connect')"
         variant="solid"
         class="text-white rounded-full px-6 text-base cursor-pointer"
       />
 
-      <ConnectedWallets v-else @click="isDropdownOpen = !isDropdownOpen" />
+      <ConnectedWallets v-else />
     </UDropdownMenu>
   </div>
 </template>
