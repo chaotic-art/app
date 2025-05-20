@@ -40,8 +40,8 @@ export const useWalletStore = defineStore('wallet', () => {
 
   const wallets = ref<Record<ChainVM, VmWalletState>>(getDefaultWallets())
   const getWalletVM = computed(() => wallets.value[vm.value])
-  const getIsEvmConnected = computed(() => wallets.value[vm.value].connected)
-  const getIsSubstrateConnected = computed(() => wallets.value[vm.value].connected)
+  const getIsEvmConnected = computed(() => wallets.value.EVM.connected)
+  const getIsSubstrateConnected = computed(() => wallets.value.SUB.connected)
 
   function setDisconnecting(vm: ChainVM, payload: boolean) {
     wallets.value[vm].disconnecting = payload
