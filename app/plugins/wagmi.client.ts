@@ -7,9 +7,9 @@ const networks = [mainnet]
 const defaultNetwork = mainnet
 
 const metadata = {
-  name: 'AppKit Nuxt Wagmi Example',
-  description: 'AppKit Nuxt Wagmi Example',
-  url: 'https://reown.com/appkit',
+  name: 'Chaotic',
+  description: 'Chaotic - Generative Art Marketplace',
+  url: 'https://chaotic.art',
   icons: ['https://avatars.githubusercontent.com/u/179229932?s=200&v=4'],
 }
 
