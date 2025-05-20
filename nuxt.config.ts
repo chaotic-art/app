@@ -4,16 +4,16 @@ import process from 'node:process'
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
+  pages: true,
+
   devServer: {
     port: 9090,
   },
 
   rootDir: 'app',
 
-  runtimeConfig: {
-    public: {
-      baseUrl: process.env.BASE_URL || 'http://localhost:9090',
-    },
+  imports: {
+    dirs: ['./utils'],
   },
 
   // Auto import components
@@ -36,7 +36,23 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
+    '@pinia/nuxt',
+    'pinia-plugin-persistedstate/nuxt',
+    '@wagmi/vue/nuxt',
   ],
+
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.BASE_URL || 'http://localhost:9090',
+      walletConnectProjectId:
+        process.env.WALLET_CONNECT_PROJECT_ID
+        || '4483dd2f5c3049479618d611e8a1087a',
+    },
+  },
+
+  pinia: {
+    storesDirs: ['./stores'],
+  },
 
   i18n: {
     locales: [
