@@ -4,16 +4,13 @@ import process from 'node:process'
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  pages: true,
+  // https://nuxt.com/docs/getting-started/upgrade#testing-nuxt-4
+  future: {
+    compatibilityVersion: 4,
+  },
 
   devServer: {
     port: 9090,
-  },
-
-  rootDir: 'app',
-
-  imports: {
-    dirs: ['./utils'],
   },
 
   // Auto import components
@@ -59,6 +56,7 @@ export default defineNuxtConfig({
       { code: 'en', name: 'English', file: 'en.json' },
     ],
     defaultLocale: 'en',
+    restructureDir: './app/i18n',
   },
 
   ui: {
@@ -73,10 +71,6 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
-
-  future: {
-    compatibilityVersion: 4,
-  },
 
   compatibilityDate: '2024-11-27',
 })

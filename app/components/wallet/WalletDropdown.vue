@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ChainVM } from '@kodadot1/static'
 import type { DropdownMenuItem } from '@nuxt/ui'
+import { useWalletStore } from '~/stores/wallet'
 
 const emit = defineEmits(['selectWalletType'])
 const { t } = useI18n()
@@ -18,13 +19,13 @@ const items = computed<DropdownMenuItem[]>(() => [
   {
     label: t('wallet.connectEvm'),
     icon: 'i-lucide-link',
-    onSelect: () => selectWalletType('EVM')
+    onSelect: () => selectWalletType('EVM'),
   },
   {
     label: t('wallet.connectSubstrate'),
     icon: 'i-lucide-link',
-    onSelect: () => selectWalletType('SUB')
-  }
+    onSelect: () => selectWalletType('SUB'),
+  },
 ])
 </script>
 
