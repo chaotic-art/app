@@ -1,7 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:ital,wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+/* docs for @nuxt/fonts: https://fonts.nuxt.com/advanced#how-it-works */
+/* docs for tailwindcss v4: https://tailwindcss.com/docs/theme#relationship-to-utility-classes */
+@theme {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Roboto Serif', serif;
+}
 
 @theme static {
   --text-color: #000000;
@@ -12,6 +17,6 @@
 }
 
 body {
-  font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   color: var(--text-color);
 }
