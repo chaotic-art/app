@@ -4,6 +4,11 @@ import process from 'node:process'
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
+  // https://nuxt.com/docs/getting-started/upgrade#testing-nuxt-4
+  future: {
+    compatibilityVersion: 4,
+  },
+
   devServer: {
     port: 9090,
   },
@@ -66,11 +71,6 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
-
-  // https://nuxt.com/docs/getting-started/upgrade#testing-nuxt-4
-  future: {
-    compatibilityVersion: 4,
-  },
 
   compatibilityDate: '2024-11-27',
 })
