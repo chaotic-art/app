@@ -28,6 +28,11 @@ function onSelectAccount({ vm, account }: SetWalletParams) {
       <WalletDropdown
         @select-wallet-type="onWalletTypeSelected"
       />
+      <template #fallback>
+        <div class="flex items-center justify-center">
+          <USkeleton class="h-10 w-[160px] rounded-full" />
+        </div>
+      </template>
     </client-only>
 
     <!-- Wallet Modal -->

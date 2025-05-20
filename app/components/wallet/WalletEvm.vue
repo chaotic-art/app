@@ -1,32 +1,33 @@
 <script setup lang="ts">
-import { createAppKit, useAppKit, useAppKitAccount } from '@reown/appkit/vue'
+import { AppKit, createAppKit, useAppKit, useAppKitAccount } from '@reown/appkit/vue'
 
 const emit = defineEmits<{
   select: [account: WalletAccount]
 }>()
 
 const { $wagmi } = useNuxtApp()
+const accountData = useAppKitAccount()
 
-if (import.meta.client) {
-  createAppKit({
-    adapters: [$wagmi.adapter],
-    networks: [$wagmi.defaultNetwork, ...$wagmi.networks],
-    projectId: $wagmi.projectId,
-    metadata: $wagmi.metadata,
-    themeMode: 'light',
-    features: {
-      email: false,
-      socials: false,
-      swaps: false,
-    },
-  })
-}
+const appKit = ref<AppKit>()
 
 function open() {
+  if (!appKit.value) {
+    appKit.value = createAppKit({
+      adapters: [$wagmi.adapter],
+      networks: [$wagmi.defaultNetwork, ...$wagmi.networks],
+      projectId: $wagmi.projectId,
+      metadata: $wagmi.metadata,
+      themeMode: 'light',
+      features: {
+        email: false,
+        socials: false,
+        swaps: false,
+      },
+    })
+  }
+
   useAppKit().open()
 }
-
-const accountData = useAppKitAccount()
 
 watchEffect(() => {
   const address = accountData.value.address
