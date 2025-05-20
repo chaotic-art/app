@@ -8,7 +8,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "npx papi && nuxt prepare",
+    "postinstall": "nuxt prepare && npx papi",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
   },
