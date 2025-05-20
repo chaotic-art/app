@@ -170,7 +170,7 @@ function disconnectWallet() {
         <!-- Accounts List -->
         <div
           v-if="subWallets.find(w => w.source === selectedWallet)?.accounts
-            && subWallets.find(w => w.source === selectedWallet)?.accounts?.length > 0"
+            && subWallets.find(w => w.source === selectedWallet)?.accounts?.length"
           class="mt-3"
         >
           <div class="flex items-center justify-between mb-3">

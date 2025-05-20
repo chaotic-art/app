@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AppKit } from '@reown/appkit/vue'
+import type { WalletAccount } from '~/stores/wallet'
 import { createAppKit, useAppKit, useAppKitAccount } from '@reown/appkit/vue'
 
 const emit = defineEmits<{
