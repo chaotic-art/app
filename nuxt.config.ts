@@ -4,16 +4,8 @@ import process from 'node:process'
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
-  pages: true,
-
   devServer: {
     port: 9090,
-  },
-
-  rootDir: 'app',
-
-  imports: {
-    dirs: ['./utils'],
   },
 
   // Auto import components
@@ -59,6 +51,7 @@ export default defineNuxtConfig({
       { code: 'en', name: 'English', file: 'en.json' },
     ],
     defaultLocale: 'en',
+    restructureDir: './app/i18n',
   },
 
   ui: {
