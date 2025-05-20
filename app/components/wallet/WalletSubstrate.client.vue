@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { WalletAccount } from '@/stores/wallet'
 import type { SubstrateWalletAccount, SubstrateWalletSource } from '~/utils/wallet/substrate/types'
+import { useWalletStore } from '@/stores/wallet'
+import { useSubWalletStore } from '~/stores/subWallet'
 
 const emit = defineEmits<{
   select: [account: WalletAccount]
