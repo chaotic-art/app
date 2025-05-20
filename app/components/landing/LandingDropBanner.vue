@@ -19,7 +19,7 @@ const subDrops = [0, 1]
               Drop Name
             </div>
             <div class="flex flex-col md:flex-row md:items-center gap-4 w-full md:w-auto">
-              <UserInfo avatar-size="40" />
+              <UserInfo :avatar-size="40" />
               <div class="text-xs text-gray-500 max-w-[350px]">
                 some subheading text about the drop, something interesting, maybe about the process of making the drop,
               </div>
