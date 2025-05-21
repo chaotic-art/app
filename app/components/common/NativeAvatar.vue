@@ -14,6 +14,8 @@ const props = withDefaults(
   },
 )
 
+const IdenticonComponent: any = Identicon
+
 const WRAPPER_CLASS = 'border border-border-color rounded-full overflow-hidden bg-background-color'
 
 const formattedAddress = computed(() => props.value.toLowerCase())
@@ -39,7 +41,7 @@ const isEVMAddress = computed(
       height: `${size}px`,
     }"
   />
-  <Identicon
+  <IdenticonComponent
     v-else
     :data-key="value"
     :size="size"
