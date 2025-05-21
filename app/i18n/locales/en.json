@@ -26,5 +26,9 @@
   "collection": {
     "topCollections": "Top Collections",
     "viewMore": "View More"
+  },
+  "footer": {
+    "becomeArtist": "Become artist on Polkadot",
+    "getInTouch": "Get In Touch"
   }
 }
