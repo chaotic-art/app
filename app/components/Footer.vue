@@ -2,8 +2,8 @@
 </script>
 
 <template>
-  <UContainer class="mb-16">
-    <footer class="mt-8 bg-gray-50 rounded-[30px]">
+  <UContainer class="mb-16 mt-8">
+    <footer class="bg-gray-50 rounded-[30px]">
       <UContainer class="px-4 py-12">
         <!-- Main Footer Content -->
         <div class="mb-16 flex flex-col md:flex-row justify-between">

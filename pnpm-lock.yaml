@@ -50,6 +50,9 @@ importers:
       '@polkadot/util-crypto':
         specifier: ^13.4.4
         version: 13.4.4(@polkadot/util@13.4.4)
+      '@polkadot/vue-identicon':
+        specifier: ^3.13.1
+        version: 3.13.1(@polkadot/util-crypto@13.4.4(@polkadot/util@13.4.4))(@polkadot/util@13.4.4)(vue@3.5.13(typescript@5.8.3))
       '@reown/appkit':
         specifier: ^1.7.5
         version: 1.7.5(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4)
@@ -1546,6 +1549,13 @@ packages:
     resolution: {integrity: sha512-/wDwKdDijxSXyNk5YezhVitdFxoQaTSSG9KXa7dEWujtmS/51UHmt9+P3W8b8D8kKaCvumahf/ww3GJI6s0Eqw==}
     engines: {node: '>=18'}
 
+  '@polkadot/ui-shared@3.13.1':
+    resolution: {integrity: sha512-4bEmO+TRVblF+dLtC2ghTenHxDMkTG1Ykwc/69y0VEF38gQ41FI72+LbRhUIAbKMRUuXeSTvYNkn1m6tByrRdg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@polkadot/util': '*'
+      '@polkadot/util-crypto': '*'
+
   '@polkadot/util-crypto@13.4.4':
     resolution: {integrity: sha512-xuXBNdK3Axlj1ItR6n1kH9zgaDNWri9pb/w1HDFx89bHvw6Bl79wA/oHtVGLbHZ1y/bunpsuapznyswhnsaVog==}
     engines: {node: '>=18'}
@@ -1555,6 +1565,14 @@ packages:
   '@polkadot/util@13.4.4':
     resolution: {integrity: sha512-Lveu+8pZLBoAyyv+8X7FI4aTOwLaNXRc9gz1wVaUoGzk5VgmKp/qbPg0a+mfJD8usjf748OVbShhjXvhV3MLiA==}
     engines: {node: '>=18'}
+
+  '@polkadot/vue-identicon@3.13.1':
+    resolution: {integrity: sha512-E94T+7wgIXgw/bza10cbLHB8+qVobmgb5tcn8D3abPeQ7hQSF4e2GlGzLAEFc9WzDaSMsjaQw+XpSM421KmH1g==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@polkadot/util': '*'
+      '@polkadot/util-crypto': '*'
+      vue: '>= 2.7'
 
   '@polkadot/wasm-bridge@7.4.1':
     resolution: {integrity: sha512-tdkJaV453tezBxhF39r4oeG0A39sPKGDJmN81LYLf+Fihb7astzwju+u75BRmDrHZjZIv00un3razJEWCxze6g==}
@@ -4580,6 +4598,11 @@ packages:
 
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
+
+  jdenticon@3.2.0:
+    resolution: {integrity: sha512-z6Iq3fTODUMSOiR2nNYrqigS6Y0GvdXfyQWrUby7htDHvX7GNEwaWR4hcaL+FmhEgBe08Xkup/BKxXQhDJByPA==}
+    engines: {node: '>=6.4.0'}
+    hasBin: true
 
   jdenticon@3.3.0:
     resolution: {integrity: sha512-DhuBRNRIybGPeAjMjdHbkIfiwZCCmf8ggu7C49jhp6aJ7DYsZfudnvnTY5/1vgUhrGA7JaDAx1WevnpjCPvaGg==}
@@ -9582,6 +9605,13 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
+  '@polkadot/ui-shared@3.13.1(@polkadot/util-crypto@13.4.4(@polkadot/util@13.4.4))(@polkadot/util@13.4.4)':
+    dependencies:
+      '@polkadot/util': 13.4.4
+      '@polkadot/util-crypto': 13.4.4(@polkadot/util@13.4.4)
+      colord: 2.9.3
+      tslib: 2.8.1
+
   '@polkadot/util-crypto@13.4.4(@polkadot/util@13.4.4)':
     dependencies:
       '@noble/curves': 1.9.1
@@ -9604,6 +9634,15 @@ snapshots:
       '@types/bn.js': 5.1.6
       bn.js: 5.2.2
       tslib: 2.8.1
+
+  '@polkadot/vue-identicon@3.13.1(@polkadot/util-crypto@13.4.4(@polkadot/util@13.4.4))(@polkadot/util@13.4.4)(vue@3.5.13(typescript@5.8.3))':
+    dependencies:
+      '@polkadot/ui-shared': 3.13.1(@polkadot/util-crypto@13.4.4(@polkadot/util@13.4.4))(@polkadot/util@13.4.4)
+      '@polkadot/util': 13.4.4
+      '@polkadot/util-crypto': 13.4.4(@polkadot/util@13.4.4)
+      jdenticon: 3.2.0
+      tslib: 2.8.1
+      vue: 3.5.13(typescript@5.8.3)
 
   '@polkadot/wasm-bridge@7.4.1(@polkadot/util@13.4.4)(@polkadot/x-randomvalues@13.4.4(@polkadot/util@13.4.4)(@polkadot/wasm-util@7.4.1(@polkadot/util@13.4.4)))':
     dependencies:
@@ -14003,6 +14042,10 @@ snapshots:
       '@isaacs/cliui': 8.0.2
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
+
+  jdenticon@3.2.0:
+    dependencies:
+      canvas-renderer: 2.2.1
 
   jdenticon@3.3.0:
     dependencies:

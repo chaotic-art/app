@@ -3,7 +3,7 @@ const subDrops = [0, 1]
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col mb-[75px]">
     <div class="w-full rounded-xl overflow-hidden border border-[#EBEBEB] bg-white">
       <div class="w-full h-[240px] md:h-[300px] bg-gray-200 relative">
       <!-- <img
