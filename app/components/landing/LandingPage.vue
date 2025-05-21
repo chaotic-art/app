@@ -19,17 +19,13 @@
       </div>
 
       <LandingDropBanner />
-
-      <ClientOnly>
-        <TestPapi class="mt-[100px]" />
-
-        <template #fallback>
-          <p>Loading . . .</p>
-        </template>
-      </ClientOnly>
     </UContainer>
 
-    <!-- Articles Section -->
-    <Articles />
+    <LandingArtistsList />
+
+    <UContainer>
+      <LandingTopCollections />
+      <Articles />
+    </UContainer>
   </div>
 </template>
