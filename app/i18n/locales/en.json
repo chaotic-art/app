@@ -22,5 +22,9 @@
   },
   "drop": {
     "mint": "Mint Drop"
+  },
+  "collection": {
+    "topCollections": "Top Collections",
+    "viewMore": "View More"
   }
 }

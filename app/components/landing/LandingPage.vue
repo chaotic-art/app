@@ -23,7 +23,9 @@
 
     <LandingArtistsList />
 
-    <!-- Articles Section -->
-    <Articles />
+    <UContainer>
+      <LandingTopCollections />
+      <Articles />
+    </UContainer>
   </div>
 </template>
