@@ -1,6 +1,6 @@
 <script lang="ts" setup>
+import { polkadotIcon } from '@polkadot/ui-shared'
 import { isEthereumAddress } from '@polkadot/util-crypto'
-import Identicon from '@polkadot/vue-identicon'
 import { toSvg } from 'jdenticon'
 
 const props = withDefaults(
@@ -13,8 +13,6 @@ const props = withDefaults(
     size: 64,
   },
 )
-
-const IdenticonComponent: any = Identicon
 
 const WRAPPER_CLASS = 'border border-border-color rounded-full overflow-hidden bg-background-color'
 
@@ -41,12 +39,9 @@ const isEVMAddress = computed(
       height: `${size}px`,
     }"
   />
-  <IdenticonComponent
-    v-else
-    :data-key="value"
-    :size="size"
-    theme="polkadot"
-    :value="value"
-    :class="WRAPPER_CLASS"
-  />
+  <div v-else>
+    <svg :width="size" :height="size" viewBox="0 0 64 64" :class="WRAPPER_CLASS">
+      <circle v-for="(icon, index) in polkadotIcon(value, { isAlternative: false })" :key="index" :cx="icon.cx" :cy="icon.cy" :r="icon.r" :fill="icon.fill" />
+    </svg>
+  </div>
 </template>
