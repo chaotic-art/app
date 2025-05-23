@@ -32,7 +32,7 @@ const isEVMAddress = computed(
 <template>
   <div
     v-if="isEVMAddress"
-    v-dompurify-html:svg="evmAvatarSvg"
+    :svg="evmAvatarSvg"
     :class="WRAPPER_CLASS"
     :style="{
       width: `${size}px`,
