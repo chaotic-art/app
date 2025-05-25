@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { AppKit, createAppKit, useAppKit, useAppKitAccount } from '@reown/appkit/vue'
+import type { AppKit } from '@reown/appkit/vue'
+import { createAppKit, useAppKit, useAppKitAccount } from '@reown/appkit/vue'
 
 const emit = defineEmits<{
   select: [account: WalletAccount]

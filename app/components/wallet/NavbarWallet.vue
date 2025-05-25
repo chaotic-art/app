@@ -3,6 +3,8 @@ import type { SetWalletParams } from '@/stores/wallet'
 import type { ChainVM } from '@kodadot1/static'
 
 const walletStore = useWalletStore()
+const accountStore = useAccountStore()
+
 const isWalletModalOpen = ref(false)
 const selectedWalletType = ref<ChainVM | undefined>(undefined)
 
@@ -18,6 +20,7 @@ function onWalletTypeSelected(type: ChainVM) {
 
 function onSelectAccount({ vm, account }: SetWalletParams) {
   walletStore.setWallet({ vm, account })
+  accountStore.setAuth({ vm, address: account.address })
   isWalletModalOpen.value = false
 }
 </script>

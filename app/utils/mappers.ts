@@ -1,0 +1,23 @@
+import type { Chain } from '@/types/chain'
+import type { Prefix } from '@kodadot1/static'
+import { Chains } from '@/types/chain'
+
+const chainToPrefix: Partial<Record<Chain, Prefix>> = {
+  [Chains.Polkadot]: 'dot',
+  [Chains.Kusama]: 'ksm',
+  [Chains.AssetHubKusama]: 'ahk',
+  [Chains.AssetHubPolkadot]: 'ahp',
+  [Chains.Base]: 'base',
+}
+
+const prefixToChain: Partial<Record<Prefix, Chain>> = {
+  dot: Chains.Polkadot,
+  ksm: Chains.Kusama,
+  ahk: Chains.AssetHubKusama,
+  ahp: Chains.AssetHubPolkadot,
+  base: Chains.Base,
+}
+
+export const getPrefixOfChain = (chain: Chain): Prefix => chainToPrefix[chain] as Prefix
+
+export const getChainOfPrefix = (prefix: Prefix): Chain => prefixToChain[prefix] as Chain

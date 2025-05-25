@@ -1,10 +1,10 @@
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { mainnet } from '@reown/appkit/networks'
+import { base } from '@reown/appkit/networks'
 import { WagmiPlugin } from '@wagmi/vue'
 
-const networks = [mainnet]
+const networks = [base]
 
-const defaultNetwork = mainnet
+const defaultNetwork = base
 
 const metadata = {
   name: 'Chaotic',
@@ -21,7 +21,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
   }
 
-  const projectId = useRuntimeConfig().public.walletConnectProjectId
+  const projectId = useRuntimeConfig().public.reownProjectId
 
   nuxtApp.vueApp.use(WagmiPlugin, { config: buildWagmiAdapter(projectId).wagmiConfig })
 

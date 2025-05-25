@@ -44,9 +44,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       baseUrl: process.env.BASE_URL || 'http://localhost:9090',
-      walletConnectProjectId:
-        process.env.WALLET_CONNECT_PROJECT_ID
-        || '4483dd2f5c3049479618d611e8a1087a',
+      reownProjectId:
+        process.env.REOWN_CONNECT_PROJECT_ID
+        || 'b56e18d47c72ab683b10814fe9495694',
     },
   },
 

@@ -1,4 +1,4 @@
-import { ahk, ahp } from '@polkadot-api/descriptors'
+import { ahk, ahp, dot, ksm } from '@polkadot-api/descriptors'
 import { createClient } from 'polkadot-api'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
 import { getWsProvider } from 'polkadot-api/ws-provider/web'
@@ -12,6 +12,14 @@ const dotApi = {
   ahk: {
     descriptor: ahk,
     providers: ['wss://kusama-asset-hub-rpc.polkadot.io'],
+  },
+  dot: {
+    descriptor: dot,
+    providers: ['wss://rpc.dotters.network/polkadot'],
+  },
+  ksm: {
+    descriptor: ksm,
+    providers: ['wss://kusama-rpc.polkadot.io'],
   },
 }
 

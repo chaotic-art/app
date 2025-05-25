@@ -1,3 +1,4 @@
+import type { Chain } from '@/types/chain'
 import type { ChainProperties, ChainVM, Prefix } from '@kodadot1/static'
 import { CHAINS } from '@kodadot1/static'
 
@@ -12,3 +13,9 @@ export function vmOf(prefix: Prefix): ChainVM {
 export function ss58Of(prefix: Prefix): number {
   return chainPropListOf(prefix).ss58Format
 }
+
+export function tokenSymbolOf(prefix: Prefix): string {
+  return chainPropListOf(prefix).tokenSymbol
+}
+
+export const vmOfChain = (chain: Chain): ChainVM => vmOf(getPrefixOfChain(chain)!)

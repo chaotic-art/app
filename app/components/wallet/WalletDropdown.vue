@@ -18,13 +18,13 @@ const items = computed<DropdownMenuItem[]>(() => [
   {
     label: t('wallet.connectEvm'),
     icon: 'i-lucide-link',
-    onSelect: () => selectWalletType('EVM')
+    onSelect: () => selectWalletType('EVM'),
   },
   {
     label: t('wallet.connectSubstrate'),
     icon: 'i-lucide-link',
-    onSelect: () => selectWalletType('SUB')
-  }
+    onSelect: () => selectWalletType('SUB'),
+  },
 ])
 </script>
 

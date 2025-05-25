@@ -1,6 +1,5 @@
 import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
-import type { ChainVM, Prefix } from '@kodadot1/static'
-import { formatAddress } from '@/utils/account'
+import type { ChainVM } from '@kodadot1/static'
 import { defineStore } from 'pinia'
 
 export interface WalletAccount {
@@ -42,6 +41,8 @@ export const useWalletStore = defineStore('wallet', () => {
   const getWalletVM = computed(() => wallets.value[vm.value])
   const getIsEvmConnected = computed(() => wallets.value.EVM.connected)
   const getIsSubstrateConnected = computed(() => wallets.value.SUB.connected)
+  const getEvmWalletAddress = computed(() => wallets.value.EVM.account?.address)
+  const getSubstrateWalletAddress = computed(() => wallets.value.SUB.account?.address)
 
   function setDisconnecting(vm: ChainVM, payload: boolean) {
     wallets.value[vm].disconnecting = payload
@@ -63,44 +64,16 @@ export const useWalletStore = defineStore('wallet', () => {
     wallets.value = getDefaultWallets()
   }
 
-  function setCorrectAddressFormat(prefix: Prefix) {
-    const vm = vmOf(prefix)
-    const account = wallets.value[vm].account
-
-    if (!account) {
-      return
-    }
-
-    if (getIsSubstrateConnected.value && isSub(prefix)) {
-      const address = formatAddress({
-        address: account.address,
-        ss58: ss58Of(prefix),
-        vm: 'SUB',
-      })
-
-      if (address === account.address) {
-        return
-      }
-
-      setWallet({ vm, account: { ...account, address } })
-      // useIdentityStore().setAuth({ address })
-    }
-  }
-
-  function switchChain(prefix: Prefix) {
-    setCorrectAddressFormat(prefix)
-  }
-
   return {
     wallets,
     getWalletVM,
     getIsSubstrateConnected,
     getIsEvmConnected,
+    getSubstrateWalletAddress,
+    getEvmWalletAddress,
     setDisconnecting,
     setWallet,
     clear,
-    setCorrectAddressFormat,
-    switchChain,
     disconnect,
   }
 }, {
