@@ -15,6 +15,7 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.40",
     "@iconify-json/simple-icons": "^1.2.33",
+    "@kodadot1/hyperdata": "0.0.2-rc.1",
     "@kodadot1/static": "^0.0.7",
     "@nuxt/fonts": "0.11.3",
     "@nuxt/icon": "1.12.0",
@@ -34,8 +35,10 @@
     "@tanstack/vue-query": "^5.76.0",
     "@unhead/vue": "^2.0.3",
     "@wagmi/vue": "^0.1.19",
+    "consola": "^3.4.2",
     "jdenticon": "^3.3.0",
     "nuxt": "^3.17.2",
+    "ofetch": "1.4.1",
     "pinia": "^3.0.2",
     "pinia-plugin-persistedstate": "^4.3.0",
     "polkadot-api": "^1.10.2"

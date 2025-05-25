@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-withDefaults(
+const props = withDefaults(
   defineProps<{
     address?: string
     profileImage?: string
@@ -11,11 +11,19 @@ withDefaults(
     size: 64,
   },
 )
+
+const { profile: profileFromAddress } = useFetchProfile(
+  computed(() => props.profileImage ? undefined : props.address),
+)
+
+const profileImageUrl = computed(
+  () => props.profileImage || profileFromAddress.value?.image,
+)
 </script>
 
 <template>
   <div
-    v-if="profileImage"
+    v-if="profileImageUrl"
     class="rounded-full overflow-hidden bg-background-color border"
     :style="{
       width: `${size}px`,
@@ -24,7 +32,7 @@ withDefaults(
     }"
   >
     <NuxtImg
-      :src="profileImage"
+      :src="profileImageUrl"
       :sizes="`${size}px`"
       title="User Avatar"
       class="object-cover overflow-hidden rounded-full h-full w-full shadow-none!"

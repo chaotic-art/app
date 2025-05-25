@@ -1,5 +1,4 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import process from 'node:process'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -41,10 +40,10 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      baseUrl: process.env.BASE_URL || 'http://localhost:9090',
+      baseUrl: import.meta.env.BASE_URL || 'http://localhost:9090',
       walletConnectProjectId:
-        process.env.WALLET_CONNECT_PROJECT_ID
-        || '4483dd2f5c3049479618d611e8a1087a',
+        import.meta.env.WALLET_CONNECT_PROJECT_ID
+          || '4483dd2f5c3049479618d611e8a1087a',
     },
   },
 
