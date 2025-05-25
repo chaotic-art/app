@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { getChainIcon } = useIcon()
 const subDrops = [0, 1]
 </script>
 
@@ -71,7 +72,10 @@ const subDrops = [0, 1]
                 <span>$20 USD</span>
               </div>
 
-              <span>BASE</span>
+              <div class="flex items-center gap-2">
+                <NuxtImg :src="getChainIcon('base')!" class="w-4 h-4" />
+                <div>Base</div>
+              </div>
             </div>
 
             <div class="flex items-center gap-1 justify-between">

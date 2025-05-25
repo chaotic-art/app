@@ -30,6 +30,7 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxtjs/i18n',
+    '@nuxtjs/color-mode',
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
