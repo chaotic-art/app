@@ -1,5 +1,5 @@
-// import type { Abi } from '@/composables/transaction/types'
 import type { Prefix } from '@kodadot1/static'
+import type { Abi } from 'viem'
 
 export interface Unit {
   name: string
