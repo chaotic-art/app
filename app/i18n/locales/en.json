@@ -21,7 +21,8 @@
     "subtitle": "Create, Collect, Sell NFTs"
   },
   "drop": {
-    "mint": "Mint Drop"
+    "mint": "Mint Drop",
+    "minted": "Minted"
   },
   "collection": {
     "topCollections": "Top Collections",
