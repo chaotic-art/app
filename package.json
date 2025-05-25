@@ -36,6 +36,7 @@
     "@wagmi/vue": "^0.1.19",
     "jdenticon": "^3.3.0",
     "nuxt": "^3.17.2",
+    "ofetch": "1.4.1",
     "pinia": "^3.0.2",
     "pinia-plugin-persistedstate": "^4.3.0",
     "polkadot-api": "^1.10.2"
