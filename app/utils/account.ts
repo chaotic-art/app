@@ -1,9 +1,14 @@
-import type { ChainAccount } from '@/types'
+import type { Prefix } from '@kodadot1/static'
 import { encodeAddress } from '@polkadot/util-crypto'
 
-export function formatAddress(account: ChainAccount) {
-  if (account.vm === 'SUB') {
-    return encodeAddress(account.address, account.ss58)
-  }
-  return ''
+export function formatAddress({
+  address,
+  prefix,
+}: {
+  address: string
+  prefix: Prefix
+}) {
+  return execByVm({
+    SUB: () => encodeAddress(address, ss58Of(prefix)),
+  }, { prefix }) || ''
 }
