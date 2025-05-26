@@ -31,15 +31,11 @@ const supportedAssets = ([
   { chain: Chains.Polkadot, token: 'DOT' },
   { chain: Chains.AssetHubPolkadot, token: 'DOT' },
   { chain: Chains.Base, token: 'ETH' },
-] as SupportedAsset[]).map((asset) => {
-  const prefix = getPrefixOfChain(asset.chain)
-
-  return {
+] as SupportedAsset[])
+  .map(asset => ({
     ...asset,
-    prefix,
-    isNative: tokenSymbolOf(prefix) === asset.token,
-  }
-})
+    prefix: getPrefixOfChain(asset.chain),
+  }))
 
 function getDefaultAccount(): AccountVm {
   return {
@@ -50,10 +46,6 @@ function getDefaultAccount(): AccountVm {
 
 function getVMSupportedAssets(vm: ChainVM) {
   return supportedAssets.filter(({ prefix }) => vmOf(prefix) === vm)
-}
-
-function getChainAssets(chain: Chain) {
-  return getVMSupportedAssets(vmOf(getPrefixOfChain(chain))).filter(({ chain: assetChain }) => assetChain === chain)
 }
 
 export const useAccountStore = defineStore('account', () => {
@@ -77,8 +69,6 @@ export const useAccountStore = defineStore('account', () => {
     for (const account of Object.values(accounts.value)) {
       for (const [chain, chainData] of Object.entries(account.chains)) {
         const prefix = getPrefixOfChain(chain as Chain)
-        const nativeToken = getChainAssets(chain as Chain).find(asset => asset.isNative)?.token
-
         const nativeToken = tokenSymbolOf<TokenKey>(prefix)
 
         if (chainData.assets[nativeToken]) {
@@ -92,6 +82,31 @@ export const useAccountStore = defineStore('account', () => {
 
   const balance = computed(() => balances.value[prefix.value])
 
+  const getUpdatedChainData = ({ vm, chain, address, balances }: { vm: ChainVM, chain: Chain, address: string, balances: GetBalancesResult }): ChainData => {
+    const chainPrefix = getPrefixOfChain(chain)
+    const supportedTokens = getVMSupportedAssets(vm).filter(({ prefix }) => prefix === chainPrefix)
+
+    const assets = Object.fromEntries(
+      supportedTokens.map(({ token, prefix }) => [
+        token,
+        {
+          balance: String(balances.find(b => b.prefix === prefix)?.balance || '0'),
+        } as TokenDetail,
+      ]),
+    )
+
+    return { address, assets }
+  }
+
+  const updateAccountChainsBalances = ({ vm, balances }: { vm: ChainVM, balances: GetBalancesResult }) => {
+    accounts.value[vm].chains = Object.fromEntries(
+      Object.entries(accounts.value[vm].chains).map(([chain, { address }]) => [
+        chain,
+        getUpdatedChainData({ vm, chain: chain as Chain, address, balances }),
+      ]),
+    )
+  }
+
   const fetchBalance = async () => {
     const { getBalances } = useBalances()
 
@@ -99,31 +114,17 @@ export const useAccountStore = defineStore('account', () => {
 
     try {
       await Promise.all(Object.entries(accounts.value).map(async ([vm, account]) => {
-        const balances = await getBalances(
-          Object.entries(account.chains).map(([chain, { address }]) => ({
-            prefix: getPrefixOfChain(chain as Chain),
-            address,
-          })),
-        )
+        const accounts = Object.entries(account.chains).map(([chain, { address }]) => ({
+          prefix: getPrefixOfChain(chain as Chain),
+          address,
+        }))
 
-        accounts.value[vm as ChainVM].chains = Object.fromEntries(
-          Object.entries(accounts.value[vm as ChainVM].chains).map(([chain, { address }]) => [
-            chain,
-            {
-              address,
-              assets: Object.fromEntries(
-                getVMSupportedAssets(vm as ChainVM)
-                  .filter(({ prefix }) => prefix === getPrefixOfChain(chain as Chain))
-                  .map(({ prefix, token }) => [
-                    token,
-                    {
-                      balance: String(balances.find(b => b.prefix === prefix)?.native || '0'),
-                    } as TokenDetail,
-                  ]),
-              ),
-            } as ChainData,
-          ]),
-        )
+        const balances = await getBalances(accounts)
+
+        updateAccountChainsBalances({
+          vm: vm as ChainVM,
+          balances,
+        })
       }))
     }
     finally {
