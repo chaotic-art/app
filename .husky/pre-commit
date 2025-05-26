@@ -1,2 +1,2 @@
 pnpm lint:fix
-npx nuxi typecheck
+pnpm exec nuxi typecheck
