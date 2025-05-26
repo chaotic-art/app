@@ -86,11 +86,13 @@ export const useAccountStore = defineStore('account', () => {
     const chainPrefix = getPrefixOfChain(chain)
     const supportedTokens = getVMSupportedAssets(vm).filter(({ prefix }) => prefix === chainPrefix)
 
+    const balanceMap = new Map(balances.map(b => [b.prefix, b.balance]))
+
     const assets = Object.fromEntries(
       supportedTokens.map(({ token, prefix }) => [
         token,
         {
-          balance: String(balances.find(b => b.prefix === prefix)?.balance || '0'),
+          balance: String(balanceMap.get(prefix) || '0'),
         } as TokenDetail,
       ]),
     )

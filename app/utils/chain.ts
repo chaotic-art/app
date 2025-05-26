@@ -1,12 +1,9 @@
 import type { Chain } from '@/types/chain'
 import type { ChainProperties, ChainVM, Prefix } from '@kodadot1/static'
 import { CHAINS } from '@kodadot1/static'
-import { useMemoize } from '@vueuse/core'
-
-const memoizedChainPropListOf = useMemoize((prefix: Prefix) => CHAINS[prefix])
 
 export function chainPropListOf(prefix: Prefix): ChainProperties {
-  return memoizedChainPropListOf(prefix)
+  return CHAINS[prefix]
 }
 
 export function vmOf(prefix: Prefix): ChainVM {
