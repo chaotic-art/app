@@ -1,3 +1,4 @@
+import type { Prefix } from '@kodadot1/static'
 import { ahk, ahp, dot, ksm } from '@polkadot-api/descriptors'
 import { createClient } from 'polkadot-api'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
@@ -23,13 +24,16 @@ const dotApi = {
   },
 }
 
-function api(chain: 'ahp' | 'ahk' = 'ahp') {
-  const client = createClient(
-    withPolkadotSdkCompat(
-      getWsProvider(dotApi[chain].providers),
-    ),
-  )
+function api(chain: Prefix = 'ahp') {
+  if (chain === 'imx' || chain === 'mnt' || chain === 'base') {
+    console.warn(`Unsupported chain: ${chain}. Using ahp as fallback.`)
 
+    // default fallback to ahp
+    const client = createClient(withPolkadotSdkCompat(getWsProvider(dotApi.ahp.providers)))
+    return client.getTypedApi(dotApi.ahp.descriptor)
+  }
+
+  const client = createClient(withPolkadotSdkCompat(getWsProvider(dotApi[chain].providers)))
   return client.getTypedApi(dotApi[chain].descriptor)
 }
 

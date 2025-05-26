@@ -20,7 +20,7 @@ export default function () {
 
     const formattedAddress = formatAddress({ address, prefix })
 
-    const balance = await $api(prefix as any).query.System.Account.getValue(formattedAddress)
+    const balance = await $api(prefix).query.System.Account.getValue(formattedAddress)
 
     return { address: formattedAddress, balance: balance.data.free }
   }
