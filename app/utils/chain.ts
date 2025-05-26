@@ -17,8 +17,8 @@ export function ss58Of(prefix: Prefix): number {
   return chainPropListOf(prefix).ss58Format
 }
 
-export function tokenSymbolOf(prefix: Prefix): string {
-  return chainPropListOf(prefix).tokenSymbol
+export function tokenSymbolOf<T = string>(prefix: Prefix): T {
+  return chainPropListOf(prefix).tokenSymbol as T
 }
 
 export const vmOfChain = (chain: Chain): ChainVM => vmOf(getPrefixOfChain(chain)!)

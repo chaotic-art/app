@@ -74,16 +74,18 @@ export const useAccountStore = defineStore('account', () => {
   const balances = computed(() => {
     const result: Partial<Record<Prefix, string>> = {}
 
-    Object.values(accounts.value).forEach((account) => {
-      Object.entries(account.chains).forEach(([chain, chainData]) => {
+    for (const account of Object.values(accounts.value)) {
+      for (const [chain, chainData] of Object.entries(account.chains)) {
         const prefix = getPrefixOfChain(chain as Chain)
         const nativeToken = getChainAssets(chain as Chain).find(asset => asset.isNative)?.token
 
-        if (nativeToken && chainData.assets[nativeToken]) {
+        const nativeToken = tokenSymbolOf<TokenKey>(prefix)
+
+        if (chainData.assets[nativeToken]) {
           result[prefix] = chainData.assets[nativeToken].balance
         }
-      })
-    })
+      }
+    }
 
     return result
   })
