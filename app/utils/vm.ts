@@ -1,6 +1,4 @@
 import type { ChainVM, Prefix } from '@kodadot1/static'
-import { useChain } from '../composables/useChain'
-import { vmOf } from './chain'
 
 interface PickByVmOptions {
   key?: string
