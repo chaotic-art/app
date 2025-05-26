@@ -12,6 +12,27 @@ export default defineNuxtConfig({
     port: 9090,
   },
 
+  site: {
+    name: 'Chaotic Labs',
+    indexable: false,
+  },
+
+  seo: {
+    meta: {
+      title: 'Chaotic Labs',
+      description: 'Your Polkadot NFT Marketplace',
+      themeColor: [
+        { content: '#18181b', media: '(prefers-color-scheme: dark)' },
+        { content: 'white', media: '(prefers-color-scheme: light)' },
+      ],
+      twitterCreator: '@chaoticlabs',
+      twitterSite: '@chaoticlabs',
+      author: 'Chaotic Labs',
+      colorScheme: 'dark light',
+      applicationName: 'Chaotic Labs',
+    },
+  },
+
   // Auto import components
   components: {
     dirs: [
@@ -35,6 +56,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     '@wagmi/vue/nuxt',
+    '@nuxtjs/seo',
   ],
 
   runtimeConfig: {
