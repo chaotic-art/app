@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { WalletAccount } from '@/stores/wallet'
 import type { AppKit } from '@reown/appkit/vue'
 import { createAppKit, useAppKit, useAppKitAccount } from '@reown/appkit/vue'
 

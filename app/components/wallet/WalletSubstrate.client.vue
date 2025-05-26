@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { WalletAccount } from '@/stores/wallet'
 import type { SubstrateWalletAccount, SubstrateWalletSource } from '~/utils/wallet/substrate/types'
+import { useWalletStore } from '@/stores/wallet'
+import { useSubWalletStore } from '~/stores/subWallet'
 
 const emit = defineEmits<{
   select: [account: WalletAccount]
@@ -168,7 +170,7 @@ function disconnectWallet() {
         <!-- Accounts List -->
         <div
           v-if="subWallets.find(w => w.source === selectedWallet)?.accounts
-            && subWallets.find(w => w.source === selectedWallet)?.accounts?.length > 0"
+            && subWallets.find(w => w.source === selectedWallet)?.accounts?.length"
           class="mt-3"
         >
           <div class="flex items-center justify-between mb-3">

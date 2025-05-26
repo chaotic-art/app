@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ChainVM } from '@kodadot1/static'
 import type { DropdownMenuItem } from '@nuxt/ui'
+import { useWalletStore } from '~/stores/wallet'
 
 const emit = defineEmits(['selectWalletType'])
 const { t } = useI18n()

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { NuxtError } from '@nuxt/types'
+import type { NuxtError } from '#app'
 
 const props = defineProps<{
   error: NuxtError
@@ -31,8 +31,8 @@ const headline = computed(() => {
           {{ error.message || 'Something went wrong' }}
         </p>
 
-        <p v-if="error.path" class="text-lg text-gray-500 mb-8">
-          Path: {{ error.path }}
+        <p v-if="error.cause" class="text-lg text-gray-500 mb-8">
+          Cause: {{ error.cause }}
         </p>
 
         <div class="mb-10 rounded-lg overflow-hidden shadow-lg">

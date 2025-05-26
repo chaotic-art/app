@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useWalletStore } from '~/stores/wallet'
+
 const { wallets, getIsEvmConnected: evmConnected, getIsSubstrateConnected: subConnected } = storeToRefs(useWalletStore())
 
 const hasConnectedWallet = computed(() => evmConnected.value || subConnected.value)

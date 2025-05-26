@@ -14,6 +14,9 @@ importers:
       '@iconify-json/simple-icons':
         specifier: ^1.2.33
         version: 1.2.34
+      '@kodadot1/hyperdata':
+        specifier: 0.0.2-rc.1
+        version: 0.0.2-rc.1
       '@kodadot1/static':
         specifier: ^0.0.7
         version: 0.0.7
@@ -35,6 +38,9 @@ importers:
       '@nuxt/ui':
         specifier: ^3.1.1
         version: 3.1.1(@babel/parser@7.27.2)(db0@0.3.2)(embla-carousel@8.6.0)(idb-keyval@6.2.2)(ioredis@5.6.1)(jwt-decode@4.0.0)(magicast@0.3.5)(qrcode@1.5.3)(typescript@5.8.3)(valibot@1.1.0(typescript@5.8.3))(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)(yaml@2.7.1))(vue-router@4.5.1(vue@3.5.13(typescript@5.8.3)))(vue@3.5.13(typescript@5.8.3))(zod@3.24.4)
+      '@nuxtjs/color-mode':
+        specifier: ^3.5.1
+        version: 3.5.2(magicast@0.3.5)
       '@nuxtjs/i18n':
         specifier: ^9.5.4
         version: 9.5.4(@vue/compiler-dom@3.5.13)(eslint@9.26.0(jiti@2.4.2))(magicast@0.3.5)(rollup@4.40.2)(vue@3.5.13(typescript@5.8.3))
@@ -47,6 +53,9 @@ importers:
       '@polkadot/extension-dapp':
         specifier: ^0.58.9
         version: 0.58.10(@polkadot/api@15.10.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@polkadot/util-crypto@13.4.4(@polkadot/util@13.4.4))(@polkadot/util@13.4.4)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@polkadot/ui-shared':
+        specifier: ^3.13.1
+        version: 3.13.1(@polkadot/util-crypto@13.4.4(@polkadot/util@13.4.4))(@polkadot/util@13.4.4)
       '@polkadot/util-crypto':
         specifier: ^13.4.4
         version: 13.4.4(@polkadot/util@13.4.4)
@@ -65,12 +74,18 @@ importers:
       '@wagmi/vue':
         specifier: ^0.1.19
         version: 0.1.19(@tanstack/query-core@5.76.0)(@tanstack/vue-query@5.76.0(vue@3.5.13(typescript@5.8.3)))(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(nuxt@3.17.2(@parcel/watcher@2.5.1)(@types/node@22.15.17)(bufferutil@4.0.9)(db0@0.3.2)(eslint@9.26.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(lightningcss@1.29.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.40.2)(terser@5.39.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1))(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.24.4))(vue@3.5.13(typescript@5.8.3))(zod@3.24.4)
+      consola:
+        specifier: ^3.4.2
+        version: 3.4.2
       jdenticon:
         specifier: ^3.3.0
         version: 3.3.0
       nuxt:
         specifier: ^3.17.2
         version: 3.17.2(@parcel/watcher@2.5.1)(@types/node@22.15.17)(bufferutil@4.0.9)(db0@0.3.2)(eslint@9.26.0(jiti@2.4.2))(idb-keyval@6.2.2)(ioredis@5.6.1)(lightningcss@1.29.2)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.40.2)(terser@5.39.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)
+      ofetch:
+        specifier: 1.4.1
+        version: 1.4.1
       pinia:
         specifier: ^3.0.2
         version: 3.0.2(typescript@5.8.3)(vue@3.5.13(typescript@5.8.3))
@@ -751,6 +766,12 @@ packages:
 
   '@jsdevtools/ono@7.1.3':
     resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
+
+  '@kodadot1/hyperdata@0.0.2-rc.1':
+    resolution: {integrity: sha512-p0W9fqrciAowOQPd8nwXlGKv7Q18j8IL4RIdcH2nLEBTEOhIGKj8S4+EV8tahU/+ATDm71HdLIGY4pK7aiKdHA==}
+
+  '@kodadot1/minipfs@0.5.1-rc.1':
+    resolution: {integrity: sha512-DdBOA/j4IriInoVhNnjY5YPFDf03mx+ULpS7qH2DNoo23sE+1z5o5tlTioMqilBNdx+rRY7YOpdV0Q1NkbcCsg==}
 
   '@kodadot1/static@0.0.7':
     resolution: {integrity: sha512-pb7uaDXGJdwCkvf8pZ/6mUrg7TNpEkWdbiKc2bPcQoJOfq7FZHrAEF+30lQrHB+woOT76kodFEoLioLwDt8cqg==}
@@ -1545,6 +1566,13 @@ packages:
   '@polkadot/types@15.10.2':
     resolution: {integrity: sha512-/wDwKdDijxSXyNk5YezhVitdFxoQaTSSG9KXa7dEWujtmS/51UHmt9+P3W8b8D8kKaCvumahf/ww3GJI6s0Eqw==}
     engines: {node: '>=18'}
+
+  '@polkadot/ui-shared@3.13.1':
+    resolution: {integrity: sha512-4bEmO+TRVblF+dLtC2ghTenHxDMkTG1Ykwc/69y0VEF38gQ41FI72+LbRhUIAbKMRUuXeSTvYNkn1m6tByrRdg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@polkadot/util': '*'
+      '@polkadot/util-crypto': '*'
 
   '@polkadot/util-crypto@13.4.4':
     resolution: {integrity: sha512-xuXBNdK3Axlj1ItR6n1kH9zgaDNWri9pb/w1HDFx89bHvw6Bl79wA/oHtVGLbHZ1y/bunpsuapznyswhnsaVog==}
@@ -8079,6 +8107,15 @@ snapshots:
 
   '@jsdevtools/ono@7.1.3': {}
 
+  '@kodadot1/hyperdata@0.0.2-rc.1':
+    dependencies:
+      '@kodadot1/minipfs': 0.5.1-rc.1
+
+  '@kodadot1/minipfs@0.5.1-rc.1':
+    dependencies:
+      ofetch: 1.4.1
+      ufo: 1.6.1
+
   '@kodadot1/static@0.0.7': {}
 
   '@kwsites/file-exists@1.1.1':
@@ -9580,6 +9617,13 @@ snapshots:
       '@polkadot/util': 13.4.4
       '@polkadot/util-crypto': 13.4.4(@polkadot/util@13.4.4)
       rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@polkadot/ui-shared@3.13.1(@polkadot/util-crypto@13.4.4(@polkadot/util@13.4.4))(@polkadot/util@13.4.4)':
+    dependencies:
+      '@polkadot/util': 13.4.4
+      '@polkadot/util-crypto': 13.4.4(@polkadot/util@13.4.4)
+      colord: 2.9.3
       tslib: 2.8.1
 
   '@polkadot/util-crypto@13.4.4(@polkadot/util@13.4.4)':

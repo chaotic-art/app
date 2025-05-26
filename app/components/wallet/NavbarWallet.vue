@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SetWalletParams } from '@/stores/wallet'
 import type { ChainVM } from '@kodadot1/static'
+import { useWalletStore } from '@/stores/wallet'
 
 const walletStore = useWalletStore()
 const accountStore = useAccountStore()
