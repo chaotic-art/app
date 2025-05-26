@@ -29,7 +29,6 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxtjs/i18n',
-    '@nuxtjs/color-mode',
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
@@ -57,11 +56,6 @@ export default defineNuxtConfig({
     ],
     defaultLocale: 'en',
     restructureDir: './app/i18n',
-  },
-
-  ui: {
-    // todo: dark mode
-    colorMode: false,
   },
 
   eslint: {
