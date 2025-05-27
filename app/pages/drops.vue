@@ -79,5 +79,36 @@
         </div>
       </div>
     </div>
+
+    <USeparator class="my-20" />
+
+    <div class="flex justify-between items-center">
+      <p class="text-3xl font-bold font-serif italic">
+        Latest NFT Mints
+      </p>
+
+      <div class="flex gap-4">
+        <UButton class="rounded-full px-4 py-2" label="Newest" variant="outline" />
+        <UButton class="rounded-full px-4 py-2" label="Buy Now" variant="outline" />
+      </div>
+    </div>
+
+    <!-- items -->
+    <div class="grid grid-cols-5 gap-6 mt-10">
+      <div v-for="i in 10" :key="i" class="border rounded-xl border-gray-300 overflow-hidden">
+        <img src="https://image.w.kodadot.xyz/type/endpoint/https://dyndata.koda.art/v1/image/ahp/461/260002839" alt="NFT" class="aspect-square">
+
+        <div class="p-4">
+          <p class="font-bold mb-2">
+            Neurotica #99
+          </p>
+
+          <div class="flex items-center justify-between">
+            <p>20 DOT</p>
+            <UBadge label="1 minute" variant="soft" class="bg-gray-100 rounded-full" />
+          </div>
+        </div>
+      </div>
+    </div>
   </UContainer>
 </template>
