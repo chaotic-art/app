@@ -117,7 +117,7 @@ onMounted(async () => {
 
     <!-- items -->
     <div class="grid grid-cols-5 gap-6 mt-10">
-      <TokenCard v-for="id in items" :key="id" :token-id="id" :collection-id="Number(drop?.collection ?? 0)" :chain="chainPrefix" />
+      <LazyTokenCard v-for="id in items" :key="id" :token-id="id" :collection-id="Number(drop?.collection ?? 0)" :chain="chainPrefix" />
     </div>
   </UContainer>
 </template>
