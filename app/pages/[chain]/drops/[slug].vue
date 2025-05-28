@@ -1,3 +1,28 @@
+<script setup lang="ts">
+import type { Prefix } from '@kodadot1/static'
+import { getDropById } from '~/services/fxart'
+import { fetchOdaCollection } from '~/services/oda'
+
+const { slug, chain } = useRoute().params
+const { $api } = useNuxtApp()
+const chainPrefix = computed(() => chain?.toString() as Prefix)
+
+const { data: drop } = await useAsyncData(`drop:${slug}`, () => getDropById(slug?.toString() ?? ''))
+
+const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
+const items = ref<number[]>([])
+
+onMounted(async () => {
+  collection.value = await fetchOdaCollection(chainPrefix.value, drop.value?.collection ?? '')
+
+  if (drop.value?.collection) {
+    const api = $api(chainPrefix.value)
+    const apiResult = await api.query.Nfts.Item.getEntries(Number(drop.value.collection))
+    items.value = apiResult.map(item => item.keyArgs[1]).sort((a, b) => b - a)
+  }
+})
+</script>
+
 <template>
   <UContainer class="max-w-7xl">
     <div class="grid grid-cols-2 gap-16">
@@ -13,7 +38,7 @@
           </UBadge>
         </div>
         <h1 class="text-6xl font-bold font-serif italic">
-          Neurotica
+          {{ collection?.metadata.name ?? '---' }}
         </h1>
 
         <!-- creator section -->
@@ -31,10 +56,7 @@
 
         <!-- description section -->
         <div>
-          <p class="mb-2">
-            some subheading text about the drop, something interesting, maybe about the process of making the drop,
-          </p>
-          <p>some subheading text about the drop, something interesting, maybe about the process of making the drop,</p>
+          {{ collection?.metadata.description ?? '---' }}
         </div>
       </div>
 
@@ -42,7 +64,7 @@
       <div>
         <!-- preview section -->
         <div class="border p-4 rounded-2xl border-gray-100">
-          <iframe class="aspect-square w-full" src="https://image.w.kodadot.xyz/ipfs/bafybeibxtwbumkxx45ldbfwsjtwrqd32c52lrmnlmjtwvy55ljuokc5zwm/?hash=0x6ad4114aab0fcbb53b532bb0e48d73291d435ee6a43a7ea5689ec7570108360b" frameborder="0" />
+          <iframe class="aspect-square w-full" :src="sanitizeIpfsUrl(collection?.metadata.generative_uri)" frameborder="0" />
           <div class="flex gap-2 mt-4 justify-center">
             <UButton class="rounded-full bg-gray-100" variant="soft" trailing-icon="i-lucide-refresh-cw">
               Preview Variation
@@ -95,20 +117,7 @@
 
     <!-- items -->
     <div class="grid grid-cols-5 gap-6 mt-10">
-      <div v-for="i in 10" :key="i" class="border rounded-xl border-gray-300 overflow-hidden">
-        <img src="https://image.w.kodadot.xyz/type/endpoint/https://dyndata.koda.art/v1/image/ahp/461/260002839" alt="NFT" class="aspect-square">
-
-        <div class="p-4">
-          <p class="font-bold mb-2">
-            Neurotica #99
-          </p>
-
-          <div class="flex items-center justify-between">
-            <p>20 DOT</p>
-            <UBadge label="1 minute" variant="soft" class="bg-gray-100 rounded-full" />
-          </div>
-        </div>
-      </div>
+      <TokenCard v-for="id in items" :key="id" :token-id="id" :collection-id="Number(drop?.collection ?? 0)" :chain="chainPrefix" />
     </div>
   </UContainer>
 </template>
