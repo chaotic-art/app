@@ -1,5 +1,5 @@
 import type { Prefix } from '@kodadot1/static'
-import type { TypedApi } from 'polkadot-api'
+import type { PolkadotClient, TypedApi } from 'polkadot-api'
 import { ahk, ahp, dot, ksm } from '@polkadot-api/descriptors'
 import { createClient } from 'polkadot-api'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
@@ -53,10 +53,27 @@ function api(chain: Prefix = 'ahp'): AhpApi | AhkApi | DotApi | KsmApi {
     return client.getTypedApi(config.ahp.descriptor)
   }
 
+  // store client in the state
+  const client = useState<Record<Prefix, PolkadotClient | undefined>>('api-client', () => ({
+    ahp: undefined,
+    ahk: undefined,
+    dot: undefined,
+    ksm: undefined,
+    imx: undefined,
+    mnt: undefined,
+    base: undefined,
+  }))
+
+  // create client if it doesn't exist
+  if (!client.value[chain]) {
+    client.value[chain] = createClient(
+      withPolkadotSdkCompat(getWsProvider(config[chain].providers)),
+    )
+  }
+
   // Return the proper descriptor for the supported chain
   const chainConfig = config[chain as keyof typeof config]
-  const client = createClient(withPolkadotSdkCompat(getWsProvider(chainConfig.providers)))
-  return client.getTypedApi(chainConfig.descriptor)
+  return client.value[chain]?.getTypedApi(chainConfig.descriptor)
 }
 
 export default defineNuxtPlugin(() => {
