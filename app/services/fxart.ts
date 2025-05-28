@@ -51,9 +51,7 @@ export async function getDrops(query?: GetDropsQuery) {
 }
 
 export function getDropById(id: string) {
-  return api<DropItem>(`/drops/${id}`, {
-    method: 'GET',
-  })
+  return api<DropItem>(`/drops/${id}`)
 }
 
 export async function getDropMintedStatus(alias: string, accountId: string) {
