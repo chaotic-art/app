@@ -14,7 +14,7 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
     },
     {
       label: 'Drops',
-      to: '/drops',
+      to: '/ahp/drops',
     },
     {
       label: 'Create',
