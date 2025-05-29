@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { VmWalletState } from '@/stores/wallet'
 import type { ChainVM } from '@kodadot1/static'
+import { shortenAddress } from '@/utils/format'
 
 const props = defineProps<{
   walletType: ChainVM
@@ -9,12 +10,6 @@ const props = defineProps<{
 
 const { $jdenticon } = useNuxtApp()
 const avatarSvg = ref('')
-
-function shortenAddress(address: string): string {
-  if (!address)
-    return ''
-  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
-}
 
 function generateAvatar(address: string): string {
   if (import.meta.client && $jdenticon) {

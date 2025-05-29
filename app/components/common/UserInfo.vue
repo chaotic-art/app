@@ -1,5 +1,7 @@
 <script setup lang="ts">
-withDefaults(
+import { shortenAddress } from '@/utils/format'
+
+const props = withDefaults(
   defineProps<{
     address?: string
     avatarSize?: number
@@ -14,7 +16,11 @@ withDefaults(
   },
 )
 
-const name = ref('Artist Name')
+const { profile: profileFromAddress } = useFetchProfile(
+  computed(() => props.address),
+)
+
+const name = computed(() => profileFromAddress.value?.name || shortenAddress(props.address))
 </script>
 
 <template>

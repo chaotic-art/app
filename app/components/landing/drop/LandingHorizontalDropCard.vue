@@ -31,7 +31,7 @@ defineProps<{
 
         <div class="flex flex-col items-start md:items-end gap-6 mt-4 md:mt-0">
           <div class="text-xs  mb-1 flex items-center gap-3">
-            <span class="font-medium">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>  <span class="font-bold text-gray-500">·</span>  <span class="font-medium">{{ drop?.price }} USD</span>
+            <span class="font-medium">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>  <span class="font-bold text-gray-500">·</span>  <span class="font-medium">5 USD</span>
           </div>
           <button class="bg-black text-white rounded-full px-4 py-[10px] text-sm hover:bg-gray-900 transition">
             {{ $t('drop.mint') }}
