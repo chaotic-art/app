@@ -44,14 +44,13 @@ onMounted(async () => {
         <!-- creator section -->
         <div class="flex justify-between items-center my-10">
           <div class="p-1 bg-gray-100 inline-block rounded-full">
-            <UserInfo :avatar-size="40" address="16dBfC3PW1KsDwXTEQzN66EPccPRMEwPJPoAvTyCYx3ubZkL" />
+            <UserInfo :avatar-size="40" :address="drop?.creator" />
           </div>
 
-          <UButton
-            class="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-900 font-medium hover:bg-gray-100"
-          >
-            + Follow
-          </UButton>
+          <FollowButton
+            v-if="drop?.creator"
+            :target="drop.creator" class="px-4 py-2"
+          />
         </div>
 
         <!-- description section -->

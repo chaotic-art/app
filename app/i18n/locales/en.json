@@ -34,7 +34,10 @@
   },
   "artist": {
     "curated": "Curated",
-    "all": "Artists",
+    "all": "Artists"
+  },
+  "profile": {
     "follow": "Follow"
+
   }
 }

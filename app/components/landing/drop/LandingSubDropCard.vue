@@ -27,9 +27,9 @@ const chainIcon = computed(() => getChainIcon(props.drop.chain))
         </div>
         <div class="flex justify-between flex-wrap items-center gap-1 mb-1">
           <UserInfo :address="drop.creator" :avatar-size="30" class="h-[40px]" />
-          <button class="h-[40px] px-4 py-2 border border-gray-300 rounded-full hover:bg-gray-100">
-            + Follow
-          </button>
+          <FollowButton
+            :target="drop.creator!" class="h-[40px] px-4 py-2"
+          />
         </div>
         <div class="text-gray-500 max-w-[300px] line-clamp-3">
           {{ drop.collectionDescription }}

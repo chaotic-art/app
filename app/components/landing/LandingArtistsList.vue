@@ -37,12 +37,7 @@ const randomSixArtist = computed(() => artists.value?.slice().sort(() => Math.ra
               </span>
             </template>
           </UserInfo>
-
-          <UButton
-            class="ml-4 px-6 py-2 rounded-full border border-gray-300 bg-white text-gray-900 font-medium hover:bg-gray-100"
-          >
-            + {{ $t('artist.follow') }}
-          </UButton>
+          <FollowButton :target="artist!" />
         </div>
       </div>
     </UContainer>
