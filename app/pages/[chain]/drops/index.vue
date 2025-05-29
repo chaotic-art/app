@@ -26,8 +26,8 @@ const { data: drops } = await useAsyncData('drops', () => getDrops({
             {{ drop.name }}
           </p>
 
-          <p class="text-sm text-gray-500 bg-gray-100 rounded-full p-0.5">
-            <UserInfo :avatar-size="16" :address="drop.creator" />
+          <p class="text-sm text-gray-500 rounded-full p-0.5">
+            <UserInfo :avatar-size="16" :address="drop.creator" :transparent-background="true" />
           </p>
         </div>
       </NuxtLink>
