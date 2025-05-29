@@ -6,13 +6,13 @@ const props = withDefaults(
     address?: string
     avatarSize?: number
     noBackground?: boolean
-    textCustomClass?: string
+    customName?: boolean
   }>(),
   {
     address: '',
     avatarSize: 40,
+    customName: false,
     noBackground: false,
-    textCustomClass: '',
   },
 )
 
@@ -26,8 +26,7 @@ const name = computed(() => profileFromAddress.value?.name || shortenAddress(pro
 <template>
   <div class="flex items-center gap-2 mb-2 md:mb-0 rounded-full p-[6px] w-fit" :class="{ 'bg-transparent': noBackground }">
     <ProfileAvatar :address="address" :size="avatarSize" />
-    <div>
-      {{ name }}
-    </div>
+    <slot name="name" :address-name="name" />
+    <span v-if="!customName">{{ name }}</span>
   </div>
 </template>
