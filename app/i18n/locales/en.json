@@ -31,5 +31,10 @@
   "footer": {
     "becomeArtist": "Become artist on Polkadot",
     "getInTouch": "Get In Touch"
+  },
+  "artist": {
+    "curated": "Curated",
+    "all": "Artists",
+    "follow": "Follow"
   }
 }
