@@ -30,7 +30,7 @@ const randomSixArtist = computed(() => artists.value?.slice().sort(() => Math.ra
           :key="artist"
           class="flex items-center justify-between bg-white rounded-xl px-6 py-4 border border-[#EBEBEB]"
         >
-          <UserInfo :address="artist" :avatar-size="72" :custom-name="true">
+          <UserInfo :address="artist" :avatar-size="72" :custom-name="true" :transparent-background="true">
             <template #name="{ addressName }">
               <span class="text-[32px] font-serif italic font-medium ml-4">
                 {{ addressName }}
