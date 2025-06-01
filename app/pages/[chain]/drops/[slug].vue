@@ -54,9 +54,7 @@ onMounted(async () => {
         </div>
 
         <!-- description section -->
-        <div>
-          {{ collection?.metadata.description ?? '---' }}
-        </div>
+        <MarkdownPreview :source="collection?.metadata.description ?? '---'" />
       </div>
 
       <!-- right side -->
