@@ -9,6 +9,8 @@ const props = defineProps<{
 const { getChainIcon } = useIcon()
 
 const chainIcon = computed(() => getChainIcon(props.drop.chain))
+const { decimals, chainSymbol } = useChain()
+const { usd: usdPrice } = useAmount(computed(() => props.drop.price), decimals, chainSymbol)
 </script>
 
 <template>
@@ -41,7 +43,7 @@ const chainIcon = computed(() => getChainIcon(props.drop.chain))
           <div class="flex items-center gap-2">
             <span>{{ drop.minted }}/{{ drop.max }} {{ $t('drop.minted') }}</span>
             <span class="font-bold text-gray-400">·</span>
-            <span>5 USD</span>
+            <span>{{ usdPrice }} USD</span>
           </div>
 
           <div class="flex items-center gap-2">
