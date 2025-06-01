@@ -23,8 +23,8 @@ defineProps<{
           </div>
           <div class="flex flex-col md:flex-row md:items-center gap-4 w-full md:w-auto">
             <UserInfo :avatar-size="40" :address="drop?.creator" />
-            <div class="text-xs text-gray-500 max-w-[350px] line-clamp-2">
-              {{ drop?.collectionDescription }}
+            <div class="text-xs text-gray-500 max-w-[350px] line-clamp-3">
+              <MarkdownPreview :source="drop?.collectionDescription || ''" />
             </div>
           </div>
         </div>

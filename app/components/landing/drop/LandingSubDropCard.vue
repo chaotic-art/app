@@ -31,8 +31,8 @@ const chainIcon = computed(() => getChainIcon(props.drop.chain))
             :target="drop.creator!" class="h-[40px] px-4 py-2"
           />
         </div>
-        <div class="text-gray-500 max-w-[300px] line-clamp-3">
-          {{ drop.collectionDescription }}
+        <div class="text-gray-500 max-w-[300px] line-clamp-4">
+          <MarkdownPreview :source="drop.collectionDescription || ''" />
         </div>
       </div>
 
