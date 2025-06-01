@@ -1,10 +1,31 @@
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { base } from '@reown/appkit/networks'
+import { defineChain } from '@reown/appkit/networks'
 import { WagmiPlugin } from '@wagmi/vue'
 
-const networks = [base]
+const westendAssetHub = defineChain({
+  id: 420420421,
+  caipNetworkId: 'eip155:420420421',
+  chainNamespace: 'eip155',
+  name: 'Westend Asset Hub',
+  nativeCurrency: {
+    decimals: 12,
+    name: 'Westend',
+    symbol: 'WND',
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://westend-asset-hub-eth-rpc.polkadot.io'],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'Subscan', url: 'https://assethub-westend.subscan.io/' },
+  },
+  contracts: { },
+})
 
-const defaultNetwork = base
+const networks = [westendAssetHub]
+
+const defaultNetwork = westendAssetHub
 
 const metadata = {
   name: 'Chaotic',
