@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { shortenAddress } from '@/utils/format'
+import { shortenAddress } from '@/utils/format/address'
 
 const props = withDefaults(
   defineProps<{

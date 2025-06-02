@@ -9,6 +9,8 @@ const props = defineProps<{
 const { getChainIcon } = useIcon()
 
 const chainIcon = computed(() => getChainIcon(props.drop.chain))
+const { decimals, chainSymbol } = useChain()
+const { usd: usdPrice } = useAmount(computed(() => props.drop.price), decimals, chainSymbol)
 </script>
 
 <template>
@@ -31,8 +33,8 @@ const chainIcon = computed(() => getChainIcon(props.drop.chain))
             :target="drop.creator!" class="h-[40px] px-4 py-2"
           />
         </div>
-        <div class="text-gray-500 max-w-[300px] line-clamp-3">
-          {{ drop.collectionDescription }}
+        <div class="text-gray-500 max-w-[300px] line-clamp-4">
+          <MarkdownPreview :source="drop.collectionDescription || ''" />
         </div>
       </div>
 
@@ -41,7 +43,7 @@ const chainIcon = computed(() => getChainIcon(props.drop.chain))
           <div class="flex items-center gap-2">
             <span>{{ drop.minted }}/{{ drop.max }} {{ $t('drop.minted') }}</span>
             <span class="font-bold text-gray-400">·</span>
-            <span>5 USD</span>
+            <span>{{ usdPrice }} USD</span>
           </div>
 
           <div class="flex items-center gap-2">
