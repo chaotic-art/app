@@ -7,7 +7,7 @@ const chainToPrefix: Partial<Record<Chain, Prefix>> = {
   [Chains.Kusama]: 'ksm',
   [Chains.AssetHubKusama]: 'ahk',
   [Chains.AssetHubPolkadot]: 'ahp',
-  [Chains.Base]: 'base',
+  [Chains.AssetHubWestend]: 'ahw',
 }
 
 const prefixToChain: Partial<Record<Prefix, Chain>> = {
@@ -15,7 +15,7 @@ const prefixToChain: Partial<Record<Prefix, Chain>> = {
   ksm: Chains.Kusama,
   ahk: Chains.AssetHubKusama,
   ahp: Chains.AssetHubPolkadot,
-  base: Chains.Base,
+  ahw: Chains.AssetHubWestend,
 }
 
 export const getPrefixOfChain = (chain: Chain): Prefix => chainToPrefix[chain] as Prefix

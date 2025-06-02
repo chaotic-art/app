@@ -3,7 +3,7 @@ export const Chains = {
   AssetHubKusama: 'AssetHubKusama',
   AssetHubPolkadot: 'AssetHubPolkadot',
   Polkadot: 'Polkadot',
-  Base: 'Base',
+  AssetHubWestend: 'AssetHubWestend',
 } as const
 
 export type Chain = typeof Chains[keyof typeof Chains]

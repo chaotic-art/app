@@ -1,52 +1,7 @@
 import type { Chain } from '@/types/chain'
 import type { ChainVM, Prefix } from '@kodadot1/static'
-import { Chains } from '@/types/chain'
-
-export type SubTokenKey = 'DOT' | 'KSM'
-export type EvmTokenKey = 'ETH'
-export type TokenKey = SubTokenKey | EvmTokenKey
-
-export interface TokenDetail {
-  balance: string
-}
-
-export interface ChainData {
-  address: string
-  assets: Partial<Record<TokenKey, TokenDetail>>
-}
-
-export interface AccountVm {
-  address: string
-  chains: Partial<Record<Chain, ChainData>>
-}
-
-interface SupportedAsset {
-  chain: Chain
-  token: TokenKey
-}
-
-const supportedAssets = ([
-  { chain: Chains.Kusama, token: 'KSM' },
-  { chain: Chains.AssetHubKusama, token: 'KSM' },
-  { chain: Chains.Polkadot, token: 'DOT' },
-  { chain: Chains.AssetHubPolkadot, token: 'DOT' },
-  { chain: Chains.Base, token: 'ETH' },
-] as SupportedAsset[])
-  .map(asset => ({
-    ...asset,
-    prefix: getPrefixOfChain(asset.chain),
-  }))
-
-function getDefaultAccount(): AccountVm {
-  return {
-    address: '',
-    chains: {},
-  }
-}
-
-function getVMSupportedAssets(vm: ChainVM) {
-  return supportedAssets.filter(({ prefix }) => vmOf(prefix) === vm)
-}
+import type { AccountVm, ChainData, TokenDetail, TokenKey } from './types'
+import { getDefaultAccount, getVMSupportedAssets, vmChains } from './utils'
 
 export const useAccountStore = defineStore('account', () => {
   const { vm, prefix } = useChain()
@@ -59,6 +14,11 @@ export const useAccountStore = defineStore('account', () => {
 
   const getVmAccount = (vm: ChainVM) => {
     return accounts.value[vm].chains[getChainOfPrefix(prefix.value)]
+  }
+
+  const getChainAddress = ({ chain, address }: { chain: Chain, address: string }) => {
+    const prefix = getPrefixOfChain(chain)
+    return vmOf(prefix) === 'SUB' ? formatAddress({ address, prefix }) : address
   }
 
   const address = computed(() => getVmAccount(vm.value)?.address)
@@ -102,9 +62,9 @@ export const useAccountStore = defineStore('account', () => {
 
   const updateAccountChainsBalances = ({ vm, balances }: { vm: ChainVM, balances: GetBalancesResult }) => {
     accounts.value[vm].chains = Object.fromEntries(
-      Object.entries(accounts.value[vm].chains).map(([chain, { address }]) => [
+      vmChains[vm].map(chain => [
         chain,
-        getUpdatedChainData({ vm, chain: chain as Chain, address, balances }),
+        getUpdatedChainData({ vm, chain, address: accounts.value[vm].address, balances }),
       ]),
     )
   }
@@ -116,9 +76,9 @@ export const useAccountStore = defineStore('account', () => {
 
     try {
       await Promise.all(Object.entries(accounts.value).map(async ([vm, account]) => {
-        const accounts = Object.entries(account.chains).map(([chain, { address }]) => ({
-          prefix: getPrefixOfChain(chain as Chain),
-          address,
+        const accounts = getVMSupportedAssets(vm as ChainVM).map(asset => ({
+          prefix: asset.prefix,
+          address: getChainAddress({ chain: asset.chain, address: account.address }),
         }))
 
         const balances = await getBalances(accounts)
@@ -138,9 +98,9 @@ export const useAccountStore = defineStore('account', () => {
     accounts.value[vm] = {
       address,
       chains: Object.fromEntries(
-        getVMSupportedAssets(vm)
-          .map(({ chain, prefix }) => [chain, {
-            address: vm === 'SUB' ? formatAddress({ address, prefix }) : address,
+        vmChains[vm]
+          .map(chain => [chain, {
+            address: getChainAddress({ chain, address }),
             assets: {},
           }]),
       ),
@@ -149,7 +109,6 @@ export const useAccountStore = defineStore('account', () => {
 
   return {
     accounts,
-    supportedAssets,
     fetchBalance,
     loading,
     address,
