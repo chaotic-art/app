@@ -25,6 +25,10 @@ function onSelectAccount({ vm, account }: SetWalletParams) {
   accountStore.setAuth({ vm, address: account.address })
   isWalletModalOpen.value = false
 }
+
+function onDisconnectAccount(vm: ChainVM) {
+  accountStore.clearAuth(vm)
+}
 </script>
 
 <template>
@@ -46,6 +50,7 @@ function onSelectAccount({ vm, account }: SetWalletParams) {
         <WalletModalContent
           :initial-wallet-type="selectedWalletType"
           @select="onSelectAccount"
+          @disconnect="onDisconnectAccount"
         />
       </template>
     </UModal>

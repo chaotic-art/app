@@ -1,10 +1,10 @@
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { base } from '@reown/appkit/networks'
 import { WagmiPlugin } from '@wagmi/vue'
+import { westendAssetHub } from '@wagmi/vue/chains'
 
-const networks = [base]
+const networks = [westendAssetHub]
 
-const defaultNetwork = base
+const defaultNetwork = westendAssetHub
 
 const metadata = {
   name: 'Chaotic',

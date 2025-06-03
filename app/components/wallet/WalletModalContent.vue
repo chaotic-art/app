@@ -6,12 +6,16 @@ const props = defineProps<{
   initialWalletType?: ChainVM
 }>()
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['select', 'disconnect'])
 
 const activeWalletType = ref(props.initialWalletType || 'EVM')
 
 function onSelectAccount({ vm, account }: SetWalletParams) {
   emit('select', { vm, account })
+}
+
+function onDisconnectAccount(vm: ChainVM) {
+  emit('disconnect', vm)
 }
 </script>
 
@@ -27,10 +31,10 @@ function onSelectAccount({ vm, account }: SetWalletParams) {
 
     <div class="p-4">
       <div v-if="activeWalletType === 'EVM'">
-        <WalletEvm @select="account => onSelectAccount({ vm: 'EVM', account })" />
+        <WalletEvm @select="account => onSelectAccount({ vm: 'EVM', account })" @disconnect="onDisconnectAccount('EVM')" />
       </div>
       <div v-else-if="activeWalletType === 'SUB'">
-        <WalletSubstrate @select="account => onSelectAccount({ vm: 'SUB', account })" />
+        <WalletSubstrate @select="account => onSelectAccount({ vm: 'SUB', account })" @disconnect="onDisconnectAccount('SUB')" />
       </div>
     </div>
   </UCard>

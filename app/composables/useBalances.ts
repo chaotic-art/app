@@ -10,6 +10,7 @@ interface GetBalanceParams {
 interface GetBalanceResult {
   address: string
   balance: bigint
+  symbol: string
 }
 
 export type GetBalancesResult = (GetBalanceResult & { prefix: Prefix })[]
@@ -22,17 +23,17 @@ export default function () {
 
     const balance = await $api(prefix).query.System.Account.getValue(formattedAddress)
 
-    return { address: formattedAddress, balance: balance.data.free }
+    return { address: formattedAddress, balance: balance.data.free, symbol: tokenSymbolOf(prefix) }
   }
 
   const getEvmBalance = async ({ address, prefix }: GetBalanceParams): Promise<GetBalanceResult> => {
-    const { value: balance } = await accountBalance(useNuxtApp().$wagmi.adapter.wagmiConfig, {
+    const { value: balance, symbol } = await accountBalance(useNuxtApp().$wagmi.adapter.wagmiConfig, {
       address: address as Address,
       blockTag: 'latest',
       chainId: VIEM_PREFIX_TO_CHAIN[prefix]?.id,
     })
 
-    return { address, balance }
+    return { address, balance, symbol }
   }
 
   const getBalance = async ({ address, prefix }: GetBalanceParams): Promise<GetBalanceResult> => {
@@ -44,12 +45,13 @@ export default function () {
 
   const getBalances = async (accounts: GetBalanceParams[]): Promise<GetBalancesResult> => {
     const balances = await Promise.all(accounts.map(async ({ address: genericAddress, prefix }) => {
-      const { address, balance } = await getBalance({ address: genericAddress, prefix })
+      const { address, balance, symbol } = await getBalance({ address: genericAddress, prefix })
 
       return {
         balance,
         address,
         prefix,
+        symbol,
       }
     }))
 
