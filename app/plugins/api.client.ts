@@ -36,11 +36,11 @@ function api(chain: 'ahp'): AhpApi
 function api(chain: 'ahk'): AhkApi
 function api(chain: 'dot'): DotApi
 function api(chain: 'ksm'): KsmApi
-function api(chain: 'imx' | 'mnt' | 'base' | 'ahw'): AhpApi // These fallback to ahp
+function api(chain: 'base' | 'ahw'): AhpApi // These fallback to ahp
 function api(chain?: Prefix): AhpApi // Default case
-function api(chain: Prefix = 'ahp'): AhpApi | AhkApi | DotApi | KsmApi {
+function api(chain: Prefix | 'base' | 'ahw' = 'ahp'): AhpApi | AhkApi | DotApi | KsmApi {
   // Handle explicitly unsupported chains
-  if (chain === 'imx' || chain === 'mnt' || chain === 'base' || chain === 'ahw') {
+  if (chain === 'base' || chain === 'ahw') {
     console.warn(`Unsupported chain: ${chain}. Using ahp as fallback.`)
     const client = createClient(withPolkadotSdkCompat(getWsProvider(config.ahp.providers)))
     return client.getTypedApi(config.ahp.descriptor)
@@ -59,8 +59,6 @@ function api(chain: Prefix = 'ahp'): AhpApi | AhkApi | DotApi | KsmApi {
     ahk: undefined,
     dot: undefined,
     ksm: undefined,
-    imx: undefined,
-    mnt: undefined,
     base: undefined,
     ahw: undefined,
   }))
