@@ -6,6 +6,7 @@ import { useSubWalletStore } from '~/stores/subWallet'
 
 const emit = defineEmits<{
   select: [account: WalletAccount]
+  disconnect: []
 }>()
 
 const subWalletStore = useSubWalletStore()
@@ -60,6 +61,7 @@ function disconnectWallet() {
   walletStore.setDisconnecting('SUB', true)
   subWalletStore.disconnectWallet(selectedWallet.value)
   walletStore.disconnect('SUB')
+  emit('disconnect')
   resetWalletSelection()
 }
 </script>

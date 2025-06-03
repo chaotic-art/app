@@ -18,8 +18,8 @@ importers:
         specifier: 0.0.2-rc.1
         version: 0.0.2-rc.1
       '@kodadot1/static':
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: 0.0.8-rc.0
+        version: 0.0.8-rc.0
       '@nuxt/fonts':
         specifier: 0.11.3
         version: 0.11.3(db0@0.3.2)(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.29.2)(terser@5.39.0)(yaml@2.7.1))
@@ -791,8 +791,8 @@ packages:
   '@kodadot1/minipfs@0.5.1-rc.1':
     resolution: {integrity: sha512-DdBOA/j4IriInoVhNnjY5YPFDf03mx+ULpS7qH2DNoo23sE+1z5o5tlTioMqilBNdx+rRY7YOpdV0Q1NkbcCsg==}
 
-  '@kodadot1/static@0.0.7':
-    resolution: {integrity: sha512-pb7uaDXGJdwCkvf8pZ/6mUrg7TNpEkWdbiKc2bPcQoJOfq7FZHrAEF+30lQrHB+woOT76kodFEoLioLwDt8cqg==}
+  '@kodadot1/static@0.0.8-rc.0':
+    resolution: {integrity: sha512-u9VmNj3/hqq85B5G6vPhudkjd1j7ZTbjRjFUFKmN4DFOaDwiN2/nUw4N3nIEbDX2WCeIwtBwH9KLdi1n1EcZ6g==}
 
   '@kwsites/file-exists@1.1.1':
     resolution: {integrity: sha512-m9/5YGR18lIwxSFDwfE3oA7bWuq9kdau6ugN4H2rJeyhFQZcG9AgSHkQtSD15a8WvTgfz9aikZMrKPHvbpqFiw==}
@@ -8482,7 +8482,7 @@ snapshots:
       ofetch: 1.4.1
       ufo: 1.6.1
 
-  '@kodadot1/static@0.0.7': {}
+  '@kodadot1/static@0.0.8-rc.0': {}
 
   '@kwsites/file-exists@1.1.1':
     dependencies:

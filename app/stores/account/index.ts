@@ -107,12 +107,17 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
+  const clearAuth = async (vm: ChainVM) => {
+    accounts.value[vm] = getDefaultAccount()
+  }
+
   return {
     accounts,
+    setAuth,
+    clearAuth,
     fetchBalance,
     loading,
     address,
-    setAuth,
     balances,
     balance,
   }
