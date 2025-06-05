@@ -31,13 +31,13 @@ const profileImageUrl = computed(
       padding: `${Math.round(size / 16)}px`,
     }"
   >
-    <NuxtImg
+    <img
       :src="profileImageUrl"
       :sizes="`${size}px`"
       title="User Avatar"
       class="object-cover overflow-hidden rounded-full h-full w-full shadow-none!"
       inner-class="object-cover"
-    />
+    >
   </div>
   <NativeAvatar
     v-else

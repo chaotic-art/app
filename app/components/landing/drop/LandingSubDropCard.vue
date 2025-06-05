@@ -16,11 +16,11 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop.price), decimals, 
 <template>
   <div :key="drop.id" class="flex flex-1 rounded-xl h-[440px] overflow-hidden border border-[#EBEBEB] bg-white">
     <div class="h-full aspect-square bg-gray-200 relative rounded-xl overflow-hidden border border-[#EBEBEB]">
-      <NuxtImg
+      <img
         :src="sanitizeIpfsUrl(drop.banner)"
         :alt="drop?.name"
         class="w-full h-full aspect-square object-cover"
-      />
+      >
     </div>
     <div class="p-6 flex flex-col justify-between">
       <div class="flex flex-col gap-4">
@@ -47,7 +47,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop.price), decimals, 
           </div>
 
           <div class="flex items-center gap-2">
-            <NuxtImg v-if="chainIcon" :src="chainIcon" class="w-4 h-4" />
+            <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4">
             <div class="capitalize">
               {{ drop.chain }}
             </div>
