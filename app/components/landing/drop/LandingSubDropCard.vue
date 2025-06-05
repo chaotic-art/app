@@ -14,39 +14,39 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop.price), decimals, 
 </script>
 
 <template>
-  <div :key="drop.id" class="flex flex-1 rounded-xl h-[440px] overflow-hidden border border-[#EBEBEB] bg-white">
-    <div class="h-full aspect-square bg-gray-200 relative rounded-xl overflow-hidden border border-[#EBEBEB]">
+  <div :key="drop.id" class="grid grid-cols-1 md:grid-cols-2 rounded-xl h-auto md:h-[440px] overflow-hidden border border-[#EBEBEB] bg-white">
+    <div class="h-full bg-gray-200 relative rounded-xl overflow-hidden border border-[#EBEBEB]">
       <img
         :src="sanitizeIpfsUrl(drop.banner)"
         :alt="drop?.name"
-        class="w-full h-full aspect-square object-cover"
+        class="w-full h-full object-cover"
       >
     </div>
-    <div class="p-6 flex flex-col justify-between">
-      <div class="flex flex-col gap-4">
-        <div class="font-serif italic font-medium text-[40px]">
+    <div class="p-4 md:p-6 flex flex-col justify-between flex-1">
+      <div class="flex flex-col gap-3 md:gap-4">
+        <div class="font-serif italic font-medium text-xl md:text-[40px] text-center md:text-left">
           {{ drop.name }}
         </div>
-        <div class="flex justify-between flex-wrap items-center gap-1 mb-1">
+        <div class="flex flex-row justify-between flex-wrap items-center gap-2 md:gap-1 mb-1">
           <UserInfo :address="drop.creator" :avatar-size="30" class="h-[40px]" />
           <FollowButton
-            :target="drop.creator!" class="h-[40px] px-4 py-2"
+            :target="drop.creator!" class="h-[40px] px-4 py-2 text-sm"
           />
         </div>
-        <div class="text-gray-500 max-w-[300px] line-clamp-4">
+        <div class="text-gray-500 max-w-full md:max-w-[300px] line-clamp-3 md:line-clamp-4 text-sm">
           <MarkdownPreview :source="drop.collectionDescription || ''" />
         </div>
       </div>
 
-      <div class="flex flex-col gap-6 mt-2">
-        <div class="flex justify-between items-center">
-          <div class="flex items-center gap-2">
+      <div class="flex flex-col gap-4 md:gap-6 mt-4 md:mt-2">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-0">
+          <div class="flex items-center gap-2 justify-center md:justify-start text-sm">
             <span>{{ drop.minted }}/{{ drop.max }} {{ $t('drop.minted') }}</span>
             <span class="font-bold text-gray-400">·</span>
             <span>{{ usdPrice }} USD</span>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 justify-center md:justify-end text-sm">
             <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4">
             <div class="capitalize">
               {{ drop.chain }}
@@ -54,11 +54,11 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop.price), decimals, 
           </div>
         </div>
 
-        <div class="flex items-center gap-1 justify-between">
-          <div class="text-gray-400">
+        <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-1 md:justify-between">
+          <div class="text-gray-400 text-center md:text-left text-sm">
             Ends in 30m
           </div>
-          <UButton variants="primary" class="rounded-full px-5 py-2 hover:bg-gray-900">
+          <UButton variants="primary" class="rounded-full px-5 py-2 hover:bg-gray-900 w-full md:w-auto">
             {{ $t('drop.mint') }}
           </UButton>
         </div>

@@ -43,24 +43,26 @@ const footerLinks: Array<
 </script>
 
 <template>
-  <UContainer class="mb-16 mt-8">
+  <UContainer class="mb-8 md:mb-16 mt-6 md:mt-8">
     <footer class="bg-[#FAFAFA] rounded-[30px] overflow-hidden">
-      <UContainer class="px-[60px] py-[40px]">
+      <UContainer class="px-6 md:px-[60px] py-6 md:py-[40px]">
         <!-- Main Footer Content -->
-        <div class="flex flex-col md:flex-row justify-between">
+        <div class="flex flex-col md:flex-row justify-between gap-8 md:gap-0">
           <!-- Become Artist Section -->
-          <div class="max-w-xs mb-8 md:mb-0">
-            <div class="text-[50px] font-serif italic font-medium mb-6 w-[400px]">
+          <div class="max-w-full md:max-w-xs mb-6 md:mb-0">
+            <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-6 w-full md:w-[400px] text-center md:text-left">
               {{ $t('footer.becomeArtist') }}
             </div>
-            <UButton :label="$t('footer.getInTouch')" class="rounded-full px-4" color="neutral" variant="solid" />
+            <div class="flex justify-center md:justify-start">
+              <UButton :label="$t('footer.getInTouch')" class="rounded-full px-6 md:px-4" color="neutral" variant="solid" />
+            </div>
           </div>
 
           <!-- Footer Links -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
             <template v-for="col in footerLinks" :key="col.title">
-              <div>
-                <h3 class="text-2xl font-serif italic font-medium mb-4" :class="col.title === 'Social' ? 'mr-4' : ''">
+              <div class="text-center md:text-left">
+                <h3 class="text-xl md:text-2xl font-serif italic font-medium mb-3 md:mb-4" :class="col.title === 'Social' ? 'mr-4' : ''">
                   {{ col.title }}
                 </h3>
                 <ul v-if="col.type === 'links'" class="space-y-2 text-gray-500">
@@ -68,7 +70,7 @@ const footerLinks: Array<
                     <a :href="item.href" class="hover:text-primary-500">{{ item.label }}</a>
                   </li>
                 </ul>
-                <div v-else-if="col.type === 'buttons'" class="flex flex-col gap-2">
+                <div v-else-if="col.type === 'buttons'" class="flex flex-col gap-2 items-center md:items-start">
                   <UButton
                     v-for="item in col.items"
                     :key="item.label"
@@ -82,7 +84,7 @@ const footerLinks: Array<
           </div>
         </div>
       </UContainer>
-      <div class="bg-cover bg-center bg-no-repeat h-[112px]" style="background-image: url('/imgs/footer-bottom-bg.png');" />
+      <div class="bg-cover bg-center bg-no-repeat h-[80px] md:h-[112px]" style="background-image: url('/imgs/footer-bottom-bg.png');" />
     </footer>
   </UContainer>
 </template>
