@@ -9,11 +9,11 @@
     <Navbar />
 
     <UContainer>
-      <div class="flex flex-col items-center justify-center mt-[25px] mb-[35px]">
-        <div class="font-medium text-[51px] capitalize font-serif italic">
+      <div class="flex flex-col items-center justify-center mt-4 mb-6 md:mt-[25px] md:mb-[35px] px-4">
+        <div class="font-medium text-3xl md:text-[51px] capitalize font-serif italic text-center">
           {{ $t('landing.title') }}
         </div>
-        <div class="text-xl capitalize opacity-[0.66]">
+        <div class="text-base md:text-xl capitalize opacity-[0.66] text-center mt-2">
           {{ $t('landing.subtitle') }}
         </div>
       </div>
