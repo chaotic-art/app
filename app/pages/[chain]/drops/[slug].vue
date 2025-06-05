@@ -24,12 +24,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UContainer class="max-w-7xl">
-    <div class="grid grid-cols-2 gap-16">
+  <UContainer class="max-w-7xl px-4 md:px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
       <!-- left side -->
       <div>
         <!-- badge section -->
-        <div class="flex gap-2 mb-4">
+        <div class="flex gap-2 mb-4 justify-center lg:justify-start">
           <UBadge class="rounded-full bg-gray-100 text-black" icon="i-heroicons-star">
             Featured
           </UBadge>
@@ -37,46 +37,48 @@ onMounted(async () => {
             Polkadot
           </UBadge>
         </div>
-        <h1 class="text-6xl font-bold font-serif italic">
+        <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center lg:text-left mb-6 lg:mb-0">
           {{ collection?.metadata.name ?? '---' }}
         </h1>
 
         <!-- creator section -->
-        <div class="flex justify-between items-center my-10">
+        <div class="flex justify-between items-center gap-4 my-6 lg:my-10">
           <div class="p-1 bg-gray-100 inline-block rounded-full">
             <UserInfo :avatar-size="40" :address="drop?.creator" />
           </div>
 
           <FollowButton
             v-if="drop?.creator"
-            :target="drop.creator" class="px-4 py-2"
+            :target="drop.creator" class="px-4 py-2 w-full sm:w-auto"
           />
         </div>
 
         <!-- description section -->
-        <MarkdownPreview :source="collection?.metadata.description ?? '---'" />
+        <div class="text-sm md:text-base">
+          <MarkdownPreview :source="collection?.metadata.description ?? '---'" />
+        </div>
       </div>
 
       <!-- right side -->
-      <div>
+      <div class="order-1 lg:order-2">
         <!-- preview section -->
-        <div class="border p-4 rounded-2xl border-gray-100">
+        <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
           <iframe class="aspect-square w-full" :src="sanitizeIpfsUrl(collection?.metadata.generative_uri)" frameborder="0" />
-          <div class="flex gap-2 mt-4 justify-center">
-            <UButton class="rounded-full bg-gray-100" variant="soft" trailing-icon="i-lucide-refresh-cw">
+          <div class="flex flex-col sm:flex-row gap-2 mt-4 justify-center">
+            <UButton class="rounded-full bg-gray-100 text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-refresh-cw">
               Preview Variation
             </UButton>
-            <UButton class="rounded-full bg-gray-100" variant="soft" trailing-icon="i-lucide-joystick">
+            <UButton class="rounded-full bg-gray-100 text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
               Controls
             </UButton>
           </div>
         </div>
 
         <!-- stats section -->
-        <div class="border p-4 rounded-2xl border-gray-100 mt-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="font-serif font-bold text-3xl italic">
+        <div class="border p-3 md:p-4 rounded-2xl border-gray-100 mt-4">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-left">
+              <p class="font-serif font-bold text-2xl md:text-3xl italic">
                 0.5 DOT
               </p>
               <p class="text-sm text-gray-500">
@@ -84,13 +86,13 @@ onMounted(async () => {
               </p>
             </div>
 
-            <div class="flex gap-4">
+            <div class="flex flex-col sm:flex-row gap-2 md:gap-4 w-full md:w-auto">
               <UInputNumber
-                class="w-24" :min="1" :ui="{
-                  base: 'rounded-full px-6 py-3',
+                class="w-full sm:w-24" :min="1" :ui="{
+                  base: 'rounded-full px-4 md:px-6 py-2 md:py-3',
                 }"
               />
-              <UButton class="rounded-full px-6 py-3">
+              <UButton class="rounded-full px-4 md:px-6 py-2 md:py-3 w-full sm:w-auto">
                 Mint Drop
               </UButton>
             </div>
@@ -99,21 +101,21 @@ onMounted(async () => {
       </div>
     </div>
 
-    <USeparator class="my-20" />
+    <USeparator class="my-12 md:my-20" />
 
-    <div class="flex justify-between items-center">
-      <p class="text-3xl font-bold font-serif italic">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 md:mb-0">
+      <p class="text-2xl md:text-3xl font-bold font-serif italic text-center md:text-left">
         Latest NFT Mints
       </p>
 
-      <div class="flex gap-4">
-        <UButton class="rounded-full px-4 py-2" label="Newest" variant="outline" />
-        <UButton class="rounded-full px-4 py-2" label="Buy Now" variant="outline" />
+      <div class="flex gap-2 md:gap-4">
+        <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Newest" variant="outline" />
+        <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Buy Now" variant="outline" />
       </div>
     </div>
 
     <!-- items -->
-    <div class="grid grid-cols-5 gap-6 mt-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mt-6 md:mt-10">
       <LazyTokenCard v-for="id in items" :key="id" :token-id="id" :collection-id="Number(drop?.collection ?? 0)" :chain="chainPrefix" />
     </div>
   </UContainer>
