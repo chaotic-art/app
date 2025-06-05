@@ -12,11 +12,11 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
 
 <template>
   <div class="w-full rounded-xl overflow-hidden border border-[#EBEBEB] bg-white">
-    <NuxtImg
+    <img
       :src="sanitizeIpfsUrl(drop?.banner)"
       :alt="drop?.name"
       class="w-full h-[240px] md:h-[300px] bg-gray-200 relative aspect-square object-cover"
-    />
+    >
 
     <UContainer>
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between py-6">
