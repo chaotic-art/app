@@ -4,7 +4,8 @@ import type { AccountVm, ChainData, TokenDetail, TokenKey } from './types'
 import { getDefaultAccount, getVMSupportedAssets, vmChains } from './utils'
 
 export const useAccountStore = defineStore('account', () => {
-  const { vm, prefix } = useChain()
+  const { prefix } = usePrefix()
+  const { vm } = useChain()
 
   const loading = ref(false)
   const accounts = ref<Record<ChainVM, AccountVm>>({
