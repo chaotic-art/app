@@ -1,9 +1,9 @@
 import type { ChainProperties, Prefix } from '@kodadot1/static'
 import { chainPropListOf } from '@/utils/chain'
 
-const prefix = ref<Prefix>('ahp')
-
 export function useChain() {
+  const { prefix } = usePrefix()
+
   const vm = computed(() => vmOf(prefix.value))
 
   const chainProperties = computed<ChainProperties>(() => {
@@ -31,7 +31,6 @@ export function useChain() {
   }
   return {
     vm,
-    prefix,
     chainProperties,
     decimals,
     decimalsOf,
