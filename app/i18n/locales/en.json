@@ -14,7 +14,22 @@
     "searchAccountsPlaceholder": "Search accounts by name",
     "unknownAccount": "Unknown Account",
     "disconnect": "Disconnect",
-    "connected": "Connected"
+    "connected": "Connected",
+    "walletManager": "Wallet Manager",
+    "manageWallets": "Manage Wallets",
+    "searchAccounts": "Search accounts",
+    "walletType": "Wallet Type",
+    "allWallets": "All Wallets",
+    "evmWallets": "EVM Wallets",
+    "substrateWallets": "Substrate Wallets",
+    "connectedAccounts": "Connected Accounts",
+    "accountsFound": "accounts found",
+    "connectNewWallet": "Connect New Wallet",
+    "connectWallets": "Connect Wallets",
+    "disconnectAll": "Disconnect All Wallets",
+    "noWalletsConnected": "No Wallets Connected",
+    "connectWalletToGetStarted": "Connect a wallet to get started with trading NFTs",
+    "all": "All"
   },
   "landing": {
     "title": "Your Polkadot NFT Marketplace",
@@ -38,6 +53,8 @@
   },
   "profile": {
     "follow": "Follow"
-
+  },
+  "common": {
+    "back": "Back"
   }
 }

@@ -43,6 +43,10 @@ export const useAccountStore = defineStore('account', () => {
 
   const balance = computed(() => balances.value[prefix.value])
 
+  const getAuthAddress = (vm: ChainVM) => {
+    return accounts.value[vm]?.address
+  }
+
   const getUpdatedChainData = ({ vm, chain, address, balances }: { vm: ChainVM, chain: Chain, address: string, balances: GetBalancesResult }): ChainData => {
     const chainPrefix = getPrefixOfChain(chain)
     const supportedTokens = getVMSupportedAssets(vm).filter(({ prefix }) => prefix === chainPrefix)
@@ -121,6 +125,7 @@ export const useAccountStore = defineStore('account', () => {
     address,
     balances,
     balance,
+    getAuthAddress,
   }
 }, {
   persist: true,

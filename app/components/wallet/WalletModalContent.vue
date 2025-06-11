@@ -2,40 +2,45 @@
 import type { SetWalletParams } from '@/stores/wallet'
 import type { ChainVM } from '@kodadot1/static'
 
-const props = defineProps<{
-  initialWalletType?: ChainVM
-}>()
+const emit = defineEmits(['select', 'disconnect', 'close'])
 
-const emit = defineEmits(['select', 'disconnect'])
+const currentPhase = ref<'extension' | 'account'>('extension')
+const connectedWalletType = ref<ChainVM | null>(null)
 
-const activeWalletType = ref(props.initialWalletType || 'EVM')
-
-function onSelectAccount({ vm, account }: SetWalletParams) {
-  emit('select', { vm, account })
+function onExtensionConnected(walletType: ChainVM) {
+  connectedWalletType.value = walletType
+  currentPhase.value = 'account'
 }
 
-function onDisconnectAccount(vm: ChainVM) {
-  emit('disconnect', vm)
+function onAccountSelected(params: SetWalletParams) {
+  emit('select', params)
+  emit('close')
+}
+
+function goBackToExtensionSelection() {
+  currentPhase.value = 'extension'
+  connectedWalletType.value = null
+}
+
+function closeModal() {
+  emit('close')
 }
 </script>
 
 <template>
-  <UCard class="max-h-[90vh] overflow-auto">
-    <template #header>
-      <div class="flex justify-between items-center">
-        <div class="text-xl font-bold">
-          {{ $t('wallet.connectWallet') }}
-        </div>
-      </div>
-    </template>
+  <div>
+    <ExtensionSelection
+      v-if="currentPhase === 'extension'"
+      @extension-connected="onExtensionConnected"
+      @close="closeModal"
+    />
 
-    <div class="p-4">
-      <div v-if="activeWalletType === 'EVM'">
-        <WalletEvm @select="account => onSelectAccount({ vm: 'EVM', account })" @disconnect="onDisconnectAccount('EVM')" />
-      </div>
-      <div v-else-if="activeWalletType === 'SUB'">
-        <WalletSubstrate @select="account => onSelectAccount({ vm: 'SUB', account })" @disconnect="onDisconnectAccount('SUB')" />
-      </div>
-    </div>
-  </UCard>
+    <AccountSelection
+      v-else-if="currentPhase === 'account' && connectedWalletType"
+      :wallet-type="connectedWalletType"
+      @select-account="onAccountSelected"
+      @back="goBackToExtensionSelection"
+      @close="closeModal"
+    />
+  </div>
 </template>

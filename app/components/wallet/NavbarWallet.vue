@@ -8,16 +8,13 @@ const walletStore = useWalletStore()
 const accountStore = useAccountStore()
 
 const isWalletModalOpen = ref(false)
-const selectedWalletType = ref<ChainVM | undefined>(undefined)
 
-function openWalletModal(type: ChainVM) {
-  selectedWalletType.value = type
+function openWalletModal() {
   isWalletModalOpen.value = true
 }
 
-function onWalletTypeSelected(type: ChainVM) {
-  selectedWalletType.value = type
-  openWalletModal(type)
+function closeWalletModal() {
+  isWalletModalOpen.value = false
 }
 
 function onSelectAccount({ vm, account }: SetWalletParams) {
@@ -35,7 +32,7 @@ function onDisconnectAccount(vm: ChainVM) {
   <div>
     <client-only>
       <WalletDropdown
-        @select-wallet-type="onWalletTypeSelected"
+        @open-wallet-modal="openWalletModal"
       />
       <template #fallback>
         <div class="flex items-center justify-center">
@@ -48,9 +45,9 @@ function onDisconnectAccount(vm: ChainVM) {
     <UModal v-model:open="isWalletModalOpen">
       <template #content>
         <WalletModalContent
-          :initial-wallet-type="selectedWalletType"
           @select="onSelectAccount"
           @disconnect="onDisconnectAccount"
+          @close="closeWalletModal"
         />
       </template>
     </UModal>
