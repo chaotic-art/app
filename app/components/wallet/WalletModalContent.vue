@@ -4,12 +4,19 @@ import type { ChainVM } from '@kodadot1/static'
 
 const emit = defineEmits(['select', 'disconnect', 'close'])
 
-const currentPhase = ref<'extension' | 'account'>('extension')
+const StageTypes = {
+  WALLET: 'wallet',
+  ACCOUNT: 'account',
+} as const
+
+type StageType = typeof StageTypes[keyof typeof StageTypes]
+
+const stage = ref<StageType>(StageTypes.WALLET)
 const connectedWalletType = ref<ChainVM | null>(null)
 
 function onExtensionConnected(walletType: ChainVM) {
   connectedWalletType.value = walletType
-  currentPhase.value = 'account'
+  stage.value = StageTypes.ACCOUNT
 }
 
 function onAccountSelected(params: SetWalletParams) {
@@ -18,7 +25,7 @@ function onAccountSelected(params: SetWalletParams) {
 }
 
 function goBackToExtensionSelection() {
-  currentPhase.value = 'extension'
+  stage.value = StageTypes.WALLET
   connectedWalletType.value = null
 }
 
@@ -29,14 +36,14 @@ function closeModal() {
 
 <template>
   <div>
-    <ExtensionSelection
-      v-if="currentPhase === 'extension'"
+    <WalletSelection
+      v-if="stage === StageTypes.WALLET"
       @extension-connected="onExtensionConnected"
       @close="closeModal"
     />
 
     <AccountSelection
-      v-else-if="currentPhase === 'account' && connectedWalletType"
+      v-else-if="stage === StageTypes.ACCOUNT && connectedWalletType"
       :wallet-type="connectedWalletType"
       @select-account="onAccountSelected"
       @back="goBackToExtensionSelection"
