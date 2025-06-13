@@ -1,7 +1,7 @@
-import type { DropItem } from '@/types'
 import type { Prefix } from '@kodadot1/static'
-import { isProduction } from '@/utils/env'
+import type { DropItem } from '@/types'
 import { $fetch } from 'ofetch'
+import { isProduction } from '@/utils/env'
 
 const BASE_URL = isProduction
   ? 'https://fxart.kodadot.workers.dev/'

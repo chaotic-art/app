@@ -1,8 +1,8 @@
 import type { DropItem } from '@/types'
+import { formatDuration, intervalToDuration, intlFormat } from 'date-fns'
 import { getDropById } from '@/services/fxart'
 import { fetchOdaCollection, fetchOdaCollectionAbi } from '@/services/oda'
 import { DropStatus } from '@/types/drop'
-import { formatDuration, intervalToDuration, intlFormat } from 'date-fns'
 
 export const FALLBACK_DROP_COLLECTION_MAX = 64
 

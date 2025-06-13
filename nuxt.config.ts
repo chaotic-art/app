@@ -76,6 +76,9 @@ export default defineNuxtConfig({
     ],
     defaultLocale: 'en',
     restructureDir: './app/i18n',
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
   },
 
   eslint: {

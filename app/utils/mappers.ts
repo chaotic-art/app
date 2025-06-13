@@ -1,5 +1,5 @@
-import type { Chain } from '@/types/chain'
 import type { Prefix } from '@kodadot1/static'
+import type { Chain } from '@/types/chain'
 import { Chains } from '@/types/chain'
 
 const chainToPrefix: Partial<Record<Chain, Prefix>> = {

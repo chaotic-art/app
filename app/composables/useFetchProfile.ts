@@ -1,7 +1,7 @@
 import type { Profile } from '@/services/profile'
-import { fetchProfileByAddress, toSubstrateAddress } from '@/services/profile'
 import { isAddress } from '@polkadot/util-crypto'
 import { useQuery } from '@tanstack/vue-query'
+import { fetchProfileByAddress, toSubstrateAddress } from '@/services/profile'
 
 export default function useFetchProfile(address: Ref<string | undefined>) {
   const {

@@ -3,17 +3,17 @@ import type {
   ProviderKeyType,
 } from '@/config/ipfs'
 import type { NFT, NFTMetadata } from '@/types'
+import { IPFS_REGEX, isCID, isHTTP } from '@kodadot1/minipfs'
+import { consola } from 'consola'
+import { $fetch } from 'ofetch'
 import {
   arweaveProviders,
   CF_IMAGE_URL,
   getIPFSProvider,
   kodaImage,
 } from '@/config/ipfs'
-import { emptyObject } from '@/utils/empty'
-import { IPFS_REGEX, isCID, isHTTP } from '@kodadot1/minipfs'
-import { consola } from 'consola'
 
-import { $fetch } from 'ofetch'
+import { emptyObject } from '@/utils/empty'
 
 export const ipfsUrlPrefix = 'ipfs://ipfs/'
 
