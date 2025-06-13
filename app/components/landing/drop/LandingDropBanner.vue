@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { getDrops } from '@/services/fxart'
 import { useQuery } from '@tanstack/vue-query'
+import { getDrops } from '@/services/fxart'
 
 const { data: dropItems } = useQuery({
   queryKey: ['landing-drop-items', 'ahp'],

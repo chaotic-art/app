@@ -1,12 +1,12 @@
+import type { Signer } from '@polkadot/api/types'
 import type {
   SubstrateWallet,
   SubstrateWalletAccount,
   SubstrateWalletSource,
 } from '@/utils/wallet/substrate/types'
-import type { Signer } from '@polkadot/api/types'
+import { defineStore } from 'pinia'
 import { getAvailableWallets } from '@/utils/wallet/substrate/config'
 import { WalletProxyMap } from '@/utils/wallet/substrate/types'
-import { defineStore } from 'pinia'
 
 const DAPP_NAME = 'Chaotic'
 

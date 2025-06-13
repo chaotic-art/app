@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { WalletAccount } from '@/stores/wallet'
 import type { AppKit } from '@reown/appkit/vue'
+import type { WalletAccount } from '@/stores/wallet'
 import { createAppKit, useAppKit, useAppKitAccount } from '@reown/appkit/vue'
 
 const emit = defineEmits<{
@@ -16,6 +16,7 @@ function open() {
   if (!appKit.value) {
     appKit.value = createAppKit({
       adapters: [$wagmi.adapter],
+      // @ts-expect-error different types of networks
       networks: [$wagmi.defaultNetwork, ...$wagmi.networks],
       projectId: $wagmi.projectId,
       metadata: $wagmi.metadata,

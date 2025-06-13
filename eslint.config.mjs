@@ -6,6 +6,6 @@ export default withNuxt(
   antfu({
     // ...@antfu/eslint-config options
     ignores: ['**/*.papi/**'],
-  }),
+  }).toConfigs(),
   // ...other rules
 )

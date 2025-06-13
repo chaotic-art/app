@@ -1,5 +1,5 @@
-import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
 import type { ChainVM } from '@kodadot1/static'
+import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
 import { defineStore } from 'pinia'
 
 export interface WalletAccount {
