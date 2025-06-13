@@ -13,7 +13,7 @@ const { data: token } = await useAsyncData(`token:${props.chain}:${props.collect
 
 // fetch price
 const { $api } = useNuxtApp()
-const queryPrice = await $api(props.chain).query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId)
+const queryPrice = await $api(props.chain).query.Nfts?.ItemPriceOf?.getValue(props.collectionId, props.tokenId)
 
 const price = computed(() => {
   if (!queryPrice)

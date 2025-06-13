@@ -36,9 +36,9 @@ onMounted(async () => {
     const api = $api(chain as Prefix)
 
     const [queryItem, queryMetadata, queryPrice] = await Promise.all([
-      api.query.Nfts.Item.getValue(Number(collectionId), Number(tokenId)),
-      api.query.Nfts.ItemMetadataOf.getValue(Number(collectionId), Number(tokenId)),
-      api.query.Nfts.ItemPriceOf.getValue(Number(collectionId), Number(tokenId)),
+      api.query.Nfts?.Item?.getValue(Number(collectionId), Number(tokenId)),
+      api.query.Nfts?.ItemMetadataOf?.getValue(Number(collectionId), Number(tokenId)),
+      api.query.Nfts?.ItemPriceOf?.getValue(Number(collectionId), Number(tokenId)),
     ])
 
     tokenDetail.owner = queryItem?.owner.toString() ?? ''
