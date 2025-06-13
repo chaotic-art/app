@@ -30,7 +30,7 @@
     "@polkadot-api/descriptors": "file:.papi/descriptors",
     "@polkadot/extension-dapp": "^0.58.9",
     "@polkadot/ui-shared": "^3.13.1",
-    "@polkadot/util-crypto": "^13.4.4",
+    "@polkadot/util-crypto": "^13.5.1",
     "@reown/appkit": "^1.7.5",
     "@reown/appkit-adapter-wagmi": "^1.7.5",
     "@tanstack/vue-query": "^5.76.0",
