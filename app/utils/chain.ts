@@ -1,5 +1,5 @@
-import type { Chain } from '@/types/chain'
 import type { ChainProperties, ChainVM, Prefix } from '@kodadot1/static'
+import type { Chain } from '@/types/chain'
 import { CHAINS } from '@kodadot1/static'
 
 export function chainPropListOf(prefix: Prefix): ChainProperties {

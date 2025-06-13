@@ -1,6 +1,6 @@
-import type { Chain } from '@/types'
 import type { ChainVM } from '@kodadot1/static'
 import type { AccountVm, SupportedAsset } from './types'
+import type { Chain } from '@/types'
 import { Chains } from '@/types'
 
 const supportedAssets = ([

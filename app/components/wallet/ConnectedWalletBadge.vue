@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { VmWalletState } from '@/stores/wallet'
 import type { ChainVM } from '@kodadot1/static'
+import type { VmWalletState } from '@/stores/wallet'
 import { shortenAddress } from '@/utils/format/address'
 
 const props = defineProps<{

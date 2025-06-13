@@ -1,19 +1,19 @@
-import { isProduction } from '@/utils/env'
 import { SERVICES } from '@kodadot1/static'
+import { isProduction } from '@/utils/env'
 
 const DEFAULT_IPFS_PROVIDER = 'https://ipfs.io/'
 export const CF_IMAGE_URL = 'https://imagedelivery.net/jk5b6spi_m_-9qC4VTnjpg/'
 
 export type ProviderKeyType = IPFSProviders
 export type ArweaveProviders = 'permafrost' | 'arweave'
-export type IPFSProviders =
-  | 'pinata'
-  | 'cloudflare'
-  | 'ipfs'
-  | 'dweb'
-  | 'kodadot'
-  | 'image'
-  | 'nftStorage'
+export type IPFSProviders
+  = | 'pinata'
+    | 'cloudflare'
+    | 'ipfs'
+    | 'dweb'
+    | 'kodadot'
+    | 'image'
+    | 'nftStorage'
 
 export const kodaImage = isProduction ? SERVICES.image : SERVICES.imageBeta
 
