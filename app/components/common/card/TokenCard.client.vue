@@ -28,7 +28,7 @@ const price = computed(() => {
 </script>
 
 <template>
-  <div class="border rounded-xl border-gray-300 overflow-hidden">
+  <NuxtLink :to="`/${chain}/gallery/${collectionId}-${tokenId}`" class="border rounded-xl border-gray-300 overflow-hidden">
     <img :src="token?.metadata.image" alt="NFT" class="aspect-square">
 
     <div class="p-4">
@@ -41,5 +41,5 @@ const price = computed(() => {
         <!-- <UBadge label="1 minute" variant="soft" class="bg-gray-100 rounded-full" /> -->
       </div>
     </div>
-  </div>
+  </NuxtLink>
 </template>
