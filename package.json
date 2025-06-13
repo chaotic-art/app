@@ -39,7 +39,7 @@
     "consola": "^3.4.2",
     "jdenticon": "^3.3.0",
     "markdown-it": "^14.1.0",
-    "nuxt": "^3.17.2",
+    "nuxt": "^3.17.5",
     "ofetch": "1.4.1",
     "pinia": "^3.0.2",
     "pinia-plugin-persistedstate": "^4.3.0",
