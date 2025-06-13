@@ -31,7 +31,7 @@
     "@polkadot/extension-dapp": "^0.58.9",
     "@polkadot/ui-shared": "^3.13.1",
     "@polkadot/util-crypto": "^13.4.4",
-    "@reown/appkit": "^1.7.5",
+    "@reown/appkit": "^1.7.9",
     "@reown/appkit-adapter-wagmi": "^1.7.5",
     "@tanstack/vue-query": "^5.76.0",
     "@unhead/vue": "^2.0.3",
