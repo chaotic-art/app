@@ -7,6 +7,8 @@ const [collectionId, tokenId] = token?.toString().split('-') ?? []
 
 const { $api } = useNuxtApp()
 
+const loading = ref(true)
+
 const tokenDetail = reactive({
   owner: '',
   price: '',
@@ -30,36 +32,114 @@ const formattedPrice = computed(() => {
 })
 
 onMounted(async () => {
-  const api = $api(chain as Prefix)
+  try {
+    const api = $api(chain as Prefix)
 
-  const [queryItem, queryMetadata, queryPrice] = await Promise.all([
-    api.query.Nfts.Item.getValue(Number(collectionId), Number(tokenId)),
-    api.query.Nfts.ItemMetadataOf.getValue(Number(collectionId), Number(tokenId)),
-    api.query.Nfts.ItemPriceOf.getValue(Number(collectionId), Number(tokenId)),
-  ])
+    const [queryItem, queryMetadata, queryPrice] = await Promise.all([
+      api.query.Nfts.Item.getValue(Number(collectionId), Number(tokenId)),
+      api.query.Nfts.ItemMetadataOf.getValue(Number(collectionId), Number(tokenId)),
+      api.query.Nfts.ItemPriceOf.getValue(Number(collectionId), Number(tokenId)),
+    ])
 
-  tokenDetail.owner = queryItem?.owner.toString() ?? ''
-  tokenDetail.price = queryPrice?.[0].toString() ?? ''
+    tokenDetail.owner = queryItem?.owner.toString() ?? ''
+    tokenDetail.price = queryPrice?.[0].toString() ?? ''
 
-  if (queryMetadata?.data.asText()) {
-    const metadata = await $fetch(sanitizeIpfsUrl(queryMetadata.data.asText())) as {
-      name: string
-      description: string
-      image: string
-      animation_url: string
+    if (queryMetadata?.data.asText()) {
+      const metadata = await $fetch(sanitizeIpfsUrl(queryMetadata.data.asText())) as {
+        name: string
+        description: string
+        image: string
+        animation_url: string
+      }
+
+      tokenDetail.metadata.name = metadata.name
+      tokenDetail.metadata.description = metadata.description
+      tokenDetail.metadata.image = metadata.image
+      tokenDetail.metadata.animation_url = metadata.animation_url
     }
-
-    tokenDetail.metadata.name = metadata.name
-    tokenDetail.metadata.description = metadata.description
-    tokenDetail.metadata.image = metadata.image
-    tokenDetail.metadata.animation_url = metadata.animation_url
+  }
+  catch (error) {
+    console.error('Error fetching token data:', error)
+  }
+  finally {
+    loading.value = false
   }
 })
 </script>
 
 <template>
   <UContainer class="max-w-7xl px-4 md:px-6">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+    <!-- Loading Skeleton -->
+    <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+      <!-- left side skeleton - image -->
+      <div class="order-2 lg:order-1">
+        <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
+          <USkeleton class="aspect-square w-full rounded-xl" />
+        </div>
+      </div>
+
+      <!-- right side skeleton - details -->
+      <div class="order-1 lg:order-2">
+        <!-- badge skeleton -->
+        <div class="flex gap-2 mb-4 justify-center lg:justify-start">
+          <USkeleton class="h-6 w-16 rounded-full" />
+          <USkeleton class="h-6 w-20 rounded-full" />
+        </div>
+
+        <!-- title skeleton -->
+        <USkeleton class="h-12 md:h-16 lg:h-20 w-full mb-6 lg:mb-8" />
+
+        <!-- owner section skeleton -->
+        <div class="flex justify-between items-center gap-4 my-6 lg:my-10">
+          <div class="flex items-center gap-3">
+            <USkeleton class="w-12 h-12 rounded-full" />
+            <USkeleton class="h-4 w-32" />
+          </div>
+          <USkeleton class="h-10 w-24 rounded-full" />
+        </div>
+
+        <!-- description skeleton -->
+        <div class="text-sm md:text-base mb-6 lg:mb-8 space-y-2">
+          <USkeleton class="h-4 w-full" />
+          <USkeleton class="h-4 w-3/4" />
+          <USkeleton class="h-4 w-1/2" />
+        </div>
+
+        <!-- price and actions skeleton -->
+        <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-left">
+              <USkeleton class="h-8 md:h-10 w-32 mb-2" />
+              <USkeleton class="h-4 w-20" />
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2 md:gap-4 w-full md:w-auto">
+              <USkeleton class="h-10 w-full sm:w-24 rounded-full" />
+              <USkeleton class="h-10 w-full sm:w-24 rounded-full" />
+            </div>
+          </div>
+        </div>
+
+        <!-- token info skeleton -->
+        <div class="mt-6 space-y-3">
+          <div class="flex justify-between items-center">
+            <USkeleton class="h-4 w-24" />
+            <USkeleton class="h-4 w-16" />
+          </div>
+          <div class="flex justify-between items-center">
+            <USkeleton class="h-4 w-20" />
+            <USkeleton class="h-4 w-12" />
+          </div>
+          <div class="flex justify-between items-center">
+            <USkeleton class="h-4 w-16" />
+            <USkeleton class="h-4 w-20" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actual Content -->
+    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
       <!-- left side - image -->
       <div class="order-2 lg:order-1">
         <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
