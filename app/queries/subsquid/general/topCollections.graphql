@@ -1,0 +1,17 @@
+query topCollections(
+  $limit: Int
+  $orderBy: CollectionEntityOrderByInput = volume_DESC
+  $where: CollectionEntityWhereInput = { volume_gt: "0" }
+) {
+  collectionEntities(orderBy: [$orderBy], limit: $limit, where: $where) {
+    id
+    name
+    image
+    media
+    volume
+    metadata
+    floor
+    nftCount
+    ownerCount: distribution
+  }
+}
