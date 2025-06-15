@@ -13,9 +13,8 @@ const { data: dropItems } = useQuery({
   }),
 })
 
-const artists = computed(() => dropItems.value?.map(drop => drop.creator).filter(Boolean))
-
-const randomSixArtist = computed(() => artists.value?.slice().sort(() => Math.random() - 0.5).slice(0, 6))
+const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.creator).filter(Boolean))])
+const randomSixArtist = computed(() => allArtists.value?.slice().sort(() => Math.random() - 0.5).slice(0, 6))
 </script>
 
 <template>

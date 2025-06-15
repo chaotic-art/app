@@ -12,6 +12,9 @@ const { data: drop } = await useAsyncData(`drop:${slug}`, () => getDropById(slug
 const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
 const items = ref<number[]>([])
 
+const { decimals, chainSymbol } = useChain()
+const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
+
 onMounted(async () => {
   collection.value = await fetchOdaCollection(chainPrefix.value, drop.value?.collection ?? '')
 
@@ -79,10 +82,10 @@ onMounted(async () => {
           <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-center md:text-left">
               <p class="font-serif font-bold text-2xl md:text-3xl italic">
-                0.5 DOT
+                {{ formattedTokenPrice }}
               </p>
               <p class="text-sm text-gray-500">
-                ~$20 USD
+                {{ usdPrice }} USD
               </p>
             </div>
 
