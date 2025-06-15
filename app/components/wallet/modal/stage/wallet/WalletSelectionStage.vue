@@ -1,42 +1,16 @@
 <script setup lang="ts">
 import type { WalletExtension } from '@/stores/wallet/types'
-import { useSubWalletStore } from '@/stores/subWallet'
+import { WalletStageTypes, WalletStates } from '@/stores/wallet/types'
+import { useWalletStore } from '~/stores/wallet'
 
-const emit = defineEmits(['extensionConnected', 'close'])
-
-const walletExtensions = ref<WalletExtension[]>([])
 const activeTab = ref('All')
 
-const subWalletStore = useSubWalletStore()
-
-if (import.meta.client) {
-  walletExtensions.value = await getWalletExtensions()
-}
-
-const subWallets = computed(() => walletExtensions.value)
-
-const installedSubstrateWallets = computed(() =>
-  subWallets.value.filter(wallet => wallet.installed),
-)
-
-const uninstalledSubstrateWallets = computed(() =>
-  subWallets.value.filter(wallet => !wallet.installed),
-)
-
-async function getWalletExtensions(): Promise<WalletExtension[]> {
-  const wallets = await subWalletStore.init()
-
-  return wallets.map(extension => ({
-    id: extension.id,
-    name: extension.name,
-    icon: extension.icon,
-    connected: extension.enabled,
-    url: extension.url,
-    source: extension.source,
-    installed: extension.installed,
-    vm: 'SUB',
-  }))
-}
+const walletStore = useWalletStore()
+const {
+  getInstalledWallets: installedWallets,
+  getUninstalledWallets: uninstalledWallets,
+  stage,
+} = storeToRefs(walletStore)
 
 // const { wallets, getIsEvmConnected, getIsSubstrateConnected } = storeToRefs(walletStore)
 // const { wallets: subWallets, initialized } = storeToRefs(subWalletStore)
@@ -199,32 +173,32 @@ async function getWalletExtensions(): Promise<WalletExtension[]> {
 //     }
 //   })
 // }
+//
+
+function onSelectInstalledWallet(extension: WalletExtension) {
+  walletStore.updateWalletState(extension.id, WalletStates.ConnectionQueued)
+  stage.value = WalletStageTypes.Authorization
+}
+
+function onSelectUnistalledWallet(wallet: WalletExtension) {
+  window.open(wallet.url, '_blank')
+}
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto">
-    <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-wide">
-        Connect Wallet
-      </h2>
+  <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+    <WalletSelectionTabs v-model="activeTab" />
 
-      <UButton
-        variant="ghost"
-        color="neutral"
-        icon="i-lucide-x"
-        size="sm"
-        @click="emit('close')"
-      />
-    </div>
+    <InstalledWallets
+      :extensions="installedWallets"
+      @select="onSelectInstalledWallet"
+    />
 
-    <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-      <WalletSelectionTabs v-model="activeTab" />
+    <hr class="my-4 text-gray-200 dark:text-gray-700">
 
-      <InstalledWallets :extensions="installedSubstrateWallets" />
-
-      <hr class="my-4 text-gray-200 dark:text-gray-700">
-
-      <UnistalledWallets :extensions="uninstalledSubstrateWallets" />
-    </div>
+    <UninstalledWallets
+      :extensions="uninstalledWallets"
+      @select="onSelectUnistalledWallet"
+    />
   </div>
 </template>

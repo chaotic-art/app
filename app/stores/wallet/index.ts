@@ -1,81 +1,77 @@
-import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
-import type { ChainVM } from '@kodadot1/static'
+import type { WalletAccount, WalletExtension, WalletStageType, WalletState } from './types'
 import { defineStore } from 'pinia'
-
-export interface WalletAccount {
-  address: string
-  name?: string
-  extension?: SubstrateWalletSource
-}
-
-export interface VmWalletState {
-  account?: WalletAccount
-  disconnecting: boolean
-  connected: boolean
-}
-
-export interface SetWalletParams {
-  vm: ChainVM
-  account: WalletAccount
-}
-
-function getDefaultWalletState(): VmWalletState {
-  return {
-    account: undefined,
-    disconnecting: false,
-    connected: false,
-  }
-}
-
-function getDefaultWallets() {
-  return {
-    SUB: getDefaultWalletState(),
-    EVM: getDefaultWalletState(),
-  }
-}
+import { WalletStageTypes, WalletStates } from './types'
 
 export const useWalletStore = defineStore('wallet', () => {
-  const { vm } = useChain()
+  const wallets = ref<WalletExtension[]>([])
+  const stage = ref<WalletStageType>(WalletStageTypes.Loading)
 
-  const wallets = ref<Record<ChainVM, VmWalletState>>(getDefaultWallets())
-  const getWalletVM = computed(() => wallets.value[vm.value])
-  const getIsEvmConnected = computed(() => wallets.value.EVM.connected)
-  const getIsSubstrateConnected = computed(() => wallets.value.SUB.connected)
-  const getEvmWalletAddress = computed(() => wallets.value.EVM.account?.address)
-  const getSubstrateWalletAddress = computed(() => wallets.value.SUB.account?.address)
+  const getIsEvmConnected = computed(() => wallets.value.find(wallet => wallet.vm === 'EVM')?.state === WalletStates.Connected)
+  const getIsSubstrateConnected = computed(() => wallets.value.find(wallet => wallet.vm === 'SUB')?.state === WalletStates.Connected)
+  const getInstalledWallets = computed(() => wallets.value.filter(wallet => wallet.installed))
+  const getUninstalledWallets = computed(() => wallets.value.filter(wallet => !wallet.installed))
 
-  function setDisconnecting(vm: ChainVM, payload: boolean) {
-    wallets.value[vm].disconnecting = payload
+  function findWallet(id: string): WalletExtension | undefined {
+    return wallets.value.find(wallet => wallet.id === id)
   }
 
-  function setWallet({ vm, account }: SetWalletParams) {
-    wallets.value[vm] = {
-      account,
-      disconnecting: false,
-      connected: true,
+  // function disconnect(vm: ChainVM) {
+  //   const wallet = findWallet(vm)
+  //   if (wallet) {
+  //     wallet.state = WalletStates.Disconnecting
+  //   }
+  // }
+
+  function clear() {
+    wallets.value = []
+  }
+
+  // TODO unify updateWalletState and updateWalletAccounts
+  function updateWalletState(id: string, state: WalletState) {
+    const wallet = findWallet(id)
+    if (wallet) {
+      wallet.state = state
     }
   }
 
-  function disconnect(vm: ChainVM) {
-    wallets.value[vm] = getDefaultWalletState()
+  function updateWalletAccounts(id: string, accounts: WalletAccount[]) {
+    const wallet = findWallet(id)
+    if (wallet) {
+      wallet.accounts = accounts
+    }
   }
 
-  function clear() {
-    wallets.value = getDefaultWallets()
+  function addWallet(wallet: WalletExtension) {
+    const index = wallets.value.findIndex(w => w.vm === wallet.vm)
+    if (index === -1) {
+      wallets.value.push(wallet)
+    }
+    else {
+      wallets.value[index] = wallet
+    }
+  }
+
+  function setStage(payload: WalletStageType) {
+    stage.value = payload
   }
 
   return {
     wallets,
-    getWalletVM,
+    addWallet,
+    stage,
     getIsSubstrateConnected,
     getIsEvmConnected,
-    getSubstrateWalletAddress,
-    getEvmWalletAddress,
-    setDisconnecting,
-    setWallet,
+    getUninstalledWallets,
+    getInstalledWallets,
+    // getSubstrateWalletAddress,
+    // getEvmWalletAddress,
+    // setDisconnecting,
+    // setWallet,
     clear,
-    disconnect,
+    updateWalletState,
+    updateWalletAccounts,
+    setStage,
   }
 }, {
-  persist: true,
+  // persist: true,
 })

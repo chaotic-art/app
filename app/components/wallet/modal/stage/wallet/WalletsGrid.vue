@@ -4,6 +4,9 @@ import type { WalletExtension } from '@/stores/wallet/types'
 defineProps<{
   extensions: WalletExtension[]
 }>()
+defineEmits<{
+  select: [extension: WalletExtension]
+}>()
 </script>
 
 <template>
@@ -12,6 +15,7 @@ defineProps<{
 
     <WalletsGridItem
       v-for="item in extensions" :key="item.id" :item="item"
+      @click="$emit('select', item)"
     >
       <slot :item="item" />
     </WalletsGridItem>

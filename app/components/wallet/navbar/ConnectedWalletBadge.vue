@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { VmWalletState } from '@/stores/wallet'
+import type { Wallet } from '@/stores/wallet'
 import type { ChainVM } from '@kodadot1/static'
 import { shortenAddress } from '@/utils/format/address'
 
 const props = defineProps<{
   walletType: ChainVM
-  wallet: VmWalletState
+  wallet: Wallet
 }>()
 
 const { $jdenticon } = useNuxtApp()

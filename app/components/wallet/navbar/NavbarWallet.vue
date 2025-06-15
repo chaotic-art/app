@@ -41,15 +41,11 @@ function onDisconnectAccount(vm: ChainVM) {
       </template>
     </client-only>
 
-    <!-- Wallet Modal -->
-    <UModal v-model:open="isWalletModalOpen">
-      <template #content>
-        <WalletModalContent
-          @select="onSelectAccount"
-          @disconnect="onDisconnectAccount"
-          @close="closeWalletModal"
-        />
-      </template>
-    </UModal>
+    <WalletModal
+      v-model="isWalletModalOpen"
+      @select="onSelectAccount"
+      @disconnect="onDisconnectAccount"
+      @close="closeWalletModal"
+    />
   </div>
 </template>

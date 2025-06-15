@@ -69,9 +69,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
       throw err
     }
 
-    // TODO extract outside
     if (!wallet.installed) {
-      window.open(wallet.url, '_blank')
       const err = new Error(`Please install ${wallet.name} to continue`)
       error.value = err
       throw err

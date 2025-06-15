@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import type { WalletExtension } from '@/stores/wallet/types'
+import type { WalletExtension } from '@/components/wallet/types'
 import { WalletsGrid } from '#components'
 
 defineProps<{
   extensions: WalletExtension[]
+}>()
+
+defineEmits<{
+  select: [extension: WalletExtension]
 }>()
 
 const showOtherWallets = ref(false)
@@ -28,7 +32,12 @@ const showOtherWallets = ref(false)
       />
     </UButton>
 
-    <WalletsGrid v-if="showOtherWallets" v-slot="{ item }" class="mt-3" :extensions="extensions">
+    <WalletsGrid
+      v-if="showOtherWallets" v-slot="{ item }"
+      class="mt-3"
+      :extensions="extensions"
+      @select="item => $emit('select', item)"
+    >
       <WalletItemContent :extension="item">
         <div class="font-medium text-xs text-blue-500 dark:text-blue-400 flex items-center">
           <span>Download</span>
