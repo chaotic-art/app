@@ -22,7 +22,8 @@
   },
   "drop": {
     "mint": "Mint Drop",
-    "minted": "Minted"
+    "minted": "Minted",
+    "seeListing": "See Listing"
   },
   "collection": {
     "topCollections": "Top Collections",

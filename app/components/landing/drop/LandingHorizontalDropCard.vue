@@ -36,9 +36,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
           <div class="text-xs mb-1 flex items-center gap-3 flex-wrap">
             <span class="font-medium">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>  <span class="font-bold text-gray-500">·</span>  <span class="font-medium">{{ usdPrice }} USD</span>
           </div>
-          <button class="bg-black text-white rounded-full px-6 py-3 md:px-4 md:py-[10px] text-sm hover:bg-gray-900 transition w-full md:w-auto">
-            {{ $t('drop.mint') }}
-          </button>
+          <LandingDropMintButton :drop="drop" />
         </div>
       </div>
     </UContainer>

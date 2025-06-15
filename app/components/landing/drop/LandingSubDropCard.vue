@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type { DropItem } from '@/types'
+import { parseCETDate } from '@/components/drops/utils'
+import { formatToNow } from '@/utils/format/time'
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
 
 const props = defineProps<{
@@ -56,11 +58,9 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop.price), decimals, 
 
         <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-1 md:justify-between">
           <div class="text-gray-400 text-center md:text-left text-sm">
-            Ends in 30m
+            {{ formatToNow(parseCETDate(drop.start_at!)) }}
           </div>
-          <UButton variants="primary" class="rounded-full px-5 py-2 hover:bg-gray-900 w-full md:w-auto">
-            {{ $t('drop.mint') }}
-          </UButton>
+          <LandingDropMintButton :drop="drop" />
         </div>
       </div>
     </div>
