@@ -21,10 +21,10 @@
       <LandingDropBanner />
     </UContainer>
 
-    <!-- <LandingArtistsList /> -->
+    <LandingArtistsList />
 
     <UContainer>
-      <!-- <LazyLandingTopCollections /> -->
+      <LandingTopCollections />
       <Articles />
     </UContainer>
   </div>
