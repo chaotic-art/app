@@ -18,13 +18,13 @@
         </div>
       </div>
 
-      <LandingDropBanner />
+      <!-- <LandingDropBanner /> -->
     </UContainer>
 
-    <LandingArtistsList />
+    <!-- <LandingArtistsList /> -->
 
     <UContainer>
-      <LazyLandingTopCollections />
+      <!-- <LazyLandingTopCollections /> -->
       <Articles />
     </UContainer>
   </div>
