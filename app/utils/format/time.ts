@@ -77,7 +77,7 @@ export function endDate(seconds: number): string {
 }
 
 export function formatToNow(date: string | number | Date, addSuffix = true): string {
-  if (import.meta.server) {
+  if (!import.meta.client) {
     return ''
   }
 
