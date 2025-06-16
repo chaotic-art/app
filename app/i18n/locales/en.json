@@ -27,7 +27,8 @@
   },
   "collection": {
     "topCollections": "Top Collections",
-    "viewMore": "View More"
+    "viewMore": "View More",
+    "volume": "Volume"
   },
   "footer": {
     "becomeArtist": "Become artist on Polkadot",
@@ -39,6 +40,8 @@
   },
   "profile": {
     "follow": "Follow"
-
+  },
+  "common": {
+    "price": "Price"
   }
 }
