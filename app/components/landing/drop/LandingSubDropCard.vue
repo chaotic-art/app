@@ -57,9 +57,11 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop.price), decimals, 
         </div>
 
         <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-1 md:justify-between">
-          <div class="text-gray-400 text-center md:text-left text-sm">
-            {{ formatToNow(parseCETDate(drop.start_at!)) }}
-          </div>
+          <ClientOnly>
+            <div class="text-gray-400 text-center md:text-left text-sm">
+              {{ formatToNow(parseCETDate(drop.start_at!)) }}
+            </div>
+          </ClientOnly>
           <!-- <LandingDropMintButton :drop="drop" /> -->
         </div>
       </div>
