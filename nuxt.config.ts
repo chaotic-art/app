@@ -4,6 +4,7 @@ import { apolloClientConfig } from './app/utils/constants'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  sourcemap: true,
 
   // https://nuxt.com/docs/getting-started/upgrade#testing-nuxt-4
   future: {
