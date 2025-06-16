@@ -18,7 +18,7 @@
         </div>
       </div>
 
-      <!-- <LandingDropBanner /> -->
+      <LandingDropBanner />
     </UContainer>
 
     <!-- <LandingArtistsList /> -->
