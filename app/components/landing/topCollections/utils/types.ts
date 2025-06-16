@@ -2,7 +2,8 @@ import type { Interaction } from '@/types'
 
 export interface CollectionEntity {
   id: string
-  floorPrice: number
+  floorPrice?: number
+  floor: number
   averagePrice: VolumeType
   image: string
   metadata: string
