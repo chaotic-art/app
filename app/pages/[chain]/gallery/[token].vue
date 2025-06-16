@@ -229,7 +229,12 @@ onMounted(async () => {
         <div class="mt-6 space-y-3">
           <div class="flex justify-between items-center text-sm">
             <span class="text-gray-500">Collection ID</span>
-            <span class="font-medium">{{ collectionId }}</span>
+            <NuxtLink
+              :to="`/${chain}/collection/${collectionId}`"
+              class="font-medium text-primary-600 hover:text-primary-500 transition-colors cursor-pointer"
+            >
+              {{ collectionId }}
+            </NuxtLink>
           </div>
           <div class="flex justify-between items-center text-sm">
             <span class="text-gray-500">Token ID</span>
