@@ -12,7 +12,7 @@ const { data: dropItems } = useQuery({
 })
 
 const mainDrop = computed(() => dropItems.value?.[0])
-// const subDrops = computed(() => dropItems.value?.slice(1, 3))
+const subDrops = computed(() => dropItems.value?.slice(1, 3))
 </script>
 
 <template>
@@ -23,12 +23,12 @@ const mainDrop = computed(() => dropItems.value?.[0])
       </template>
     </DropCardAttributeEnhance>
 
-    <!-- <div class="flex flex-col md:flex-row gap-4 md:gap-6 mt-6 md:mt-8">
+    <div class="flex flex-col md:flex-row gap-4 md:gap-6 mt-6 md:mt-8">
       <DropCardAttributeEnhance v-for="subDrop in subDrops" :key="subDrop.id" :drop="subDrop">
         <template #default="{ drop }">
           <LandingSubDropCard v-if="drop" :drop="drop" />
         </template>
       </DropCardAttributeEnhance>
-    </div> -->
+    </div>
   </div>
 </template>
