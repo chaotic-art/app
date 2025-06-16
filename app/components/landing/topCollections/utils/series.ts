@@ -1,6 +1,6 @@
 import type { Interaction } from '@/types'
-import { after, between, getVolume } from '@/utils/math'
 import { formatISO, subDays } from 'date-fns'
+import { after, between, getVolume } from '@/utils/math'
 
 export interface SortType {
   field: string
