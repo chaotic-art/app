@@ -18,7 +18,7 @@
     "@iconify-json/simple-icons": "^1.2.38",
     "@kodadot1/hyperdata": "0.0.2-rc.1",
     "@kodadot1/static": "0.0.8-rc.0",
-    "@nuxt/fonts": "0.11.3",
+    "@nuxt/fonts": "0.11.4",
     "@nuxt/icon": "1.13.0",
     "@nuxt/image": "1.10.0",
     "@nuxt/scripts": "0.11.8",
