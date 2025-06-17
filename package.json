@@ -38,6 +38,7 @@
     "@unhead/vue": "^2.0.10",
     "@wagmi/vue": "^0.1.22",
     "consola": "^3.4.2",
+    "date-fns": "^4.1.0",
     "gql.tada": "^1.8.10",
     "jdenticon": "^3.3.0",
     "markdown-it": "^14.1.0",
