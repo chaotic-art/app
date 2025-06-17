@@ -24,7 +24,9 @@
     <LandingArtistsList />
 
     <UContainer>
-      <LazyLandingTopCollections />
+      <ClientOnly>
+        <LandingTopCollections />
+      </ClientOnly>
       <Articles />
     </UContainer>
   </div>
