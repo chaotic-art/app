@@ -60,7 +60,7 @@ const title = computed(() => {
 
 <template>
   <UModal
-    v-model:open="isModalOpen" 
+    v-model:open="isModalOpen"
     :ui="{
       content: 'max-w-xl w-full',
     }"
@@ -86,7 +86,7 @@ const title = computed(() => {
           />
         </div>
 
-        <div class="p-4">
+        <div class="p-4 max-h-[70vh] overflow-y-auto">
           <WalletSelectionStage v-if="stage === WalletStageTypes.Wallet" />
 
           <WalletAuthorizationStage v-else-if="stage === WalletStageTypes.Authorization" />
