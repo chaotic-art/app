@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { CollectionEntityWithVolumes } from './utils/types'
+import type { proccessData } from './utils/useTopCollections'
 
 const props = defineProps<{
-  collection?: CollectionEntityWithVolumes
+  collection?: Awaited<ReturnType<typeof proccessData>>[number]
 }>()
 
 const { prefix } = usePrefix()
@@ -19,7 +19,7 @@ const { volume } = useCollectionVolume(
       <img
         v-if="collection?.image"
         :src="collection.image"
-        :alt="collection.name"
+        :alt="collection.name || ''"
         class="w-full h-full object-cover"
       >
       <div v-else class="w-full h-full bg-neutral-300" />
@@ -34,7 +34,7 @@ const { volume } = useCollectionVolume(
             {{ $t('common.price') }}
           </div>
           <div class="text-xl text-black font-normal">
-            <Money :value="collection?.floorPrice || collection?.floor" :inline="true" :round="2" />
+            <Money :value="collection?.floor" :inline="true" :round="2" />
           </div>
         </div>
         <div class="flex flex-col items-center">

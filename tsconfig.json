@@ -1,4 +1,19 @@
 {
   // https://nuxt.com/docs/guide/concepts/typescript
-  "extends": "./.nuxt/tsconfig.json"
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "gql.tada/ts-plugin",
+        // TODO: setup multiple schemas for different chains
+        "schemas": [
+          {
+            "name": "ahp",
+            "schema": "https://ahp.gql.api.kodadot.xyz/",
+            "tadaOutputLocation": "./app/graphql/ahp-env.d.ts"
+          }
+        ]
+      }
+    ]
+  }
 }

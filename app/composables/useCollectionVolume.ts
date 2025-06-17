@@ -1,9 +1,9 @@
-import type { CollectionEntityWithVolumes } from '@/components/landing/topCollections/utils/types'
+import type { proccessData } from '~/components/landing/topCollections/utils/useTopCollections'
 
 export type TimeRange = 'All' | 'Quarter' | 'Month' | 'Week'
 
 export default (
-  collection?: CollectionEntityWithVolumes,
+  collection?: Awaited<ReturnType<typeof proccessData>>[number],
   timeRange?: Ref<TimeRange>,
 ) => {
   const volume = computed(() => {
