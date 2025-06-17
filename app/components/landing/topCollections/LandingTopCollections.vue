@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useFiatStore } from '@/stores/fiat'
 // import TopCollectionsCard from './TopCollectionsCard.vue'
-import { useTopCollections } from './utils/useTopCollections'
+// import { useTopCollections } from './utils/useTopCollections'
 
-const limit = 8
+// const limit = 8
 
-const { data } = useTopCollections(limit)
+// const { data } = useTopCollections(limit)
 const fiatStore = useFiatStore()
 
 onMounted(() => {
@@ -16,7 +16,7 @@ onMounted(() => {
 </script>
 
 <template>
-  {{ data }}
+  <!-- {{ data }} -->
   <section class="pt-8 md:pt-16 px-4 md:px-0">
     <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 text-center md:text-left">
       {{ $t('collection.topCollections') }}
