@@ -8,7 +8,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && npx papi",
+    "postinstall": "nuxt prepare && npx papi && npx gql-tada generate-output",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "prepare": "husky"
