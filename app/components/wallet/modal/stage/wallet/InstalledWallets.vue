@@ -24,7 +24,7 @@ const isConnected = (extension: WalletExtension) => extension.state === WalletSt
     <WalletsGrid :extensions @select="item => emit('select', item)">
       <template #grid>
         <WalletsGridItem>
-          <div class="flex flex-col space-y-1">
+          <div class="flex flex-col items-center space-y-3">
             <StackedWallets :wallets="extensions" size="sm" />
             <span class="text-xs">{{ $t('wallet.lastConnected') }}</span>
           </div>
@@ -43,7 +43,7 @@ const isConnected = (extension: WalletExtension) => extension.state === WalletSt
         <WalletItemContent :extension="item">
           <div class="font-medium text-xs flex items-center" :class="isConnected(item) ? 'text-red-500 dark:text-red-400' : 'text-blue-500 dark:text-blue-400'">
             <span>{{ isConnected(item) ? $t('wallet.disconnect') : $t('wallet.connect') }}</span>
-            <UIcon :name="isConnected(item) ? 'i-heroicons-x-mark' : 'i-heroicons-chevron-right'" class="w-3 h-3 ml-1" />
+            <UIcon :name="isConnected(item) ? 'i-heroicons-link-slash' : 'i-heroicons-chevron-right'" class="w-3 h-3 ml-1" />
           </div>
         </WalletItemContent>
       </template>
