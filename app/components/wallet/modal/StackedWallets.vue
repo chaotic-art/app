@@ -1,36 +1,52 @@
 <script setup lang="ts">
 import type { WalletExtension } from '@/stores/wallet/types'
 
-const props = withDefaults(defineProps<Props>(), {
-  maxVisible: 3,
-  size: 'md',
-})
+type Size = 'sm' | 'md' | 'lg' | 'xl'
 
-const sizeMap = {
+interface SizeConfig {
+  container: string
+  image: string
+  text: string
+  overlap: string
+}
+
+const props = withDefaults(
+  defineProps<{
+    wallets: WalletExtension[]
+    maxVisible?: number
+    size?: Size
+  }>(),
+  {
+    maxVisible: 3,
+    size: 'md',
+  },
+)
+
+const sizeMap: Record<Size, SizeConfig> = {
   sm: {
+    container: 'h-6',
+    image: 'w-6 h-6',
+    text: 'text-xs',
+    overlap: '-ml-1',
+  },
+  md: {
     container: 'h-8',
     image: 'w-8 h-8',
     text: 'text-xs',
     overlap: '-ml-2',
   },
-  md: {
+  lg: {
     container: 'h-10',
     image: 'w-10 h-10',
     text: 'text-sm',
     overlap: '-ml-2.5',
   },
-  lg: {
+  xl: {
     container: 'h-12',
     image: 'w-12 h-12',
     text: 'text-sm',
     overlap: '-ml-3',
   },
-}
-
-interface Props {
-  wallets: WalletExtension[]
-  maxVisible?: number
-  size?: 'sm' | 'md' | 'lg'
 }
 
 const visibleWallets = computed(() => props.wallets.slice(0, props.maxVisible))
