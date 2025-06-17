@@ -59,7 +59,12 @@ const title = computed(() => {
 </script>
 
 <template>
-  <UModal v-model:open="isModalOpen">
+  <UModal
+    v-model:open="isModalOpen" 
+    :ui="{
+      content: 'max-w-xl w-full',
+    }"
+  >
     <template #content>
       <div>
         <div class="flex justify-between items-start p-4 border-b border-gray-200 dark:border-gray-700">

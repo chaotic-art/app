@@ -34,55 +34,53 @@ async function copyAddress(address: string) {
       :key="account.id"
       class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
       :class="{ 'ring-2 ring-primary-500': account.isSelected }"
-      :ui="{ body: '!p-2' }"
+      :ui="{ body: '!py-2 !px-3' }"
       @click="selectAccount(account)"
     >
       <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 w-full">
           <div class="relative">
-            <ProfileAvatar :address="account.address" />
+            <ProfileAvatar :address="account.address" :size="32" />
           </div>
-          <div class="flex items-start space-x-1">
-            <div>
-              <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-1">
-                  <div class="w-4 h-4 rounded shadow-lg bg-white flex items-center justify-center relative z-10">
-                    <img
-                      :src="extension.icon"
-                      :alt="extension.name"
-                      class="w-3 h-3 object-contain"
-                    >
-                  </div>
-                  <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                    {{ account.name }}
-                  </div>
-                  <UBadge
-                    v-if="account.vm === 'EVM'"
-                    color="info"
-                    size="xs"
+          <div class="w-full">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center space-x-1">
+                <div class="w-4 h-4 rounded shadow-lg bg-white flex items-center justify-center relative z-10">
+                  <img
+                    :src="extension.icon"
+                    :alt="extension.name"
+                    class="w-3 h-3 object-contain"
                   >
-                    EVM
-                  </UBadge>
                 </div>
-                <span class="text-xs text-gray-600 dark:text-gray-400">
-                  ${{ account.balance }}
-                </span>
-              </div>
-
-              <div class="flex justify-between items-center space-x-2">
-                <div class="text-xs text-gray-500 dark:text-gray-400">
-                  {{ account.address }}
+                <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  {{ account.name }}
                 </div>
-
-                <UButton
-                  icon="i-lucide-copy"
+                <UBadge
+                  v-if="account.vm === 'EVM'"
+                  color="info"
                   size="xs"
-                  color="neutral"
-                  variant="ghost"
-                  class="opacity-60 hover:opacity-100 transition-opacity"
-                  @click.prevent="copyAddress(account.address)"
-                />
+                >
+                  EVM
+                </UBadge>
               </div>
+              <span class="text-xs text-gray-600 dark:text-gray-400">
+                ${{ account.balance }}
+              </span>
+            </div>
+
+            <div class="flex justify-between items-center space-x-2">
+              <div class="text-xs text-gray-500 dark:text-gray-400">
+                {{ account.address }}
+              </div>
+
+              <UButton
+                icon="i-lucide-copy"
+                size="xs"
+                color="neutral"
+                variant="ghost"
+                class="opacity-60 hover:opacity-100 transition-opacity"
+                @click.prevent="copyAddress(account.address)"
+              />
             </div>
           </div>
         </div>
