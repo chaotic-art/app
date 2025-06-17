@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import type { WalletAccount } from '@/components/wallet/types.ts'
+import type { WalletAccount, WalletExtensionAccountPair } from '@/stores/wallet/types.ts'
+import { useWalletStore } from '@/stores/wallet'
 
-const props = defineProps<{
-  accounts: WalletAccount[]
+defineProps<{
+  items: WalletExtensionAccountPair[]
+}>()
+
+const emit = defineEmits<{
+  select: [accountId: string]
 }>()
 
 const { $jdenticon } = useNuxtApp()
+
+const walletStore = useWalletStore()
 
 function generateAvatar(address: string): string {
   // if (import.meta.client && $jdenticon) {
@@ -14,19 +21,18 @@ function generateAvatar(address: string): string {
   return ''
 }
 
-const filteredAccounts = computed(() => props.accounts)
-
-function selectAccount(account) {
+function selectAccount(account: WalletAccount) {
+  emit('select', account.id)
 }
 </script>
 
 <template>
   <div>
-    <WalletAccountListEmpty v-if="filteredAccounts.length === 0" />
+    <WalletAccountListEmpty v-if="items.length === 0" />
 
     <UCard
-      v-for="account in filteredAccounts"
-      :key="`${account.vm}-${account.address}`"
+      v-for="({ account, extension }) in items"
+      :key="account.id"
       class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
       :class="{ 'ring-2 ring-primary-500': account.isSelected }"
       @click="selectAccount(account)"
@@ -34,18 +40,15 @@ function selectAccount(account) {
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3">
           <div class="relative">
-            <div
-              class="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800"
-              v-html="generateAvatar(account.address)"
-            />
+            <ProfileAvatar :address="account.address" />
           </div>
           <div class="flex items-start">
             <div>
-              <div class="flex items-center space-x-0.5">
-                <div class="w-4 h-4 rounded-lg shadow-lg bg-white flex items-center justify-center relative z-10">
+              <div class="flex items-center space-x-1">
+                <div class="w-4 h-4 rounded shadow-lg bg-white flex items-center justify-center relative z-10">
                   <img
-                    src="/partners/logo-talisman.svg"
-                    alt="Talisman Wallet Extension"
+                    :src="extension.icon"
+                    :alt="extension.name"
                     class="w-3 h-3 object-contain"
                   >
                 </div>

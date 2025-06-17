@@ -18,6 +18,7 @@ async function initSubAuthorization(extension: WalletExtension): Promise<WalletA
   const subWalletAccounts = await subWalletStore.connectWallet(extension.source as any)
 
   const walletAccounts: WalletAccount[] = subWalletAccounts.map(account => ({
+    id: `${extension.id}:${account.address}`,
     vm: 'SUB',
     address: account.address,
     isSelected: false,
@@ -42,8 +43,11 @@ async function initAuthorization(extension: WalletExtension) {
       // TODO
     }
 
-    walletStore.updateWalletAccounts(extension.id, walletAccounts)
-    walletStore.updateWalletState(extension.id, WalletStates.Connected)
+    walletStore.updateWallet(extension.id, {
+      accounts: walletAccounts,
+      state: WalletStates.Connected,
+      isSelected: true,
+    })
   }
   catch (error) {
     walletStore.updateWalletState(extension.id, WalletStates.ConnectionFailed)

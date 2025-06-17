@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { Wallet } from '@/stores/wallet'
-import type { ChainVM } from '@kodadot1/static'
+import type { WalletAccount } from '@/stores/wallet/types'
 import { shortenAddress } from '@/utils/format/address'
 
 const props = defineProps<{
-  walletType: ChainVM
-  wallet: Wallet
+  account: WalletAccount
 }>()
 
 const { $jdenticon } = useNuxtApp()
 const avatarSvg = ref('')
+
+const selectedAccount = computed(() => props.account)
 
 function generateAvatar(address: string): string {
   if (import.meta.client && $jdenticon) {
@@ -19,8 +19,8 @@ function generateAvatar(address: string): string {
 }
 
 function updateAvatar() {
-  if (props.wallet.connected && props.wallet.account?.address && import.meta.client) {
-    avatarSvg.value = generateAvatar(props.wallet.account.address)
+  if (selectedAccount.value && import.meta.client) {
+    avatarSvg.value = generateAvatar(selectedAccount.value.address)
   }
 }
 
@@ -28,23 +28,23 @@ onMounted(() => {
   updateAvatar()
 })
 
-watch(() => props.wallet.account?.address, () => {
+watch(() => selectedAccount.value?.address, () => {
   updateAvatar()
 })
 
 const displayName = computed(() => {
-  if (props.walletType === 'SUB' && props.wallet.account?.name) {
-    return props.wallet.account.name
+  if (props.account.vm === 'SUB' && selectedAccount.value?.name) {
+    return selectedAccount.value.name
   }
-  return props.walletType
+  return props.account.vm
 })
 </script>
 
 <template>
   <div
-    v-if="wallet.connected && wallet.account?.address"
+    v-if="selectedAccount?.address"
     class="flex items-center cursor-pointer"
-    :class="{ 'mr-1': walletType === 'EVM' }"
+    :class="{ 'mr-1': account.vm === 'EVM' }"
   >
     <div
       class="w-7 h-7 rounded-full overflow-hidden mr-2 border border-gray-200 dark:border-gray-700"
@@ -52,7 +52,7 @@ const displayName = computed(() => {
     />
     <div class="flex flex-col">
       <span class="text-xs font-medium">{{ displayName }}</span>
-      <span class="text-xs text-gray-500">{{ shortenAddress(wallet.account?.address || '') }}</span>
+      <span class="text-xs text-gray-500">{{ shortenAddress(selectedAccount?.address || '') }}</span>
     </div>
   </div>
 </template>

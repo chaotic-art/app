@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useWalletStore } from '~/stores/wallet'
 
-const { wallets, getIsEvmConnected: evmConnected, getIsSubstrateConnected: subConnected } = storeToRefs(useWalletStore())
+const { getIsEvmConnected: evmConnected, getIsSubstrateConnected: subConnected, getConnectedEvmAccount, getConnectedSubAccount } = storeToRefs(useWalletStore())
 
 const hasConnectedWallet = computed(() => evmConnected.value || subConnected.value)
 </script>
@@ -13,8 +13,7 @@ const hasConnectedWallet = computed(() => evmConnected.value || subConnected.val
   >
     <ConnectedWalletBadge
       v-if="evmConnected"
-      wallet-type="EVM"
-      :wallet="wallets.EVM"
+      :account="getConnectedEvmAccount!"
     />
 
     <div
@@ -24,8 +23,7 @@ const hasConnectedWallet = computed(() => evmConnected.value || subConnected.val
 
     <ConnectedWalletBadge
       v-if="subConnected"
-      wallet-type="SUB"
-      :wallet="wallets.SUB"
+      :account="getConnectedSubAccount!"
     />
 
     <UIcon
