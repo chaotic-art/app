@@ -13,6 +13,10 @@ onMounted(() => {
   }
 
   try {
+    if (!import.meta.client) {
+      return
+    }
+
     const { data } = useTopCollections(limit)
     // eslint-disable-next-line no-console
     console.log(data)
