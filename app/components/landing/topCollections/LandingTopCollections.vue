@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import { useFiatStore } from '@/stores/fiat'
 // import TopCollectionsCard from './TopCollectionsCard.vue'
-// import { useTopCollections } from './utils/useTopCollections'
+import { useTopCollections } from './utils/useTopCollections'
 
-// const limit = 8
+const limit = 8
 
-// const { data } = useTopCollections(limit)
 const fiatStore = useFiatStore()
 
 onMounted(() => {
   if (fiatStore.getCurrentKSMValue) {
     fiatStore.fetchFiatPrice()
+  }
+
+  try {
+    const { data } = useTopCollections(limit)
+    // eslint-disable-next-line no-console
+    console.log(data)
+  }
+  catch (error) {
+    console.error(error)
   }
 })
 </script>
