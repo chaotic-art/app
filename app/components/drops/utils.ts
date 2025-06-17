@@ -1,37 +1,10 @@
 import type { DropItem } from '@/types'
-import { type Duration, formatDuration, intervalToDuration, intlFormat } from 'date-fns'
+import { intlFormat } from 'date-fns'
 import { getDropById } from '@/services/fxart'
 import { fetchOdaCollection, fetchOdaCollectionAbi } from '@/services/oda'
 import { DropStatus } from '@/types/drop'
 
 export const FALLBACK_DROP_COLLECTION_MAX = 64
-
-export function toDropScheduledDurationString(startTime: Date, short: boolean = false) {
-  const duration = intervalToDuration({
-    start: startTime,
-    end: new Date(),
-  })
-
-  const options = {
-    format: ['hours', 'minutes'] as (keyof Duration)[],
-  }
-
-  if (short) {
-    Object.assign(options, {
-      locale: {
-        formatDistance: (token: string, count: string) => {
-          return {
-            xHours: '{{count}}h',
-            xMinutes: '{{count}}m',
-            xSeconds: '{{count}}s',
-          }?.[token]?.replace('{{count}}', count)
-        },
-      },
-    })
-  }
-
-  return formatDuration(duration, options)
-}
 
 export function formatDropStartTime(
   startTime: Date,
