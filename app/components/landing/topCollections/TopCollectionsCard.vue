@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import type { CollectionEntityWithVolumes } from './utils/types'
 
-const props = defineProps<{
+defineProps<{
   collection?: CollectionEntityWithVolumes
 }>()
 
 const { prefix } = usePrefix()
 
-const { volume } = useCollectionVolume(
-  props.collection,
-  ref('All'),
-)
+// const { volume } = useCollectionVolume(
+//   props.collection,
+//   ref('All'),
+// )
 </script>
 
 <template>
@@ -42,7 +42,7 @@ const { volume } = useCollectionVolume(
             {{ $t('collection.volume') }}
           </div>
           <div class="text-xl text-black font-normal">
-            <Money :value="volume" :inline="true" :round="0" />
+            <!-- <Money :value="volume" :inline="true" :round="0" /> -->
           </div>
         </div>
       </div>
