@@ -29,7 +29,7 @@ const price = computed(() => {
 
 <template>
   <NuxtLink :to="`/${chain}/gallery/${collectionId}-${tokenId}`" class="border rounded-xl border-gray-300 overflow-hidden">
-    <img :src="token?.metadata.image" alt="NFT" class="aspect-square">
+    <img :src="sanitizeIpfsUrl(token?.metadata.image)" alt="NFT" class="aspect-square">
 
     <div class="p-4">
       <p class="font-bold mb-2">
