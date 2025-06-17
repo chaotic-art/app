@@ -1,31 +1,9 @@
 import type { DropItem } from '@/types'
-import { intlFormat } from 'date-fns'
 import { getDropById } from '@/services/fxart'
 import { fetchOdaCollection, fetchOdaCollectionAbi } from '@/services/oda'
 import { DropStatus } from '@/types/drop'
 
 export const FALLBACK_DROP_COLLECTION_MAX = 64
-
-export function formatDropStartTime(
-  startTime: Date,
-  locale: string,
-  withTime = false,
-) {
-  const options = {
-    day: '2-digit',
-    month: withTime ? '2-digit' : 'long',
-    hour12: withTime,
-  } as const
-
-  if (withTime) {
-    Object.assign(options, {
-      hour: 'numeric',
-      minute: '2-digit',
-    })
-  }
-
-  return intlFormat(startTime, options, { locale })
-}
 
 export function formatCETDate(date: string, time: string): Date {
   return new Date(`${date}T${time}+02:00`)
@@ -35,8 +13,6 @@ export function parseCETDate(datetime: string): Date {
   const [date, time] = datetime.split(' ')
   return formatCETDate(date!, time!)
 }
-
-export const dateHasTime = (datetime: string): boolean => /:/.test(datetime)
 
 function getLocalDropStatus(drop: Pick<DropItem, 'dropStartTime' | 'minted' | 'max' | 'disabled'>): DropStatus {
   const now = new Date()
@@ -127,5 +103,3 @@ export async function getDropAttributes(alias: string): Promise<DropItem | undef
     status: getLocalDropStatus(drop),
   }
 }
-
-export const isTBA = (price: unknown) => price === null || price === ''

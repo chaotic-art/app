@@ -1,6 +1,5 @@
 import type { Interaction } from '@/types'
 import { collectionsSales, type CollectionsSalesData, topCollections, type TopCollectionsData } from '@/graphql/queries/collections'
-import { getCollectionImage } from '@/utils/collections'
 
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
 import {
@@ -28,13 +27,7 @@ export function proccessData(
           .map(nft => nft.events)
           .flat() ?? []) as unknown as Interaction[]
 
-        const image = collection.image
-          ? sanitizeIpfsUrl(collection.image)
-          : sanitizeIpfsUrl(
-              getCollectionImage(
-                await processSingleMetadata(collection.metadata ?? ''),
-              ) || '',
-            )
+        const image = sanitizeIpfsUrl(collection.image || '')
 
         return {
           ...collection,

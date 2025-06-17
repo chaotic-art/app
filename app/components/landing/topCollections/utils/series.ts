@@ -1,5 +1,5 @@
 import type { Interaction } from '@/types'
-import { formatISO, subDays } from 'date-fns'
+import { subDays } from 'date-fns'
 import { after, between, getVolume } from '@/utils/math'
 
 export interface SortType {
@@ -44,14 +44,6 @@ export function monthlyrangeVolume(buyEvents: Interaction[]) {
 
 export function threeMonthRangeVolume(buyEvents: Interaction[]) {
   return Number(getVolume(buyEvents.filter(between(last6monthDate, last3monthDate))))
-}
-
-export function onlyDate(datetime: Date) {
-  return formatISO(datetime, { representation: 'date' })
-}
-
-export function toSort(sortBy: SortType): string {
-  return `${sortBy.field}_${sortBy.value}`
 }
 
 export function calculateAvgPrice(volume: string, buys: number): string {
