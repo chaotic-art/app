@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { WalletAccount, WalletExtensionAccountPair } from '@/stores/wallet/types.ts'
-import { useWalletStore } from '@/stores/wallet'
 
 defineProps<{
   items: WalletExtensionAccountPair[]
@@ -9,17 +8,6 @@ defineProps<{
 const emit = defineEmits<{
   select: [accountId: string]
 }>()
-
-const { $jdenticon } = useNuxtApp()
-
-const walletStore = useWalletStore()
-
-function generateAvatar(address: string): string {
-  // if (import.meta.client && $jdenticon) {
-  //   return $jdenticon.toSvg(address, 40)
-  // }
-  return ''
-}
 
 function selectAccount(account: WalletAccount) {
   emit('select', account.id)

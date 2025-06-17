@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useWalletStore } from '@/stores/wallet'
+import { WalletStageTypes } from '~/stores/wallet/types'
 
 const walletStore = useWalletStore()
 
-const { wallets } = storeToRefs(walletStore)
+const { wallets, getConnectedWallets: connectedWallets } = storeToRefs(walletStore)
+
 const searchQuery = ref('')
 
 const selectedWallets = computed(() => wallets.value.filter(wallet => wallet.isSelected))
@@ -32,6 +34,14 @@ function hadnleAccountSelect(accountId: string) {
 
   walletStore.setSelectedAccount(wallet.vm, accountId)
 }
+
+function handleManageWallets() {
+  walletStore.setStage(WalletStageTypes.Wallet)
+}
+
+function handleLogout() {
+  console.log('Logout')
+}
 </script>
 
 <template>
@@ -47,6 +57,12 @@ function hadnleAccountSelect(accountId: string) {
     <WalletAccountList
       :items="filteredAccounts"
       @select="hadnleAccountSelect"
+    />
+
+    <WalletAccountFooter
+      :extensions="connectedWallets"
+      @manage="handleManageWallets"
+      @logout="handleLogout"
     />
   </div>
 </template>

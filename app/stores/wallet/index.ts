@@ -1,7 +1,7 @@
 import type { ChainVM } from '@kodadot1/static'
 import type { WalletAccount, WalletExtension, WalletStageType, WalletState } from './types'
 import { defineStore } from 'pinia'
-import { WalletStageTypes } from './types'
+import { WalletStageTypes, WalletStates } from './types'
 
 export const useWalletStore = defineStore('wallet', () => {
   const wallets = ref<WalletExtension[]>([])
@@ -14,6 +14,7 @@ export const useWalletStore = defineStore('wallet', () => {
   const getConnectedSubAccount = computed(() => selectedAccounts.value.SUB ? getWalletAccount(selectedAccounts.value.SUB) : undefined)
   const getInstalledWallets = computed(() => wallets.value.filter(wallet => wallet.installed))
   const getUninstalledWallets = computed(() => wallets.value.filter(wallet => !wallet.installed))
+  const getConnectedWallets = computed(() => wallets.value.filter(wallet => wallet.state === WalletStates.Connected))
 
   function findWallet(id: string): WalletExtension | undefined {
     return wallets.value.find(wallet => wallet.id === id)
@@ -71,6 +72,7 @@ export const useWalletStore = defineStore('wallet', () => {
     getInstalledWallets,
     getConnectedSubAccount,
     getConnectedEvmAccount,
+    getConnectedWallets,
     clear,
     updateWalletState,
     updateWallet,

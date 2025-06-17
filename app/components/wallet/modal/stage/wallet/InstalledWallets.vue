@@ -24,8 +24,10 @@ const isConnected = (extension: WalletExtension) => extension.state === WalletSt
     <WalletsGrid :extensions @select="item => emit('select', item)">
       <template #grid>
         <WalletsGridItem>
-          <!-- TODO -->
-          Last Connected
+          <div class="flex flex-col space-y-1">
+            <StackedWallets :wallets="fiveWallets" size="md" />
+            <span>Last Connected</span>
+          </div>
         </WalletsGridItem>
       </template>
 
