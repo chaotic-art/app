@@ -1,7 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-import { apolloClientConfig } from './app/utils/constants'
-
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
@@ -59,7 +57,6 @@ export default defineNuxtConfig({
     'pinia-plugin-persistedstate/nuxt',
     '@wagmi/vue/nuxt',
     '@nuxtjs/seo',
-    '@nuxtjs/apollo',
   ],
 
   runtimeConfig: {
@@ -71,11 +68,6 @@ export default defineNuxtConfig({
 
   pinia: {
     storesDirs: ['./stores'],
-  },
-
-  apollo: {
-    clients: apolloClientConfig,
-
   },
 
   i18n: {

@@ -1,16 +1,8 @@
-import type {
-  CollectionEntity,
-  CollectionEntityWithVolumes,
-  CollectionSales,
-  CollectionsSalesResult,
-  TopCollectionListResult,
-} from './types'
-import collectionsSales from '@/queries/subsquid/general/collectionsSales.graphql'
-import topCollectionList from '@/queries/subsquid/general/topCollectionList.graphql'
-import topCollectionsListAh from '@/queries/subsquid/general/topCollections.graphql'
+import type { Interaction } from '@/types'
+import { collectionsSales, type CollectionsSalesData, topCollections, type TopCollectionsData } from '@/graphql/queries/collections'
 import { getCollectionImage } from '@/utils/collections'
-import { sanitizeIpfsUrl } from '@/utils/ipfs'
 
+import { sanitizeIpfsUrl } from '@/utils/ipfs'
 import {
   calculateAvgPrice,
   monthlyrangeVolume,
@@ -22,22 +14,25 @@ import {
   weeklyVolume,
 } from './series'
 
-function proccessData(collectionsList: CollectionEntity[], collectionsSales: CollectionSales[]) {
+export function proccessData(
+  collectionsList: TopCollectionsData['collectionEntities'],
+  collectionsSales: CollectionsSalesData['collectionsSales'],
+) {
   return Promise.all(
     collectionsList.map(
-      async (collection): Promise<CollectionEntityWithVolumes> => {
+      async (collection) => {
         const thisCollectionSales = collectionsSales.find(
           ({ id }) => id === collection.id,
-        ) as CollectionSales
-        const saleEvents = thisCollectionSales.sales
+        )
+        const saleEvents = (thisCollectionSales?.sales
           .map(nft => nft.events)
-          .flat()
+          .flat() ?? []) as unknown as Interaction[]
 
         const image = collection.image
           ? sanitizeIpfsUrl(collection.image)
           : sanitizeIpfsUrl(
               getCollectionImage(
-                await processSingleMetadata(collection.metadata),
+                await processSingleMetadata(collection.metadata ?? ''),
               ) || '',
             )
 
@@ -46,7 +41,7 @@ function proccessData(collectionsList: CollectionEntity[], collectionsSales: Col
           image,
           averagePrice: calculateAvgPrice(
             collection.volume as string,
-            collection.buys,
+            collection.nftCount,
           ),
           volume: volume(saleEvents),
           weeklyVolume: weeklyVolume(saleEvents),
@@ -61,89 +56,58 @@ function proccessData(collectionsList: CollectionEntity[], collectionsSales: Col
   )
 }
 
-export function useTopCollections(limit: number, immediate = true) {
+export function useTopCollections(limit: number) {
+  const { $apolloClient } = useNuxtApp()
   const { prefix } = usePrefix()
-  const { isAssetHub, isBase } = useIsChain(prefix)
-  const topCollectionWithVolumeList = useState<CollectionEntityWithVolumes[]>(
+  const topCollectionWithVolumeList = useState<Awaited<ReturnType<typeof proccessData>>>(
     'topCollectionWithVolumeList',
     () => [],
   )
-  const loading = ref(true)
-  const collectionsSalesResults = ref<CollectionsSalesResult | null>(null)
+  const collectionsSalesResults = ref<CollectionsSalesData | null>(null)
 
-  const {
-    data: topCollections,
-    pending: topCollectionLoading,
-    refresh,
-  } = useAsyncData(
-    'topCollections',
-    async () => {
-      const where
-        = isAssetHub.value
-          ? {
-              issuer_not_in: getDenyList(prefix.value) || [],
-              volume_gt: '0',
-            }
-          : {}
+  onMounted(async () => {
+    const { data: topCollectionsData } = await $apolloClient.query({
+      query: topCollections,
+      variables: {
+        orderBy: 'volume_DESC',
+        limit,
+        where: {
+          issuer_not_in: getDenyList(prefix.value) || [],
+          volume_gt: '0',
+        },
+      },
+      context: {
+        endpoint: prefix.value,
+      },
+    })
 
-      if (isBase.value) {
-        // remove once volume is tracked
-        delete where.volume_gt
-      }
+    if (topCollectionsData?.collectionEntities?.length) {
+      const ids = topCollectionsData.collectionEntities.map(c => c.id)
 
-      const { data } = await useAsyncQuery<TopCollectionListResult>({
-        query:
-          isAssetHub.value || isBase.value
-            ? topCollectionsListAh
-            : topCollectionList,
-        variables: { orderBy: 'volume_DESC', limit, where },
-        clientId: prefix.value,
-      })
-      return data.value
-    },
-    {
-      immediate,
-    },
-  )
-
-  watchEffect(async () => {
-    if (topCollections.value) {
-      const ids = topCollections.value.collectionEntities.map(c => c.id)
-
-      const { data } = useAsyncQuery<CollectionsSalesResult>({
-        clientId: prefix.value,
+      const result = await $apolloClient.query({
         query: collectionsSales,
         variables: { ids },
+        context: {
+          endpoint: prefix.value,
+        },
       })
 
       topCollectionWithVolumeList.value = []
-      collectionsSalesResults.value = data.value
+      collectionsSalesResults.value = result.data
 
       if (
         collectionsSalesResults.value
-        && topCollections.value?.collectionEntities.length
+        && topCollectionsData.collectionEntities?.length
       ) {
         topCollectionWithVolumeList.value = await proccessData(
-          topCollections.value.collectionEntities,
+          topCollectionsData.collectionEntities,
           collectionsSalesResults.value.collectionsSales,
         )
-
-        loading.value = false
       }
     }
   })
 
-  watch(topCollectionLoading, (value) => {
-    if (value) {
-      loading.value = true
-    }
-  })
-
-  watch(prefix, () => refresh())
-
   return {
     data: topCollectionWithVolumeList,
-    loading,
-    refresh,
   }
 }
