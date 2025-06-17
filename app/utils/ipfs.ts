@@ -1,31 +1,11 @@
-import type {
-  ArweaveProviders,
-  ProviderKeyType,
-} from '@/config/ipfs'
-import type { NFT, NFTMetadata } from '@/types'
+import type { ProviderKeyType } from '@/config/ipfs'
 import { IPFS_REGEX, isCID, isHTTP } from '@kodadot1/minipfs'
-import { consola } from 'consola'
-import { $fetch } from 'ofetch'
 import {
-  arweaveProviders,
-  CF_IMAGE_URL,
   getIPFSProvider,
   kodaImage,
 } from '@/config/ipfs'
 
-import { emptyObject } from '@/utils/empty'
-
 export const ipfsUrlPrefix = 'ipfs://ipfs/'
-
-export const IPFS_BASE_URL = 'https://ipfs.io/'
-
-const api = $fetch.create({
-  baseURL: IPFS_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  credentials: 'omit',
-})
 
 export function fastExtract(ipfsLink?: string): string {
   if (!ipfsLink) {
@@ -39,61 +19,12 @@ export function fastExtract(ipfsLink?: string): string {
   return ipfsLink.replace('ipfs://', '')
 }
 
-const cidRegex = /ipfs\/([a-zA-Z0-9]+)/
-export function extractCid(ipfsLink?: string): string {
-  if (!ipfsLink) {
-    return ''
-  }
-
-  const match = cidRegex.exec(ipfsLink)
-  if (!match) {
-    const fastCid = fastExtract(ipfsLink)
-    return fastCid
-  }
-
-  return match[1] as string
-}
-
-export function dummyIpfsCid(): string {
-  return `${ipfsUrlPrefix}QmaCWgK91teVsQuwLDt56m2xaUfBCCJLeCsPeJyHEenoES`
-}
-const ar = /^ar:\/\//
-
-export function sanitizeArweaveUrl(url: string, provider?: ArweaveProviders): string {
-  if (ar.test(url)) {
-    return url.replace(ar, resolveArProvider(provider))
-  }
-
-  return url
-}
-
-export function isArweaveUrl(url: string): boolean {
-  return ar.test(url)
-}
-
 export function sanitizeIpfsCid(url: string, provider?: ProviderKeyType): string {
   return `${resolveProvider(provider)}ipfs/${url}`
 }
 
-export function isIpfsUrl(url: string): boolean {
-  return /^ipfs:\/\//.test(url)
-}
-
-export function isIpfsCid(url: string): boolean {
-  return /^[0-9a-z]{44,}$/i.test(url)
-}
-
-export type SanitizerFunc = (url: string) => string
-
 function resolveProvider(key: ProviderKeyType = 'image'): string {
   return getIPFSProvider(key)
-}
-function resolveArProvider(key: ArweaveProviders = 'arweave'): string {
-  return arweaveProviders[key]
-}
-
-export interface SomethingWithMeta {
-  metadata: string
 }
 
 export function replaceIpfsGateway(url: string, provider?: ProviderKeyType): string {
@@ -131,81 +62,4 @@ export function sanitizeIpfsUrl(ipfsUrl = '', provider?: ProviderKeyType): strin
   }
 
   return assetExternalUrl(extract)
-}
-
-export async function fetchMetadata<T>(rmrk: SomethingWithMeta, sanitizer: SanitizerFunc = sanitizeIpfsUrl): Promise<T> {
-  try {
-    if (!rmrk.metadata) {
-      return emptyObject<T>()
-    }
-
-    const { status, _data } = await api.raw(sanitizer(rmrk.metadata), {
-      responseType: 'json',
-    })
-    if (status < 400) {
-      return _data as T
-    }
-  }
-  catch (e) {
-    console.warn('IPFS Err', e)
-    return emptyObject<T>()
-  }
-
-  return emptyObject<T>()
-}
-
-export function fetchNFTMetadata(rmrk: NFT | SomethingWithMeta, sanitizer: SanitizerFunc = sanitizeIpfsUrl): Promise<NFTMetadata> {
-  return fetchMetadata<NFTMetadata>(rmrk, sanitizer)
-}
-
-export function preheatFileFromIPFS(ipfsUrl: string) {
-  const url = sanitizeIpfsUrl(`${ipfsUrlPrefix}${ipfsUrl}`)
-
-  // preheat to r2/cfi
-  api(url, {
-    redirect: 'manual', // no need to hit cf-images if the file exists
-  })
-    .then(async () => consola.log(`[PREHEAT] ${url}`))
-    .catch(err => consola.error(`[PREHEAT] ${url} ${err.message}`))
-}
-
-export function getSanitizer(url: string, ipfsProvider?: ProviderKeyType, arProvider?: ArweaveProviders): SanitizerFunc {
-  if (url && (isIpfsUrl(url) || url.includes('https://gateway.pinata.cloud'))) {
-    return link => sanitizeIpfsUrl(link, ipfsProvider)
-  }
-
-  if (isArweaveUrl(url)) {
-    return link => sanitizeArweaveUrl(link, arProvider)
-  }
-
-  if (isIpfsCid(url)) {
-    return link => sanitizeIpfsCid(link, ipfsProvider)
-  }
-
-  return link => link
-}
-
-export function ipfsToCf(ipfsUrl: string): string {
-  const cid = extractCid(ipfsUrl)
-  return `${CF_IMAGE_URL}${cid}/public`
-}
-
-export function getHigherResolutionCloudflareImage(url: string): string {
-  return url.replace(/\/public$/, '/detail')
-}
-
-export interface EntityWithMeta {
-  metadata: string
-  meta?: NFTMetadata
-}
-
-export function toCloudflareIpfsUrl(baseurl: string) {
-  const url = new URL(baseurl)
-  return `https://cloudflare-ipfs.com/${url.pathname}`
-}
-
-export function toOriginalContentUrl(baseurl: string) {
-  const url = new URL(baseurl)
-  url.searchParams.append('original', 'true')
-  return url.toString()
 }

@@ -53,7 +53,6 @@ export const URLS = {
     coingecko: 'https://api.coingecko.com/api/v3',
     kodaprice: 'https://price.kodadot.workers.dev/',
     ramp: 'https://ramp.network/buy/',
-    cloudflare: 'https://cloudflare-ipfs.com/ipfs/',
     pinata: 'https://api.pinata.cloud/',
   },
 }
