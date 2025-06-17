@@ -24,7 +24,7 @@
     <LandingArtistsList />
 
     <UContainer>
-      <LazyLandingTopCollections />
+      <!-- <LazyLandingTopCollections /> -->
       <Articles />
     </UContainer>
   </div>
