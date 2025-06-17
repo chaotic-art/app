@@ -83,10 +83,10 @@ watch(currentExtension, handleQueue, { immediate: true })
 
     <div class="text-center space-y-2">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-        Waiting for authorization
+        {{ $t('wallet.waitingForAuthorization') }}
       </h1>
       <h2 class="text-lg text-gray-600 dark:text-gray-300 font-medium">
-        Please connect your wallet extension to Chaotic
+        {{ $t('wallet.pleaseConnectWalletExtensionToChaotic') }}
       </h2>
     </div>
   </div>

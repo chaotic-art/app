@@ -48,7 +48,7 @@ function handleLogout() {
   <div class="space-y-2">
     <UInput
       v-model="searchQuery"
-      placeholder="Search by name or paste address"
+      :placeholder="$t('wallet.searchByNameOrPasteAddress')"
       icon="i-lucide-search"
       size="lg"
       class="w-full"

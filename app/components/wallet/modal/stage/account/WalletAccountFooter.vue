@@ -13,7 +13,7 @@ defineEmits(['manage', 'logout'])
       <StackedWallets :wallets="extensions" :max-visible="2" size="sm" />
 
       <div class="text-sm text-gray-600 dark:text-gray-400 capitalize">
-        {{ extensions.length }} connected
+        {{ $t('wallet.connected_count', { count: extensions.length }) }}
       </div>
     </div>
 
@@ -25,7 +25,7 @@ defineEmits(['manage', 'logout'])
         icon="i-lucide-log-out"
         @click="$emit('logout')"
       >
-        Log out
+        {{ $t('wallet.logOut') }}
       </UButton>
 
       <UButton
@@ -34,7 +34,7 @@ defineEmits(['manage', 'logout'])
         size="sm"
         @click="$emit('manage')"
       >
-        Manage wallets
+        {{ $t('wallet.manageWallets') }}
       </UButton>
     </div>
   </div>

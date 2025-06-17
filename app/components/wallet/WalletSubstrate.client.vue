@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WalletAccount } from '@/stores/wallet'
+import type { WalletAccount } from '@/stores/wallet/types'
 import type { SubstrateWalletSource } from '~/utils/wallet/substrate/types'
 import { useWalletStore } from '@/stores/wallet'
 import { useSubWalletStore } from '~/stores/subWallet'
@@ -90,7 +90,7 @@ function isWalletConnected(source: SubstrateWalletSource) {
           </div>
           <div>
             <div class="font-medium text-success-800 dark:text-success-200">
-              {{ connectedWallet.account.name || 'Connected' }}
+              {{ connectedWallet.account.name || $t('wallet.connected') }}
             </div>
             <div class="text-sm text-success-600 dark:text-success-400">
               {{ connectedWallet.account.address.slice(0, 6) }}...{{ connectedWallet.account.address.slice(-4) }}
@@ -104,7 +104,7 @@ function isWalletConnected(source: SubstrateWalletSource) {
           size="sm"
           @click="disconnectWallet"
         >
-          Disconnect
+          {{ $t('wallet.disconnect') }}
         </UButton>
       </div>
     </UCard>
@@ -143,7 +143,7 @@ function isWalletConnected(source: SubstrateWalletSource) {
                 color="success"
                 size="xs"
               >
-                Connected
+                {{ $t('wallet.connected') }}
               </UBadge>
               <UButton
                 color="secondary"
@@ -151,7 +151,7 @@ function isWalletConnected(source: SubstrateWalletSource) {
                 :disabled="connecting === wallet.source"
                 @click.stop="connectWallet(wallet.source)"
               >
-                {{ connecting === wallet.source ? 'Connecting...' : 'Connect' }}
+                {{ connecting === wallet.source ? $t('wallet.connecting') : $t('wallet.connect') }}
               </UButton>
             </div>
           </div>
@@ -163,10 +163,10 @@ function isWalletConnected(source: SubstrateWalletSource) {
           <UIcon name="i-simple-icons-polkadot" class="w-6 h-6 text-secondary-600" />
         </div>
         <h4 class="font-medium text-gray-900 dark:text-gray-100 mb-2">
-          No Polkadot Wallets Found
+          {{ $t('wallet.noPolkadotWalletsFound') }}
         </h4>
         <p class="text-sm text-gray-500 dark:text-gray-400">
-          Install a Polkadot wallet extension to continue
+          {{ $t('wallet.installPolkadotWalletExtension') }}
         </p>
       </div>
 
@@ -180,7 +180,7 @@ function isWalletConnected(source: SubstrateWalletSource) {
           @click="showUninstalled = !showUninstalled"
         >
           <span class="text-sm text-gray-600 dark:text-gray-400">
-            Other Wallets ({{ uninstalledWallets.length }})
+            {{ $t('wallet.otherWallets') }} ({{ uninstalledWallets.length }})
           </span>
           <UIcon
             :name="showUninstalled ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
@@ -210,7 +210,7 @@ function isWalletConnected(source: SubstrateWalletSource) {
                     {{ wallet.name }}
                   </div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">
-                    Not installed
+                    {{ $t('wallet.notInstalled') }}
                   </div>
                 </div>
               </div>
@@ -226,7 +226,7 @@ function isWalletConnected(source: SubstrateWalletSource) {
                   icon="i-lucide-external-link"
                   size="sm"
                 >
-                  Install
+                  {{ $t('wallet.install') }}
                 </UButton>
               </a>
             </div>

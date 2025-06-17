@@ -24,7 +24,7 @@ const showOtherWallets = ref(false)
       @click="showOtherWallets = !showOtherWallets"
     >
       <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
-        Other wallets
+        {{ $t('wallet.otherWalletsLowercase') }}
       </span>
       <UIcon
         :name="showOtherWallets ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
@@ -40,7 +40,7 @@ const showOtherWallets = ref(false)
     >
       <WalletItemContent :extension="item">
         <div class="font-medium text-xs text-blue-500 dark:text-blue-400 flex items-center">
-          <span>Download</span>
+          <span>{{ $t('wallet.download') }}</span>
           <UIcon name="i-heroicons-arrow-down-tray" class="w-3 h-3 ml-1" />
         </div>
       </WalletItemContent>

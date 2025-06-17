@@ -7,6 +7,7 @@ import { WalletStageTypes, WalletStates } from '@/stores/wallet/types'
 const emit = defineEmits(['select', 'disconnect', 'close'])
 const isModalOpen = defineModel<boolean>({ required: true })
 
+const { t } = useI18n()
 const subWalletStore = useSubWalletStore()
 const walletStore = useWalletStore()
 
@@ -48,10 +49,10 @@ async function getWalletExtensions(): Promise<WalletExtension[]> {
 
 const title = computed(() => {
   if (stage.value === WalletStageTypes.Wallet) {
-    return 'Select Wallet'
+    return t('wallet.selectWallet')
   }
   else if (stage.value === WalletStageTypes.Account) {
-    return 'Select Account'
+    return t('wallet.selectAccount')
   }
   return ''
 })
@@ -67,7 +68,7 @@ const title = computed(() => {
               {{ title }}
             </h2>
             <p v-if="stage === WalletStageTypes.Account" class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Which account would you like to use?
+              {{ $t('wallet.whichAccountWouldYouLikeToUse') }}
             </p>
           </div>
 

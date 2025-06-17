@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WalletAccount } from '@/stores/wallet'
+import type { WalletAccount } from '@/stores/wallet/types'
 import type { AppKit } from '@reown/appkit/vue'
 import { createAppKit, useAppKit, useAppKitAccount } from '@reown/appkit/vue'
 
@@ -69,7 +69,7 @@ watchEffect(() => {
           </div>
           <div>
             <div class="font-medium text-success-800 dark:text-success-200">
-              Connected
+              {{ $t('wallet.connected') }}
             </div>
             <div class="text-sm text-success-600 dark:text-success-400">
               {{ accountData.address.slice(0, 6) }}...{{ accountData.address.slice(-4) }}
@@ -83,7 +83,7 @@ watchEffect(() => {
           size="sm"
           @click="disconnectWallet"
         >
-          Disconnect
+          {{ $t('wallet.disconnect') }}
         </UButton>
       </div>
     </UCard>
@@ -97,10 +97,10 @@ watchEffect(() => {
             </div>
             <div>
               <div class="font-medium text-gray-900 dark:text-gray-100">
-                Ethereum Wallets
+                {{ $t('wallet.ethereumWallets') }}
               </div>
               <div class="text-sm text-gray-500 dark:text-gray-400">
-                MetaMask, WalletConnect, and more
+                {{ $t('wallet.metamaskWalletConnectAndMore') }}
               </div>
             </div>
           </div>
@@ -111,7 +111,7 @@ watchEffect(() => {
               :disabled="isConnecting"
               @click.stop="connectWallet"
             >
-              {{ isConnecting ? 'Connecting...' : 'Connect' }}
+              {{ isConnecting ? $t('wallet.connecting') : $t('wallet.connect') }}
             </UButton>
           </div>
         </div>

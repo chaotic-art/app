@@ -23,7 +23,7 @@ function onSelectUnistalledWallet(wallet: WalletExtension) {
 </script>
 
 <template>
-  <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+  <div class="space-y-6 max-h-[70vh] overflow-y-auto">
     <WalletSelectionTabs v-model="activeTab" />
 
     <InstalledWallets

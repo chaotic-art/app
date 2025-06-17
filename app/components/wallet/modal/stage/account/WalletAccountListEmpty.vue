@@ -7,10 +7,10 @@
       <UIcon name="i-lucide-user" class="w-8 h-8 text-gray-400" />
     </div>
     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-      No accounts found
+      {{ $t('wallet.noAccountsFound') }}
     </h3>
     <p class="text-gray-500 dark:text-gray-400 text-sm">
-      Try adjusting your search or connect more wallets
+      {{ $t('wallet.tryAdjustingSearchOrConnectMoreWallets') }}
     </p>
   </div>
 </template>
