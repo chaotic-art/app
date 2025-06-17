@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { CollectionEntityWithVolumes } from './utils/types'
+import type { proccessData } from './utils/useTopCollections'
 
-defineProps<{
-  collection?: CollectionEntityWithVolumes
+const props = defineProps<{
+  collection?: Awaited<ReturnType<typeof proccessData>>[number]
 }>()
 
 const { prefix } = usePrefix()
 
-// const { volume } = useCollectionVolume(
-//   props.collection,
-//   ref('All'),
-// )
+const { volume } = useCollectionVolume(
+  props.collection,
+  ref('All'),
+)
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const { prefix } = usePrefix()
       <img
         v-if="collection?.image"
         :src="collection.image"
-        :alt="collection.name"
+        :alt="collection.name || ''"
         class="w-full h-full object-cover"
       >
       <div v-else class="w-full h-full bg-neutral-300" />
@@ -34,7 +34,7 @@ const { prefix } = usePrefix()
             {{ $t('common.price') }}
           </div>
           <div class="text-xl text-black font-normal">
-            <Money :value="collection?.floorPrice || collection?.floor" :inline="true" :round="2" />
+            <Money :value="collection?.floor" :inline="true" :round="2" />
           </div>
         </div>
         <div class="flex flex-col items-center">
@@ -42,7 +42,7 @@ const { prefix } = usePrefix()
             {{ $t('collection.volume') }}
           </div>
           <div class="text-xl text-black font-normal">
-            <!-- <Money :value="volume" :inline="true" :round="0" /> -->
+            <Money :value="volume" :inline="true" :round="0" />
           </div>
         </div>
       </div>
