@@ -1,5 +1,5 @@
 import type { DropItem } from '@/types'
-import { formatDuration, intervalToDuration, intlFormat } from 'date-fns'
+import { type Duration, formatDuration, intervalToDuration, intlFormat } from 'date-fns'
 import { getDropById } from '@/services/fxart'
 import { fetchOdaCollection, fetchOdaCollectionAbi } from '@/services/oda'
 import { DropStatus } from '@/types/drop'
@@ -13,7 +13,7 @@ export function toDropScheduledDurationString(startTime: Date, short: boolean = 
   })
 
   const options = {
-    format: ['hours', 'minutes'],
+    format: ['hours', 'minutes'] as (keyof Duration)[],
   }
 
   if (short) {
@@ -26,7 +26,7 @@ export function toDropScheduledDurationString(startTime: Date, short: boolean = 
             xSeconds: '{{count}}s',
           }?.[token]?.replace('{{count}}', count)
         },
-      } as Locale,
+      },
     })
   }
 
