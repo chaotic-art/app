@@ -65,6 +65,7 @@ function handleLogout() {
     />
 
     <WalletAccountList
+      class="max-h-[400px] overflow-y-auto"
       :items="filteredAccounts"
       @select="hadnleAccountSelect"
     />
