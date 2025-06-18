@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WalletAccount, WalletExtensionAccountPair } from '@/stores/wallet/types.ts'
+import type { WalletExtensionAccountPair } from '@/stores/wallet/types.ts'
 
 defineProps<{
   items: WalletExtensionAccountPair[]

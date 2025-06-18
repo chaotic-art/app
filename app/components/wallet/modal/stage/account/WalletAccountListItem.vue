@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { WalletAccount, WalletExtensionAccountPair } from '@/stores/wallet/types.ts'
+import { useQuery } from '@tanstack/vue-query'
 
-defineProps<{
+const props = defineProps<{
   account: WalletAccount
   extension: WalletExtensionAccountPair['extension']
 }>()
@@ -12,6 +13,22 @@ const emit = defineEmits<{
 }>()
 
 const toast = useToast()
+const { prefix } = usePrefix()
+const { getBalance } = useBalances()
+const { decimals, chainSymbol } = useChain()
+
+const { data: balanceData, isPending: isBalanceLoading } = useQuery({
+  queryKey: ['wallet-balance', props.account.address, prefix],
+  queryFn: () => getBalance({
+    address: props.account.address,
+    prefix: prefix.value,
+  }),
+  staleTime: 30000,
+  refetchInterval: 60000,
+})
+
+const balance = computed(() => balanceData.value?.balance?.toString() || '0')
+const { usd: usdBalance } = useAmount(balance, decimals, chainSymbol)
 
 function selectAccount(account: WalletAccount) {
   emit('select', account.id)
@@ -60,8 +77,15 @@ async function copyAddress(address: string) {
                 EVM
               </UBadge>
             </div>
-            <span class="text-xs text-gray-600 dark:text-gray-400">
-              ${{ account.balance }}
+            <USkeleton
+              v-if="isBalanceLoading"
+              class="h-3 w-12"
+            />
+            <span
+              v-else
+              class="text-xs text-gray-600 dark:text-gray-400"
+            >
+              {{ usdBalance }}
             </span>
           </div>
 
