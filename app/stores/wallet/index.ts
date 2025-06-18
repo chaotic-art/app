@@ -61,6 +61,10 @@ export const useWalletStore = defineStore('wallet', () => {
     selectedAccounts.value[vm] = accountId
   }
 
+  function clearSelectedWallets() {
+    wallets.value = wallets.value.map(wallet => ({ ...wallet, isSelected: false }))
+  }
+
   return {
     wallets,
     addWallet,
@@ -78,5 +82,6 @@ export const useWalletStore = defineStore('wallet', () => {
     updateWallet,
     setStage,
     setSelectedAccount,
+    clearSelectedWallets,
   }
 })

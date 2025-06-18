@@ -3,6 +3,7 @@ import { useWalletStore } from '@/stores/wallet'
 import { WalletStageTypes } from '~/stores/wallet/types'
 
 const walletStore = useWalletStore()
+const { disconnectWallet } = useWalletManager()
 
 const { wallets, getConnectedWallets: connectedWallets } = storeToRefs(walletStore)
 
@@ -35,12 +36,21 @@ function hadnleAccountSelect(accountId: string) {
   walletStore.setSelectedAccount(wallet.vm, accountId)
 }
 
-function handleManageWallets() {
+function backToWalletSelection() {
   walletStore.setStage(WalletStageTypes.Wallet)
 }
 
+function handleManageWallets() {
+  walletStore.clearSelectedWallets()
+  backToWalletSelection()
+}
+
 function handleLogout() {
-  console.log('Logout')
+  for (const extension of connectedWallets.value) {
+    disconnectWallet(extension)
+  }
+
+  backToWalletSelection()
 }
 </script>
 

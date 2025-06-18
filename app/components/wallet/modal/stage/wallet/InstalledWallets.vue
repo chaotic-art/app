@@ -4,10 +4,12 @@ import { WalletStates } from '@/stores/wallet/types'
 
 defineProps<{
   extensions: WalletExtension[]
+  lastConnected: WalletExtension[]
 }>()
 
 const emit = defineEmits<{
-  select: [extension: WalletExtension]
+  select: [extension: WalletExtension[]]
+  lastConnected: [extension: WalletExtension[]]
 }>()
 
 const isConnected = (extension: WalletExtension) => extension.state === WalletStates.Connected
@@ -21,11 +23,11 @@ const isConnected = (extension: WalletExtension) => extension.state === WalletSt
       </h3>
     </div>
 
-    <WalletsGrid :extensions @select="item => emit('select', item)">
-      <template #grid>
-        <WalletsGridItem>
+    <WalletsGrid :extensions @select="item => emit('select', [item])">
+      <template v-if="lastConnected.length" #grid>
+        <WalletsGridItem @click="$emit('lastConnected', lastConnected)">
           <div class="flex flex-col items-center space-y-3">
-            <StackedWallets :wallets="extensions" size="sm" />
+            <StackedWallets :wallets="lastConnected" size="sm" />
             <span class="text-xs">{{ $t('wallet.lastConnected') }}</span>
           </div>
         </WalletsGridItem>

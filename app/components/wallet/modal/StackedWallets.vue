@@ -60,7 +60,7 @@ const sizeClasses = computed(() => sizeMap[props.size])
     <div
       v-for="(wallet, index) in visibleWallets"
       :key="wallet.id"
-      class="relative rounded-full border-2 border-white dark:border-gray-900 bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden"
+      class="relative rounded-full border-2 border-white dark:border-gray-900 bg-white flex items-center justify-center overflow-hidden"
       :class="[
         sizeClasses.image,
         index > 0 ? sizeClasses.overlap : '',

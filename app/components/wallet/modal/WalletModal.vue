@@ -29,7 +29,6 @@ async function getSubWalletExtensions(): Promise<WalletExtension[]> {
     id: extension.id,
     name: extension.name,
     icon: extension.icon,
-    connected: extension.enabled,
     url: extension.url,
     source: extension.source,
     installed: extension.installed,
@@ -41,6 +40,7 @@ async function getSubWalletExtensions(): Promise<WalletExtension[]> {
 
 async function getWalletExtensions(): Promise<WalletExtension[]> {
   const subExtensions = await getSubWalletExtensions()
+  // TODO add evm
 
   return [
     ...subExtensions,
