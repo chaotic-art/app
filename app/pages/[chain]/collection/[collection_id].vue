@@ -10,7 +10,7 @@ const { $api } = useNuxtApp()
 const chain = computed(() => chainPrefix as Prefix)
 const loading = ref(true)
 
-const { data: collection } = await useLazyAsyncData(
+const { data: collection } = await useAsyncData(
   `collection:${chain.value}:${collection_id}`,
   () => fetchOdaCollection(chain.value, collection_id?.toString() ?? ''),
 )
@@ -23,6 +23,19 @@ definePageMeta({
     const { chain } = route.params
     return typeof chain === 'string' && chain in CHAINS
   },
+})
+
+useSeoMeta({
+  title: collection.value?.metadata.name,
+  description: collection.value?.metadata.description.slice(0, 150),
+})
+
+defineOgImageComponent('Frame', {
+  title: collection.value?.metadata.name,
+  image: sanitizeIpfsUrl(collection.value?.metadata.image),
+  items: collection.value?.supply,
+  claimed: collection.value?.claimed,
+  network: chain.value,
 })
 
 onMounted(async () => {
