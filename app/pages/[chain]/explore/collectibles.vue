@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { CHAINS } from '@kodadot1/static'
+import { exploreCollections, type ExploreCollectionsData } from '~/graphql/queries/explore'
+import { getDenyList } from '~/utils/prefix'
 
 // Validate chain parameter
 definePageMeta({
@@ -10,17 +12,13 @@ definePageMeta({
 })
 
 // State for UI controls
-const selectedCategory = ref('Gen Art')
 const selectedType = ref('Collections')
-const isListedFilter = ref(false)
-const sortBy = ref('Recent')
-const viewMode = ref('Grid')
+
+// Data loading state
+const isLoading = ref(true)
 
 // Categories for browsing
-const categories = ['Gen Art', 'PFPs', 'Art']
 const typeOptions = ['Collections', 'NFTs']
-const sortOptions = ['Recent', 'Price: Low to High', 'Price: High to Low', 'Most Popular']
-const viewOptions = ['Grid', 'List']
 
 // Mock data for placeholder cards
 const placeholderItems = Array.from({ length: 8 }, (_, i) => ({
@@ -34,6 +32,54 @@ useSeoMeta({
   title: 'Gallery - Explore Collections and NFTs',
   description: 'Browse and discover collections and NFTs across different categories.',
 })
+
+const { $apolloClient } = useNuxtApp()
+const { prefix } = usePrefix()
+
+const topCollectionsData = ref<ExploreCollectionsData | null>(null)
+
+// Computed property to get collections array
+const collections = computed(() => {
+  return topCollectionsData.value?.collectionEntities || []
+})
+
+// Computed property to determine if we should show placeholder or real data
+const displayItems = computed(() => {
+  if (isLoading.value || !topCollectionsData.value) {
+    return placeholderItems.map(item => ({ ...item, isPlaceholder: true }))
+  }
+  return collections.value.map((collection, index) => ({
+    id: collection.id,
+    name: collection.name || `Collection ${index + 1}`,
+    image: collection.meta?.image || '',
+    issuer: collection.issuer,
+    currentOwner: collection.currentOwner,
+    metadata: collection.metadata,
+    isPlaceholder: false,
+  }))
+})
+
+onMounted(async () => {
+  try {
+    const { data } = await $apolloClient.query({
+      query: exploreCollections,
+      variables: {
+        first: 40,
+        offset: 0,
+        denyList: getDenyList(prefix.value) || [],
+        search: [],
+      },
+    })
+
+    topCollectionsData.value = data
+  }
+  catch (error) {
+    console.error('Error fetching collections:', error)
+  }
+  finally {
+    isLoading.value = false
+  }
+})
 </script>
 
 <template>
@@ -42,27 +88,8 @@ useSeoMeta({
       <!-- Header -->
       <div class="space-y-6">
         <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center md:text-left">
-          Gallery
+          Explore
         </h1>
-
-        <!-- Browse Categories -->
-        <div class="space-y-4">
-          <div class="text-lg font-medium text-gray-700">
-            Browse:
-          </div>
-          <div class="flex flex-wrap gap-3">
-            <UButton
-              v-for="category in categories"
-              :key="category"
-              :variant="selectedCategory === category ? 'solid' : 'outline'"
-              :color="selectedCategory === category ? 'primary' : 'neutral'"
-              class="rounded-full px-6 py-2"
-              @click="selectedCategory = category"
-            >
-              {{ category }}
-            </UButton>
-          </div>
-        </div>
       </div>
 
       <!-- Controls Row -->
@@ -79,82 +106,71 @@ useSeoMeta({
             {{ type }}
           </UButton>
         </div>
-
-        <!-- Right Side - Filters -->
-        <div class="flex flex-wrap items-center gap-3">
-          <!-- Listed For Sale Toggle -->
-          <UButton
-            :variant="isListedFilter ? 'solid' : 'outline'"
-            :color="isListedFilter ? 'primary' : 'neutral'"
-            class="rounded-full px-4 py-2 text-sm"
-            @click="isListedFilter = !isListedFilter"
-          >
-            Listed For Sale
-          </UButton>
-
-          <!-- Sort By Dropdown -->
-          <USelectMenu
-            v-model="sortBy"
-            :options="sortOptions"
-            placeholder="Sort By"
-            class="w-40"
-          />
-
-          <!-- View Mode Dropdown -->
-          <USelectMenu
-            v-model="viewMode"
-            :options="viewOptions"
-            placeholder="View"
-            class="w-24"
-          />
-        </div>
       </div>
 
       <!-- Grid Content -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-        <div
-          v-for="item in placeholderItems"
+        <NuxtLink
+          v-for="item in displayItems"
           :key="item.id"
           class="border rounded-xl border-gray-300 overflow-hidden bg-white hover:shadow-lg transition-shadow"
+          :to="`/${prefix}/collection/${item.id}`"
         >
-          <!-- Placeholder Image -->
-          <div class="aspect-square bg-gray-200 flex items-center justify-center">
-            <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
+          <!-- Collection Image -->
+          <div class="aspect-square bg-gray-200 overflow-hidden">
+            <img
+              v-if="item.image && !isLoading"
+              :src="sanitizeIpfsUrl(item.image)"
+              :alt="item.name"
+              class="w-full h-full object-cover"
+              @error="($event.target as HTMLImageElement).style.display = 'none'"
+            >
+            <div
+              v-else
+              class="w-full h-full flex items-center justify-center"
+              :class="{ 'animate-pulse': isLoading }"
+            >
+              <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
+            </div>
           </div>
 
           <!-- Card Content -->
           <div class="p-4 space-y-3">
-            <!-- Placeholder Title -->
-            <div class="h-4 bg-gray-200 rounded w-3/4" />
-
-            <!-- Placeholder Subtitle -->
-            <div class="h-3 bg-gray-100 rounded w-1/2" />
-
-            <!-- Placeholder Price -->
-            <div class="h-3 bg-gray-100 rounded w-1/3" />
-
-            <!-- View Button -->
-            <div class="pt-2">
-              <UButton
-                variant="outline"
-                color="neutral"
-                size="sm"
-                class="rounded-full w-full"
-              >
-                View
-              </UButton>
+            <!-- Collection Title -->
+            <div v-if="!isLoading" class="font-medium text-gray-900 truncate">
+              {{ item.name }}
             </div>
+            <div v-else class="h-4 bg-gray-200 rounded w-3/4 animate-pulse" />
+
+            <!-- Collection Owner Info -->
+            <div v-if="!isLoading && 'issuer' in item" class="text-sm text-gray-600 truncate">
+              By {{ item.issuer?.slice(0, 6) }}...{{ item.issuer?.slice(-4) }}
+            </div>
+            <div v-else-if="isLoading" class="h-3 bg-gray-100 rounded w-1/2 animate-pulse" />
+
+            <!-- Placeholder for stats/price -->
+            <!-- <div v-if="!isLoading" class="text-sm text-gray-500">
+              Collection
+            </div>
+            <div v-else class="h-3 bg-gray-100 rounded w-1/3 animate-pulse" /> -->
           </div>
+        </NuxtLink>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="isLoading" class="text-center py-8">
+        <div class="text-gray-500">
+          Loading collections...
         </div>
       </div>
 
-      <!-- Empty State (can be shown when no results) -->
-      <div v-if="false" class="text-center py-16">
+      <!-- Empty State -->
+      <div v-else-if="collections.length === 0" class="text-center py-16">
         <div class="text-gray-400 mb-4">
           <UIcon name="i-heroicons-photo" class="w-16 h-16 mx-auto" />
         </div>
         <h3 class="text-xl font-semibold text-gray-600 mb-2">
-          No items found
+          No collections found
         </h3>
         <p class="text-gray-500">
           Try adjusting your filters to see more results.
