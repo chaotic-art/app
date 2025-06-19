@@ -24,7 +24,6 @@ const isLoading = computed(() => !props.drop)
         :src="sanitizeIpfsUrl(drop?.banner)"
         :alt="drop?.name"
         class="w-full h-full object-cover"
-        loading="lazy"
       >
     </div>
 

@@ -51,7 +51,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
           </div>
 
           <div class="flex items-center gap-2 justify-center md:justify-end text-sm">
-            <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4">
+            <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4" :alt="drop?.chain">
             <div class="capitalize">
               {{ drop?.chain }}
             </div>
