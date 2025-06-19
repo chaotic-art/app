@@ -22,7 +22,7 @@ const subDrops = computed(() => dropItems.value?.slice(1, 3))
 </script>
 
 <template>
-  <div class="flex flex-col mb-12 md:mb-[75px] px-4 md:px-0">
+  <div class="flex flex-col mb-12 md:mb-[75px] md:px-0">
     <LandingHorizontalDropCard
       :drop="dropItems?.[0]"
       :description="dropItems?.[0]?.metadata?.description"
