@@ -15,7 +15,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
     <img
       :src="sanitizeIpfsUrl(drop?.banner)"
       :alt="drop?.name"
-      class="w-full h-[240px] md:h-[300px] bg-gray-200 relative aspect-square object-cover"
+      class="w-full h-[240px] md:h-[600px] bg-gray-200 relative aspect-square object-cover"
     >
 
     <UContainer>
