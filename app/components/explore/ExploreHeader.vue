@@ -1,0 +1,57 @@
+<script setup lang="ts">
+const route = useRoute()
+const router = useRouter()
+
+// Categories for browsing
+const typeOptions = ['Collections', 'NFTs']
+
+// Determine selected type based on current route
+const selectedType = computed(() => {
+  const currentPath = route.path
+  if (currentPath.includes('/explore/nfts')) {
+    return 'NFTs'
+  }
+  return 'Collections'
+})
+
+function handleTypeChange(type: string) {
+  if (type === 'Collections') {
+    router.push(`/${route.params.chain}/explore/collectibles`)
+  }
+  else if (type === 'NFTs') {
+    router.push(`/${route.params.chain}/explore/nfts`)
+  }
+}
+</script>
+
+<template>
+  <div class="space-y-8">
+    <!-- Header -->
+    <div class="space-y-6">
+      <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center md:text-left">
+        Explore
+      </h1>
+    </div>
+
+    <!-- Controls Row -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <!-- Left Side - Type Toggle -->
+      <div class="flex bg-gray-100 rounded-full p-1">
+        <UButton
+          v-for="type in typeOptions"
+          :key="type"
+          :variant="selectedType === type ? 'solid' : 'ghost'"
+          class="rounded-full px-4 py-2 text-sm font-medium"
+          @click="handleTypeChange(type)"
+        >
+          {{ type }}
+        </UButton>
+      </div>
+
+      <!-- Right Side - Slot for page-specific controls -->
+      <div class="flex items-center gap-3">
+        <slot name="controls" />
+      </div>
+    </div>
+  </div>
+</template>

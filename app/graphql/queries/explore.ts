@@ -29,3 +29,61 @@ export const exploreCollections = graphql(`
 `)
 
 export type ExploreCollectionsData = ResultOf<typeof exploreCollections>
+
+export const exploreNfts = graphql(`
+    query tokenListWithSearch(
+        $first: Int!
+        $offset: Int
+        $price_gte: Float
+        $price_gt: Float
+        $price_lte: Float
+        $owner: String
+        $issuer: String
+        $denyList: [String!]
+        $collections: [String!]
+        $name: String
+        $orderBy: [NFTEntityOrderByInput!]
+    ) {
+        tokenEntities: nftEntities(
+            limit: $first
+            offset: $offset
+            orderBy: $orderBy
+            where: {
+                issuer_not_in: $denyList
+                name_containsInsensitive: $name
+                collection: {
+                    id_in: $collections
+                }
+                burned_eq: false
+                metadata_isNull: false
+            }
+        ) {
+            id
+            name
+            image
+            media
+            metadata
+            meta {
+                id
+                image
+                animationUrl
+                description
+                kind
+            }
+        }
+        tokenEntityCount(
+            owner: $owner
+            issuer: $issuer
+            denyList: $denyList
+            price_gte: $price_gte
+            price_gt: $price_gt
+            price_lte: $price_lte
+            collections: $collections
+            name: $name
+        ) {
+            totalCount
+        }
+    }
+`)
+
+export type ExploreNftsData = ResultOf<typeof exploreNfts>

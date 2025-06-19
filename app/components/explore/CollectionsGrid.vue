@@ -2,8 +2,6 @@
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 interface Props {
-  pageSize?: number
-  distance?: number
   variables?: Record<string, any>
   prefix?: string
 }
