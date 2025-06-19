@@ -3,18 +3,19 @@ import type { DropItem } from '@/types'
 
 const props = defineProps<{
   drop?: DropItem
+  isMintedOut?: boolean
 }>()
 const { $i18n } = useNuxtApp()
 
 const mintButtonLabel = computed(() => {
-  if (props.drop?.isMintedOut) {
+  if (props.isMintedOut) {
     return $i18n.t('drop.seeListing')
   }
   return $i18n.t('drop.mint')
 })
 
 function handleMintButtonClick(_event: MouseEvent) {
-  if (props.drop?.isMintedOut) {
+  if (props.isMintedOut) {
     navigateTo(
       `/${props.drop?.chain}/collection/${props.drop?.collection}`,
     )
