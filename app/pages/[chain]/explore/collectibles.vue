@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { CHAINS } from '@kodadot1/static'
-import { exploreCollections, type ExploreCollectionsData } from '~/graphql/queries/explore'
-import { getDenyList } from '~/utils/prefix'
 
 // Validate chain parameter
 definePageMeta({
@@ -14,18 +12,14 @@ definePageMeta({
 // State for UI controls
 const selectedType = ref('Collections')
 
-// Data loading state
-const isLoading = ref(true)
-
 // Categories for browsing
 const typeOptions = ['Collections', 'NFTs']
-
-// Mock data for placeholder cards
-const placeholderItems = Array.from({ length: 8 }, (_, i) => ({
-  id: i + 1,
-  name: `Item ${i + 1}`,
-  image: '',
-}))
+const sortOptions = [
+  { label: 'Recent', value: 'blockNumber_DESC' },
+  { label: 'Oldest', value: 'blockNumber_ASC' },
+  { label: 'A-Z', value: 'name_ASC' },
+  { label: 'Z-A', value: 'name_DESC' },
+]
 
 // SEO Meta
 useSeoMeta({
@@ -33,53 +27,51 @@ useSeoMeta({
   description: 'Browse and discover collections and NFTs across different categories.',
 })
 
-const { $apolloClient } = useNuxtApp()
 const { prefix } = usePrefix()
+const route = useRoute()
+const router = useRouter()
 
-const topCollectionsData = ref<ExploreCollectionsData | null>(null)
-
-// Computed property to get collections array
-const collections = computed(() => {
-  return topCollectionsData.value?.collectionEntities || []
-})
-
-// Computed property to determine if we should show placeholder or real data
-const displayItems = computed(() => {
-  if (isLoading.value || !topCollectionsData.value) {
-    return placeholderItems.map(item => ({ ...item, isPlaceholder: true }))
+// Initialize selectedSort from URL query params
+function initSortFromQuery() {
+  const sortParam = route.query.sort as string
+  if (sortParam) {
+    const sortOption = sortOptions.find(option => option.value === sortParam)
+    if (sortOption) {
+      return sortOption
+    }
   }
-  return collections.value.map((collection, index) => ({
-    id: collection.id,
-    name: collection.name || `Collection ${index + 1}`,
-    image: collection.meta?.image || '',
-    issuer: collection.issuer,
-    currentOwner: collection.currentOwner,
-    metadata: collection.metadata,
-    isPlaceholder: false,
-  }))
-})
+  // Default to Recent if no valid sort in URL
+  return { label: 'Recent', value: 'blockNumber_DESC' }
+}
 
-onMounted(async () => {
-  try {
-    const { data } = await $apolloClient.query({
-      query: exploreCollections,
-      variables: {
-        first: 40,
-        offset: 0,
-        denyList: getDenyList(prefix.value) || [],
-        search: [],
-      },
-    })
+const selectedSort = ref(initSortFromQuery())
 
-    topCollectionsData.value = data
+// Watch selectedSort and update URL
+watch(selectedSort, (newSort) => {
+  const query = { ...route.query }
+  if (newSort.value === 'blockNumber_DESC') {
+    // Remove sort param for default value to keep URL clean
+    delete query.sort
   }
-  catch (error) {
-    console.error('Error fetching collections:', error)
+  else {
+    query.sort = newSort.value
   }
-  finally {
-    isLoading.value = false
+
+  router.push({ query })
+}, { deep: true })
+
+// Watch route query changes (for browser back/forward)
+watch(() => route.query.sort, () => {
+  const newSort = initSortFromQuery()
+  if (newSort.value !== selectedSort.value.value) {
+    selectedSort.value = newSort
   }
 })
+
+// Computed variables for the query
+const queryVariables = computed(() => ({
+  orderBy: selectedSort.value.value,
+}))
 </script>
 
 <template>
@@ -106,76 +98,26 @@ onMounted(async () => {
             {{ type }}
           </UButton>
         </div>
+
+        <!-- Right Side - Sort Options -->
+        <div class="flex items-center gap-3">
+          <USelectMenu
+            v-model="selectedSort"
+            :items="sortOptions"
+            placeholder="Sort By"
+            class="w-32"
+          />
+        </div>
       </div>
 
       <!-- Grid Content -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-        <NuxtLink
-          v-for="item in displayItems"
-          :key="item.id"
-          class="border rounded-xl border-gray-300 overflow-hidden bg-white hover:shadow-lg transition-shadow"
-          :to="`/${prefix}/collection/${item.id}`"
-        >
-          <!-- Collection Image -->
-          <div class="aspect-square bg-gray-200 overflow-hidden">
-            <img
-              v-if="item.image && !isLoading"
-              :src="sanitizeIpfsUrl(item.image)"
-              :alt="item.name"
-              class="w-full h-full object-cover"
-              @error="($event.target as HTMLImageElement).style.display = 'none'"
-            >
-            <div
-              v-else
-              class="w-full h-full flex items-center justify-center"
-              :class="{ 'animate-pulse': isLoading }"
-            >
-              <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
-            </div>
-          </div>
-
-          <!-- Card Content -->
-          <div class="p-4 space-y-3">
-            <!-- Collection Title -->
-            <div v-if="!isLoading" class="font-medium text-gray-900 truncate">
-              {{ item.name }}
-            </div>
-            <div v-else class="h-4 bg-gray-200 rounded w-3/4 animate-pulse" />
-
-            <!-- Collection Owner Info -->
-            <div v-if="!isLoading && 'issuer' in item" class="text-sm text-gray-600 truncate">
-              By {{ item.issuer?.slice(0, 6) }}...{{ item.issuer?.slice(-4) }}
-            </div>
-            <div v-else-if="isLoading" class="h-3 bg-gray-100 rounded w-1/2 animate-pulse" />
-
-            <!-- Placeholder for stats/price -->
-            <!-- <div v-if="!isLoading" class="text-sm text-gray-500">
-              Collection
-            </div>
-            <div v-else class="h-3 bg-gray-100 rounded w-1/3 animate-pulse" /> -->
-          </div>
-        </NuxtLink>
-      </div>
-
-      <!-- Loading State -->
-      <div v-if="isLoading" class="text-center py-8">
-        <div class="text-gray-500">
-          Loading collections...
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else-if="collections.length === 0" class="text-center py-16">
-        <div class="text-gray-400 mb-4">
-          <UIcon name="i-heroicons-photo" class="w-16 h-16 mx-auto" />
-        </div>
-        <h3 class="text-xl font-semibold text-gray-600 mb-2">
-          No collections found
-        </h3>
-        <p class="text-gray-500">
-          Try adjusting your filters to see more results.
-        </p>
-      </div>
+      <CollectionsGrid
+        :key="selectedSort.value"
+        :variables="queryVariables"
+        :prefix="prefix"
+        :page-size="40"
+        :distance="300"
+      />
     </div>
   </UContainer>
 </template>
