@@ -21,20 +21,10 @@ const {
   isLoading,
   hasMoreData,
   initialize,
-  reset,
 } = useInfiniteCollections({
   pageSize: 40,
   distance: 300,
   variables: props.variables,
-})
-
-// Expose data and methods to parent component
-defineExpose({
-  totalCount,
-  isInitialLoading,
-  isLoading,
-  hasMoreData,
-  reset,
 })
 
 onMounted(async () => {

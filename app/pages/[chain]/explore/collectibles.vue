@@ -31,46 +31,35 @@ const { prefix } = usePrefix()
 const route = useRoute()
 const router = useRouter()
 
-// Initialize selectedSort from URL query params
-function initSortFromQuery() {
-  const sortParam = route.query.sort as string
-  if (sortParam) {
-    const sortOption = sortOptions.find(option => option.value === sortParam)
-    if (sortOption) {
-      return sortOption
-    }
-  }
-  // Default to Recent if no valid sort in URL
-  return { label: 'Recent', value: 'blockNumber_DESC' }
-}
+const queryState = computed({
+  get: () => ({
+    sort: sortOptions.find(opt => opt.value === route.query.sort) || sortOptions[0],
+    search: route.query.search as string || '',
+  }),
+  set: ({ sort, search }: any) => {
+    const query: any = { ...route.query }
 
-const selectedSort = ref(initSortFromQuery())
+    // Clean up default values
+    if (sort?.value === 'blockNumber_DESC')
+      delete query.sort
+    else if (sort)
+      query.sort = sort.value
 
-// Watch selectedSort and update URL
-watch(selectedSort, (newSort) => {
-  const query = { ...route.query }
-  if (newSort.value === 'blockNumber_DESC') {
-    // Remove sort param for default value to keep URL clean
-    delete query.sort
-  }
-  else {
-    query.sort = newSort.value
-  }
+    if (!search)
+      delete query.search
+    else query.search = search
 
-  router.push({ query })
-}, { deep: true })
-
-// Watch route query changes (for browser back/forward)
-watch(() => route.query.sort, () => {
-  const newSort = initSortFromQuery()
-  if (newSort.value !== selectedSort.value.value) {
-    selectedSort.value = newSort
-  }
+    router.push({ query })
+  },
 })
 
-// Computed variables for the query
 const queryVariables = computed(() => ({
-  orderBy: selectedSort.value.value,
+  orderBy: queryState.value.sort?.value || 'blockNumber_DESC',
+  search: [
+    {
+      name_containsInsensitive: queryState.value.search,
+    },
+  ],
 }))
 </script>
 
@@ -99,20 +88,28 @@ const queryVariables = computed(() => ({
           </UButton>
         </div>
 
-        <!-- Right Side - Sort Options -->
+        <!-- Right Side - Search and Sort Options -->
         <div class="flex items-center gap-3">
+          <UInput
+            :model-value="queryState.search"
+            placeholder="Search collections..."
+            class="w-48"
+            icon="i-heroicons-magnifying-glass"
+            @update:model-value="queryState = { ...queryState, search: $event }"
+          />
           <USelectMenu
-            v-model="selectedSort"
+            :model-value="queryState.sort"
             :items="sortOptions"
             placeholder="Sort By"
             class="w-32"
+            @update:model-value="queryState = { ...queryState, sort: $event }"
           />
         </div>
       </div>
 
       <!-- Grid Content -->
       <CollectionsGrid
-        :key="selectedSort.value"
+        :key="queryVariables.orderBy + queryVariables.search[0]?.name_containsInsensitive"
         :variables="queryVariables"
         :prefix="prefix"
         :page-size="40"
