@@ -12,6 +12,16 @@ const { decimals, chainSymbol } = useChain()
 const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals, chainSymbol)
 
 const isLoading = computed(() => !props.drop)
+
+useHead({
+  link: [
+    {
+      rel: 'preload',
+      href: sanitizeIpfsUrl(props.drop?.banner),
+      as: 'image',
+    },
+  ],
+})
 </script>
 
 <template>
@@ -24,7 +34,7 @@ const isLoading = computed(() => !props.drop)
         :src="sanitizeIpfsUrl(drop?.banner)"
         :alt="drop?.name"
         class="w-full h-full object-cover"
-        loading="lazy"
+        fetchpriority="high"
       >
     </div>
 
@@ -51,7 +61,7 @@ const isLoading = computed(() => !props.drop)
             <UserInfo v-else :avatar-size="40" :address="drop?.creator" />
 
             <!-- Description -->
-            <div class="text-xs text-gray-500 max-w-full md:max-w-[350px] line-clamp-3">
+            <div class="text-gray-500 max-w-full md:max-w-[350px] line-clamp-3">
               <div v-if="isLoading" class="flex flex-col gap-2">
                 <div class="h-3 bg-gray-200 animate-pulse rounded w-full" />
                 <div class="h-3 bg-gray-200 animate-pulse rounded w-4/5" />
@@ -63,9 +73,9 @@ const isLoading = computed(() => !props.drop)
         </div>
 
         <!-- Right Section: Stats and Mint Button -->
-        <div class="flex flex-col items-start md:items-end gap-4 md:gap-6 mt-4 md:mt-0 w-full md:w-auto">
+        <div class="flex flex-col items-start md:items-end gap-4 mt-4 md:mt-0 w-full md:w-auto">
           <!-- Minted Stats and Price -->
-          <div class="text-xs mb-1 flex items-center gap-3 flex-wrap">
+          <div class="mb-1 flex items-center gap-3 flex-wrap">
             <template v-if="isLoading">
               <div class="h-4 bg-gray-200 animate-pulse rounded w-20" />
               <span class="font-bold text-gray-500">·</span>
