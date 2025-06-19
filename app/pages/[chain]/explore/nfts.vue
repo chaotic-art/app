@@ -18,11 +18,10 @@ const sortOptions = [
 
 // SEO Meta
 useSeoMeta({
-  title: 'Gallery - Explore Collections and NFTs',
-  description: 'Browse and discover collections and NFTs across different categories.',
+  title: 'Explore NFTs - Discover Digital Collectibles',
+  description: 'Browse and discover NFTs across different categories and collections.',
 })
 
-const { prefix } = usePrefix()
 const route = useRoute()
 const router = useRouter()
 
@@ -48,14 +47,15 @@ const queryState = computed({
   },
 })
 
-const queryVariables = computed(() => ({
-  orderBy: queryState.value.sort?.value || 'blockNumber_DESC',
-  search: [
-    {
-      name_containsInsensitive: queryState.value.search,
-    },
-  ],
-}))
+const queryVariables = computed(() => {
+  const orderBy = queryState.value.sort?.value || 'blockNumber_DESC'
+  const search = queryState.value.search
+
+  return {
+    orderBy: [orderBy],
+    ...(search && { name: search }),
+  }
+})
 </script>
 
 <template>
@@ -64,7 +64,7 @@ const queryVariables = computed(() => ({
       <template #controls>
         <UInput
           :model-value="queryState.search"
-          placeholder="Search collections..."
+          placeholder="Search NFTs..."
           class="w-48"
           icon="i-heroicons-magnifying-glass"
           @update:model-value="queryState = { ...queryState, search: $event }"
@@ -79,12 +79,12 @@ const queryVariables = computed(() => ({
       </template>
     </ExploreHeader>
 
-    <!-- Grid Content -->
+    <!-- Grid Content for NFTs -->
     <div class="mt-8">
-      <CollectionsGrid
-        :key="queryVariables.orderBy + queryVariables.search[0]?.name_containsInsensitive"
+      <NftsGrid
+        :key="queryVariables.orderBy + (queryVariables.name || '')"
+        :search="queryState.search"
         :variables="queryVariables"
-        :prefix="prefix"
       />
     </div>
   </UContainer>

@@ -7,19 +7,44 @@ const props = defineProps<{
   tokenId: number
   collectionId: number
   chain: Prefix
+  image?: string | null
+  name?: string | null
 }>()
 
-const { data: token } = await useAsyncData(`token:${props.chain}:${props.collectionId}:${props.tokenId}`, () => fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()))
+// Reactive data
+const token = ref<Awaited<ReturnType<typeof fetchOdaToken>> | null>(null)
+const queryPrice = ref<bigint | null>(null)
+const isLoading = ref(true)
+const error = ref<unknown | null>(null)
 
-// fetch price
 const { $api } = useNuxtApp()
-const queryPrice = await $api(props.chain).query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId)
+
+// Fetch data on component mount
+onMounted(async () => {
+  try {
+    // Fetch token metadata and price in parallel
+    const [tokenData, priceData] = await Promise.all([
+      fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
+      $api(props.chain).query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId).catch(() => null),
+    ])
+
+    token.value = tokenData
+    queryPrice.value = priceData?.[0] || null
+  }
+  catch (err) {
+    console.error('Failed to fetch token data:', err)
+    error.value = err
+  }
+  finally {
+    isLoading.value = false
+  }
+})
 
 const price = computed(() => {
-  if (!queryPrice)
+  if (!queryPrice.value)
     return ''
 
-  const pricesString = formatBalance(queryPrice?.[0], { decimals: 10, withSi: false })
+  const pricesString = formatBalance(queryPrice.value, { decimals: 10, withSi: false })
   let float = Number.parseFloat(pricesString)
   float = float > 1 ? Number(float.toFixed(0)) : Number(float.toFixed(4))
 
@@ -28,18 +53,71 @@ const price = computed(() => {
 </script>
 
 <template>
-  <NuxtLink :to="`/${chain}/gallery/${collectionId}-${tokenId}`" class="border rounded-xl border-gray-300 overflow-hidden">
-    <img :src="sanitizeIpfsUrl(token?.metadata.image)" alt="NFT" class="aspect-square">
-
-    <div class="p-4">
-      <p class="font-bold mb-2">
-        {{ token?.metadata.name }}
-      </p>
-
-      <div class="flex items-center justify-between">
-        <p>{{ price }}</p>
-        <!-- <UBadge label="1 minute" variant="soft" class="bg-gray-100 rounded-full" /> -->
+  <div class="border rounded-xl border-gray-300 overflow-hidden bg-white">
+    <!-- Loading State -->
+    <template v-if="isLoading">
+      <!-- Image Skeleton -->
+      <div class="aspect-square bg-gray-200 animate-pulse flex items-center justify-center">
+        <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
       </div>
-    </div>
-  </NuxtLink>
+
+      <!-- Content Skeleton -->
+      <div class="p-4 space-y-3">
+        <!-- Title Skeleton -->
+        <div class="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+
+        <!-- Price Skeleton -->
+        <div class="flex items-center justify-between">
+          <div class="h-3 bg-gray-100 rounded animate-pulse w-1/3" />
+        </div>
+      </div>
+    </template>
+
+    <!-- Error State -->
+    <template v-else-if="error">
+      <div class="aspect-square bg-red-50 flex items-center justify-center">
+        <UIcon name="i-heroicons-exclamation-triangle" class="w-16 h-16 text-red-400" />
+      </div>
+      <div class="p-4">
+        <p class="text-red-600 text-sm">
+          Failed to load NFT
+        </p>
+      </div>
+    </template>
+
+    <!-- Loaded State -->
+    <template v-else>
+      <NuxtLink :to="`/${chain}/gallery/${collectionId}-${tokenId}`" class="block hover:shadow-lg transition-shadow">
+        <!-- NFT Image -->
+        <div class="aspect-square bg-gray-200 overflow-hidden">
+          <img
+            v-if="image || token?.metadata?.image"
+            :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
+            :alt="token?.metadata?.name || 'NFT'"
+            class="w-full h-full object-cover"
+            @error="($event.target as HTMLImageElement).style.display = 'none'"
+          >
+          <div
+            v-else
+            class="w-full h-full flex items-center justify-center bg-gray-100"
+          >
+            <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
+          </div>
+        </div>
+
+        <!-- Card Content -->
+        <div class="p-4">
+          <p class="font-bold mb-2 text-gray-900 truncate">
+            {{ name || token?.metadata?.name || 'Untitled NFT' }}
+          </p>
+
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-medium text-gray-600">
+              {{ price || 'No price set' }}
+            </p>
+          </div>
+        </div>
+      </NuxtLink>
+    </template>
+  </div>
 </template>
