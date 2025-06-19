@@ -12,6 +12,16 @@ const { decimals, chainSymbol } = useChain()
 const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals, chainSymbol)
 
 const isLoading = computed(() => !props.drop)
+
+useHead({
+  link: [
+    {
+      rel: 'preload',
+      href: sanitizeIpfsUrl(props.drop?.banner),
+      as: 'image',
+    },
+  ],
+})
 </script>
 
 <template>
