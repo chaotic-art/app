@@ -28,7 +28,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
     </div>
     <div class="p-4 md:p-6 flex flex-col justify-between flex-1">
       <div class="flex flex-col gap-3 md:gap-4">
-        <div class="font-serif italic font-medium text-xl md:text-[40px] text-center md:text-left">
+        <div class="font-serif italic line-clamp-1 font-medium text-xl md:text-[40px] text-center md:text-left">
           {{ drop?.name }}
         </div>
         <div class="flex flex-row justify-between flex-wrap items-center gap-2 md:gap-1 mb-1">
@@ -58,7 +58,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
           </div>
         </div>
 
-        <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-1 md:justify-between">
+        <div class="flex flex-col items-center md:flex-row gap-3 md:gap-1 md:justify-between">
           <div class="text-gray-400 text-center md:text-left">
             {{ formatToNow(parseCETDate(drop?.start_at || '')) }}
           </div>

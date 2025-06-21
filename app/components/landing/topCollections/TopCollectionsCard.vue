@@ -28,7 +28,7 @@ const { volume } = useCollectionVolume(
       <span class="text-xl text-black truncate text-center font-bold">
         {{ collection?.name || '—' }}
       </span>
-      <div class="flex justify-around mt-4">
+      <div class="flex justify-around mt-4 gap-1">
         <div class="flex flex-col items-center">
           <div class="text-sm text-neutral-400 font-medium">
             {{ $t('common.price') }}
