@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { useAccountStore } from '@/stores/account'
 import { useWalletStore } from '@/stores/wallet'
 import { WalletStageTypes } from '@/stores/wallet/types'
 
 const walletStore = useWalletStore()
 const { disconnectWallet } = useWalletManager()
+const accountStore = useAccountStore()
 
 const { wallets, getConnectedWallets: connectedWallets } = storeToRefs(walletStore)
 
@@ -34,7 +36,14 @@ function handleAccountSelect(accountId: string) {
     return
   }
 
+  const account = wallet.accounts.find(account => account.id === accountId)
+
+  if (!account) {
+    return
+  }
+
   walletStore.setSelectedAccount(wallet.vm, accountId)
+  accountStore.setAuth({ vm: wallet.vm, address: account.address })
 }
 
 function backToWalletSelection() {
