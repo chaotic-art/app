@@ -63,3 +63,9 @@ export function sanitizeIpfsUrl(ipfsUrl = '', provider?: ProviderKeyType): strin
 
   return assetExternalUrl(extract)
 }
+
+export function toOriginalContentUrl(baseurl: string) {
+  const url = new URL(baseurl)
+  url.searchParams.append('original', 'true')
+  return url.toString()
+}
