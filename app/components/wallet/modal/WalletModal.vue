@@ -38,12 +38,27 @@ async function getSubWalletExtensions(): Promise<WalletExtension[]> {
   }))
 }
 
+function getEvmWalletExtension(): WalletExtension {
+  return {
+    id: 'reown',
+    name: 'EVM Wallets',
+    icon: '/partners/logo-reown.png',
+    url: '',
+    source: 'reown',
+    installed: true,
+    vm: 'EVM',
+    accounts: [],
+    state: WalletStates.Idle,
+  }
+}
+
 async function getWalletExtensions(): Promise<WalletExtension[]> {
   const subExtensions = await getSubWalletExtensions()
-  // TODO add evm
+  const evmExtension = getEvmWalletExtension()
 
   return [
     ...subExtensions,
+    evmExtension,
   ]
 }
 
@@ -61,6 +76,7 @@ const title = computed(() => {
 <template>
   <UModal
     v-model:open="isModalOpen"
+    :dismissible="false"
     :ui="{
       content: 'max-w-xl w-full',
     }"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useWalletStore } from '@/stores/wallet'
-import { WalletStageTypes } from '~/stores/wallet/types'
+import { WalletStageTypes } from '@/stores/wallet/types'
 
 const walletStore = useWalletStore()
 const { disconnectWallet } = useWalletManager()
@@ -21,11 +21,12 @@ const filteredAccounts = computed(() => {
 
   const query = searchQuery.value.toLowerCase()
   return selectedAccounts.value.filter(({ account }) =>
-    account.name.toLowerCase().includes(query)
+    account.name?.toLowerCase().includes(query)
     || account.address.toLowerCase().includes(query))
 })
 
-function hadnleAccountSelect(accountId: string) {
+function handleAccountSelect(accountId: string) {
+  // TODO: add destrucure account id method
   const [walletId] = accountId.split(':')
   const wallet = wallets.value.find(wallet => wallet.id === walletId)
 
@@ -67,7 +68,7 @@ function handleLogout() {
     <WalletAccountList
       class="max-h-[400px] overflow-y-auto"
       :items="filteredAccounts"
-      @select="hadnleAccountSelect"
+      @select="handleAccountSelect"
     />
 
     <WalletAccountFooter

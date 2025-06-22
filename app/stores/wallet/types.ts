@@ -1,12 +1,12 @@
 import type { ChainVM } from '@kodadot1/static'
 
 export interface WalletAccount {
-  id: string // extensionId:accountAddress
+  id: `${string}:${string}`
   vm: ChainVM
   address: string
   isSelected: boolean
-  name: string
-  balance: number
+  icon?: string
+  name?: string
 }
 
 export const WalletStates = {

@@ -13,16 +13,27 @@ const emit = defineEmits<{
 }>()
 
 const toast = useToast()
-const { prefix } = usePrefix()
+const { prefix: currentPrefix } = usePrefix()
+const { vm: currentVm } = useChain()
 const { getBalance } = useBalances()
 const { decimals, chainSymbol } = useChain()
 
 const { data: balanceData, isPending: isBalanceLoading } = useQuery({
-  queryKey: ['wallet-balance', props.account.address, prefix],
-  queryFn: () => getBalance({
-    address: props.account.address,
-    prefix: prefix.value,
-  }),
+  queryKey: ['wallet-balance', props.account.address, currentPrefix],
+  queryFn: () => {
+    const vm = vmOf(currentPrefix.value)
+    let prefix = currentPrefix.value
+
+    if (vm !== currentVm.value) {
+      // TODO: add default chain map
+      prefix = vm === 'SUB' ? 'ahp' : 'ahw'
+    }
+
+    return getBalance({
+      address: props.account.address,
+      prefix,
+    })
+  },
   staleTime: 30000,
   refetchInterval: 60000,
 })
@@ -42,6 +53,21 @@ async function copyAddress(address: string) {
     color: 'success',
   })
 }
+
+const accountImg = ref()
+
+onMounted(async () => {
+  const icon = props.account.icon
+
+  if (!icon) {
+    accountImg.value = props.extension.icon
+    return
+  }
+
+  const blob = await $fetch<Blob>(icon)
+
+  accountImg.value = URL.createObjectURL(blob)
+})
 </script>
 
 <template>
@@ -61,13 +87,13 @@ async function copyAddress(address: string) {
             <div class="flex items-center space-x-1">
               <div class="w-4 h-4 rounded shadow-lg bg-white flex items-center justify-center relative z-10">
                 <img
-                  :src="extension.icon"
+                  :src="accountImg"
                   :alt="extension.name"
                   class="w-3 h-3 object-contain"
                 >
               </div>
               <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                {{ account.name }}
+                {{ account.name || shortenAddress(account.address) }}
               </div>
               <UBadge
                 v-if="account.vm === 'EVM'"

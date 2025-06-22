@@ -10,7 +10,6 @@ const {
   getInstalledWallets: installedWallets,
   getUninstalledWallets: uninstalledWallets,
   getConnectedWallets: lastConnected,
-  stage,
 } = storeToRefs(walletStore)
 
 const activeTab = ref('All')

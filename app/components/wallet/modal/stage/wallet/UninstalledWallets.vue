@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WalletExtension } from '@/components/wallet/types'
+import type { WalletExtension } from '@/stores/wallet/types'
 import { WalletsGrid } from '#components'
 
 defineProps<{

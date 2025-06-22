@@ -5,7 +5,7 @@ const Tabs = {
   EVM: 'EVM',
 }
 
-const value = defineModel()
+const value = defineModel({ type: String })
 
 const { t } = useI18n()
 
