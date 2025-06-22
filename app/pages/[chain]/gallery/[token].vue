@@ -95,16 +95,12 @@ onMounted(async () => {
         animation_url: string
       }
 
-      const mimeTypeAnimation = metadata.animation_url ? await fetchMimeType(metadata.animation_url) : null
-      tokenDetail.metadata.animation_mime_type = mimeTypeAnimation?.mime_type || ''
-
-      const mimeType = metadata.image ? await fetchMimeType(metadata.image) : null
-      tokenDetail.metadata.mime_type = mimeType?.mime_type || ''
-
       tokenDetail.metadata.name = metadata.name
       tokenDetail.metadata.description = metadata.description
       tokenDetail.metadata.image = metadata.image
       tokenDetail.metadata.animation_url = metadata.animation_url
+
+      getTokenMimeType()
     }
   }
   catch (error) {
@@ -114,6 +110,15 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+async function getTokenMimeType() {
+  const metadata = tokenDetail.metadata
+  const mimeTypeAnimation = tokenDetail.metadata.animation_url ? await fetchMimeType(tokenDetail.metadata.animation_url) : null
+  tokenDetail.metadata.animation_mime_type = mimeTypeAnimation?.mime_type || ''
+
+  const mimeType = metadata.image ? await fetchMimeType(metadata.image) : null
+  tokenDetail.metadata.mime_type = mimeType?.mime_type || ''
+}
 </script>
 
 <template>
