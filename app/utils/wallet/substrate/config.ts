@@ -1,9 +1,6 @@
 import type { SubstrateWalletMetadata, SubstrateWalletSource } from './types'
+import { isMobileDevice } from '@/utils/environment'
 import { SubstrateWalletSources } from './types'
-
-export const isMobileDevice = import.meta.browser
-  ? /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  : false
 
 export const WalletRegistry: Record<SubstrateWalletSource, SubstrateWalletMetadata> = {
   [SubstrateWalletSources.PolkadotJs]: {

@@ -1,6 +1,24 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
 import { formatBalance } from '@polkadot/util'
+import { useFullscreen } from '@vueuse/core'
+import { fetchMimeType } from '@/services/oda'
+import { MediaType, resolveMedia } from '@/utils/gallery/media'
+
+export interface TokenDetail {
+  owner: string
+  price: string
+  metadata: {
+    name: string
+    description: string
+    image: string
+    animation_url: string
+    mime_type: string
+    animation_mime_type: string
+  }
+}
+
+const CONTAINER_ID = 'nft-img-container'
 
 const { token, chain } = useRoute().params
 const [collectionId, tokenId] = token?.toString().split('-') ?? []
@@ -8,8 +26,12 @@ const [collectionId, tokenId] = token?.toString().split('-') ?? []
 const { $api } = useNuxtApp()
 
 const loading = ref(true)
+const fullScreenDisabled = ref(false)
 
-const tokenDetail = reactive({
+const mediaItemRef = ref<HTMLDivElement & { toggleFullscreen: () => void } | null>(null)
+const { toggle, isFullscreen, isSupported } = useFullscreen(mediaItemRef)
+
+const tokenDetail = reactive<TokenDetail>({
   owner: '',
   price: '',
   metadata: {
@@ -17,6 +39,8 @@ const tokenDetail = reactive({
     description: '',
     image: '',
     animation_url: '',
+    mime_type: '',
+    animation_mime_type: '',
   },
 })
 
@@ -30,6 +54,25 @@ const formattedPrice = computed(() => {
 
   return `${float} DOT`
 })
+
+function toggleMediaFullscreen() {
+  if (!isSupported.value || fullScreenDisabled.value) {
+    return
+  }
+  toggle().catch(() => {
+    fullScreenDisabled.value = true
+  })
+}
+
+function toggleFullscreen() {
+  const mediaType = resolveMedia(tokenDetail.metadata.animation_mime_type)
+  if ([MediaType.VIDEO].includes(mediaType)) {
+    mediaItemRef.value?.toggleFullscreen()
+  }
+  else {
+    toggleMediaFullscreen()
+  }
+}
 
 onMounted(async () => {
   try {
@@ -51,6 +94,12 @@ onMounted(async () => {
         image: string
         animation_url: string
       }
+
+      const mimeTypeAnimation = metadata.animation_url ? await fetchMimeType(metadata.animation_url) : null
+      tokenDetail.metadata.animation_mime_type = mimeTypeAnimation?.mime_type || ''
+
+      const mimeType = metadata.image ? await fetchMimeType(metadata.image) : null
+      tokenDetail.metadata.mime_type = mimeType?.mime_type || ''
 
       tokenDetail.metadata.name = metadata.name
       tokenDetail.metadata.description = metadata.description
@@ -143,19 +192,37 @@ onMounted(async () => {
       <!-- left side - image -->
       <div class="order-2 lg:order-1">
         <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
-          <iframe
-            v-if="tokenDetail.metadata.animation_url"
-            :src="sanitizeIpfsUrl(tokenDetail.metadata.animation_url)"
-            :alt="tokenDetail.metadata.name"
-            class="aspect-square w-full object-cover rounded-xl"
-          />
-          <img
-            v-else
-            :src="sanitizeIpfsUrl(tokenDetail.metadata.image)"
-            :alt="tokenDetail.metadata.name"
-            class="aspect-square w-full object-cover rounded-xl"
+          <div
+            :id="CONTAINER_ID"
+            ref="mediaItemRef"
           >
+            <iframe
+              v-if="tokenDetail.metadata.animation_url"
+              :src="sanitizeIpfsUrl(tokenDetail.metadata.animation_url)"
+              :alt="tokenDetail.metadata.name"
+              class="aspect-square w-full object-cover rounded-xl"
+            />
+            <img
+              v-else
+              :src="sanitizeIpfsUrl(tokenDetail.metadata.image)"
+              :alt="tokenDetail.metadata.name"
+              class="aspect-square w-full object-cover rounded-xl"
+            >
+
+            <ButtonConfig
+              v-if="isFullscreen"
+              :button="{
+                label: 'Go Back',
+                icon: 'i-heroicons-chevron-left',
+                variant: 'ghost',
+                classes: 'z-20 fixed top-4 left-4',
+                onClick: toggleFullscreen,
+              }"
+            />
+          </div>
         </div>
+
+        <GalleryItemToolBar :nft="tokenDetail" :container-id="CONTAINER_ID" @toggle-fullscreen="toggleFullscreen" />
       </div>
 
       <!-- right side - details -->

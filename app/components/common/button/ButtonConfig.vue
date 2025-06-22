@@ -6,6 +6,7 @@ export interface ButtonConfig {
   classes?: string
   active?: boolean
   disabled?: boolean
+  variant?: 'solid' | 'outline' | 'ghost' | 'subtle' | 'soft' | 'link'
 }
 
 defineProps<{
@@ -25,6 +26,7 @@ defineProps<{
     :active="button.active"
     :disabled="button.disabled || loading"
     :loading="loading"
+    :variant="button.variant"
     @click="button.onClick"
   >
     <UIcon
