@@ -1,7 +1,13 @@
 <script setup lang="ts">
+import type { ChainVM } from '@kodadot1/static'
 import type { WalletExtension } from '@/stores/wallet/types'
 import { useWalletStore } from '@/stores/wallet'
 import { WalletStageTypes, WalletStates } from '@/stores/wallet/types'
+
+const ACTIVE_TAB_VM_MAP: Record<string, ChainVM> = {
+  Polkadot: 'SUB',
+  EVM: 'EVM',
+}
 
 const walletStore = useWalletStore()
 const { disconnectWallet } = useWalletManager()
@@ -13,6 +19,13 @@ const {
 } = storeToRefs(walletStore)
 
 const activeTab = ref('All')
+
+const filteredInstalledWallets = computed(() => {
+  if (activeTab.value === 'All') {
+    return installedWallets.value
+  }
+  return installedWallets.value.filter(wallet => wallet.vm === ACTIVE_TAB_VM_MAP[activeTab.value])
+})
 
 async function processWalletExtensions(extensions: WalletExtension[], connectOnly: boolean): Promise<boolean> {
   const toConnectExtensions = extensions.filter(extension => extension.state !== WalletStates.Connected)
@@ -58,17 +71,19 @@ function onSelectUnistalledWallet(wallet: WalletExtension) {
     <WalletSelectionTabs v-model="activeTab" />
 
     <InstalledWallets
-      :extensions="installedWallets"
+      :extensions="filteredInstalledWallets"
       :last-connected="lastConnected"
       @select="onSelectInstalledWallet"
       @last-connected="onLastConnected"
     />
 
-    <hr class="my-4 text-gray-200 dark:text-gray-700">
+    <template v-if="activeTab === 'All' || activeTab === 'Polkadot'">
+      <hr class="my-4 text-gray-200 dark:text-gray-700">
 
-    <UninstalledWallets
-      :extensions="uninstalledWallets"
-      @select="onSelectUnistalledWallet"
-    />
+      <UninstalledWallets
+        :extensions="uninstalledWallets"
+        @select="onSelectUnistalledWallet"
+      />
+    </template>
   </div>
 </template>

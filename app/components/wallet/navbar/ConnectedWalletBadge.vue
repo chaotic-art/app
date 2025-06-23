@@ -43,13 +43,10 @@ const displayName = computed(() => {
 <template>
   <div
     v-if="selectedAccount?.address"
-    class="flex items-center cursor-pointer"
+    class="flex items-center cursor-pointer gap-2"
     :class="{ 'mr-1': account.vm === 'EVM' }"
   >
-    <div
-      class="w-7 h-7 rounded-full overflow-hidden mr-2 border border-gray-200 dark:border-gray-700"
-      v-html="avatarSvg"
-    />
+    <ProfileAvatar :address="selectedAccount?.address" :size="28" />
     <div class="flex flex-col">
       <span class="text-xs font-medium">{{ displayName }}</span>
       <span class="text-xs text-gray-500">{{ shortenAddress(selectedAccount?.address || '') }}</span>

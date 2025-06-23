@@ -12,7 +12,3 @@ export function formatAddress({
     SUB: () => encodeAddress(address, ss58Of(prefix)),
   }, { prefix }) || ''
 }
-
-export function shortenAddress(address: string, length = 4) {
-  return `${address.slice(0, length)}...${address.slice(-length)}`
-}

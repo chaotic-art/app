@@ -1,6 +1,6 @@
-import type { Chain } from '@/types/chain'
 import type { ChainVM, Prefix } from '@kodadot1/static'
 import type { AccountVm, ChainData, TokenDetail, TokenKey } from './types'
+import type { Chain } from '@/types/chain'
 import { getDefaultAccount, getVMSupportedAssets, vmChains } from './utils'
 
 export const useAccountStore = defineStore('account', () => {

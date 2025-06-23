@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { SetWalletParams, WalletAccount } from '@/stores/wallet'
 import type { ChainVM } from '@kodadot1/static'
+import type { SetWalletParams, WalletAccount } from '@/stores/wallet'
 import type { SubstrateWalletSource } from '~/utils/wallet/substrate/types'
+import { useAppKit, useAppKitAccount } from '@reown/appkit/vue'
 import { useAccountStore } from '@/stores/account'
 import { useWalletStore } from '@/stores/wallet'
-import { useAppKit, useAppKitAccount } from '@reown/appkit/vue'
 import { useSubWalletStore } from '~/stores/subWallet'
 
 const props = defineProps<{

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
-import { fetchMimeType } from '@/services/oda'
-import { MediaType, resolveMedia } from '@/utils/gallery/media'
 import { formatBalance } from '@polkadot/util'
 import { useFullscreen } from '@vueuse/core'
+import { fetchMimeType } from '@/services/oda'
+import { MediaType, resolveMedia } from '@/utils/gallery/media'
 
 export interface TokenDetail {
   owner: string

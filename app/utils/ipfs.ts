@@ -1,9 +1,9 @@
 import type { ProviderKeyType } from '@/config/ipfs'
+import { IPFS_REGEX, isCID, isHTTP } from '@kodadot1/minipfs'
 import {
   getIPFSProvider,
   kodaImage,
 } from '@/config/ipfs'
-import { IPFS_REGEX, isCID, isHTTP } from '@kodadot1/minipfs'
 
 export const ipfsUrlPrefix = 'ipfs://ipfs/'
 

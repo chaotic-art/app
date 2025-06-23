@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { WalletAccount, WalletExtensionAccountPair } from '@/stores/wallet/types.ts'
 import { useQuery } from '@tanstack/vue-query'
+import { shortenAddress } from '@/utils/format/address'
 
 const props = defineProps<{
   account: WalletAccount
