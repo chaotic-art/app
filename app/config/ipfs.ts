@@ -6,20 +6,18 @@ export const CF_IMAGE_URL = 'https://imagedelivery.net/jk5b6spi_m_-9qC4VTnjpg/'
 
 export type ProviderKeyType = IPFSProviders
 export type ArweaveProviders = 'permafrost' | 'arweave'
-export type IPFSProviders =
-  | 'pinata'
-  | 'cloudflare'
-  | 'ipfs'
-  | 'dweb'
-  | 'kodadot'
-  | 'image'
-  | 'nftStorage'
+export type IPFSProviders
+  = | 'pinata'
+    | 'ipfs'
+    | 'dweb'
+    | 'kodadot'
+    | 'image'
+    | 'nftStorage'
 
 export const kodaImage = isProduction ? SERVICES.image : SERVICES.imageBeta
 
 const ipfsProviders: Partial<Record<IPFSProviders, string>> = {
   pinata: 'https://kodadot.mypinata.cloud/',
-  cloudflare: 'https://cloudflare-ipfs.com/',
   ipfs: DEFAULT_IPFS_PROVIDER,
   dweb: 'https://dweb.link/',
   image: kodaImage,

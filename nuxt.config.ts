@@ -2,7 +2,9 @@
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-
+  experimental: {
+    appManifest: false,
+  },
   // https://nuxt.com/docs/getting-started/upgrade#testing-nuxt-4
   future: {
     compatibilityVersion: 4,
@@ -76,6 +78,9 @@ export default defineNuxtConfig({
     ],
     defaultLocale: 'en',
     restructureDir: './app/i18n',
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
   },
 
   eslint: {

@@ -13,9 +13,8 @@ const { data: dropItems } = useQuery({
   }),
 })
 
-const artists = computed(() => dropItems.value?.map(drop => drop.creator).filter(Boolean))
-
-const randomSixArtist = computed(() => artists.value?.slice().sort(() => Math.random() - 0.5).slice(0, 6))
+const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.creator).filter(Boolean))])
+const randomSixArtist = computed(() => allArtists.value?.slice().sort(() => Math.random() - 0.5).slice(0, 6))
 </script>
 
 <template>
@@ -24,7 +23,7 @@ const randomSixArtist = computed(() => artists.value?.slice().sort(() => Math.ra
       <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 px-4 text-center md:text-left">
         {{ $t('artist.curated') }} <span class="text-gray-400">&lt;</span>{{ $t('artist.all') }}<span class="text-gray-400">&gt;</span>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
         <div
           v-for="artist in randomSixArtist"
           :key="artist"

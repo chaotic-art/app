@@ -9,8 +9,8 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
       to: '/',
     },
     {
-      label: 'Gallery',
-      to: '/gallery',
+      label: 'Explore',
+      to: '/ahp/explore/collectibles',
     },
     {
       label: 'Drops',

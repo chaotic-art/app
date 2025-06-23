@@ -73,4 +73,15 @@ const headline = computed(() => {
       </div>
     </UContainer>
   </div>
+
+  <UContainer>
+    <div class="mt-8 max-w-4xl mx-auto">
+      <details class="group">
+        <summary class="cursor-pointer text-sm text-gray-500 hover:text-gray-700 mb-2">
+          Show error details
+        </summary>
+        <pre class="bg-gray-100 border border-gray-200 rounded-lg p-4 text-sm text-gray-800 overflow-auto max-h-96 whitespace-pre-wrap font-mono">{{ error }}</pre>
+      </details>
+    </div>
+  </UContainer>
 </template>

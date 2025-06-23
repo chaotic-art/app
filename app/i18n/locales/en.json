@@ -39,11 +39,13 @@
   },
   "drop": {
     "mint": "Mint Drop",
-    "minted": "Minted"
+    "minted": "Minted",
+    "seeListing": "See Listing"
   },
   "collection": {
     "topCollections": "Top Collections",
-    "viewMore": "View More"
+    "viewMore": "View More",
+    "volume": "Volume"
   },
   "footer": {
     "becomeArtist": "Become artist on Polkadot",
@@ -57,6 +59,7 @@
     "follow": "Follow"
   },
   "common": {
-    "back": "Back"
+    "back": "Back",
+    "price": "Price"
   }
 }

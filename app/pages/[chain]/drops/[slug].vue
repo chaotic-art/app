@@ -12,6 +12,9 @@ const { data: drop } = await useAsyncData(`drop:${slug}`, () => getDropById(slug
 const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
 const items = ref<number[]>([])
 
+const { decimals, chainSymbol } = useChain()
+const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
+
 onMounted(async () => {
   collection.value = await fetchOdaCollection(chainPrefix.value, drop.value?.collection ?? '')
 
@@ -41,16 +44,36 @@ onMounted(async () => {
           {{ collection?.metadata.name ?? '---' }}
         </h1>
 
-        <!-- creator section -->
-        <div class="flex justify-between items-center gap-4 my-6 lg:my-10">
-          <div class="p-1 bg-gray-100 inline-block rounded-full">
-            <UserInfo :avatar-size="40" :address="drop?.creator" />
+        <div class="flex gap-2 justify-between items-center my-6 lg:my-10">
+          <div class="flex flex-col gap-2">
+            <p class="text-sm text-gray-500">
+              Created By
+            </p>
+            <div class="flex justify-between items-center gap-1">
+              <div class="p-1 bg-gray-100 inline-block rounded-full">
+                <UserInfo :avatar-size="40" :address="drop?.creator" />
+              </div>
+
+              <FollowButton
+                v-if="drop?.creator"
+                :target="drop.creator"
+                class="px-4 py-2 w-full sm:w-auto ml-0"
+              />
+            </div>
           </div>
 
-          <FollowButton
-            v-if="drop?.creator"
-            :target="drop.creator" class="px-4 py-2 w-full sm:w-auto"
-          />
+          <div v-if="collection?.claimed" class="flex flex-col gap-2">
+            <p class="text-sm text-gray-500">
+              Collected By
+            </p>
+
+            <DropCollectedBy
+              :chain="chainPrefix"
+              :collection-id="drop?.collection ?? ''"
+              :max-address-count="5"
+              size="medium"
+            />
+          </div>
         </div>
 
         <!-- description section -->
@@ -79,10 +102,10 @@ onMounted(async () => {
           <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-center md:text-left">
               <p class="font-serif font-bold text-2xl md:text-3xl italic">
-                0.5 DOT
+                {{ formattedTokenPrice }}
               </p>
               <p class="text-sm text-gray-500">
-                ~$20 USD
+                {{ usdPrice }} USD
               </p>
             </div>
 
