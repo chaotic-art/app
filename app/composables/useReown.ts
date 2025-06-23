@@ -1,17 +1,19 @@
 import type { AppKit, ConnectedWalletInfo, UseAppKitAccountReturn } from '@reown/appkit/vue'
-import { createAppKit, useAppKit } from '@reown/appkit/vue'
+import { createAppKit, useAppKit, useDisconnect } from '@reown/appkit/vue'
 
-export default ({ onAccountChange }: { onAccountChange: (params: { account: UseAppKitAccountReturn, wallet: ConnectedWalletInfo }) => void }) => {
+export default ({ onAccountChange }: { onAccountChange?: (params: { account: UseAppKitAccountReturn, wallet: ConnectedWalletInfo }) => void } = {}) => {
   const { $wagmi } = useNuxtApp()
+  const { disconnect } = useDisconnect()
+
   const isConnecting = ref(false)
   const connectedWalletInfo = ref<ConnectedWalletInfo>()
   const currentKey = ref<string | undefined>()
-
   const appKit = ref<AppKit>()
 
   const initModal = () => {
     appKit.value = createAppKit({
       adapters: [$wagmi.adapter],
+      // @ts-expect-error different types each network
       networks: [$wagmi.defaultNetwork, ...$wagmi.networks],
       projectId: $wagmi.projectId,
       metadata: $wagmi.metadata,
@@ -40,7 +42,7 @@ export default ({ onAccountChange }: { onAccountChange: (params: { account: UseA
 
       currentKey.value = key
 
-      onAccountChange({ account, wallet: connectedWalletInfo.value })
+      onAccountChange?.({ account, wallet: connectedWalletInfo.value })
     })
   }
 
@@ -65,15 +67,8 @@ export default ({ onAccountChange }: { onAccountChange: (params: { account: UseA
     }
   }
 
-  // async function disconnect() {
-  //   console.log('disconnect called', (await import('@wagmi/vue')).useDisconnect())
-  //   // auto import causes ssr issue
-  //   console.log((await import('@wagmi/vue')).useDisconnect().disconnect)
-  //   return (await import('@wagmi/vue')).useDisconnect().disconnect()
-  // }
-
   return {
     openModal,
-    // disconnect
+    disconnect,
   }
 }
