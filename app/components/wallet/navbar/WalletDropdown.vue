@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useWalletStore } from '~/stores/wallet'
 
-const emit = defineEmits(['openWalletModal'])
+const emit = defineEmits(['open'])
 
 const { getIsEvmConnected, getIsSubstrateConnected } = storeToRefs(useWalletStore())
 
 function openWalletModal() {
-  emit('openWalletModal')
+  emit('open')
 }
 </script>
 

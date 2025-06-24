@@ -1,20 +1,12 @@
 <script setup lang="ts">
-const isWalletModalOpen = ref(false)
-
-function openWalletModal() {
-  isWalletModalOpen.value = true
-}
-
-function closeWalletModal() {
-  isWalletModalOpen.value = false
-}
+const { isModalOpen } = storeToRefs(useWalletStore())
 </script>
 
 <template>
   <div>
     <client-only>
       <WalletDropdown
-        @open-wallet-modal="openWalletModal"
+        @open="isModalOpen = true"
       />
       <template #fallback>
         <div class="flex items-center justify-center">
@@ -24,8 +16,8 @@ function closeWalletModal() {
     </client-only>
 
     <WalletModal
-      v-model="isWalletModalOpen"
-      @close="closeWalletModal"
+      v-model="isModalOpen"
+      @close="isModalOpen = false"
     />
   </div>
 </template>

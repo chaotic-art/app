@@ -3,7 +3,7 @@ const walletStore = useWalletStore()
 const { disconnectWallet } = useWalletManager()
 const accountStore = useAccountStore()
 
-const { wallets, getConnectedWallets: connectedWallets } = storeToRefs(walletStore)
+const { wallets, getConnectedWallets: connectedWallets, isModalOpen: isWalletModalOpen } = storeToRefs(walletStore)
 
 const searchQuery = ref('')
 
@@ -40,6 +40,7 @@ function handleAccountSelect(accountId: string) {
 
   walletStore.setSelectedAccount(wallet.vm, accountId)
   accountStore.setAuth({ vm: wallet.vm, address: account.address })
+  isWalletModalOpen.value = false
 }
 
 function backToWalletSelection() {
