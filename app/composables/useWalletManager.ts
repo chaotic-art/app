@@ -1,7 +1,3 @@
-import type { WalletExtension } from '@/stores/wallet/types'
-import { useWalletStore } from '@/stores/wallet'
-import { WalletStates } from '@/stores/wallet/types'
-
 export default function useWalletManager() {
   const walletStore = useWalletStore()
   const { selectedAccounts } = storeToRefs(walletStore)

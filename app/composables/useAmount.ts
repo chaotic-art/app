@@ -1,5 +1,4 @@
 import type { Prefix } from '@kodadot1/static'
-import { useFiatStore } from '@/stores/fiat'
 import { formatAmountWithRound } from '@/utils/format/balance'
 
 export default function (

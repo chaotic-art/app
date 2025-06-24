@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useFiatStore } from '@/stores/fiat'
 import TopCollectionsCard from './TopCollectionsCard.vue'
 import { useTopCollections } from './utils/useTopCollections'
 

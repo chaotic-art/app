@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import type { ChainVM } from '@kodadot1/static'
-import type { WalletExtension } from '@/stores/wallet/types'
-import { useWalletStore } from '@/stores/wallet'
-import { WalletStageTypes, WalletStates } from '@/stores/wallet/types'
 
 const ACTIVE_TAB_VM_MAP: Record<string, ChainVM> = {
   Polkadot: 'SUB',

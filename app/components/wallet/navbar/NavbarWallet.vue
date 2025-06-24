@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import type { ChainVM } from '@kodadot1/static'
-import type { SetWalletParams } from '@/stores/wallet'
-import { useAccountStore } from '@/stores/account'
-import { useWalletStore } from '@/stores/wallet'
-
-const walletStore = useWalletStore()
-const accountStore = useAccountStore()
-
 const isWalletModalOpen = ref(false)
 
 function openWalletModal() {
@@ -15,16 +7,6 @@ function openWalletModal() {
 
 function closeWalletModal() {
   isWalletModalOpen.value = false
-}
-
-function onSelectAccount({ vm, account }: SetWalletParams) {
-  walletStore.setWallet({ vm, account })
-  accountStore.setAuth({ vm, address: account.address })
-  isWalletModalOpen.value = false
-}
-
-function onDisconnectAccount(vm: ChainVM) {
-  accountStore.clearAuth(vm)
 }
 </script>
 
@@ -43,8 +25,6 @@ function onDisconnectAccount(vm: ChainVM) {
 
     <WalletModal
       v-model="isWalletModalOpen"
-      @select="onSelectAccount"
-      @disconnect="onDisconnectAccount"
       @close="closeWalletModal"
     />
   </div>

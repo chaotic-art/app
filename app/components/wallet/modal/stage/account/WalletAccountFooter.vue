@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { WalletExtension } from '@/stores/wallet/types'
-
 defineProps<{
   extensions: WalletExtension[]
 }>()

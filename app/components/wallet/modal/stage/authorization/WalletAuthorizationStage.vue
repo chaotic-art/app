@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import type { WalletAccount, WalletExtension } from '@/stores/wallet/types'
-import { useSubWalletStore } from '@/stores/subWallet'
-import { useWalletStore } from '@/stores/wallet'
-import { WalletStageTypes, WalletStates } from '@/stores/wallet/types'
 import WalletAuthorizationLoader from './WalletAuthorizationLoader.vue'
 
 const walletStore = useWalletStore()

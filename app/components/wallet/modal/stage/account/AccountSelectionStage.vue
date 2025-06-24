@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { useAccountStore } from '@/stores/account'
-import { useWalletStore } from '@/stores/wallet'
-import { WalletStageTypes } from '@/stores/wallet/types'
-
 const walletStore = useWalletStore()
 const { disconnectWallet } = useWalletManager()
 const accountStore = useAccountStore()

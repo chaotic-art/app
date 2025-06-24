@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import type { WalletExtension } from '@/stores/wallet/types'
-import { useSubWalletStore } from '@/stores/subWallet'
-import { useWalletStore } from '@/stores/wallet'
-import { WalletStageTypes, WalletStates } from '@/stores/wallet/types'
-
-const emit = defineEmits(['select', 'disconnect', 'close'])
+const emit = defineEmits(['close'])
 const isModalOpen = defineModel<boolean>({ required: true })
 
 const { t } = useI18n()

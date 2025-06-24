@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import type { WalletExtension } from '@/stores/wallet/types'
-import { WalletsGrid } from '#components'
-
 defineProps<{
   extensions: WalletExtension[]
 }>()

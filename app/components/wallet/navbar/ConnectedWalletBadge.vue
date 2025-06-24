@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { WalletAccount } from '@/stores/wallet/types'
 import { shortenAddress } from '@/utils/format/address'
 
 const props = defineProps<{
