@@ -21,11 +21,11 @@
       <LandingDropBanner />
     </UContainer>
 
-    <LazyLandingArtistsList hydrate-on-interaction />
+    <LazyLandingArtistsList :hydrate-on-visible="{ rootMargin: '300px' }" />
 
     <UContainer>
-      <LazyLandingTopCollections hydrate-on-interaction />
-      <LazyArticles hydrate-on-interaction />
+      <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '300px' }" />
+      <LazyArticles :hydrate-on-visible="{ rootMargin: '300px' }" />
     </UContainer>
   </div>
 </template>
