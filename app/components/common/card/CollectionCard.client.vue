@@ -1,22 +1,51 @@
 <script setup lang="ts">
+import type { Prefix } from '@kodadot1/static'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
-interface Collection {
-  id: string | number
-  name: string
-  image?: string
-  issuer?: string
-}
-
 interface Props {
-  item: Collection
-  prefix?: string
+  item: ReturnType<typeof useInfiniteCollections>['collections']['value'][number]
+  prefix?: Prefix
   isLoading?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
-  prefix: '',
+const props = withDefaults(defineProps<Props>(), {
+  prefix: 'ahp',
   isLoading: false,
+})
+
+const { $api } = useNuxtApp()
+
+const collectionData = reactive({
+  items: 0,
+  floor: 0,
+  uniqueOwners: 0,
+})
+
+// temporary: fetch onchain data
+onMounted(async () => {
+  const api = await $api(props.prefix)
+  const queryItems = await api.query.Nfts.Item.getEntries(Number(props.item.id))
+  const queryFloor = await api.query.Nfts.ItemPriceOf.getEntries(Number(props.item.id))
+
+  if (props.item.id === '471') {
+    console.clear()
+    console.log(queryItems)
+    console.log(queryFloor)
+  }
+
+  collectionData.items = queryItems.length
+
+  if (queryFloor.length) {
+    const floorValues = queryFloor
+      .filter(item => Number(item.value[0]) > 0)
+      .map(item => Number(item.value[0]))
+    collectionData.floor = Math.min(...floorValues)
+  }
+
+  if (queryItems.length) {
+    const uniqueOwners = new Set(queryItems.map(item => item.value.owner))
+    collectionData.uniqueOwners = uniqueOwners.size
+  }
 })
 </script>
 
@@ -56,6 +85,8 @@ withDefaults(defineProps<Props>(), {
         By {{ item.issuer.slice(0, 6) }}...{{ item.issuer.slice(-4) }}
       </div>
       <div v-else-if="isLoading" class="h-3 bg-gray-100 rounded w-1/2 animate-pulse" />
+
+      {{ collectionData.items }} - <Money inline :value="collectionData.floor" /> - {{ collectionData.uniqueOwners }}
     </div>
   </NuxtLink>
 </template>

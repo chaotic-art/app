@@ -40,7 +40,7 @@ export function useInfiniteCollections(options: UseInfiniteCollectionsOptions = 
       // Type guard for placeholder items
       if (item.isPlaceholder) {
         return {
-          id: item.id,
+          id: item.id.toString(),
           name: item.name,
           image: item.image,
           issuer: '',

@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import type { Prefix } from '@kodadot1/static'
+
 interface Props {
   variables?: Record<string, any>
-  prefix?: string
+  prefix?: Prefix
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variables: () => ({}),
-  prefix: '',
+  prefix: 'ahp',
 })
 
 // Use the collections infinite query composable
