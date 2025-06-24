@@ -191,15 +191,15 @@ onKodahashRenderCompleted(({ payload }) => imageData.value = payload.image)
       text="Open in New Tab"
       :popper="{ placement: 'top' }"
     >
-      <span v-if="disableNewTab">
+      <span>
         <UIcon
+          v-if="disableNewTab"
           name="i-mdi:arrow-top-right"
           class="h-5 w-5 hover:cursor-pointer"
           @click="handleNewTab"
         />
-      </span>
-      <span v-else>
         <UIcon
+          v-else
           name="i-mdi:arrow-top-right"
           class="h-5 w-5 text-k-grey"
         />
