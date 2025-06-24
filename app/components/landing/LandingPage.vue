@@ -21,11 +21,11 @@
       <LandingDropBanner />
     </UContainer>
 
-    <LazyLandingArtistsList hydrate-on-visible />
+    <LazyLandingArtistsList hydrate-on-interaction />
 
     <UContainer>
-      <LazyLandingTopCollections hydrate-on-visible />
-      <LazyArticles hydrate-on-visible />
+      <LazyLandingTopCollections hydrate-on-interaction />
+      <LazyArticles hydrate-on-interaction />
     </UContainer>
   </div>
 </template>
