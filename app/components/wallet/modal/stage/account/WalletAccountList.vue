@@ -16,12 +16,14 @@ function handleAccountSelect(accountId: string) {
   <div>
     <WalletAccountListEmpty v-if="items.length === 0" />
 
-    <WalletAccountListItem
-      v-for="({ account, extension }) in items"
-      :key="account.id"
-      :account="account"
-      :extension="extension"
-      @select="handleAccountSelect"
-    />
+    <div class="flex flex-col gap-2 p-1">
+      <WalletAccountListItem
+        v-for="({ account, extension }) in items"
+        :key="account.id"
+        :account="account"
+        :extension="extension"
+        @select="handleAccountSelect"
+      />
+    </div>
   </div>
 </template>

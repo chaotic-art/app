@@ -4,7 +4,6 @@ export interface WalletAccount {
   id: `${string}:${string}`
   vm: ChainVM
   address: string
-  isSelected: boolean
   icon?: string
   name?: string
 }

@@ -17,6 +17,7 @@ const { prefix: currentPrefix } = usePrefix()
 const { vm: currentVm } = useChain()
 const { getBalance } = useBalances()
 const { decimals, chainSymbol } = useChain()
+const { selectedAccounts } = useWalletStore()
 
 const { data: balanceData, isPending: isBalanceLoading } = useQuery({
   queryKey: ['wallet-balance', props.account.address, currentPrefix],
@@ -73,7 +74,7 @@ onMounted(async () => {
 <template>
   <UCard
     class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-    :class="{ 'ring-2 ring-primary-500': account.isSelected }"
+    :class="{ 'ring-2 ring-primary-500 !bg-primary-50 dark:!bg-primary-950': [selectedAccounts.SUB, selectedAccounts.EVM].includes(account.id) }"
     :ui="{ body: '!py-2 !px-3' }"
     @click="selectAccount(account)"
   >

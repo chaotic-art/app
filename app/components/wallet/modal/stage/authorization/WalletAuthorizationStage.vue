@@ -45,8 +45,11 @@ async function initSubAuthorization(extension: WalletExtension): Promise<WalletA
 }
 
 function setWalletConnected(extension: WalletExtension, accounts: WalletAccount[]) {
+  // for some reason from extensions return an account more than once
+  const uniqueAccounts = accounts.filter((account, index, self) => self.findIndex(a => a.id === account.id) === index)
+
   walletStore.updateWallet(extension.id, {
-    accounts,
+    accounts: uniqueAccounts,
     state: WalletStates.Connected,
     isSelected: true,
   })
@@ -70,7 +73,7 @@ async function initExtensionAuthorization(extension: WalletExtension) {
       EVM: async () => await initEvmAuth(),
     }, { vm: extension.vm })
   }
-  catch (error) {
+  catch {
     walletStore.updateWalletState(extension.id, WalletStates.ConnectionFailed)
   }
 }
