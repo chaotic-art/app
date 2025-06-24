@@ -21,24 +21,38 @@ const collectionData = reactive({
   uniqueOwners: 0,
 })
 
+const isLoadingData = ref(false)
+
 // temporary: fetch onchain data
 onMounted(async () => {
-  const api = await $api(props.prefix)
-  const queryItems = await api.query.Nfts.Item.getEntries(Number(props.item.id))
-  const queryFloor = await api.query.Nfts.ItemPriceOf.getEntries(Number(props.item.id))
+  if (props.isLoading)
+    return
 
-  collectionData.items = queryItems.length
+  isLoadingData.value = true
+  try {
+    const api = await $api(props.prefix)
 
-  if (queryFloor.length) {
-    const floorValues = queryFloor
-      .filter(item => Number(item.value[0]) > 0)
-      .map(item => Number(item.value[0]))
-    collectionData.floor = Math.min(...floorValues)
+    const [queryItems, queryFloor] = await Promise.all([
+      api.query.Nfts.Item.getEntries(Number(props.item.id)),
+      api.query.Nfts.ItemPriceOf.getEntries(Number(props.item.id)),
+    ])
+
+    collectionData.items = queryItems.length
+
+    if (queryFloor.length) {
+      const floorValues = queryFloor
+        .filter(item => Number(item.value[0]) > 0)
+        .map(item => Number(item.value[0]))
+      collectionData.floor = Math.min(...floorValues)
+    }
+
+    if (queryItems.length) {
+      const uniqueOwners = new Set(queryItems.map(item => item.value.owner))
+      collectionData.uniqueOwners = uniqueOwners.size
+    }
   }
-
-  if (queryItems.length) {
-    const uniqueOwners = new Set(queryItems.map(item => item.value.owner))
-    collectionData.uniqueOwners = uniqueOwners.size
+  finally {
+    isLoadingData.value = false
   }
 })
 </script>
@@ -89,6 +103,14 @@ onMounted(async () => {
         <div v-if="!isLoading" class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           #{{ item.id }}
         </div>
+
+        <!-- Collection Owner - Overlay on Image -->
+        <div v-if="!isLoading && item.issuer" class="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <UserInfo
+            :address="item.issuer"
+            :avatar-size="28"
+          />
+        </div>
       </div>
 
       <!-- Card Content -->
@@ -100,23 +122,18 @@ onMounted(async () => {
             {{ item.name }}
           </h3>
           <div v-else class="h-6 bg-gray-200 rounded-lg w-4/5 animate-pulse" />
-
-          <!-- Collection Owner -->
-          <div v-if="!isLoading && item.issuer" class="flex items-center gap-2">
-            <div class="w-5 h-5 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex-shrink-0" />
-            <span class="text-sm text-gray-600 truncate">
-              {{ item.issuer.slice(0, 8) }}...{{ item.issuer.slice(-6) }}
-            </span>
-          </div>
-          <div v-else-if="isLoading" class="flex items-center gap-2">
-            <div class="w-5 h-5 bg-gray-200 rounded-full animate-pulse" />
-            <div class="h-4 bg-gray-200 rounded w-24 animate-pulse" />
-          </div>
         </div>
 
         <!-- Collection Stats -->
         <div v-if="!isLoading" class="bg-gray-50/50 rounded-xl p-3 border border-gray-100">
-          <div class="grid grid-cols-3 gap-3">
+          <!-- Loading Indicator -->
+          <div v-if="isLoadingData" class="flex items-center justify-center py-2">
+            <UIcon name="i-heroicons-arrow-path" class="w-4 h-4 animate-spin text-gray-400 mr-2" />
+            <span class="text-xs text-gray-500">Loading stats...</span>
+          </div>
+
+          <!-- Stats Data -->
+          <div v-else class="grid grid-cols-3 gap-3">
             <!-- Items Count -->
             <div class="text-center">
               <div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
