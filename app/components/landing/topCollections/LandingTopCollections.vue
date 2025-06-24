@@ -15,7 +15,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="pt-8 md:pt-16 px-4 md:px-0">
+  <section class="pt-8 md:pt-16 md:px-0">
     <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 text-center md:text-left">
       {{ $t('collection.topCollections') }}
     </div>

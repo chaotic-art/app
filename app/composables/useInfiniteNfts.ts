@@ -1,5 +1,4 @@
-import type { ExploreNftsData } from '~/graphql/queries/explore'
-import { exploreNfts } from '~/graphql/queries/explore'
+import { exploreNfts, type ExploreNftsData } from '~/graphql/queries/explore'
 import { getDenyList } from '~/utils/prefix'
 
 type NftEntity = ExploreNftsData['tokenEntities'][0]

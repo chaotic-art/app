@@ -1,6 +1,5 @@
-import type { Prefix } from '@kodadot1/static'
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
-import { INDEXERS as GRAPHQL_ENDPOINTS } from '@kodadot1/static'
+import { INDEXERS as GRAPHQL_ENDPOINTS, type Prefix } from '@kodadot1/static'
 
 export default defineNuxtPlugin(() => {
   const customUri = new HttpLink({

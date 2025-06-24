@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
 import type { CSSProperties } from 'vue'
-import { chainNames } from '@kodadot1/static'
+import { chainNames, type Prefix } from '@kodadot1/static'
 
 // inherited attrs can mess up the satori parser
 defineOptions({

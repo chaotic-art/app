@@ -1,5 +1,4 @@
-import type { ExploreCollectionsData } from '~/graphql/queries/explore'
-import { exploreCollections } from '~/graphql/queries/explore'
+import { exploreCollections, type ExploreCollectionsData } from '~/graphql/queries/explore'
 import { getDenyList } from '~/utils/prefix'
 
 type CollectionEntity = ExploreCollectionsData['collectionEntities'][0]
@@ -41,7 +40,7 @@ export function useInfiniteCollections(options: UseInfiniteCollectionsOptions = 
       // Type guard for placeholder items
       if (item.isPlaceholder) {
         return {
-          id: item.id,
+          id: item.id.toString(),
           name: item.name,
           image: item.image,
           issuer: '',
