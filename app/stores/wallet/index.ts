@@ -44,12 +44,9 @@ export const useWalletStore = defineStore('wallet', () => {
   }
 
   function addWallet(wallet: WalletExtension) {
-    const index = wallets.value.findIndex(w => w.vm === wallet.vm)
+    const index = wallets.value.findIndex(w => w.id === wallet.id)
     if (index === -1) {
       wallets.value.push(wallet)
-    }
-    else {
-      wallets.value[index] = wallet
     }
   }
 
@@ -84,4 +81,6 @@ export const useWalletStore = defineStore('wallet', () => {
     setSelectedAccount,
     clearSelectedWallets,
   }
+}, {
+  persist: true,
 })

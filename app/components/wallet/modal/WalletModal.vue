@@ -10,16 +10,21 @@ const isModalOpen = defineModel<boolean>({ required: true })
 const { t } = useI18n()
 const subWalletStore = useSubWalletStore()
 const walletStore = useWalletStore()
-
-const { stage, wallets: walletExtensions } = storeToRefs(walletStore)
+const { stage } = storeToRefs(walletStore)
 
 if (import.meta.client) {
   init()
 }
 
 async function init() {
-  walletExtensions.value = await getWalletExtensions()
-  stage.value = WalletStageTypes.Wallet
+  const extensions = await getWalletExtensions()
+
+  // TODO: add a sync extension mechanism
+  for (const extension of extensions) {
+    walletStore.addWallet(extension)
+  }
+
+  walletStore.setStage(WalletStageTypes.Wallet)
 }
 
 async function getSubWalletExtensions(): Promise<WalletExtension[]> {
