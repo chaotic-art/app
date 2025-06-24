@@ -9,7 +9,7 @@
     <Navbar />
 
     <UContainer>
-      <div class="flex flex-col items-center justify-center mt-4 mb-6 md:mt-[25px] md:mb-[35px] px-4">
+      <div class="flex flex-col items-center justify-center mt-4 mb-6 md:mt-[25px] md:mb-[35px]">
         <div class="font-medium text-3xl md:text-[51px] capitalize font-serif italic text-center">
           {{ $t('landing.title') }}
         </div>
@@ -21,11 +21,11 @@
       <LandingDropBanner />
     </UContainer>
 
-    <LandingArtistsList />
+    <LazyLandingArtistsList :hydrate-on-visible="{ rootMargin: '300px' }" />
 
     <UContainer>
-      <LandingTopCollections />
-      <Articles />
+      <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '300px' }" />
+      <LazyArticles :hydrate-on-visible="{ rootMargin: '300px' }" />
     </UContainer>
   </div>
 </template>
