@@ -82,5 +82,8 @@ export const useWalletStore = defineStore('wallet', () => {
     clearSelectedWallets,
   }
 }, {
-  persist: true,
+  persist: {
+    // SSR is disabled because wallet components are mostly available only on client side
+    storage: import.meta.client ? localStorage : undefined,
+  },
 })
