@@ -7,10 +7,6 @@ const subWalletStore = useSubWalletStore()
 const walletStore = useWalletStore()
 const { stage } = storeToRefs(walletStore)
 
-if (import.meta.client) {
-  init()
-}
-
 async function init() {
   const extensions = await getWalletExtensions()
 
@@ -71,6 +67,14 @@ const title = computed(() => {
   }
   return ''
 })
+
+if (import.meta.client) {
+  watch(isModalOpen, (open) => {
+    if (open) {
+      init()
+    }
+  }, { once: true })
+}
 </script>
 
 <template>
