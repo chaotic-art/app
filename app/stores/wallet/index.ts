@@ -3,6 +3,26 @@ import type { WalletAccount, WalletExtension, WalletStageType, WalletState } fro
 import { defineStore } from 'pinia'
 import { WalletStageTypes, WalletStates } from './types'
 
+function getStorage() {
+  if (!import.meta.client) {
+    return undefined
+  }
+
+  // remove, backwards compatibility
+  const wallet = localStorage.getItem('wallet')
+
+  if (wallet) {
+    const walletStore = JSON.parse(wallet)
+    const wallets = walletStore.wallets
+    if (Boolean(wallets?.EVM) && Boolean(wallets?.SUB)) {
+      localStorage.setItem('wallet', JSON.stringify({ ...walletStore, wallets: [] }))
+    }
+  }
+  // end backwards compatibility
+
+  return localStorage
+}
+
 export const useWalletStore = defineStore('wallet', () => {
   const isModalOpen = ref(false)
   const wallets = ref<WalletExtension[]>([])
@@ -86,7 +106,7 @@ export const useWalletStore = defineStore('wallet', () => {
 }, {
   persist: {
     // SSR is disabled because wallet components are mostly available only on client side
-    storage: import.meta.client ? localStorage : undefined,
+    storage: getStorage(),
     pick: ['wallets', 'selectedAccounts', 'stage'],
   },
 })
