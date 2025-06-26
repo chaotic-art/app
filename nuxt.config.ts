@@ -20,7 +20,7 @@ export default defineNuxtConfig({
 
   // Enable better error reporting
   ssr: true,
-  debug: import.meta.env.NODE_ENV !== 'production',
+  debug: true,
 
   // https://nuxt.com/docs/getting-started/upgrade#testing-nuxt-4
   future: {
