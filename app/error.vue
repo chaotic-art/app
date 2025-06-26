@@ -4,7 +4,11 @@ import type { NuxtError } from '#app'
 const props = defineProps<{
   error: NuxtError
 }>()
-// const { urlPrefix } = usePrefix()
+
+// Log error to console
+console.log('🚨 ERROR:', props.error)
+console.log('🚨 ERROR STACK:', props.error.stack)
+
 const headline = computed(() => {
   switch (props.error?.statusCode) {
     case 404:
