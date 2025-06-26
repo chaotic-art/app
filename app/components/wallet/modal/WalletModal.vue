@@ -107,7 +107,9 @@ if (import.meta.client) {
         </div>
 
         <div class="p-4 max-h-[70vh] overflow-y-auto">
-          <WalletSelectionStage v-if="stage === WalletStageTypes.Wallet" />
+          <WalletLoadingStage v-if="stage === WalletStageTypes.Loading" />
+
+          <WalletSelectionStage v-else-if="stage === WalletStageTypes.Wallet" />
 
           <WalletAuthorizationStage v-else-if="stage === WalletStageTypes.Authorization" />
 
