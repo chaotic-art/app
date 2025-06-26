@@ -5,6 +5,23 @@ export default defineNuxtConfig({
   experimental: {
     appManifest: false,
   },
+
+  // Enable stack traces in production for better error debugging
+  sourcemap: {
+    server: true,
+    client: false,
+  },
+
+  // Preserve error details in production
+  nitro: {
+    sourceMap: true,
+    devErrorHandler: true,
+  },
+
+  // Enable better error reporting
+  ssr: true,
+  debug: import.meta.env.NODE_ENV !== 'production',
+
   // https://nuxt.com/docs/getting-started/upgrade#testing-nuxt-4
   future: {
     compatibilityVersion: 4,
