@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
+import { chainPropListOf } from '@/utils/chain'
 import { shortenAddress } from '@/utils/format/address'
 
 const props = defineProps<{
@@ -16,23 +17,22 @@ const toast = useToast()
 const { prefix: currentPrefix } = usePrefix()
 const { vm: currentVm } = useChain()
 const { getBalance } = useBalances()
-const { decimals, chainSymbol } = useChain()
 const { selectedAccounts } = useWalletStore()
+
+const accountPrefix = computed(() => {
+  const isCurrentAccountVm = currentVm.value === props.account.vm
+
+  return isCurrentAccountVm ? currentPrefix.value : DEFAULT_PREFIX_MAP[props.account.vm]
+})
+
+const chainProps = computed(() => chainPropListOf(accountPrefix.value))
 
 const { data: balanceData, isPending: isBalanceLoading } = useQuery({
   queryKey: ['wallet-balance', props.account.address, currentPrefix],
   queryFn: () => {
-    const vm = vmOf(currentPrefix.value)
-    let prefix = currentPrefix.value
-
-    if (vm !== currentVm.value) {
-      // TODO: add default chain map
-      prefix = vm === 'SUB' ? 'ahp' : 'ahw'
-    }
-
     return getBalance({
       address: props.account.address,
-      prefix,
+      prefix: accountPrefix.value,
     })
   },
   staleTime: 30000,
@@ -40,7 +40,7 @@ const { data: balanceData, isPending: isBalanceLoading } = useQuery({
 })
 
 const balance = computed(() => balanceData.value?.balance?.toString() || '0')
-const { usd: usdBalance } = useAmount(balance, decimals, chainSymbol)
+const { usd: usdBalance } = useAmount(balance, computed(() => chainProps.value.tokenDecimals), computed(() => chainProps.value.tokenSymbol))
 
 function selectAccount(account: WalletAccount) {
   emit('select', account.id)
