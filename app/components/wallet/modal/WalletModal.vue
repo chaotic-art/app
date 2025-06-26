@@ -8,6 +8,8 @@ const walletStore = useWalletStore()
 const { stage } = storeToRefs(walletStore)
 
 async function init() {
+  walletStore.setStage(WalletStageTypes.Loading)
+
   const extensions = await getWalletExtensions()
 
   // TODO: add a sync extension mechanism
