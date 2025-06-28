@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import WalletAuthorizationLoader from './WalletAuthorizationLoader.vue'
-
 const walletStore = useWalletStore()
 const { wallets } = storeToRefs(walletStore)
 const subWalletStore = useSubWalletStore()
 
-const queuedWallets = computed(() => wallets.value.filter(wallet => wallet.state === WalletStates.ConnectionQueued))
+const queuedWallets = computed(() => wallets.value.filter(wallet =>
+  wallet.state === WalletStates.ConnectionQueued
+  || wallet.state === WalletStates.Connecting
+  || wallet.state === WalletStates.ConnectionFailed,
+))
 
-const currentExtension = ref<WalletExtension | undefined>(queuedWallets.value[0])
+const currentExtensionId = ref<string | undefined>(queuedWallets.value[0]?.id)
+const currentExtension = computed<WalletExtension | undefined>(() => queuedWallets.value.find(wallet => wallet.id === currentExtensionId.value))
 
 const { openModal } = useReown({
   onAccountChange: ({ account, wallet }) => {
@@ -25,6 +28,13 @@ const { openModal } = useReown({
       isSelected: false,
       icon: wallet.icon,
     })))
+  },
+  onModalOpenChange: (open) => {
+    setTimeout(() => {
+      if (!open && currentExtension.value && currentExtension.value.state !== WalletStates.Connected) {
+        setWalletConnectionFailed(currentExtension.value)
+      }
+    }, 300)
   },
 })
 
@@ -44,17 +54,24 @@ async function initSubAuthorization(extension: WalletExtension): Promise<WalletA
   return walletAccounts
 }
 
+function setWalletConnectionFailed(extension: WalletExtension) {
+  walletStore.updateWallet(extension.id, {
+    state: WalletStates.ConnectionFailed,
+    accounts: [],
+  })
+}
+
 function setWalletConnected(extension: WalletExtension, accounts: WalletAccount[]) {
   // for some reason from extensions return an account more than once
   const uniqueAccounts = accounts.filter((account, index, self) => self.findIndex(a => a.id === account.id) === index)
 
   walletStore.updateWallet(extension.id, {
-    accounts: uniqueAccounts,
     state: WalletStates.Connected,
+    accounts: uniqueAccounts,
     isSelected: true,
   })
 
-  currentExtension.value = queuedWallets.value[0]
+  currentExtensionId.value = queuedWallets.value[0]?.id
 }
 
 async function initEvmAuth() {
@@ -84,6 +101,15 @@ function handleQueue(extension?: WalletExtension) {
     return
   }
 
+  if (extension.state !== WalletStates.ConnectionQueued) {
+    return
+  }
+
+  initExtensionAuthorization(extension)
+}
+
+function handleRetry(extension: WalletExtension) {
+  walletStore.updateWalletState(extension.id, WalletStates.ConnectionQueued)
   initExtensionAuthorization(extension)
 }
 
@@ -91,5 +117,8 @@ watch(currentExtension, handleQueue, { immediate: true })
 </script>
 
 <template>
-  <WalletAuthorizationLoader :current-extension="currentExtension" />
+  <WalletAuthorizationLoader
+    :current-extension="currentExtension"
+    @retry="handleRetry"
+  />
 </template>
