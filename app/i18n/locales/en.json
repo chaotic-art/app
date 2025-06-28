@@ -34,7 +34,9 @@
     "manageWallets": "Manage wallets",
     "all": "All",
     "polkadot": "Polkadot",
-    "evm": "EVM"
+    "evm": "EVM",
+    "allInstalledWallets": "All installed wallets",
+    "connectAll": "Connect All"
   },
   "landing": {
     "title": "Your Polkadot NFT Marketplace",

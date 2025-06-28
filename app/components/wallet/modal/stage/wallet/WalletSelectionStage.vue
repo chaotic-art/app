@@ -58,6 +58,19 @@ function onLastConnected() {
   walletStore.setStage(WalletStageTypes.Account)
 }
 
+function onConnectAll() {
+  for (const extension of filteredInstalledWallets.value) {
+    if (extension.state !== WalletStates.Connected) {
+      walletStore.updateWalletState(extension.id, WalletStates.ConnectionQueued)
+    }
+    else {
+      walletStore.updateWallet(extension.id, { isSelected: true })
+    }
+  }
+
+  walletStore.setStage(WalletStageTypes.Authorization)
+}
+
 function onSelectUnistalledWallet(wallet: WalletExtension) {
   window.open(wallet.url, '_blank')
 }
@@ -72,6 +85,7 @@ function onSelectUnistalledWallet(wallet: WalletExtension) {
       :last-connected="lastConnected"
       @select="onSelectInstalledWallet"
       @last-connected="onLastConnected"
+      @connect-all="onConnectAll"
     />
 
     <template v-if="activeTab === 'All' || activeTab === 'Polkadot'">
