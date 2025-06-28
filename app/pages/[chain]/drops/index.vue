@@ -1,36 +1,39 @@
 <script setup lang="ts">
-import { getDrops } from '~/services/fxart'
+import { getDrops } from '@/services/fxart'
+import { useMintedDropsStore } from '@/stores/dropsMinted'
+import { isEvm } from '@/utils/network'
 
-const route = useRoute()
-const chain = computed(() => route.params.chain)
+const { prefix } = usePrefix()
+const mintedDrops = useMintedDropsStore()
+const sortedMintedDrops = computed(() => isEvm(prefix.value) ? mintedDrops.getMintedDrops : mintedDrops.sortedMintedDrops)
 
 const { data: drops } = await useAsyncData('drops', () => getDrops({
   active: [true],
   chain: ['ahp'],
-  limit: 100,
+  limit: 200,
 }))
 </script>
 
 <template>
   <UContainer>
     <h1 class="text-2xl md:text-4xl font-bold font-serif italic mb-6 md:mb-10 text-center md:text-left px-4 md:px-0">
-      Generative Art Drops
+      {{ $t('drop.generativeArtDrops') }}
     </h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 px-4 md:px-0">
-      <NuxtLink v-for="drop in drops" :key="drop.id" :to="`/${chain}/drops/${drop.alias}`" class="border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow">
-        <img :src="sanitizeIpfsUrl(drop.image)" :alt="drop.name" class="aspect-square w-full object-cover">
+      <DropCard v-for="drop in drops" :key="drop.id" :drop="drop" />
+    </div>
 
-        <div class="p-3 md:p-4">
-          <p class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
-            {{ drop.name }}
-          </p>
+    <div v-if="sortedMintedDrops.length">
+      <hr class="my-14 border-gray-300">
 
-          <div class="text-sm text-gray-500 rounded-full p-0.5">
-            <UserInfo :avatar-size="16" :address="drop.creator" :transparent-background="true" />
-          </div>
-        </div>
-      </NuxtLink>
+      <h1 class="text-2xl md:text-4xl font-bold font-serif italic mb-6 md:mb-10 text-center md:text-left px-4 md:px-0">
+        {{ $t('drop.pastDrops') }}
+      </h1>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4 px-4 md:px-0">
+        <DropCard v-for="drop in sortedMintedDrops" :key="drop.id" :drop="drop" show-minted />
+      </div>
     </div>
   </UContainer>
 </template>
