@@ -121,4 +121,6 @@ watch(currentExtension, handleQueue, { immediate: true })
     :current-extension="currentExtension"
     @retry="handleRetry"
   />
+
+  <WalletAccountFooter />
 </template>

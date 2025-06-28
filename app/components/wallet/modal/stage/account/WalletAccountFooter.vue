@@ -1,19 +1,37 @@
 <script setup lang="ts">
-defineProps<{
-  extensions: WalletExtension[]
-}>()
-defineEmits(['manage', 'logout'])
+const walletStore = useWalletStore()
+const { disconnectWallet } = useWalletManager()
+
+const { getConnectedWallets: connectedWallets } = storeToRefs(walletStore)
+
+function backToWalletSelection() {
+  walletStore.setStage(WalletStageTypes.Wallet)
+}
+
+function handleManageWallets() {
+  walletStore.clearSelectedWallets()
+  backToWalletSelection()
+}
+
+function handleLogout() {
+  for (const extension of connectedWallets.value) {
+    disconnectWallet(extension)
+  }
+
+  backToWalletSelection()
+}
 </script>
 
 <template>
-  <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-    <div class="flex items-center space-x-3">
-      <StackedWallets :wallets="extensions" :max-visible="2" size="sm" />
+  <div class="flex flex-wrap gap-2 items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+    <div v-if="connectedWallets.length" class="flex items-center space-x-3">
+      <StackedWallets :wallets="connectedWallets" :max-visible="2" size="sm" />
 
       <div class="text-sm text-gray-600 dark:text-gray-400 capitalize">
-        {{ $t('wallet.connected_count', { count: extensions.length }) }}
+        {{ $t('wallet.connected_count', { count: connectedWallets.length }) }}
       </div>
     </div>
+    <span v-else />
 
     <div class="flex items-center space-x-2">
       <UButton
@@ -21,7 +39,7 @@ defineEmits(['manage', 'logout'])
         variant="soft"
         size="sm"
         icon="i-lucide-log-out"
-        @click="$emit('logout')"
+        @click="handleLogout"
       >
         {{ $t('wallet.logOut') }}
       </UButton>
@@ -30,7 +48,7 @@ defineEmits(['manage', 'logout'])
         variant="ghost"
         color="neutral"
         size="sm"
-        @click="$emit('manage')"
+        @click="handleManageWallets"
       >
         {{ $t('wallet.manageWallets') }}
       </UButton>

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 const walletStore = useWalletStore()
-const { disconnectWallet } = useWalletManager()
 const accountStore = useAccountStore()
 
-const { wallets, getConnectedWallets: connectedWallets, isModalOpen: isWalletModalOpen } = storeToRefs(walletStore)
+const { wallets, isModalOpen: isWalletModalOpen } = storeToRefs(walletStore)
 
 const searchQuery = ref('')
 
@@ -42,23 +41,6 @@ function handleAccountSelect(accountId: string) {
   accountStore.setAuth({ vm: wallet.vm, address: account.address })
   isWalletModalOpen.value = false
 }
-
-function backToWalletSelection() {
-  walletStore.setStage(WalletStageTypes.Wallet)
-}
-
-function handleManageWallets() {
-  walletStore.clearSelectedWallets()
-  backToWalletSelection()
-}
-
-function handleLogout() {
-  for (const extension of connectedWallets.value) {
-    disconnectWallet(extension)
-  }
-
-  backToWalletSelection()
-}
 </script>
 
 <template>
@@ -77,10 +59,6 @@ function handleLogout() {
       @select="handleAccountSelect"
     />
 
-    <WalletAccountFooter
-      :extensions="connectedWallets"
-      @manage="handleManageWallets"
-      @logout="handleLogout"
-    />
+    <WalletAccountFooter />
   </div>
 </template>
