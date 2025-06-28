@@ -32,12 +32,12 @@ const isEVMAddress = computed(
 <template>
   <div
     v-if="isEVMAddress"
-    :svg="evmAvatarSvg"
     :class="WRAPPER_CLASS"
     :style="{
       width: `${size}px`,
       height: `${size}px`,
     }"
+    v-html="evmAvatarSvg"
   />
   <div v-else>
     <svg :width="size" :height="size" viewBox="0 0 64 64" :class="WRAPPER_CLASS">

@@ -1,0 +1,86 @@
+<script setup lang="ts">
+import type { ChainVM } from '@kodadot1/static'
+
+const ACTIVE_TAB_VM_MAP: Record<string, ChainVM> = {
+  Polkadot: 'SUB',
+  EVM: 'EVM',
+}
+
+const walletStore = useWalletStore()
+const { disconnectWallet } = useWalletManager()
+
+const {
+  getInstalledWallets: installedWallets,
+  getUninstalledWallets: uninstalledWallets,
+  getConnectedWallets: lastConnected,
+} = storeToRefs(walletStore)
+
+const activeTab = ref('All')
+
+const filteredInstalledWallets = computed(() => {
+  if (activeTab.value === 'All') {
+    return installedWallets.value
+  }
+  return installedWallets.value.filter(wallet => wallet.vm === ACTIVE_TAB_VM_MAP[activeTab.value])
+})
+
+async function processWalletExtensions(extensions: WalletExtension[], connectOnly: boolean): Promise<boolean> {
+  const toConnectExtensions = extensions.filter(extension => extension.state !== WalletStates.Connected)
+
+  for (const extension of toConnectExtensions) {
+    walletStore.updateWalletState(extension.id, WalletStates.ConnectionQueued)
+  }
+
+  if (!connectOnly) {
+    const disconnectPromises = extensions
+      .filter(extension => extension.state === WalletStates.Connected)
+      .map(extension => disconnectWallet(extension))
+
+    await Promise.all(disconnectPromises)
+  }
+
+  return Boolean(toConnectExtensions.length)
+}
+
+async function onSelectInstalledWallet(extensions: WalletExtension[]) {
+  const hasUnconnected = await processWalletExtensions(extensions, false)
+
+  if (hasUnconnected) {
+    walletStore.setStage(WalletStageTypes.Authorization)
+  }
+}
+
+function onLastConnected() {
+  for (const extension of lastConnected.value) {
+    walletStore.updateWallet(extension.id, { isSelected: true })
+  }
+
+  walletStore.setStage(WalletStageTypes.Account)
+}
+
+function onSelectUnistalledWallet(wallet: WalletExtension) {
+  window.open(wallet.url, '_blank')
+}
+</script>
+
+<template>
+  <div class="space-y-6">
+    <WalletSelectionTabs v-model="activeTab" />
+
+    <InstalledWallets
+      :extensions="filteredInstalledWallets"
+      :last-connected="lastConnected"
+      @select="onSelectInstalledWallet"
+      @last-connected="onLastConnected"
+    />
+
+    <template v-if="activeTab === 'All' || activeTab === 'Polkadot'">
+      <hr class="my-4 text-gray-200 dark:text-gray-700">
+
+      <UninstalledWallets
+        :extensions="uninstalledWallets"
+        @select="onSelectUnistalledWallet"
+      />
+    </template>
+  </div>
+</template>

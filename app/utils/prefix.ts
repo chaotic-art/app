@@ -1,3 +1,4 @@
+import type { ChainVM, Prefix } from '@kodadot1/static'
 import { dotHubDenyList, ksmHubDenyList } from '@/utils/constants'
 
 export function getDenyList(prefix: string): string[] | undefined {
@@ -12,3 +13,8 @@ export function getDenyList(prefix: string): string[] | undefined {
 }
 
 export const hasOperationsDisabled = (_: string): boolean => false
+
+export const DEFAULT_PREFIX_MAP: Record<ChainVM, Prefix> = {
+  EVM: 'ahw',
+  SUB: 'ahp',
+}
