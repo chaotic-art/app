@@ -39,8 +39,6 @@ const { openModal } = useReown({
 })
 
 async function initSubAuthorization(extension: WalletExtension): Promise<WalletAccount[]> {
-  await subWalletStore.init()
-
   const subWalletAccounts = await subWalletStore.connectWallet(extension.source as any)
 
   const walletAccounts: WalletAccount[] = subWalletAccounts.map(account => ({
@@ -84,8 +82,13 @@ async function initExtensionAuthorization(extension: WalletExtension) {
 
     execByVm({
       SUB: async () => {
-        const walletAccounts = await initSubAuthorization(extension)
-        setWalletConnected(extension, walletAccounts)
+        try {
+          const walletAccounts = await initSubAuthorization(extension)
+          setWalletConnected(extension, walletAccounts)
+        }
+        catch {
+          walletStore.updateWalletState(extension.id, WalletStates.ConnectionFailed)
+        }
       },
       EVM: async () => await initEvmAuth(),
     }, { vm: extension.vm })

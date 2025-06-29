@@ -25,6 +25,12 @@ const filteredInstalledWallets = computed(() => {
 })
 
 async function processWalletExtensions(extensions: WalletExtension[], connectOnly: boolean): Promise<boolean> {
+  const otherExtensions = installedWallets.value.filter(wallet => !extensions.some(ext => ext.id === wallet.id) && wallet.state !== WalletStates.Connected && wallet.state !== WalletStates.Disconnected)
+
+  for (const extension of otherExtensions) {
+    walletStore.updateWalletState(extension.id, WalletStates.Idle)
+  }
+
   const toConnectExtensions = extensions.filter(extension => extension.state !== WalletStates.Connected)
 
   for (const extension of toConnectExtensions) {
