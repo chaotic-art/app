@@ -55,8 +55,10 @@ export default ({ onAccountChange, onModalOpenChange }: AppKitOptions = {}) => {
     const state = useAppKitState()
 
     watch(() => state.open, (open) => {
-      isModalOpen.value = open
-      onModalOpenChange?.(open)
+      setTimeout(() => {
+        isModalOpen.value = open
+        onModalOpenChange?.(open)
+      }, 300) // Delay to not trigger modal change before account change event
     })
   }
 

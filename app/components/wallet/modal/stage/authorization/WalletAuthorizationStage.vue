@@ -30,11 +30,9 @@ const { openModal } = useReown({
     })))
   },
   onModalOpenChange: (open) => {
-    setTimeout(() => {
-      if (!open && currentExtension.value && currentExtension.value.state !== WalletStates.Connected) {
-        setWalletConnectionFailed(currentExtension.value)
-      }
-    }, 300)
+    if (!open && currentExtension.value && currentExtension.value.state !== WalletStates.Connected) {
+      setWalletConnectionFailed(currentExtension.value)
+    }
   },
 })
 
