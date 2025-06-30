@@ -27,16 +27,16 @@ function handleRetry() {
 
 const title = computed(() => {
   if (isConnectionFailed.value) {
-    return $i18n.t('wallet.connectionFailed')
+    return $i18n.t('wallet.connectionFailed.title')
   }
-  return $i18n.t('wallet.waitingForAuthorization')
+  return $i18n.t('wallet.waitingForAuthorization.title')
 })
 
 const subtitle = computed(() => {
   if (isConnectionFailed.value) {
-    return $i18n.t('wallet.connectionFailedDescription')
+    return $i18n.t('wallet.connectionFailed.description')
   }
-  return $i18n.t('wallet.waitingForAuthorizationDescription')
+  return $i18n.t('wallet.waitingForAuthorization.description')
 })
 
 const ringColors = computed(() => {
