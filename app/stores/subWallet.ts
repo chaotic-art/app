@@ -89,7 +89,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
       const walletAccounts: SubstrateWalletAccount[] = accounts
         .map(account => ({
           address: account.address,
-          name: account.name || undefined,
+          name: account.name,
           source: walletSource,
           type: account.type,
           genesisHash: account.genesisHash,
@@ -119,21 +119,23 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     }
   }
 
-  async function disconnectWallet(walletSource: string): Promise<void> {
+  async function disconnectWallet(source: SubstrateWalletSource): Promise<void> {
     try {
       isLoading.value = true
 
-      const walletIndex = enabledWallets.value.findIndex(w => w.source === walletSource)
+      const wallet = wallets.value.find(w => w.source === source)
 
-      if (enabledWallets.value[walletIndex]) {
-        enabledWallets.value[walletIndex].enabled = false
+      if (!wallet) {
+        throw new Error(`Wallet ${source} not found`)
       }
+
+      updateWallet(wallet.source, { enabled: false })
 
       error.value = null
     }
     catch (err) {
-      console.error(`Failed to disconnect wallet ${walletSource}:`, err)
-      error.value = err instanceof Error ? err : new Error(`Failed to disconnect ${walletSource}`)
+      console.error(`Failed to disconnect wallet ${source}:`, err)
+      error.value = err instanceof Error ? err : new Error(`Failed to disconnect ${source}`)
       throw error.value
     }
     finally {
@@ -162,6 +164,17 @@ export const useSubWalletStore = defineStore('subWallet', () => {
   function getAccountsBySource(source: SubstrateWalletSource): SubstrateWalletAccount[] {
     const wallet = enabledWallets.value.find(w => w.source === source)
     return wallet ? wallet.accounts : []
+  }
+
+  function updateWallet(source: SubstrateWalletSource, wallet: Partial<SubstrateWallet>): void {
+    const walletIndex = wallets.value.findIndex(w => w.source === source)
+
+    if (walletIndex !== -1) {
+      wallets.value[walletIndex] = {
+        ...wallets.value[walletIndex],
+        ...wallet,
+      } as SubstrateWallet
+    }
   }
 
   return {
