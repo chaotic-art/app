@@ -1,23 +1,15 @@
 import type { Signer } from '@polkadot/api/types'
-import type { InjectedExtension, InjectedWindow, InjectedWindowProvider } from '@polkadot/extension-inject/types'
+import type { InjectedExtension } from '@polkadot/extension-inject/types'
 import type {
   SubstrateWallet,
   SubstrateWalletAccount,
   SubstrateWalletSource,
 } from '@/utils/wallet/substrate/types'
 import { defineStore } from 'pinia'
+import { getInjectedExtension, isExtensionInstalled } from '@/utils/wallet/substrate'
 import { getAvailableWallets } from '@/utils/wallet/substrate/config'
 
 const DAPP_NAME = 'Chaotic'
-
-function getInjectedExtension(source: SubstrateWalletSource): InjectedWindowProvider | undefined {
-  const injectedWindow = window as Window & InjectedWindow
-  return injectedWindow?.injectedWeb3?.[source]
-}
-
-function isExtensionInstalled(source: SubstrateWalletSource): boolean {
-  return Boolean(getInjectedExtension(source))
-}
 
 export const useSubWalletStore = defineStore('subWallet', () => {
   const wallets = ref<SubstrateWallet[]>([])
