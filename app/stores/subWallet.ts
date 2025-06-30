@@ -141,23 +141,10 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     }
   }
 
-  // TODO: get signer from spefic ocnnected wallet/extension
-  async function getSigner(address: string): Promise<Signer | undefined> {
-    for (const wallet of enabledWallets.value) {
-      const account = wallet.accounts.find(acc => acc.address === address)
-      if (account) {
-        try {
-          const { web3FromSource } = await import('@polkadot/extension-dapp')
-          const injected = await web3FromSource(wallet.source)
-          return injected.signer
-        }
-        catch (err) {
-          console.error(`Failed to get signer for ${address}:`, err)
-          return undefined
-        }
-      }
-    }
-    return undefined
+  function getSigner(source: SubstrateWalletSource): Signer | undefined {
+    const wallet = enabledWallets.value.find(w => w.source === source)
+
+    return wallet?.signer
   }
 
   function getInstalledWallets(): SubstrateWallet[] {
