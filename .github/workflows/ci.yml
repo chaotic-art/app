@@ -43,4 +43,4 @@ jobs:
           run_install: true
 
       - name: Type Check
-        run: npx nuxi typecheck
+        run: pnpm exec nuxi typecheck
