@@ -1,4 +1,5 @@
-import { exploreCollections, type ExploreCollectionsData } from '~/graphql/queries/explore'
+import type { ExploreCollectionsData } from '~/graphql/queries/explore'
+import { exploreCollections } from '~/graphql/queries/explore'
 import { getDenyList } from '~/utils/prefix'
 
 type CollectionEntity = ExploreCollectionsData['collectionEntities'][0]
