@@ -10,10 +10,12 @@ export interface WalletAccount {
 
 export const WalletStates = {
   Idle: 'idle',
-  ConnectionQueued: 'connectionQueued',
-  ConnectionFailed: 'connectionFailed',
-  Connected: 'connected',
-  Connecting: 'connecting',
+  AuthorizationQueued: 'authorizationQueued',
+  AuthorizationFailed: 'authorizationFailed',
+  Authorizing: 'authorizing', // popup opening, requesting permission
+  Authorized: 'authorized', // user approved accounts
+  Connecting: 'connecting', // setting up subscriptions/technical connection
+  Connected: 'connected', // fully connected and ready
   Disconnecting: 'disconnecting',
   Disconnected: 'disconnected', // TODO: remove and use Idle?
 } as const

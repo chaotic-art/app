@@ -1,27 +1,78 @@
 <script setup lang="ts">
+import type { SubstrateWallet, SubstrateWalletSource } from '@/utils/wallet/substrate/types'
+
 const emit = defineEmits(['close'])
 const isModalOpen = defineModel<boolean>({ required: true })
 
 const { t } = useI18n()
 const subWalletStore = useSubWalletStore()
 const walletStore = useWalletStore()
-const { stage } = storeToRefs(walletStore)
+const walletManager = useWalletManager()
+
+const { stage, wallets } = storeToRefs(walletStore)
 
 async function init() {
   walletStore.setStage(WalletStageTypes.Loading)
 
   const extensions = await getWalletExtensions()
 
-  // TODO: add a sync extension mechanism
-  for (const extension of extensions) {
-    walletStore.addWallet(extension)
-  }
+  await initWalletState()
+
+  wallets.value = extensions
 
   walletStore.setStage(WalletStageTypes.Wallet)
 }
 
+async function initWalletState() {
+  // sub
+  subWalletStore.$subscribe((mutation, state) => {
+    const events = Array.isArray(mutation.events) ? mutation.events : [mutation.events]
+
+    for (const event of events) {
+      if (event.key === 'accounts') {
+        const targetId = (event.target as SubstrateWallet).id
+        const extension = wallets.value.find(wallet => wallet.id === targetId)
+        const accounts = state.wallets.find(wallet => wallet.id === targetId)?.accounts || []
+
+        if (!extension) {
+          return
+        }
+
+        walletStore.updateWallet(extension.id, {
+          accounts: walletManager.formatSubAccounts({
+            accounts,
+            extension,
+          }),
+        })
+      }
+    }
+  })
+
+  // evm
+  useReown({
+    onAccountChange: (params) => {
+      if (stage.value === WalletStageTypes.Authorization) {
+        return
+      }
+
+      const extension = wallets.value.find(wallet => wallet.id === 'reown')
+
+      if (!extension) {
+        return
+      }
+
+      const accounts = walletManager.formatEvmAccounts({ extension, ...params })
+
+      walletStore.updateWallet(extension.id, {
+        state: extension.state === WalletStates.Authorized ? WalletStates.Connected : extension.state,
+        accounts,
+      })
+    },
+  })
+}
+
 async function getSubWalletExtensions(): Promise<WalletExtension[]> {
-  const wallets = await subWalletStore.init()
+  const wallets = subWalletStore.init()
 
   return wallets.map(extension => ({
     id: extension.id,
@@ -54,11 +105,58 @@ async function getWalletExtensions(): Promise<WalletExtension[]> {
   const subExtensions = await getSubWalletExtensions()
   const evmExtension = getEvmWalletExtension()
 
-  return [
+  const originalWallets = [
     ...subExtensions,
     evmExtension,
   ]
+
+  return originalWallets.map((wallet) => {
+    const savedWallet = wallets.value.find(w => w.id === wallet.id)
+
+    if (!savedWallet) {
+      return wallet
+    }
+
+    let state: WalletState = WalletStates.Idle
+
+    if (savedWallet.state === WalletStates.Connected) {
+      state = WalletStates.Authorized
+    }
+
+    return {
+      ...savedWallet,
+      state,
+    }
+  })
 }
+
+const walletStates = computed<Record<string, WalletState>>(() => {
+  return wallets.value.reduce((acc, wallet) => {
+    Object.assign(acc, { [wallet.id]: wallet.state })
+    return acc
+  }, {})
+})
+
+// watch for unsyncedExtensions
+watch(walletStates, (_, prevState) => {
+  for (const wallet of wallets.value) {
+    if (wallet.state === WalletStates.Authorized && prevState[wallet.id] !== WalletStates.Authorized) {
+      execByVm({
+        SUB: async () => {
+          walletStore.updateWallet(wallet.id, { state: WalletStates.Connecting })
+
+          if (!subWalletStore.isWalletInitialized(wallet.id)) {
+            await subWalletStore.connectWallet(wallet.source as SubstrateWalletSource)
+          }
+
+          subWalletStore.subscribeAccounts(wallet.id)
+
+          walletStore.updateWallet(wallet.id, { state: WalletStates.Connected })
+        },
+      }, { vm: wallet.vm })
+    }
+  }
+})
 
 const title = computed(() => {
   if (stage.value === WalletStageTypes.Wallet) {

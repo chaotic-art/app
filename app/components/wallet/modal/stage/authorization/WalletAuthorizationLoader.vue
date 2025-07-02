@@ -9,16 +9,16 @@ const emit = defineEmits<{
 
 const { $i18n } = useNuxtApp()
 
-const isConnectionFailed = computed(() =>
-  props.currentExtension?.state === WalletStates.ConnectionFailed,
+const isAuthorizationFailed = computed(() =>
+  props.currentExtension?.state === WalletStates.AuthorizationFailed,
 )
 
-const isConnectionQueued = computed(() =>
-  props.currentExtension?.state === WalletStates.ConnectionQueued,
+const isAuthorizationQueued = computed(() =>
+  props.currentExtension?.state === WalletStates.AuthorizationQueued,
 )
 
-const isConnecting = computed(() =>
-  props.currentExtension?.state === WalletStates.Connecting,
+const isAuthorizing = computed(() =>
+  props.currentExtension?.state === WalletStates.Authorizing,
 )
 
 function handleRetry() {
@@ -26,21 +26,21 @@ function handleRetry() {
 }
 
 const title = computed(() => {
-  if (isConnectionFailed.value) {
+  if (isAuthorizationFailed.value) {
     return $i18n.t('wallet.connectionFailed.title')
   }
   return $i18n.t('wallet.waitingForAuthorization.title')
 })
 
 const subtitle = computed(() => {
-  if (isConnectionFailed.value) {
+  if (isAuthorizationFailed.value) {
     return $i18n.t('wallet.connectionFailed.description')
   }
   return $i18n.t('wallet.waitingForAuthorization.description')
 })
 
 const ringColors = computed(() => {
-  if (isConnectionFailed.value) {
+  if (isAuthorizationFailed.value) {
     return {
       primary: 'border-red-500',
       secondary: 'border-red-400',
@@ -53,7 +53,7 @@ const ringColors = computed(() => {
 })
 
 const showRings = computed(() =>
-  isConnectionQueued.value || isConnecting.value || isConnectionFailed.value,
+  isAuthorizationQueued.value || isAuthorizing.value || isAuthorizationFailed.value,
 )
 </script>
 
@@ -82,7 +82,7 @@ const showRings = computed(() =>
         {{ subtitle }}
       </h2>
 
-      <div v-if="isConnectionFailed" class="pt-2">
+      <div v-if="isAuthorizationFailed" class="pt-2">
         <UButton
           :label="$t('wallet.retry')"
           variant="solid"

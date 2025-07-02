@@ -2,22 +2,28 @@ import type { AppKit, ConnectedWalletInfo, UseAppKitAccountReturn } from '@reown
 import { createAppKit, useAppKit, useDisconnect } from '@reown/appkit/vue'
 import { useAppKitState } from '@reown/appkit/vue'
 
-interface AppKitOptions {
-  onAccountChange?: (params: { account: UseAppKitAccountReturn, wallet: ConnectedWalletInfo }) => void
-  onModalOpenChange?: (open: boolean) => void
+export interface UseReownOnAccountChangeParams {
+  account: UseAppKitAccountReturn
+  wallet: ConnectedWalletInfo
 }
 
-export default ({ onAccountChange, onModalOpenChange }: AppKitOptions = {}) => {
+interface AppKitOptions {
+  onAccountChange?: (params: UseReownOnAccountChangeParams) => void
+  onModalOpenChange?: (open: boolean) => void
+  onWalletChange?: (wallet?: ConnectedWalletInfo) => void
+}
+
+export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOptions = {}) => {
   const { $wagmi } = useNuxtApp()
   const { disconnect } = useDisconnect()
 
   const isModalOpen = ref(false)
   const isConnecting = ref(false)
   const connectedWalletInfo = ref<ConnectedWalletInfo>()
-  const currentKey = ref<string | undefined>()
-  const appKit = ref<AppKit>()
+  const currentKey = ref<string>()
+  const appKit = ref<AppKit>() // TODO: nake it a singelton
 
-  const initModal = () => {
+  const initAppKit = () => {
     appKit.value = createAppKit({
       adapters: [$wagmi.adapter],
       // @ts-expect-error different types each network
@@ -34,6 +40,8 @@ export default ({ onAccountChange, onModalOpenChange }: AppKitOptions = {}) => {
 
     appKit.value.subscribeWalletInfo((walletInfo) => {
       connectedWalletInfo.value = walletInfo
+
+      onWalletChange?.(walletInfo)
     })
 
     appKit.value.subscribeAccount((account) => {
@@ -62,6 +70,10 @@ export default ({ onAccountChange, onModalOpenChange }: AppKitOptions = {}) => {
     })
   }
 
+  if (import.meta.client && !appKit.value) {
+    initAppKit()
+  }
+
   async function openModal() {
     if (isConnecting.value)
       return
@@ -69,10 +81,6 @@ export default ({ onAccountChange, onModalOpenChange }: AppKitOptions = {}) => {
     isConnecting.value = true
 
     try {
-      if (!appKit.value) {
-        initModal()
-      }
-
       useAppKit().open()
     }
     catch (error) {

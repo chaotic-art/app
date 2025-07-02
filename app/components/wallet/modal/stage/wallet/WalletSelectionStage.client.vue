@@ -34,7 +34,7 @@ async function processWalletExtensions(extensions: WalletExtension[], connectOnl
   const toConnectExtensions = extensions.filter(extension => extension.state !== WalletStates.Connected)
 
   for (const extension of toConnectExtensions) {
-    walletStore.updateWalletState(extension.id, WalletStates.ConnectionQueued)
+    walletStore.updateWalletState(extension.id, WalletStates.AuthorizationQueued)
   }
 
   if (!connectOnly) {
@@ -67,7 +67,7 @@ function onLastConnected() {
 function onConnectAll() {
   for (const extension of filteredInstalledWallets.value) {
     if (extension.state !== WalletStates.Connected) {
-      walletStore.updateWalletState(extension.id, WalletStates.ConnectionQueued)
+      walletStore.updateWalletState(extension.id, WalletStates.AuthorizationQueued)
     }
     else {
       walletStore.updateWallet(extension.id, { isSelected: true })

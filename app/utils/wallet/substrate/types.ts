@@ -1,5 +1,5 @@
 import type { Signer } from '@polkadot/api/types'
-import type { InjectedExtension } from '@polkadot/extension-inject/types'
+import type { InjectedExtension, Unsubcall } from '@polkadot/extension-inject/types'
 
 export const SubstrateWalletSources = {
   PolkadotJs: 'polkadot-js',
@@ -45,6 +45,7 @@ export interface SubstrateWallet extends SubstrateWalletMetadata {
   accounts: SubstrateWalletAccount[]
   extension?: InjectedExtension
   signer?: Signer
+  unsub?: Unsubcall
 }
 
 export type SubscriptionFn = (wallets: ReadonlyArray<SubstrateWallet>) => void

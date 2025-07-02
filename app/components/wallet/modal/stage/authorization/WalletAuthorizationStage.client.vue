@@ -2,32 +2,28 @@
 const walletStore = useWalletStore()
 const { wallets } = storeToRefs(walletStore)
 const subWalletStore = useSubWalletStore()
+const walletManager = useWalletManager()
 
 const queuedWallets = computed(() => wallets.value.filter(wallet =>
-  wallet.state === WalletStates.ConnectionQueued
-  || wallet.state === WalletStates.Connecting
-  || wallet.state === WalletStates.ConnectionFailed,
+  wallet.state === WalletStates.AuthorizationQueued
+  || wallet.state === WalletStates.Authorizing
+  || wallet.state === WalletStates.AuthorizationFailed,
 ))
 
 const currentExtensionId = ref<string | undefined>(queuedWallets.value[0]?.id)
 const currentExtension = computed<WalletExtension | undefined>(() => queuedWallets.value.find(wallet => wallet.id === currentExtensionId.value))
 
 const { openModal } = useReown({
-  onAccountChange: ({ account, wallet }) => {
-    const { allAccounts: accounts } = account
+  onAccountChange: (params) => {
     const extension = currentExtension.value
 
     if (!extension) {
       return
     }
 
-    setWalletConnected(extension, accounts.map(account => ({
-      id: `${extension.id}:${wallet.rdns}/${account.address}`,
-      vm: 'EVM',
-      address: account.address,
-      isSelected: false,
-      icon: wallet.icon,
-    })))
+    const accounts = walletManager.formatEvmAccounts({ extension, ...params })
+
+    setWalletAuthorized(extension, accounts)
   },
   onModalOpenChange: (open) => {
     if (!open && currentExtension.value && currentExtension.value.state !== WalletStates.Connected) {
@@ -37,32 +33,24 @@ const { openModal } = useReown({
 })
 
 async function initSubAuthorization(extension: WalletExtension): Promise<WalletAccount[]> {
-  const subWalletAccounts = await subWalletStore.connectWallet(extension.source as any)
+  const accounts = await subWalletStore.connectWallet(extension.source as any)
 
-  const walletAccounts: WalletAccount[] = subWalletAccounts.map(account => ({
-    id: `${extension.id}:${account.address}`,
-    vm: 'SUB',
-    address: account.address,
-    isSelected: false,
-    name: account.name,
-  }))
-
-  return walletAccounts
+  return walletManager.formatSubAccounts({ extension, accounts })
 }
 
 function setWalletConnectionFailed(extension: WalletExtension) {
   walletStore.updateWallet(extension.id, {
-    state: WalletStates.ConnectionFailed,
+    state: WalletStates.AuthorizationFailed,
     accounts: [],
   })
 }
 
-function setWalletConnected(extension: WalletExtension, accounts: WalletAccount[]) {
+function setWalletAuthorized(extension: WalletExtension, accounts: WalletAccount[]) {
   // for some reason from extensions return an account more than once
   const uniqueAccounts = accounts.filter((account, index, self) => self.findIndex(a => a.id === account.id) === index)
 
   walletStore.updateWallet(extension.id, {
-    state: WalletStates.Connected,
+    state: WalletStates.Authorized,
     accounts: uniqueAccounts,
     isSelected: true,
   })
@@ -76,23 +64,23 @@ async function initEvmAuth() {
 
 async function initExtensionAuthorization(extension: WalletExtension) {
   try {
-    walletStore.updateWalletState(extension.id, WalletStates.Connecting)
+    walletStore.updateWalletState(extension.id, WalletStates.Authorizing)
 
     execByVm({
       SUB: async () => {
         try {
           const walletAccounts = await initSubAuthorization(extension)
-          setWalletConnected(extension, walletAccounts)
+          setWalletAuthorized(extension, walletAccounts)
         }
         catch {
-          walletStore.updateWalletState(extension.id, WalletStates.ConnectionFailed)
+          walletStore.updateWalletState(extension.id, WalletStates.AuthorizationFailed)
         }
       },
       EVM: async () => await initEvmAuth(),
     }, { vm: extension.vm })
   }
   catch {
-    walletStore.updateWalletState(extension.id, WalletStates.ConnectionFailed)
+    walletStore.updateWalletState(extension.id, WalletStates.AuthorizationFailed)
   }
 }
 
@@ -102,7 +90,7 @@ function handleQueue(extension?: WalletExtension) {
     return
   }
 
-  if (extension.state !== WalletStates.ConnectionQueued) {
+  if (extension.state !== WalletStates.AuthorizationQueued) {
     return
   }
 
@@ -110,7 +98,8 @@ function handleQueue(extension?: WalletExtension) {
 }
 
 function handleRetry(extension: WalletExtension) {
-  walletStore.updateWalletState(extension.id, WalletStates.ConnectionQueued)
+  walletStore.updateWalletState(extension.id, WalletStates.AuthorizationQueued)
+
   initExtensionAuthorization(extension)
 }
 

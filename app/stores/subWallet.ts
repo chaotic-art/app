@@ -1,5 +1,5 @@
 import type { Signer } from '@polkadot/api/types'
-import type { InjectedExtension } from '@polkadot/extension-inject/types'
+import type { InjectedAccount, InjectedExtension } from '@polkadot/extension-inject/types'
 import type {
   SubstrateWallet,
   SubstrateWalletAccount,
@@ -10,6 +10,16 @@ import { getInjectedExtension, isExtensionInstalled } from '@/utils/wallet/subst
 import { getAvailableWallets } from '@/utils/wallet/substrate/config'
 
 const DAPP_NAME = 'Chaotic'
+
+function formatAccounts(source: SubstrateWalletSource, accounts: InjectedAccount[]): SubstrateWalletAccount[] {
+  return accounts.map(account => ({
+    address: account.address,
+    name: account.name,
+    source,
+    type: account.type,
+    genesisHash: account.genesisHash,
+  }))
+}
 
 export const useSubWalletStore = defineStore('subWallet', () => {
   const wallets = ref<SubstrateWallet[]>([])
@@ -54,6 +64,32 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     }
   }
 
+  function isWalletInitialized(walletId: string): boolean {
+    return Boolean(wallets.value.find(w => w.id === walletId)?.extension)
+  }
+
+  function subscribeAccounts(walletId: string) {
+    const wallet = wallets.value.find(w => w.id === walletId)
+
+    if (!wallet) {
+      return
+    }
+
+    const extension = wallet.extension
+
+    if (!extension) {
+      return
+    }
+
+    wallet.unsub?.()
+
+    const unsub = extension.accounts.subscribe((accounts) => {
+      wallet.accounts = formatAccounts(wallet.source, accounts)
+    })
+
+    wallet.unsub = unsub
+  }
+
   async function connectWallet(walletSource: SubstrateWalletSource): Promise<SubstrateWalletAccount[]> {
     const wallet = wallets.value.find(w => w.source === walletSource)
 
@@ -86,14 +122,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
 
       const accounts = await rawExtension.accounts.get()
 
-      const walletAccounts: SubstrateWalletAccount[] = accounts
-        .map(account => ({
-          address: account.address,
-          name: account.name,
-          source: walletSource,
-          type: account.type,
-          genesisHash: account.genesisHash,
-        }))
+      const walletAccounts = formatAccounts(wallet.source, accounts)
 
       const extension: InjectedExtension = {
         ...rawExtension,
@@ -186,6 +215,8 @@ export const useSubWalletStore = defineStore('subWallet', () => {
 
     init,
     connectWallet,
+    isWalletInitialized,
+    subscribeAccounts,
     disconnectWallet,
     getSigner,
     getInstalledWallets,
