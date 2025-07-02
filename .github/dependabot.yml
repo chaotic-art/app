@@ -9,3 +9,18 @@ updates:
     directory: / # Location of package manifests
     schedule:
       interval: monthly
+    groups:
+      # Group all minor updates together
+      minor-updates:
+        applies-to: version-updates
+        patterns:
+          - '*'
+        update-types:
+          - minor
+      # Group all major updates together
+      major-updates:
+        applies-to: version-updates
+        patterns:
+          - '*'
+        update-types:
+          - major
