@@ -44,3 +44,41 @@ jobs:
 
       - name: Type Check
         run: pnpm exec nuxi typecheck
+
+  build-cf-workers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: true
+
+      - name: Build Cloudflare Workers
+        run: NITRO_PRESET=cloudflare_module pnpm run build
+
+  build-cf-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: true
+
+      - name: Build Cloudflare Pages
+        run: NITRO_PRESET=cloudflare_pages pnpm run build
