@@ -16,7 +16,6 @@ const metadata = {
 export default defineNuxtPlugin((nuxtApp) => {
   const buildWagmiAdapter = (projectId: string) => {
     return new WagmiAdapter({
-      // @ts-expect-error different types each network
       networks,
       projectId,
     })
