@@ -10,13 +10,14 @@ updates:
     schedule:
       interval: monthly
     groups:
-      # Group all minor updates together
+      # Group all minor and patch updates together
       minor-updates:
         applies-to: version-updates
         patterns:
           - '*'
         update-types:
           - minor
+          - patch
       # Group all major updates together
       major-updates:
         applies-to: version-updates
