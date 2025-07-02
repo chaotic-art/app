@@ -1,6 +1,7 @@
+import type { DropItem } from '@/types'
 import { getDropById } from '@/services/fxart'
 import { fetchOdaCollection, fetchOdaCollectionAbi } from '@/services/oda'
-import { type DropItem, DropStatus } from '@/types'
+import { DropStatus } from '@/types'
 
 export function formatCETDate(date: string, time: string): Date {
   return new Date(`${date}T${time}+02:00`)

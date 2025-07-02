@@ -1,4 +1,5 @@
-import { graphql, type ResultOf } from '../client'
+import type { ResultOf } from '../client'
+import { graphql } from '../client'
 
 // collections sales
 export const collectionsSales = graphql(`
