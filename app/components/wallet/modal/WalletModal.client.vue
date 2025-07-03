@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SubstrateWallet, SubstrateWalletSource } from '@/utils/wallet/substrate/types'
+import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
 
 const emit = defineEmits(['close'])
 const isModalOpen = defineModel<boolean>({ required: true })
@@ -50,12 +51,9 @@ async function initWalletState() {
 
   // evm
   useReown({
+    initOn: 'immediate',
     onAccountChange: (params) => {
-      if (stage.value === WalletStageTypes.Authorization) {
-        return
-      }
-
-      const extension = wallets.value.find(wallet => wallet.id === 'reown')
+      const extension = wallets.value.find(wallet => wallet.id === REOWN_WALLET_CONFIG.id)
 
       if (!extension) {
         return
@@ -63,8 +61,9 @@ async function initWalletState() {
 
       const accounts = walletManager.formatEvmAccounts({ extension, ...params })
 
+      // TODO: make dynamic state
       walletStore.updateWallet(extension.id, {
-        state: extension.state === WalletStates.Authorized ? WalletStates.Connected : extension.state,
+        state: WalletStates.Connected,
         accounts,
       })
     },
@@ -87,27 +86,23 @@ async function getSubWalletExtensions(): Promise<WalletExtension[]> {
   }))
 }
 
-function getEvmWalletExtension(): WalletExtension {
-  return {
-    id: 'reown',
-    name: 'EVM Wallets',
-    icon: '/partners/logo-reown.png',
-    url: '',
-    source: 'reown',
-    installed: true,
-    vm: 'EVM',
-    accounts: [],
-    state: WalletStates.Idle,
-  }
+function getEvmWalletExtensions(): WalletExtension[] {
+  return [
+    {
+      ...REOWN_WALLET_CONFIG,
+      accounts: [],
+      state: WalletStates.Idle,
+    },
+  ]
 }
 
 async function getWalletExtensions(): Promise<WalletExtension[]> {
   const subExtensions = await getSubWalletExtensions()
-  const evmExtension = getEvmWalletExtension()
+  const evmExtensions = getEvmWalletExtensions()
 
   const originalWallets = [
     ...subExtensions,
-    evmExtension,
+    ...evmExtensions,
   ]
 
   return originalWallets.map((wallet) => {

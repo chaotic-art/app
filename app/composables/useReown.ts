@@ -11,9 +11,12 @@ interface AppKitOptions {
   onAccountChange?: (params: UseReownOnAccountChangeParams) => void
   onModalOpenChange?: (open: boolean) => void
   onWalletChange?: (wallet?: ConnectedWalletInfo) => void
+  initOn?: 'mounted' | 'immediate'
 }
 
-export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOptions = {}) => {
+const appKit = ref<AppKit>()
+
+export default ({ onAccountChange, onModalOpenChange, onWalletChange, initOn = 'mounted' }: AppKitOptions = {}) => {
   const { $wagmi } = useNuxtApp()
   const { disconnect } = useDisconnect()
 
@@ -21,7 +24,7 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
   const isConnecting = ref(false)
   const connectedWalletInfo = ref<ConnectedWalletInfo>()
   const currentKey = ref<string>()
-  const appKit = ref<AppKit>() // TODO: nake it a singelton
+  const isReady = computed(() => Boolean(appKit.value))
 
   const initAppKit = () => {
     appKit.value = createAppKit({
@@ -37,6 +40,12 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
         swaps: false,
       },
     })
+  }
+
+  const initSubsriptions = async () => {
+    if (!appKit.value) {
+      return
+    }
 
     appKit.value.subscribeWalletInfo((walletInfo) => {
       connectedWalletInfo.value = walletInfo
@@ -70,8 +79,23 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
     })
   }
 
-  if (import.meta.client && !appKit.value) {
-    initAppKit()
+  const init = async () => {
+    if (import.meta.client) {
+      if (!appKit.value) {
+        initAppKit()
+      }
+
+      initSubsriptions()
+    }
+  }
+
+  if (initOn === 'mounted') {
+    onMounted(() => {
+      init()
+    })
+  }
+  else if (initOn === 'immediate') {
+    init()
   }
 
   async function openModal() {
@@ -94,5 +118,6 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
   return {
     openModal,
     disconnect,
+    isReady,
   }
 }

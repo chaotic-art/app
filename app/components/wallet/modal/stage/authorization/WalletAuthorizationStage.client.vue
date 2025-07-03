@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
+
 const walletStore = useWalletStore()
 const { wallets } = storeToRefs(walletStore)
 const subWalletStore = useSubWalletStore()
@@ -13,17 +15,19 @@ const queuedWallets = computed(() => wallets.value.filter(wallet =>
 const currentExtensionId = ref<string | undefined>(queuedWallets.value[0]?.id)
 const currentExtension = computed<WalletExtension | undefined>(() => queuedWallets.value.find(wallet => wallet.id === currentExtensionId.value))
 
-const { openModal } = useReown({
-  onAccountChange: (params) => {
+const { openModal, isReady: isReownReady } = useReown({
+  onWalletChange: (wallet) => {
     const extension = currentExtension.value
 
-    if (!extension) {
+    if (!extension || !wallet) {
       return
     }
 
-    const accounts = walletManager.formatEvmAccounts({ extension, ...params })
+    if (extension.id !== REOWN_WALLET_CONFIG.id) {
+      return
+    }
 
-    setWalletAuthorized(extension, accounts)
+    setWalletAuthorized(extension, [])
   },
   onModalOpenChange: (open) => {
     if (!open && currentExtension.value && currentExtension.value.state !== WalletStates.Connected) {
@@ -103,7 +107,13 @@ function handleRetry(extension: WalletExtension) {
   initExtensionAuthorization(extension)
 }
 
-watch(currentExtension, handleQueue, { immediate: true })
+watch([currentExtension, isReownReady], ([extension, isReady]) => {
+  if (!isReady) {
+    return
+  }
+
+  handleQueue(extension)
+}, { immediate: true })
 </script>
 
 <template>

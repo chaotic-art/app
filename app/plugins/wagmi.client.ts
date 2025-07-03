@@ -1,4 +1,5 @@
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { reconnect } from '@wagmi/core'
 import { WagmiPlugin } from '@wagmi/vue'
 import { westendAssetHub } from '@wagmi/vue/chains'
 
@@ -24,12 +25,16 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const projectId = useRuntimeConfig().public.reownProjectId
 
-  nuxtApp.vueApp.use(WagmiPlugin, { config: buildWagmiAdapter(projectId).wagmiConfig })
+  const adapter = buildWagmiAdapter(projectId)
+
+  nuxtApp.vueApp.use(WagmiPlugin, { config: adapter.wagmiConfig })
+
+  reconnect(adapter.wagmiConfig)
 
   return {
     provide: {
       wagmi: {
-        adapter: buildWagmiAdapter(projectId),
+        adapter,
         projectId,
         networks,
         defaultNetwork,

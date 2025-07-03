@@ -2,7 +2,7 @@
 const walletStore = useWalletStore()
 const { disconnectWallet } = useWalletManager()
 
-const { getConnectedWallets: connectedWallets } = storeToRefs(walletStore)
+const { getUserConnectedWallets: connectedWallets } = storeToRefs(walletStore)
 
 function backToWalletSelection() {
   walletStore.setStage(WalletStageTypes.Wallet)
