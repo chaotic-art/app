@@ -1,19 +1,59 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
+import { useTimeoutFn } from '@vueuse/core'
+import { FALLBACK_DROP_COLLECTION_MAX } from '@/components/drops/utils'
+import useGenerativeIframeData from '@/composables/drop/useGenerativeIframeData'
 import { getDropById } from '~/services/fxart'
 import { fetchOdaCollection } from '~/services/oda'
 
 const { slug, chain } = useRoute().params
 const { $api } = useNuxtApp()
 const chainPrefix = computed(() => chain?.toString() as Prefix)
-
+const { address } = useAccountStore()
 const { data: drop } = await useAsyncData(`drop:${slug}`, () => getDropById(slug?.toString() ?? ''))
-
 const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
+const { imageDataPayload, imageDataLoaded } = useGenerativeIframeData()
+const isCapturingImage = ref(false)
+const generativeImageUrl = ref(collection.value?.metadata.generative_uri)
 const items = ref<number[]>([])
+
+const { start: startTimer } = useTimeoutFn(() => {
+  // quick fix: ensure that even if the completed event is not received, the loading state of the drop can be cleared
+  // only applicable if the drop is missing`kodahash/render/completed` event
+  if (!imageDataLoaded.value) {
+    isCapturingImage.value = false
+  }
+}, 5000)
 
 const { decimals, chainSymbol } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
+
+function generateNft() {
+  if (!drop.value?.content) {
+    return
+  }
+  isCapturingImage.value = true
+  startTimer()
+
+  const previewItem = generatePreviewItem({
+    entropyRange: getEntropyRange(drop.value?.max ?? FALLBACK_DROP_COLLECTION_MAX),
+    accountId: address ?? '',
+    content: drop.value.content,
+  })
+
+  generativeImageUrl.value = previewItem.image
+  imageDataPayload.value = undefined
+}
+
+watch(collection, () => {
+  generativeImageUrl.value = collection.value?.metadata.generative_uri
+})
+
+watch(imageDataLoaded, () => {
+  if (imageDataLoaded.value) {
+    isCapturingImage.value = false
+  }
+})
 
 onMounted(async () => {
   collection.value = await fetchOdaCollection(chainPrefix.value, drop.value?.collection ?? '')
@@ -86,9 +126,9 @@ onMounted(async () => {
       <div class="order-1 lg:order-2">
         <!-- preview section -->
         <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
-          <iframe class="aspect-square w-full" :src="sanitizeIpfsUrl(collection?.metadata.generative_uri)" frameborder="0" />
+          <iframe class="aspect-square w-full" :src="sanitizeIpfsUrl(generativeImageUrl)" frameborder="0" />
           <div class="flex flex-col sm:flex-row gap-2 mt-4 justify-center">
-            <UButton class="rounded-full bg-gray-100 text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-refresh-cw">
+            <UButton class="rounded-full bg-gray-100 text-xs md:text-sm cursor-pointer" variant="soft" trailing-icon="i-lucide-refresh-cw" :loading="isCapturingImage" @click="generateNft">
               Preview Variation
             </UButton>
             <UButton class="rounded-full bg-gray-100 text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
