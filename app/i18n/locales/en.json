@@ -49,7 +49,9 @@
   "drop": {
     "mint": "Mint Drop",
     "minted": "Minted",
-    "seeListing": "See Listing"
+    "seeListing": "See Listing",
+    "generativeArtDrops": "Generative Art Drops",
+    "pastDrops": "Past Art Drops"
   },
   "collection": {
     "topCollections": "Top Collections",

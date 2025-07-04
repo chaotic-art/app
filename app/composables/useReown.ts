@@ -29,7 +29,6 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
   const initAppKit = () => {
     appKit.value = createAppKit({
       adapters: [$wagmi.adapter],
-      // @ts-expect-error different types each network
       networks: [$wagmi.defaultNetwork, ...$wagmi.networks],
       projectId: $wagmi.projectId,
       metadata: $wagmi.metadata,

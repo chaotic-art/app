@@ -1,4 +1,5 @@
-import { graphql, type ResultOf } from '../client'
+import type { ResultOf } from '../client'
+import { graphql } from '../client'
 
 export const exploreCollections = graphql(`
     query collectionListWithSearch($first: Int!, $offset: Int, $search: [CollectionEntityWhereInput!], $orderBy: [CollectionEntityOrderByInput!] = [blockNumber_DESC], $denyList: [String!]) {

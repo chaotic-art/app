@@ -1,5 +1,6 @@
+import type { CollectionsSalesData, TopCollectionsData } from '@/graphql/queries/collections'
 import type { Interaction } from '@/types'
-import { collectionsSales, type CollectionsSalesData, topCollections, type TopCollectionsData } from '@/graphql/queries/collections'
+import { collectionsSales, topCollections } from '@/graphql/queries/collections'
 
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
 import {
