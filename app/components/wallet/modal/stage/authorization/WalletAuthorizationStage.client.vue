@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { formatSubAccounts } from '@/utils/wallet'
 import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
 
 const walletStore = useWalletStore()
 const { wallets } = storeToRefs(walletStore)
 const subWalletStore = useSubWalletStore()
-const walletManager = useWalletManager()
 
 const queuedWallets = computed(() => wallets.value.filter(wallet =>
   wallet.state === WalletStates.AuthorizationQueued
@@ -27,7 +27,7 @@ const { openModal, isReady: isReownReady } = useReown({
       return
     }
 
-    setWalletAuthorized(extension, [])
+    setWalletAuthorized(extension)
   },
   onModalOpenChange: (open) => {
     if (!open && currentExtension.value && currentExtension.value.state !== WalletStates.Connected) {
@@ -39,7 +39,7 @@ const { openModal, isReady: isReownReady } = useReown({
 async function initSubAuthorization(extension: WalletExtension): Promise<WalletAccount[]> {
   const accounts = await subWalletStore.connectWallet(extension.source as any)
 
-  return walletManager.formatSubAccounts({ extension, accounts })
+  return formatSubAccounts({ extension, accounts })
 }
 
 function setWalletConnectionFailed(extension: WalletExtension) {
@@ -49,15 +49,20 @@ function setWalletConnectionFailed(extension: WalletExtension) {
   })
 }
 
-function setWalletAuthorized(extension: WalletExtension, accounts: WalletAccount[]) {
-  // for some reason from extensions return an account more than once
-  const uniqueAccounts = accounts.filter((account, index, self) => self.findIndex(a => a.id === account.id) === index)
-
-  walletStore.updateWallet(extension.id, {
+function setWalletAuthorized(extension: WalletExtension, accounts?: WalletAccount[]) {
+  const toUpdate = {
     state: WalletStates.Authorized,
-    accounts: uniqueAccounts,
     isSelected: true,
-  })
+  }
+
+  if (accounts) {
+    // for some reason from extensions return an account more than once
+    const uniqueAccounts = accounts.filter((account, index, self) => self.findIndex(a => a.id === account.id) === index)
+
+    Object.assign(toUpdate, { accounts: uniqueAccounts })
+  }
+
+  walletStore.updateWallet(extension.id, toUpdate)
 
   currentExtensionId.value = queuedWallets.value[0]?.id
 }

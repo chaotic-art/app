@@ -1,6 +1,5 @@
-import type { AppKit, ConnectedWalletInfo, UseAppKitAccountReturn } from '@reown/appkit/vue'
+import type { AppKit, ConnectedWalletInfo, PublicStateControllerState, UseAppKitAccountReturn } from '@reown/appkit/vue'
 import { createAppKit, useAppKit, useDisconnect } from '@reown/appkit/vue'
-import { useAppKitState } from '@reown/appkit/vue'
 
 export interface UseReownOnAccountChangeParams {
   account: UseAppKitAccountReturn
@@ -11,20 +10,21 @@ interface AppKitOptions {
   onAccountChange?: (params: UseReownOnAccountChangeParams) => void
   onModalOpenChange?: (open: boolean) => void
   onWalletChange?: (wallet?: ConnectedWalletInfo) => void
-  initOn?: 'mounted' | 'immediate'
 }
 
 const appKit = ref<AppKit>()
+const appKitState = ref<PublicStateControllerState>()
+const connectedWalletInfo = ref<ConnectedWalletInfo>()
+const accountState = ref<UseAppKitAccountReturn>()
+const currentKey = ref<string>()
 
-export default ({ onAccountChange, onModalOpenChange, onWalletChange, initOn = 'mounted' }: AppKitOptions = {}) => {
+export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOptions = {}) => {
   const { $wagmi } = useNuxtApp()
   const { disconnect } = useDisconnect()
 
-  const isModalOpen = ref(false)
-  const isConnecting = ref(false)
-  const connectedWalletInfo = ref<ConnectedWalletInfo>()
-  const currentKey = ref<string>()
   const isReady = computed(() => Boolean(appKit.value))
+  const isModalOpen = computed(() => Boolean(appKitState.value?.open))
+  const isConnected = computed(() => Boolean(accountState.value?.isConnected))
 
   const initAppKit = () => {
     appKit.value = createAppKit({
@@ -40,69 +40,29 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange, initOn = '
         swaps: false,
       },
     })
-  }
-
-  const initSubsriptions = async () => {
-    if (!appKit.value) {
-      return
-    }
 
     appKit.value.subscribeWalletInfo((walletInfo) => {
       connectedWalletInfo.value = walletInfo
-
-      onWalletChange?.(walletInfo)
     })
 
     appKit.value.subscribeAccount((account) => {
-      if (!connectedWalletInfo.value) {
-        return
-      }
-
-      const key = `${connectedWalletInfo.value?.rdns}:${account.allAccounts.map(({ address }) => address).join(', ')}`
-
-      if (currentKey.value === key) {
-        return
-      }
-
-      currentKey.value = key
-
-      onAccountChange?.({ account, wallet: connectedWalletInfo.value })
+      accountState.value = account
     })
 
-    const state = useAppKitState()
-
-    watch(() => state.open, (open) => {
-      setTimeout(() => {
-        isModalOpen.value = open
-        onModalOpenChange?.(open)
-      }, 300) // Delay to not trigger modal change before account change event
+    appKit.value.subscribeState((state) => {
+      appKitState.value = state
     })
   }
 
-  const init = async () => {
-    if (import.meta.client) {
-      if (!appKit.value) {
-        initAppKit()
-      }
-
-      initSubsriptions()
+  if (import.meta.client) {
+    if (!appKit.value) {
+      initAppKit()
     }
   }
 
-  if (initOn === 'mounted') {
-    onMounted(() => {
-      init()
-    })
-  }
-  else if (initOn === 'immediate') {
-    init()
-  }
-
   async function openModal() {
-    if (isConnecting.value)
+    if (isModalOpen.value)
       return
-
-    isConnecting.value = true
 
     try {
       useAppKit().open()
@@ -110,14 +70,43 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange, initOn = '
     catch (error) {
       console.error('Failed to connect EVM wallet:', error)
     }
-    finally {
-      isConnecting.value = false
-    }
   }
+
+  watch(connectedWalletInfo, (walletInfo) => {
+    if (!walletInfo) {
+      accountState.value = undefined
+    }
+
+    onWalletChange?.(walletInfo)
+  })
+
+  watch([accountState, connectedWalletInfo], ([account, walletInfo]) => {
+    if (!walletInfo || !account) {
+      return
+    }
+
+    const key = `${walletInfo.rdns}:${account.allAccounts.map(({ address }) => address).join(', ')}`
+
+    if (currentKey.value === key) {
+      return
+    }
+
+    currentKey.value = key
+
+    onAccountChange?.({ account, wallet: walletInfo })
+  })
+
+  watch(isModalOpen, (isOpen) => {
+    onModalOpenChange?.(isOpen)
+  })
 
   return {
     openModal,
     disconnect,
     isReady,
+    isModalOpen,
+    isConnected,
+    accounts: accountState,
+    walletInfo: connectedWalletInfo,
   }
 }

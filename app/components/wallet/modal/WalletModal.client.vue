@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SubstrateWallet, SubstrateWalletSource } from '@/utils/wallet/substrate/types'
+import { formatEvmAccounts, formatSubAccounts } from '@/utils/wallet'
 import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
 
 const emit = defineEmits(['close'])
@@ -8,7 +9,6 @@ const isModalOpen = defineModel<boolean>({ required: true })
 const { t } = useI18n()
 const subWalletStore = useSubWalletStore()
 const walletStore = useWalletStore()
-const walletManager = useWalletManager()
 
 const { stage, wallets } = storeToRefs(walletStore)
 
@@ -40,7 +40,7 @@ async function initWalletState() {
         }
 
         walletStore.updateWallet(extension.id, {
-          accounts: walletManager.formatSubAccounts({
+          accounts: formatSubAccounts({
             accounts,
             extension,
           }),
@@ -50,23 +50,32 @@ async function initWalletState() {
   })
 
   // evm
-  useReown({
-    initOn: 'immediate',
-    onAccountChange: (params) => {
-      const extension = wallets.value.find(wallet => wallet.id === REOWN_WALLET_CONFIG.id)
+  const { accounts, walletInfo } = useReown()
 
-      if (!extension) {
-        return
-      }
+  watch([
+    accounts,
+    walletInfo,
+    computed(() => wallets.value.find(wallet => wallet.id === REOWN_WALLET_CONFIG.id)),
+  ], ([accountsState, walletInfo, extension]) => {
+    if (!accountsState || !extension || !walletInfo) {
+      return
+    }
 
-      const accounts = walletManager.formatEvmAccounts({ extension, ...params })
+    const accounts = formatEvmAccounts({ extension, wallet: walletInfo, account: accountsState })
 
-      // TODO: make dynamic state
-      walletStore.updateWallet(extension.id, {
-        state: WalletStates.Connected,
-        accounts,
-      })
-    },
+    const toConnect = extension.state === WalletStates.Authorized
+    const accountsChanged = !areArraysEqual(accounts.map(account => account.id), extension.accounts.map(account => account.id)) && extension.state === WalletStates.Connected
+
+    if (!toConnect && !accountsChanged) {
+      return
+    }
+
+    walletStore.updateWallet(extension.id, {
+      state: WalletStates.Connected,
+      accounts,
+    })
+  }, {
+    immediate: true,
   })
 }
 
