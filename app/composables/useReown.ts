@@ -54,7 +54,9 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
     })
 
     appKit.value.subscribeState((state) => {
-      appKitState.value = state
+      // Create a defensive copy to break references and ensure Vue reactivity works properly
+      // The original state object may be mutated by AppKit, causing reactivity issues
+      appKitState.value = { ...state }
     })
   }
 
