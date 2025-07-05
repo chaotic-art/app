@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div>
+  <div class="bg-white dark:bg-neutral-900">
     <!-- <img
       src="/img/landing/landing-bg.png" alt="Landing Background" class="w-full h-full object-cover bg-transparent opacity-[10%] mix-blend-exclusion"
     > -->
@@ -10,10 +10,10 @@
 
     <UContainer>
       <div class="flex flex-col items-center justify-center mt-4 mb-6 md:mt-[25px] md:mb-[35px]">
-        <div class="font-medium text-3xl md:text-[51px] capitalize font-serif italic text-center">
+        <div class="font-medium text-3xl md:text-[51px] capitalize font-serif italic text-center text-gray-900 dark:text-white">
           {{ $t('landing.title') }}
         </div>
-        <div class="text-base md:text-xl capitalize opacity-[0.66] text-center mt-2">
+        <div class="text-base md:text-xl capitalize opacity-[0.66] text-center mt-2 text-gray-700 dark:text-gray-300">
           {{ $t('landing.subtitle') }}
         </div>
       </div>

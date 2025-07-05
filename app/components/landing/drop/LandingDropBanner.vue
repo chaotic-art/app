@@ -39,8 +39,8 @@ const subDrops = computed(() => dropItems.value?.slice(1, 3))
       />
     </div>
     <div v-else class="flex flex-col md:flex-row gap-4 md:gap-6 mt-6 md:mt-8">
-      <div class="w-full h-[440px] bg-gray-200 animate-pulse rounded-xl" />
-      <div class="w-full h-[440px] bg-gray-200 animate-pulse rounded-xl" />
+      <div class="w-full h-[440px] bg-gray-200 dark:bg-neutral-800 animate-pulse rounded-xl" />
+      <div class="w-full h-[440px] bg-gray-200 dark:bg-neutral-800 animate-pulse rounded-xl" />
     </div>
   </div>
 </template>

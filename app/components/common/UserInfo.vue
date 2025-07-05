@@ -24,7 +24,7 @@ const name = computed(() => profileFromAddress.value?.name || shortenAddress(pro
 </script>
 
 <template>
-  <div class="flex items-center gap-2 rounded-full p-1.5 pr-4 w-fit bg-gray-100" :class="{ 'bg-transparent': transparentBackground }">
+  <div class="flex items-center gap-2 rounded-full p-1.5 pr-4 w-fit bg-gray-100 dark:bg-neutral-800" :class="{ 'bg-transparent': transparentBackground }">
     <ProfileAvatar :address="address" :size="avatarSize" />
     <slot name="name" :address-name="name" />
     <span v-if="!customName" class="text-ellipsis overflow-hidden whitespace-nowrap">{{ name }}</span>
