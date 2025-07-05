@@ -18,7 +18,7 @@ interface Account {
 
 const appKit = ref<AppKit>()
 const appKitState = ref<PublicStateControllerState>()
-const connectedWalletInfo = ref<ConnectedWalletInfo>()
+const connectedWallet = ref<ConnectedWalletInfo>()
 const accountState = ref<UseAppKitAccountReturn>()
 const accounts = ref<Account[]>([])
 const currentKey = ref<string>()
@@ -45,8 +45,8 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
       },
     })
 
-    appKit.value.subscribeWalletInfo((walletInfo) => {
-      connectedWalletInfo.value = walletInfo
+    appKit.value.subscribeWalletInfo((wallet) => {
+      connectedWallet.value = wallet
     })
 
     appKit.value.subscribeAccount((account) => {
@@ -78,22 +78,22 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
     }
   }
 
-  watch(connectedWalletInfo, (walletInfo) => {
-    if (!walletInfo) {
+  watch(connectedWallet, (wallet) => {
+    if (!wallet) {
       accountState.value = undefined
     }
 
-    onWalletChange?.(walletInfo)
+    onWalletChange?.(wallet)
   })
 
-  watch([accountState, connectedWalletInfo], ([account, walletInfo]) => {
-    if (!walletInfo || !account) {
+  watch([accountState, connectedWallet], ([account, wallet]) => {
+    if (!wallet || !account) {
       return
     }
 
     const addresses = unique([...account.allAccounts.map(({ address }) => address), account.address].filter(Boolean) as string[])
 
-    const key = `${walletInfo.rdns}:${addresses.join(', ')}`
+    const key = `${wallet.rdns}:${addresses.join(', ')}`
 
     if (currentKey.value === key) {
       return
@@ -105,7 +105,7 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
 
     accounts.value = newAccounts
 
-    onAccountChange?.({ accounts: newAccounts, wallet: walletInfo })
+    onAccountChange?.({ accounts: newAccounts, wallet })
   })
 
   watch(isModalOpen, (isOpen) => {
@@ -119,6 +119,6 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
     isModalOpen,
     isConnected,
     accounts,
-    walletInfo: connectedWalletInfo,
+    wallet: connectedWallet,
   }
 }

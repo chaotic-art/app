@@ -50,18 +50,18 @@ async function initWalletState() {
   })
 
   // evm
-  const { accounts, walletInfo } = useReown()
+  const { accounts, wallet } = useReown()
 
   watch([
     accounts,
-    walletInfo,
+    wallet,
     computed(() => wallets.value.find(wallet => wallet.id === REOWN_WALLET_CONFIG.id)),
-  ], ([accountsState, walletInfo, extension]) => {
-    if (!accountsState || !extension || !walletInfo) {
+  ], ([accountsState, wallet, extension]) => {
+    if (!accountsState || !extension || !wallet) {
       return
     }
 
-    const accounts = formatEvmAccounts({ extension, wallet: walletInfo, accounts: accountsState })
+    const accounts = formatEvmAccounts({ extension, wallet, accounts: accountsState })
 
     const toConnect = extension.state === WalletStates.Authorized
     const accountsChanged = !areArraysEqual(accounts.map(account => account.id), extension.accounts.map(account => account.id)) && extension.state === WalletStates.Connected
