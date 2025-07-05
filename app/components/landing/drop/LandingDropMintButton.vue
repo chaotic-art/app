@@ -26,7 +26,7 @@ function handleMintButtonClick(_event: MouseEvent) {
 </script>
 
 <template>
-  <UButton class="bg-black text-white rounded-full px-6 py-3 md:px-4 md:py-[10px] text-sm hover:bg-gray-900 transition w-fit md:w-auto cursor-pointer" @click="handleMintButtonClick">
+  <UButton class="bg-black text-white rounded-full px-6 py-3 md:px-4 md:py-[10px] text-sm hover:bg-gray-900 transition w-fit md:w-auto cursor-pointer" @click.stop="handleMintButtonClick">
     {{ mintButtonLabel }}
   </UButton>
 </template>
