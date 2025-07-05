@@ -1,7 +1,7 @@
 import type { SubstrateWalletAccount } from '@/utils/wallet/substrate/types'
 
 export function formatEvmAccounts({
-  account: { allAccounts: accounts },
+  accounts,
   wallet,
   extension,
 }: { extension: WalletExtension } & UseReownOnAccountChangeParams): WalletAccount[] {

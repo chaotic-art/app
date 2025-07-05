@@ -10,3 +10,5 @@ export function areArraysEqual(arr1: string[], arr2: string[]) {
 
   return [...set1].every(item => set2.has(item))
 }
+
+export const unique = (arr: string[]) => [...new Set(arr)]

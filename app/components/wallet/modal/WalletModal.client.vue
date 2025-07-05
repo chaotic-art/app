@@ -61,7 +61,7 @@ async function initWalletState() {
       return
     }
 
-    const accounts = formatEvmAccounts({ extension, wallet: walletInfo, account: accountsState })
+    const accounts = formatEvmAccounts({ extension, wallet: walletInfo, accounts: accountsState })
 
     const toConnect = extension.state === WalletStates.Authorized
     const accountsChanged = !areArraysEqual(accounts.map(account => account.id), extension.accounts.map(account => account.id)) && extension.state === WalletStates.Connected

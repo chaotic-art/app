@@ -2,7 +2,7 @@ import type { AppKit, ConnectedWalletInfo, PublicStateControllerState, UseAppKit
 import { createAppKit, useAppKit, useDisconnect } from '@reown/appkit/vue'
 
 export interface UseReownOnAccountChangeParams {
-  account: UseAppKitAccountReturn
+  accounts: Account[]
   wallet: ConnectedWalletInfo
 }
 
@@ -12,10 +12,15 @@ interface AppKitOptions {
   onWalletChange?: (wallet?: ConnectedWalletInfo) => void
 }
 
+interface Account {
+  address: string
+}
+
 const appKit = ref<AppKit>()
 const appKitState = ref<PublicStateControllerState>()
 const connectedWalletInfo = ref<ConnectedWalletInfo>()
 const accountState = ref<UseAppKitAccountReturn>()
+const accounts = ref<Account[]>([])
 const currentKey = ref<string>()
 
 export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOptions = {}) => {
@@ -84,7 +89,9 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
       return
     }
 
-    const key = `${walletInfo.rdns}:${account.allAccounts.map(({ address }) => address).join(', ')}`
+    const addresses = unique([...account.allAccounts.map(({ address }) => address), account.address].filter(Boolean) as string[])
+
+    const key = `${walletInfo.rdns}:${addresses.join(', ')}`
 
     if (currentKey.value === key) {
       return
@@ -92,7 +99,11 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
 
     currentKey.value = key
 
-    onAccountChange?.({ account, wallet: walletInfo })
+    const newAccounts = addresses.map(address => ({ address }))
+
+    accounts.value = newAccounts
+
+    onAccountChange?.({ accounts: newAccounts, wallet: walletInfo })
   })
 
   watch(isModalOpen, (isOpen) => {
@@ -105,7 +116,7 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
     isReady,
     isModalOpen,
     isConnected,
-    accounts: accountState,
+    accounts,
     walletInfo: connectedWalletInfo,
   }
 }
