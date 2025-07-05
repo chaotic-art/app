@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { OnchainCollection } from '@/services/oda'
 import type { DropItem } from '@/types/drop'
 import { getDrops } from '@/services/fxart'
-import { fetchOdaCollection, type OnchainCollection } from '@/services/oda'
+import { fetchOdaCollection } from '@/services/oda'
 
 type DropItemWithCollection = DropItem & OnchainCollection
 
