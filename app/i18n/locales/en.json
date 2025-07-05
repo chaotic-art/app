@@ -71,5 +71,12 @@
   },
   "common": {
     "price": "Price"
+  },
+  "theme": {
+    "dark": "Dark",
+    "darkMode": "Dark Mode",
+    "light": "Light",
+    "lightMode": "Light Mode",
+    "system": "System Default"
   }
 }

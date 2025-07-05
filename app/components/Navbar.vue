@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { NavigationMenuItem } from '@nuxt/ui'
+import ThemeSwitcher from '@/components/common/ThemeSwitcher.vue'
 
 const route = useRoute()
 const navItems = computed<NavigationMenuItem[][]>(() => [
@@ -35,10 +36,11 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
       </div>
 
       <div class="flex items-center gap-3 md:gap-6">
-        <div class="hidden md:block">
+        <div class="hidden md:flex  items-center">
           <UNavigationMenu
             :items="navItems"
           />
+          <ThemeSwitcher />
         </div>
         <NavbarWallet />
       </div>
