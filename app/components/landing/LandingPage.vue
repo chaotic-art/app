@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="bg-white dark:bg-neutral-900">
+  <div class="bg-background-color">
     <!-- <img
       src="/img/landing/landing-bg.png" alt="Landing Background" class="w-full h-full object-cover bg-transparent opacity-[10%] mix-blend-exclusion"
     > -->

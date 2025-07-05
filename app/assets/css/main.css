@@ -11,6 +11,8 @@
 @theme static {
   --text-color: #000000;
   --ui-primary: #000000;
+  --background-color: #ffffff;
+  --background-color-secondary: #ffffff;
 
   --ui-container: 1680px;
 
@@ -20,6 +22,8 @@
   :root {
     --text-color: #fff;
     --ui-primary: #fff;
+    --background-color: var(--neutral-900);
+    --background-color-secondary: var(--neutral-800);
   }
 }
 

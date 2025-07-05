@@ -25,7 +25,7 @@ useHead({
 </script>
 
 <template>
-  <div class="w-full rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
+  <div class="w-full rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 bg-background-color-secondary">
     <!-- Banner Image Section -->
     <div class="w-full h-[240px] md:h-[300px] bg-gray-200 dark:bg-neutral-800 relative">
       <div v-if="isLoading" class="w-full h-full bg-gray-200 dark:bg-neutral-800 animate-pulse" />

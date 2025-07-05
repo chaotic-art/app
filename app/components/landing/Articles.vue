@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <section class="py-8 md:py-16 px-4 md:px-0 bg-white dark:bg-neutral-900">
+  <section class="py-8 md:py-16 px-4 md:px-0 bg-background-color">
     <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 text-center md:text-left text-gray-900 dark:text-white">
       Articles
     </div>

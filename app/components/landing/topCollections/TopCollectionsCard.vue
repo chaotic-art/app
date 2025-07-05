@@ -15,7 +15,7 @@ const { volume } = useCollectionVolume(
 
 <template>
   <NuxtLink :to="`${collection?.id && `/${prefix}/collection/${collection.id}`}`" class="rounded-[15px] w-full flex flex-col relative overflow-hidden shadow-sm">
-    <div class="w-full aspect-square bg-white dark:bg-neutral-800 flex items-center justify-center">
+    <div class="w-full aspect-square bg-background-color-secondary flex items-center justify-center">
       <img
         v-if="collection?.image"
         :src="collection.image"
@@ -24,7 +24,7 @@ const { volume } = useCollectionVolume(
       >
       <div v-else class="w-full h-full bg-neutral-300 dark:bg-neutral-700" />
     </div>
-    <div class="bg-white dark:bg-neutral-800 px-4 py-6 flex flex-col min-h-16">
+    <div class="bg-background-color-secondary px-4 py-6 flex flex-col min-h-16">
       <span class="text-xl text-black dark:text-white truncate text-center font-bold">
         {{ collection?.name || '—' }}
       </span>
