@@ -9,22 +9,20 @@
 }
 
 @theme static {
+  --ui-container: 1680px;
+
+
   --text-color: #000000;
   --ui-primary: #000000;
   --background-color: #ffffff;
   --background-color-secondary: #ffffff;
-
-  --ui-container: 1680px;
-
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-color: #fff;
-    --ui-primary: #fff;
-    --background-color: var(--neutral-900);
-    --background-color-secondary: var(--neutral-800);
-  }
+.dark {
+  --text-color: #ffffff;
+  --ui-primary: #ffffff;
+  --background-color: #18181b;
+  --background-color-secondary: #232329;
 }
 
 body {

@@ -53,33 +53,33 @@ const price = computed(() => {
 </script>
 
 <template>
-  <div class="border rounded-xl border-gray-300 overflow-hidden bg-white">
+  <div class="border rounded-xl border-gray-300 dark:border-neutral-700 overflow-hidden bg-white dark:bg-neutral-900">
     <!-- Loading State -->
     <template v-if="isLoading">
       <!-- Image Skeleton -->
-      <div class="aspect-square bg-gray-200 animate-pulse flex items-center justify-center">
+      <div class="aspect-square bg-gray-200 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
         <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
       </div>
 
       <!-- Content Skeleton -->
       <div class="p-4 space-y-3">
         <!-- Title Skeleton -->
-        <div class="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+        <div class="h-4 bg-gray-200 dark:bg-neutral-800 rounded animate-pulse w-3/4" />
 
         <!-- Price Skeleton -->
         <div class="flex items-center justify-between">
-          <div class="h-3 bg-gray-100 rounded animate-pulse w-1/3" />
+          <div class="h-3 bg-gray-100 dark:bg-neutral-700 rounded animate-pulse w-1/3" />
         </div>
       </div>
     </template>
 
     <!-- Error State -->
     <template v-else-if="error">
-      <div class="aspect-square bg-red-50 flex items-center justify-center">
-        <UIcon name="i-heroicons-exclamation-triangle" class="w-16 h-16 text-red-400" />
+      <div class="aspect-square bg-red-50 dark:bg-red-900 flex items-center justify-center">
+        <UIcon name="i-heroicons-exclamation-triangle" class="w-16 h-16 text-red-400 dark:text-red-300" />
       </div>
       <div class="p-4">
-        <p class="text-red-600 text-sm">
+        <p class="text-red-600 dark:text-red-300 text-sm">
           Failed to load NFT
         </p>
       </div>
@@ -89,7 +89,7 @@ const price = computed(() => {
     <template v-else>
       <NuxtLink :to="`/${chain}/gallery/${collectionId}-${tokenId}`" class="block hover:shadow-lg transition-shadow">
         <!-- NFT Image -->
-        <div class="aspect-square bg-gray-200 overflow-hidden">
+        <div class="aspect-square bg-gray-200 dark:bg-neutral-800 overflow-hidden">
           <img
             v-if="image || token?.metadata?.image"
             :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
@@ -99,7 +99,7 @@ const price = computed(() => {
           >
           <div
             v-else
-            class="w-full h-full flex items-center justify-center bg-gray-100"
+            class="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-neutral-700"
           >
             <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
           </div>
@@ -107,12 +107,12 @@ const price = computed(() => {
 
         <!-- Card Content -->
         <div class="p-4">
-          <p class="font-bold mb-2 text-gray-900 truncate">
+          <p class="font-bold mb-2 text-gray-900 dark:text-white truncate">
             {{ name || token?.metadata?.name || 'Untitled NFT' }}
           </p>
 
           <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-gray-600">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
               {{ price || 'No price set' }}
             </p>
           </div>

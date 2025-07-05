@@ -28,7 +28,7 @@ function handleTypeChange(type: string) {
   <div class="space-y-8">
     <!-- Header -->
     <div class="space-y-6">
-      <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center md:text-left">
+      <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center md:text-left text-gray-900 dark:text-white">
         Explore
       </h1>
     </div>
@@ -36,7 +36,7 @@ function handleTypeChange(type: string) {
     <!-- Controls Row -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <!-- Left Side - Type Toggle -->
-      <div class="flex bg-gray-100 rounded-full p-1">
+      <div class="flex bg-gray-100 dark:bg-gray-800 rounded-full p-1">
         <UButton
           v-for="type in typeOptions"
           :key="type"
