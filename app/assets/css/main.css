@@ -9,11 +9,20 @@
 }
 
 @theme static {
-  --text-color: #000000;
-  --ui-primary: #000000;
-
   --ui-container: 1680px;
 
+
+  --text-color: #000000;
+  --ui-primary: #000000;
+  --background-color: #ffffff;
+  --background-color-secondary: #ffffff;
+}
+
+.dark {
+  --text-color: #ffffff;
+  --ui-primary: #ffffff;
+  --background-color: #18181b;
+  --background-color-secondary: #232329;
 }
 
 body {
