@@ -63,10 +63,10 @@ importers:
         specifier: ^13.5.3
         version: 13.5.3(@polkadot/util@13.5.3)
       '@reown/appkit':
-        specifier: ^1.7.12
+        specifier: 1.7.12
         version: 1.7.12(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)
       '@reown/appkit-adapter-wagmi':
-        specifier: ^1.7.12
+        specifier: 1.7.12
         version: 1.7.12(@wagmi/core@2.17.3(@tanstack/query-core@5.81.5)(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@18.3.1))(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67)))(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(wagmi@2.15.3(@tanstack/query-core@5.81.5)(@tanstack/react-query@5.76.1(react@18.3.1))(bufferutil@4.0.9)(db0@0.3.2)(ioredis@5.6.1)(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.31.6(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.67))(zod@3.25.67))(zod@3.25.67)
       '@tanstack/vue-query':
         specifier: ^5.81.5
