@@ -1,14 +1,25 @@
 import type { Signer } from '@polkadot/api/types'
+import type { InjectedAccount, InjectedExtension } from '@polkadot/extension-inject/types'
 import type {
   SubstrateWallet,
   SubstrateWalletAccount,
   SubstrateWalletSource,
 } from '@/utils/wallet/substrate/types'
 import { defineStore } from 'pinia'
+import { getInjectedExtension, isExtensionInstalled } from '@/utils/wallet/substrate'
 import { getAvailableWallets } from '@/utils/wallet/substrate/config'
-import { WalletProxyMap } from '@/utils/wallet/substrate/types'
 
 const DAPP_NAME = 'Chaotic'
+
+function formatAccounts(source: SubstrateWalletSource, accounts: InjectedAccount[]): SubstrateWalletAccount[] {
+  return accounts.map(account => ({
+    address: account.address,
+    name: account.name,
+    source,
+    type: account.type,
+    genesisHash: account.genesisHash,
+  }))
+}
 
 export const useSubWalletStore = defineStore('subWallet', () => {
   const wallets = ref<SubstrateWallet[]>([])
@@ -18,7 +29,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
 
   const enabledWallets = computed(() => wallets.value.filter(wallet => wallet.enabled))
 
-  async function init(appName: string = DAPP_NAME): Promise<SubstrateWallet[]> {
+  function init(): SubstrateWallet[] {
     if (initialized.value) {
       return wallets.value
     }
@@ -26,23 +37,16 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     try {
       isLoading.value = true
 
-      const { web3Enable } = await import('@polkadot/extension-dapp')
-      const extensions = await web3Enable(appName)
-
       const availableWallets = getAvailableWallets()
-      wallets.value = availableWallets.map((metadata) => {
-        const extension = extensions.find(ext =>
-          ext.name === metadata.source
-          || WalletProxyMap[ext.name as SubstrateWalletSource] === metadata.source,
-        )
 
+      wallets.value = availableWallets.map((metadata) => {
         return {
           ...metadata,
-          installed: !!extension,
+          installed: isExtensionInstalled(metadata.source),
           enabled: false,
           accounts: [],
-          extension: extension || undefined,
-          signer: extension?.signer || undefined,
+          extension: undefined,
+          signer: undefined,
         }
       })
 
@@ -58,6 +62,32 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     finally {
       isLoading.value = false
     }
+  }
+
+  function isWalletInitialized(walletId: string): boolean {
+    return Boolean(wallets.value.find(w => w.id === walletId)?.extension)
+  }
+
+  function subscribeAccounts(walletId: string) {
+    const wallet = wallets.value.find(w => w.id === walletId)
+
+    if (!wallet) {
+      return
+    }
+
+    const extension = wallet.extension
+
+    if (!extension) {
+      return
+    }
+
+    wallet.unsub?.()
+
+    const unsub = extension.accounts.subscribe((accounts) => {
+      wallet.accounts = formatAccounts(wallet.source, accounts)
+    })
+
+    wallet.unsub = unsub
   }
 
   async function connectWallet(walletSource: SubstrateWalletSource): Promise<SubstrateWalletAccount[]> {
@@ -78,21 +108,32 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     try {
       isLoading.value = true
 
-      const { web3Accounts } = await import('@polkadot/extension-dapp')
-      const accounts = await web3Accounts()
+      const injectedExtension = getInjectedExtension(walletSource)
 
-      const walletAccounts: SubstrateWalletAccount[] = accounts
-        .filter(account => account.meta.source === WalletProxyMap[walletSource] || walletSource)
-        .map(account => ({
-          address: account.address,
-          name: account.meta.name || undefined,
-          source: walletSource,
-          type: account.type,
-          genesisHash: account.meta.genesisHash,
-        }))
+      if (!injectedExtension) {
+        throw new Error(`Injected extension not found for ${walletSource}`)
+      }
+
+      const rawExtension = await injectedExtension.enable?.(DAPP_NAME)
+
+      if (!rawExtension) {
+        throw new Error(`Failed to enable ${walletSource}`)
+      }
+
+      const accounts = await rawExtension.accounts.get()
+
+      const walletAccounts = formatAccounts(wallet.source, accounts)
+
+      const extension: InjectedExtension = {
+        ...rawExtension,
+        // Manually add `InjectedExtensionInfo` so as to have a consistent response.
+        name: wallet.name,
+        version: injectedExtension.version || '',
+      } as const
 
       wallet.accounts = walletAccounts
       wallet.enabled = true
+      wallet.extension = extension
       error.value = null
 
       return walletAccounts
@@ -107,21 +148,23 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     }
   }
 
-  async function disconnectWallet(walletSource: string): Promise<void> {
+  async function disconnectWallet(source: SubstrateWalletSource): Promise<void> {
     try {
       isLoading.value = true
 
-      const walletIndex = enabledWallets.value.findIndex(w => w.source === walletSource)
+      const wallet = wallets.value.find(w => w.source === source)
 
-      if (enabledWallets.value[walletIndex]) {
-        enabledWallets.value[walletIndex].enabled = false
+      if (!wallet) {
+        throw new Error(`Wallet ${source} not found`)
       }
+
+      updateWallet(wallet.source, { enabled: false })
 
       error.value = null
     }
     catch (err) {
-      console.error(`Failed to disconnect wallet ${walletSource}:`, err)
-      error.value = err instanceof Error ? err : new Error(`Failed to disconnect ${walletSource}`)
+      console.error(`Failed to disconnect wallet ${source}:`, err)
+      error.value = err instanceof Error ? err : new Error(`Failed to disconnect ${source}`)
       throw error.value
     }
     finally {
@@ -129,22 +172,10 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     }
   }
 
-  async function getSigner(address: string): Promise<Signer | undefined> {
-    for (const wallet of enabledWallets.value) {
-      const account = wallet.accounts.find(acc => acc.address === address)
-      if (account) {
-        try {
-          const { web3FromSource } = await import('@polkadot/extension-dapp')
-          const injected = await web3FromSource(wallet.source)
-          return injected.signer
-        }
-        catch (err) {
-          console.error(`Failed to get signer for ${address}:`, err)
-          return undefined
-        }
-      }
-    }
-    return undefined
+  function getSigner(source: SubstrateWalletSource): Signer | undefined {
+    const wallet = enabledWallets.value.find(w => w.source === source)
+
+    return wallet?.signer
   }
 
   function getInstalledWallets(): SubstrateWallet[] {
@@ -164,17 +195,28 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     return wallet ? wallet.accounts : []
   }
 
+  function updateWallet(source: SubstrateWalletSource, wallet: Partial<SubstrateWallet>): void {
+    const walletIndex = wallets.value.findIndex(w => w.source === source)
+
+    if (walletIndex !== -1) {
+      wallets.value[walletIndex] = {
+        ...wallets.value[walletIndex],
+        ...wallet,
+      } as SubstrateWallet
+    }
+  }
+
   return {
-    // State
     wallets,
     enabledWallets,
     isLoading,
     error,
     initialized,
 
-    // Actions
     init,
     connectWallet,
+    isWalletInitialized,
+    subscribeAccounts,
     disconnectWallet,
     getSigner,
     getInstalledWallets,

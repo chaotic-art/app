@@ -25,10 +25,16 @@ const filteredInstalledWallets = computed(() => {
 })
 
 async function processWalletExtensions(extensions: WalletExtension[], connectOnly: boolean): Promise<boolean> {
+  const otherExtensions = installedWallets.value.filter(wallet => !extensions.some(ext => ext.id === wallet.id) && wallet.state !== WalletStates.Connected && wallet.state !== WalletStates.Disconnected)
+
+  for (const extension of otherExtensions) {
+    walletStore.updateWalletState(extension.id, WalletStates.Idle)
+  }
+
   const toConnectExtensions = extensions.filter(extension => extension.state !== WalletStates.Connected)
 
   for (const extension of toConnectExtensions) {
-    walletStore.updateWalletState(extension.id, WalletStates.ConnectionQueued)
+    walletStore.updateWalletState(extension.id, WalletStates.AuthorizationQueued)
   }
 
   if (!connectOnly) {
@@ -58,6 +64,19 @@ function onLastConnected() {
   walletStore.setStage(WalletStageTypes.Account)
 }
 
+function onConnectAll() {
+  for (const extension of filteredInstalledWallets.value) {
+    if (extension.state !== WalletStates.Connected) {
+      walletStore.updateWalletState(extension.id, WalletStates.AuthorizationQueued)
+    }
+    else {
+      walletStore.updateWallet(extension.id, { isSelected: true })
+    }
+  }
+
+  walletStore.setStage(WalletStageTypes.Authorization)
+}
+
 function onSelectUnistalledWallet(wallet: WalletExtension) {
   window.open(wallet.url, '_blank')
 }
@@ -72,6 +91,7 @@ function onSelectUnistalledWallet(wallet: WalletExtension) {
       :last-connected="lastConnected"
       @select="onSelectInstalledWallet"
       @last-connected="onLastConnected"
+      @connect-all="onConnectAll"
     />
 
     <template v-if="activeTab === 'All' || activeTab === 'Polkadot'">

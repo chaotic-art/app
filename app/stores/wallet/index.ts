@@ -3,6 +3,12 @@ import type { WalletAccount, WalletExtension, WalletStageType, WalletState } fro
 import { defineStore } from 'pinia'
 import { WalletStageTypes, WalletStates } from './types'
 
+const USER_CONNECTED_WALLET_STATES: WalletState[] = [
+  WalletStates.Authorized,
+  WalletStates.Connecting,
+  WalletStates.Connected,
+]
+
 export const useWalletStore = defineStore('wallet', () => {
   const isModalOpen = ref(false)
   const wallets = ref<WalletExtension[]>([])
@@ -16,6 +22,7 @@ export const useWalletStore = defineStore('wallet', () => {
   const getInstalledWallets = computed(() => wallets.value.filter(wallet => wallet.installed))
   const getUninstalledWallets = computed(() => wallets.value.filter(wallet => !wallet.installed))
   const getConnectedWallets = computed(() => wallets.value.filter(wallet => wallet.state === WalletStates.Connected))
+  const getUserConnectedWallets = computed(() => wallets.value.filter(wallet => USER_CONNECTED_WALLET_STATES.includes(wallet.state)))
 
   function findWallet(id: string): WalletExtension | undefined {
     return wallets.value.find(wallet => wallet.id === id)
@@ -75,6 +82,7 @@ export const useWalletStore = defineStore('wallet', () => {
     getConnectedSubAccount,
     getConnectedEvmAccount,
     getConnectedWallets,
+    getUserConnectedWallets,
     clear,
     updateWalletState,
     updateWallet,
