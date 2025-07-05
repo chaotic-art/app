@@ -8,6 +8,7 @@ const props = defineProps<{
   claimed?: number
 }>()
 
+const emit = defineEmits(['click'])
 const { decimals, chainSymbol } = useChain()
 const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals, chainSymbol)
 
@@ -25,7 +26,7 @@ useHead({
 </script>
 
 <template>
-  <div class="w-full rounded-xl overflow-hidden border border-[#EBEBEB] bg-white">
+  <div class="w-full rounded-xl overflow-hidden border border-[#EBEBEB] bg-white" @click="emit('click', drop)">
     <!-- Banner Image Section -->
     <div class="w-full h-[240px] md:h-[300px] bg-gray-200 relative">
       <div v-if="isLoading" class="w-full h-full bg-gray-200 animate-pulse" />

@@ -4,7 +4,7 @@ import type { Abi } from 'viem'
 const BASE_URL = isProduction ? 'https://oda.koda.art' : 'https://oda-beta.koda.art'
 const api = $fetch.create({ baseURL: BASE_URL, retry: 3 })
 
-interface OnchainCollection {
+export interface OnchainCollection {
   metadata: {
     name: string
     image: string
