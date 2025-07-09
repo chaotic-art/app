@@ -2,11 +2,15 @@
 interface Props {
   search?: string
   variables?: Record<string, any>
+  noItemsFoundMessage?: string
+  gridClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variables: () => ({}),
   search: '',
+  gridClass: 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6',
+  noItemsFoundMessage: 'Try adjusting your search or filters to see more results.',
 })
 
 // Use the NFTs infinite query composable
@@ -32,7 +36,7 @@ onMounted(async () => {
 <template>
   <div class="space-y-8">
     <!-- Grid Content -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+    <div :class="props.gridClass">
       <TokenCard
         v-for="nft in nfts"
         :key="nft.id"
@@ -76,7 +80,7 @@ onMounted(async () => {
         No NFTs found
       </h3>
       <p class="text-gray-500">
-        Try adjusting your search or filters to see more results.
+        {{ noItemsFoundMessage }}
       </p>
     </div>
   </div>
