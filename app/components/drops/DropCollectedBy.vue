@@ -8,6 +8,7 @@ const props = withDefaults(
     collectionId: string
     maxAddressCount?: number
     size?: 'small' | 'medium'
+    noBackground?: boolean
   }>(),
   {
     size: 'medium',
@@ -37,7 +38,7 @@ watchEffect(async () => {
 <template>
   <div
     class="rounded-full h-[62px] md:w-auto bg-gray-100 dark:bg-neutral-800 inline-flex items-center justify-between py-1.5 px-3"
-    :class="{ 'h-full border-none': size === 'small' }"
+    :class="{ '!h-full !border-none !py-1 !px-2': size === 'small', 'bg-transparent': noBackground }"
   >
     <div class="flex items-center">
       <ProfileAvatar
@@ -52,6 +53,7 @@ watchEffect(async () => {
     <div
       v-if="remainingCount"
       class="ml-2.5"
+      :class="{ 'text-xs !ml-1': size === 'small' }"
     >
       +{{ remainingCount }}
     </div>
