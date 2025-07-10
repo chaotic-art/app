@@ -25,7 +25,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <NuxtLink v-if="shouldShowDrop" :to="`/${prefix}/drops/${drop.alias}`" class="border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow">
+  <NuxtLink v-if="shouldShowDrop" :to="`/${prefix}/drops/${drop.alias}`" class="border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow hover-card-effect">
     <img :src="sanitizeIpfsUrl(drop.image)" :alt="drop.name" class="aspect-square w-full object-cover">
 
     <div class="p-3 md:p-4">

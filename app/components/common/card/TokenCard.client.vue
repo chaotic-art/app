@@ -53,7 +53,7 @@ const price = computed(() => {
 </script>
 
 <template>
-  <div class="border rounded-xl border-gray-300 dark:border-neutral-700 overflow-hidden bg-white dark:bg-neutral-900">
+  <div class="border rounded-xl border-gray-300 dark:border-neutral-700 overflow-hidden bg-white dark:bg-neutral-900 hover-card-effect">
     <!-- Loading State -->
     <template v-if="isLoading">
       <!-- Image Skeleton -->
