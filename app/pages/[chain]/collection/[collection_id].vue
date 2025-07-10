@@ -20,6 +20,39 @@ function clearCache() {
   clearOdaCache(chain.value, collection_id?.toString() ?? '', refresh)
 }
 
+// Floor price data
+const { $api } = useNuxtApp()
+const floorPrice = ref(0)
+const isLoadingFloor = ref(false)
+
+// Fetch floor price data
+onMounted(async () => {
+  if (!collection_id)
+    return
+
+  isLoadingFloor.value = true
+  try {
+    const api = await $api(chain.value)
+    const queryFloor = await api.query.Nfts.ItemPriceOf.getEntries(Number(collection_id))
+
+    if (queryFloor.length) {
+      const floorValues = queryFloor
+        .filter(item => Number(item.value[0]) > 0)
+        .map(item => Number(item.value[0]))
+
+      if (floorValues.length) {
+        floorPrice.value = Math.min(...floorValues)
+      }
+    }
+  }
+  catch (error) {
+    console.error('Error fetching floor price:', error)
+  }
+  finally {
+    isLoadingFloor.value = false
+  }
+})
+
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
@@ -68,22 +101,6 @@ defineOgImageComponent('Frame', {
 
         <!-- Collection Details -->
         <div class="lg:col-span-3 space-y-6">
-          <!-- Badges -->
-          <div class="flex gap-2 flex-wrap">
-            <UBadge
-              class="px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm font-medium"
-              variant="soft"
-            >
-              Collection
-            </UBadge>
-            <UBadge
-              class="px-3 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm font-medium"
-              variant="soft"
-            >
-              {{ chain.toUpperCase() }}
-            </UBadge>
-          </div>
-
           <!-- Title -->
           <div>
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-white mb-4">
@@ -117,7 +134,7 @@ defineOgImageComponent('Frame', {
           </div>
 
           <!-- Quick Stats -->
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
               <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                 {{ collection?.claimed || 0 }}
@@ -138,10 +155,21 @@ defineOgImageComponent('Frame', {
 
             <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
               <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                #{{ collection_id }}
+                <UIcon v-if="isLoadingFloor" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin mx-auto" />
+                <Money v-else-if="floorPrice" inline :value="floorPrice" />
+                <span v-else class="text-gray-400 dark:text-gray-500">–</span>
               </div>
               <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                ID
+                Floor Price
+              </div>
+            </div>
+
+            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+              <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {{ chain.toUpperCase() }}
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Chain
               </div>
             </div>
           </div>
@@ -150,12 +178,6 @@ defineOgImageComponent('Frame', {
           <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4">
             <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
               <div class="flex-1">
-                <div class="flex items-center gap-2 mb-2">
-                  <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Data Refresh
-                  </h3>
-                </div>
                 <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                   Collection data is cached for better performance. If you notice outdated information,
                   use the refresh button to fetch the latest data from the blockchain.
