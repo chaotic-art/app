@@ -8,22 +8,9 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-      <!-- Article Card 1 -->
-      <div class="flex flex-col">
-        <div class="bg-gray-200 dark:bg-neutral-800 h-[120px] md:h-[150px] rounded-t-lg" />
-        <div class="bg-gray-100 dark:bg-neutral-700 h-[80px] md:h-[100px] rounded-b-lg" />
-      </div>
-
-      <!-- Article Card 2 -->
-      <div class="flex flex-col">
-        <div class="bg-gray-200 dark:bg-neutral-800 h-[120px] md:h-[150px] rounded-t-lg" />
-        <div class="bg-gray-100 dark:bg-neutral-700 h-[80px] md:h-[100px] rounded-b-lg" />
-      </div>
-
-      <!-- Article Card 3 -->
-      <div class="flex flex-col">
-        <div class="bg-gray-200 dark:bg-neutral-800 h-[120px] md:h-[150px] rounded-t-lg" />
-        <div class="bg-gray-100 dark:bg-neutral-700 h-[80px] md:h-[100px] rounded-b-lg" />
+      <div v-for="i in 3" :key="i" class="flex flex-col hover-card-effect rounded-lg overflow-hidden">
+        <div class="bg-gray-200 dark:bg-neutral-800 h-[120px] md:h-[150px]" />
+        <div class="bg-gray-100 dark:bg-neutral-700 h-[80px] md:h-[100px]" />
       </div>
     </div>
   </section>
