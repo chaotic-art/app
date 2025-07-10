@@ -5,18 +5,53 @@ import { fetchOdaCollection } from '~/services/oda'
 
 const route = useRoute()
 const { chain: chainPrefix, collection_id } = route.params
-const { $api } = useNuxtApp()
 
 const chain = computed(() => chainPrefix as Prefix)
-const loading = ref(true)
 
-const { data: collection } = await useAsyncData(
+const { data: collection, refresh } = await useAsyncData(
   `collection:${chain.value}:${collection_id}`,
   () => fetchOdaCollection(chain.value, collection_id?.toString() ?? ''),
 )
 
-const collectionData = ref<any>(null)
-const items = ref<number[]>([])
+// Clear cache functionality using useOda composable
+const { isRefreshing, clearCache: clearOdaCache } = useOda()
+
+function clearCache() {
+  clearOdaCache(chain.value, collection_id?.toString() ?? '', refresh)
+}
+
+// Floor price data
+const { $api } = useNuxtApp()
+const floorPrice = ref(0)
+const isLoadingFloor = ref(false)
+
+// Fetch floor price data
+onMounted(async () => {
+  if (!collection_id)
+    return
+
+  isLoadingFloor.value = true
+  try {
+    const api = await $api(chain.value)
+    const queryFloor = await api.query.Nfts.ItemPriceOf.getEntries(Number(collection_id))
+
+    if (queryFloor.length) {
+      const floorValues = queryFloor
+        .filter(item => Number(item.value[0]) > 0)
+        .map(item => Number(item.value[0]))
+
+      if (floorValues.length) {
+        floorPrice.value = Math.min(...floorValues)
+      }
+    }
+  }
+  catch (error) {
+    console.error('Error fetching floor price:', error)
+  }
+  finally {
+    isLoadingFloor.value = false
+  }
+})
 
 definePageMeta({
   validate: async (route) => {
@@ -37,207 +72,155 @@ defineOgImageComponent('Frame', {
   claimed: collection.value?.claimed,
   network: chain.value,
 })
-
-onMounted(async () => {
-  try {
-    const api = $api(chain.value)
-    const [queryCollection, queryItems] = await Promise.all([
-      api.query.Nfts.Collection.getValue(Number(collection_id)),
-      api.query.Nfts.Item.getEntries(Number(collection_id)),
-    ])
-
-    collectionData.value = queryCollection
-    items.value = queryItems.map(item => item.keyArgs[1]).sort((a, b) => b - a)
-  }
-  catch (error) {
-    console.error('Error fetching collection data:', error)
-  }
-  finally {
-    loading.value = false
-  }
-})
-
-const collectionStats = computed(() => {
-  if (!collectionData.value || !items.value.length)
-    return null
-
-  return {
-    totalItems: items.value.length,
-    owner: collectionData.value.owner?.toString() || '',
-  }
-})
 </script>
 
 <template>
   <UContainer class="px-4 md:px-6">
-    <!-- Loading Skeleton -->
-    <div v-if="loading" class="space-y-8">
-      <!-- Header skeleton - two column layout -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-        <!-- Image skeleton -->
-        <div class="order-2 lg:order-1">
-          <div class="border p-3 md:p-4 rounded-2xl border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
-            <USkeleton class="aspect-square w-full rounded-xl bg-gray-200 dark:bg-gray-800" />
-          </div>
-        </div>
-
-        <!-- Details skeleton -->
-        <div class="order-1 lg:order-2">
-          <!-- Badges skeleton -->
-          <div class="flex gap-2 mb-4 justify-center lg:justify-start">
-            <USkeleton class="h-6 w-16 rounded-full bg-gray-100 dark:bg-gray-800" />
-            <USkeleton class="h-6 w-20 rounded-full bg-gray-100 dark:bg-gray-800" />
-          </div>
-
-          <!-- Title skeleton -->
-          <USkeleton class="h-12 md:h-16 lg:h-20 w-full mb-6 lg:mb-8 bg-gray-200 dark:bg-gray-800" />
-
-          <!-- Description skeleton -->
-          <div class="space-y-2 mb-6 lg:mb-8">
-            <USkeleton class="h-4 w-full bg-gray-200 dark:bg-gray-800" />
-            <USkeleton class="h-4 w-3/4 bg-gray-200 dark:bg-gray-800" />
-            <USkeleton class="h-4 w-1/2 bg-gray-200 dark:bg-gray-800" />
-          </div>
-
-          <!-- Owner info skeleton -->
-          <div class="flex justify-center lg:justify-start items-center gap-4 mb-8">
-            <USkeleton class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800" />
-            <USkeleton class="h-10 w-24 rounded-full bg-gray-100 dark:bg-gray-800" />
-          </div>
-
-          <!-- Quick stats skeleton -->
-          <div class="grid grid-cols-2 gap-4">
-            <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-xl">
-              <USkeleton class="h-6 w-full mb-2 bg-gray-200 dark:bg-gray-800" />
-              <USkeleton class="h-3 w-16 bg-gray-100 dark:bg-gray-800" />
-            </div>
-            <div class="p-3 bg-gray-50 dark:bg-gray-900 rounded-xl">
-              <USkeleton class="h-6 w-full mb-2 bg-gray-200 dark:bg-gray-800" />
-              <USkeleton class="h-3 w-20 bg-gray-100 dark:bg-gray-800" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Full stats skeleton -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div v-for="i in 4" :key="i" class="text-center">
-          <USkeleton class="h-8 w-full mb-2 bg-gray-200 dark:bg-gray-800" />
-          <USkeleton class="h-4 w-24 mx-auto bg-gray-100 dark:bg-gray-800" />
-        </div>
-      </div>
-
-      <!-- Items grid skeleton -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-        <div v-for="i in 10" :key="i">
-          <USkeleton class="aspect-square w-full mb-3 rounded-xl bg-gray-200 dark:bg-gray-800" />
-          <USkeleton class="h-4 w-full mb-2 bg-gray-100 dark:bg-gray-800" />
-          <USkeleton class="h-4 w-3/4 bg-gray-100 dark:bg-gray-800" />
-        </div>
-      </div>
-    </div>
-
-    <!-- Actual Content -->
-    <div v-else class="space-y-8">
-      <!-- Header Section -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+    <!-- Hero Section -->
+    <div class="py-8 md:py-12">
+      <div class="grid grid-cols-1 lg:grid-cols-6 gap-8 lg:gap-12">
         <!-- Collection Image -->
-        <div class="order-2 lg:order-1">
-          <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
-            <img
-              v-if="collection?.metadata?.image"
-              :src="sanitizeIpfsUrl(collection.metadata.image)"
-              :alt="collection.metadata.name || 'Collection'"
-              class="aspect-square w-full object-cover rounded-xl"
-            >
-            <div
-              v-else
-              class="aspect-square w-full bg-gray-200 dark:bg-gray-800 rounded-xl flex items-center justify-center"
-            >
-              <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
+        <div class="lg:col-span-3">
+          <div class="relative group">
+            <div class="aspect-square w-full overflow-hidden rounded-3xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+              <img
+                v-if="collection?.metadata?.image"
+                :src="sanitizeIpfsUrl(collection.metadata.image)"
+                :alt="collection.metadata.name || 'Collection'"
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              >
+              <div
+                v-else
+                class="w-full h-full flex items-center justify-center"
+              >
+                <UIcon name="i-heroicons-photo" class="w-20 h-20 text-gray-400" />
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Collection Details -->
-        <div class="order-1 lg:order-2">
-          <!-- Badges -->
-          <div class="flex gap-2 mb-4 justify-center lg:justify-start">
-            <UBadge class="rounded-full bg-gray-100 dark:bg-gray-800 text-black dark:text-white" icon="i-heroicons-star">
-              Collection
-            </UBadge>
-            <UBadge class="rounded-full bg-gray-100 dark:bg-gray-800 text-black dark:text-white" icon="i-token-polkadot">
-              {{ chain.toUpperCase() }}
-            </UBadge>
+        <div class="lg:col-span-3 space-y-6">
+          <!-- Title -->
+          <div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-white mb-4">
+              {{ collection?.metadata?.name || `Collection #${collection_id}` }}
+            </h1>
           </div>
 
-          <!-- Title -->
-          <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center lg:text-left mb-6 lg:mb-8 text-gray-900 dark:text-white">
-            {{ collection?.metadata?.name || `Collection #${collection_id}` }}
-          </h1>
-
           <!-- Description -->
-          <div v-if="collection?.metadata?.description" class="text-sm md:text-base text-gray-600 dark:text-gray-300 mb-6 lg:mb-8">
+          <div v-if="collection?.metadata?.description" class="prose prose-gray dark:prose-invert max-w-none">
             <MarkdownPreview :source="collection.metadata.description" />
           </div>
 
           <!-- Owner Info -->
-          <div v-if="collectionStats?.owner" class="flex justify-center lg:justify-start items-center gap-4 mb-8">
-            <div class="p-1 bg-gray-100 dark:bg-gray-800 inline-block rounded-full">
-              <UserInfo :avatar-size="40" :address="collectionStats.owner" />
+          <div v-if="collection?.owner" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+            <div class="shrink-0">
+              <UserInfo :avatar-size="48" :address="collection.owner" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 dark:text-white">
+                Collection Owner
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                {{ collection.owner }}
+              </p>
             </div>
             <FollowButton
-              :target="collectionStats.owner"
-              class="px-4 py-2"
+              :target="collection.owner"
+              class="shrink-0"
+              size="sm"
             />
           </div>
 
-          <!-- Quick Stats in Header -->
-          <div class="grid grid-cols-2 gap-4">
-            <div class="text-center lg:text-left p-3 bg-gray-50 dark:bg-gray-900 rounded-xl">
-              <div class="text-xl md:text-2xl font-bold font-serif italic text-gray-900 dark:text-white">
-                {{ collectionStats?.totalItems || 0 }}
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+              <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {{ collection?.claimed || 0 }}
               </div>
-              <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Total Items
+              <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Claimed
               </div>
             </div>
 
-            <div class="text-center lg:text-left p-3 bg-gray-50 dark:bg-gray-900 rounded-xl">
-              <div class="text-xl md:text-2xl font-bold font-serif italic text-gray-900 dark:text-white">
-                {{ collection_id }}
+            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+              <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {{ unlimited(collection?.supply) ? '∞' : collection?.supply || 0 }}
               </div>
-              <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Collection ID
+              <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Supply
               </div>
+            </div>
+
+            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+              <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                <UIcon v-if="isLoadingFloor" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin mx-auto" />
+                <Money v-else-if="floorPrice" inline :value="floorPrice" />
+                <span v-else class="text-gray-400 dark:text-gray-500">–</span>
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Floor Price
+              </div>
+            </div>
+
+            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+              <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {{ chain.toUpperCase() }}
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Chain
+              </div>
+            </div>
+          </div>
+
+          <!-- Clear Cache Section -->
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+              <div class="flex-1">
+                <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  Collection data is cached for better performance. If you notice outdated information,
+                  use the refresh button to fetch the latest data from the blockchain.
+                </p>
+              </div>
+              <UButton
+                :loading="isRefreshing"
+                :disabled="isRefreshing"
+                class="shrink-0"
+                variant="outline"
+                @click="clearCache"
+              >
+                <UIcon name="i-heroicons-arrow-path" class="w-4 h-4 mr-2" />
+                {{ isRefreshing ? 'Refreshing...' : 'Refresh' }}
+              </UButton>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <USeparator class="my-12 md:my-20" />
+    <USeparator class="my-12 md:my-20" />
 
-      <!-- Items Section -->
-      <div class="space-y-6">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-          <h2 class="text-2xl md:text-3xl font-bold font-serif italic text-center md:text-left text-gray-900 dark:text-white">
-            Collection Items
-          </h2>
+    <!-- Items Section -->
+    <div class="space-y-6">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <h2 class="text-2xl md:text-3xl font-bold font-serif italic text-center md:text-left text-gray-900 dark:text-white">
+          Collection Items
+        </h2>
 
-          <div class="flex gap-2 md:gap-4">
-            <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Newest" variant="outline" />
-            <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Price" variant="outline" />
-            <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Rarity" variant="outline" />
-          </div>
+        <div class="flex gap-2 md:gap-4">
+          <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Newest" variant="outline" />
+          <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Price" variant="outline" />
+          <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Rarity" variant="outline" />
         </div>
-
-        <!-- Items Grid -->
-        <LazyNftsGrid
-          :variables="{ collections: [collection_id], orderBy: 'blockNumber_DESC' }"
-          grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
-          no-items-found-message="This collection doesn't have any items yet."
-        />
       </div>
+
+      <!-- Items Grid -->
+      <LazyNftsGrid
+        :variables="{ collections: [collection_id], orderBy: 'blockNumber_DESC' }"
+        grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
+        no-items-found-message="This collection doesn't have any items yet."
+      />
     </div>
   </UContainer>
 </template>
