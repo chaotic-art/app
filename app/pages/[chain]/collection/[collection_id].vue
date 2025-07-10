@@ -232,28 +232,11 @@ const collectionStats = computed(() => {
         </div>
 
         <!-- Items Grid -->
-        <div v-if="items.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
-          <LazyTokenCard
-            v-for="tokenId in items"
-            :key="tokenId"
-            :token-id="tokenId"
-            :collection-id="Number(collection_id)"
-            :chain="chain"
-          />
-        </div>
-
-        <!-- Empty State -->
-        <div v-else class="text-center py-16">
-          <div class="text-gray-400 dark:text-gray-600 mb-4">
-            <UIcon name="i-heroicons-photo" class="w-16 h-16 mx-auto" />
-          </div>
-          <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
-            No items found
-          </h3>
-          <p class="text-gray-500 dark:text-gray-400">
-            This collection doesn't have any items yet.
-          </p>
-        </div>
+        <LazyNftsGrid
+          :variables="{ collections: [collection_id], orderBy: 'blockNumber_DESC' }"
+          grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
+          no-items-found-message="This collection doesn't have any items yet."
+        />
       </div>
     </div>
   </UContainer>
