@@ -14,7 +14,7 @@ const { volume } = useCollectionVolume(
 </script>
 
 <template>
-  <NuxtLink :to="`${collection?.id && `/${prefix}/collection/${collection.id}`}`" class="rounded-[15px] w-full flex flex-col relative overflow-hidden shadow-sm">
+  <NuxtLink :to="`${collection?.id && `/${prefix}/collection/${collection.id}`}`" class="rounded-[15px] w-full flex flex-col relative overflow-hidden shadow-sm hover-card-effect">
     <div class="w-full aspect-square bg-background-color-secondary flex items-center justify-center">
       <img
         v-if="collection?.image"

@@ -19,7 +19,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 rounded-xl h-auto md:h-[440px] overflow-hidden border border-gray-200 dark:border-neutral-700 bg-background-color-secondary" @click="emit('click', drop)">
+  <div class="grid grid-cols-1 md:grid-cols-2 rounded-xl h-auto md:h-[440px] overflow-hidden border border-gray-200 dark:border-neutral-700 bg-background-color-secondary hover-card-effect" @click="emit('click', drop)">
     <div class="h-full bg-gray-200 dark:bg-neutral-800 relative rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700">
       <img
         :src="sanitizeIpfsUrl(drop?.banner)"
