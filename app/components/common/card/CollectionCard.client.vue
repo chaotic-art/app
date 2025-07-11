@@ -6,11 +6,13 @@ interface Props {
   item: ReturnType<typeof useInfiniteCollections>['collections']['value'][number]
   prefix?: Prefix
   isLoading?: boolean
+  volume?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   prefix: 'ahp',
   isLoading: false,
+  volume: '',
 })
 
 const { $api } = useNuxtApp()
@@ -134,8 +136,19 @@ onMounted(async () => {
 
           <!-- Stats Data -->
           <div v-else class="grid grid-cols-3 gap-3">
+            <!-- Volume -->
+            <div v-if="volume" class="text-center">
+              <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                Volume
+              </div>
+              <div class="text-base font-semibold text-gray-900 dark:text-white">
+                <Money v-if="volume" inline :value="volume" :round="0" />
+                <span v-else class="text-gray-400 dark:text-gray-500">–</span>
+              </div>
+            </div>
+
             <!-- Items Count -->
-            <div class="text-center">
+            <div v-else class="text-center">
               <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                 Items
               </div>
@@ -150,7 +163,7 @@ onMounted(async () => {
                 Floor
               </div>
               <div class="text-base font-semibold text-gray-900 dark:text-white">
-                <Money v-if="collectionData.floor" inline :value="collectionData.floor" />
+                <Money v-if="collectionData.floor" inline :value="collectionData.floor" :round="2" />
                 <span v-else class="text-gray-400 dark:text-gray-500">–</span>
               </div>
             </div>
