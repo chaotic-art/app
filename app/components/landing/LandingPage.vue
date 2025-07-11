@@ -25,7 +25,7 @@
 
     <UContainer>
       <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '300px' }" />
-      <LazyArticles :hydrate-on-visible="{ rootMargin: '300px' }" />
+      <!-- <LazyArticles :hydrate-on-visible="{ rootMargin: '300px' }" /> -->
     </UContainer>
   </div>
 </template>
