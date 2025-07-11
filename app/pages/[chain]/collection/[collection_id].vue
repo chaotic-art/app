@@ -24,6 +24,7 @@ function clearCache() {
 // Floor price data
 const { $api } = useNuxtApp()
 const floorPrice = ref(0)
+const owner = ref('')
 const isLoadingFloor = ref(false)
 
 // Fetch floor price data
@@ -34,7 +35,12 @@ onMounted(async () => {
   isLoadingFloor.value = true
   try {
     const api = await $api(chain.value)
-    const queryFloor = await api.query.Nfts.ItemPriceOf.getEntries(Number(collection_id))
+    const [queryFloor, queryCollection] = await Promise.all([
+      api.query.Nfts.ItemPriceOf.getEntries(Number(collection_id)),
+      api.query.Nfts.Collection.getValue(Number(collection_id)),
+    ])
+
+    owner.value = queryCollection?.owner.toString() ?? ''
 
     if (queryFloor.length) {
       const floorValues = queryFloor
@@ -115,16 +121,16 @@ defineOgImageComponent('Frame', {
           </div>
 
           <!-- Owner Info -->
-          <div v-if="collection?.owner" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+          <div v-if="owner" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
             <div class="shrink-0">
-              <UserInfo :address="collection.owner" />
+              <UserInfo :address="owner" />
             </div>
             <div class="flex-1 min-w-0 hidden md:block">
               <p class="text-sm font-medium text-gray-900 dark:text-white">
                 Collection Owner
               </p>
               <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
-                {{ shortenAddress(collection.owner) }}
+                {{ shortenAddress(owner) }}
               </p>
             </div>
             <div class="flex items-center gap-2 shrink-0">
@@ -132,12 +138,12 @@ defineOgImageComponent('Frame', {
                 size="sm"
                 variant="outline"
                 icon="i-heroicons-clipboard-document"
-                @click="() => copyAddress(collection?.owner)"
+                @click="() => copyAddress(owner)"
               >
                 Copy
               </UButton>
               <UButton
-                :to="getSubscanUrl(collection.owner, chain)"
+                :to="getSubscanUrl(owner, chain)"
                 target="_blank"
                 size="sm"
                 variant="outline"
