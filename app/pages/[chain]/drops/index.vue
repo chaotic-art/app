@@ -31,7 +31,7 @@ const { data: drops } = await useAsyncData('drops', () => getDrops({
         {{ $t('drop.pastDrops') }}
       </h1>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xxl:grid-cols-6 gap-3 md:gap-4 px-4 md:px-0">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xxl:grid-cols-6 gap-3 md:gap-4 px-4 md:px-0">
         <DropCard v-for="drop in sortedMintedDrops" :key="drop.id" :drop="drop" show-minted />
       </div>
     </div>
