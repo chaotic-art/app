@@ -18,8 +18,15 @@
     "selectAccount": "Select Account",
     "whichAccountWouldYouLikeToUse": "Which account would you like to use?",
     "searchByNameOrPasteAddress": "Search by name or paste address",
-    "waitingForAuthorization": "Waiting for authorization",
-    "pleaseConnectWalletExtensionToChaotic": "Please connect your wallet extension to Chaotic",
+    "waitingForAuthorization": {
+      "title": "Waiting for Authorization",
+      "description": "Please connect your wallet extension to Chaotic"
+    },
+    "connectionFailed": {
+      "title": "Connection Failed",
+      "description": "Unable to connect to your wallet extension. Please try again."
+    },
+    "retry": "Retry",
     "installedAndRecentlyUsed": "Installed & recently used",
     "lastConnected": "Last Connected",
     "otherWalletsLowercase": "Other wallets",
@@ -31,7 +38,9 @@
     "manageWallets": "Manage wallets",
     "all": "All",
     "polkadot": "Polkadot",
-    "evm": "EVM"
+    "evm": "EVM",
+    "allInstalledWallets": "All installed wallets",
+    "connectAll": "Connect All"
   },
   "landing": {
     "title": "Your Polkadot NFT Marketplace",
@@ -62,5 +71,12 @@
   },
   "common": {
     "price": "Price"
+  },
+  "theme": {
+    "dark": "Dark",
+    "darkMode": "Dark Mode",
+    "light": "Light",
+    "lightMode": "Light Mode",
+    "system": "System Default"
   }
 }

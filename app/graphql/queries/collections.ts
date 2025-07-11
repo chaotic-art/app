@@ -38,6 +38,8 @@ export const topCollections = graphql(`
             floor
             nftCount
             ownerCount: distribution
+            issuer
+            currentOwner
         }
     }
 `)

@@ -8,6 +8,7 @@ const props = defineProps<{
   claimed?: number
 }>()
 
+const emit = defineEmits(['click'])
 const { decimals, chainSymbol } = useChain()
 const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals, chainSymbol)
 
@@ -25,10 +26,10 @@ useHead({
 </script>
 
 <template>
-  <div class="w-full rounded-xl overflow-hidden border border-[#EBEBEB] bg-white">
+  <div class="w-full rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 bg-background-color-secondary hover-card-effect" @click="emit('click', drop)">
     <!-- Banner Image Section -->
-    <div class="w-full h-[240px] md:h-[300px] bg-gray-200 relative">
-      <div v-if="isLoading" class="w-full h-full bg-gray-200 animate-pulse" />
+    <div class="w-full h-[240px] md:h-[300px] bg-gray-200 dark:bg-neutral-800 relative">
+      <div v-if="isLoading" class="w-full h-full bg-gray-200 dark:bg-neutral-800 animate-pulse" />
       <img
         v-else
         :src="sanitizeIpfsUrl(drop?.banner)"
@@ -43,8 +44,8 @@ useHead({
         <!-- Left Section: Title, Creator, Description -->
         <div class="flex flex-col gap-3 md:gap-4 w-full md:w-auto">
           <!-- Drop Name -->
-          <div class="font-serif italic font-medium text-2xl md:text-[50px] text-center md:text-left">
-            <div v-if="isLoading" class="h-8 md:h-16 bg-gray-200 animate-pulse rounded-md w-3/4 mx-auto md:mx-0" />
+          <div class="font-serif italic font-medium text-2xl md:text-[50px] text-center md:text-left text-gray-900 dark:text-white">
+            <div v-if="isLoading" class="h-8 md:h-16 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded-md w-3/4 mx-auto md:mx-0" />
             <span v-else>{{ drop?.name }}</span>
           </div>
 
@@ -52,20 +53,20 @@ useHead({
           <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 w-full md:w-auto">
             <!-- Creator Info -->
             <div v-if="isLoading" class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-gray-200 animate-pulse rounded-full" />
+              <div class="w-10 h-10 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded-full" />
               <div class="flex flex-col gap-2">
-                <div class="h-4 bg-gray-200 animate-pulse rounded w-24" />
-                <div class="h-3 bg-gray-200 animate-pulse rounded w-32" />
+                <div class="h-4 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-24" />
+                <div class="h-3 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-32" />
               </div>
             </div>
             <UserInfo v-else :avatar-size="40" :address="drop?.creator" />
 
             <!-- Description -->
-            <div class="text-gray-500 max-w-full md:max-w-[350px] line-clamp-3">
+            <div class="text-gray-500 dark:text-gray-300 max-w-full md:max-w-[350px] line-clamp-3">
               <div v-if="isLoading" class="flex flex-col gap-2">
-                <div class="h-3 bg-gray-200 animate-pulse rounded w-full" />
-                <div class="h-3 bg-gray-200 animate-pulse rounded w-4/5" />
-                <div class="h-3 bg-gray-200 animate-pulse rounded w-3/5" />
+                <div class="h-3 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-full" />
+                <div class="h-3 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-4/5" />
+                <div class="h-3 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-3/5" />
               </div>
               <MarkdownPreview v-else :source="description || ''" />
             </div>
@@ -77,19 +78,19 @@ useHead({
           <!-- Minted Stats and Price -->
           <div class="mb-1 flex items-center gap-3 flex-wrap">
             <template v-if="isLoading">
-              <div class="h-4 bg-gray-200 animate-pulse rounded w-20" />
-              <span class="font-bold text-gray-500">·</span>
-              <div class="h-4 bg-gray-200 animate-pulse rounded w-16" />
+              <div class="h-4 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-20" />
+              <span class="font-bold text-gray-500 dark:text-gray-300">·</span>
+              <div class="h-4 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-16" />
             </template>
             <template v-else>
-              <span class="font-medium">{{ claimed }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
-              <span class="font-bold text-gray-500">·</span>
-              <span class="font-medium">{{ usdPrice }} USD</span>
+              <span class="font-medium text-gray-900 dark:text-white">{{ claimed }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
+              <span class="font-bold text-gray-500 dark:text-gray-300">·</span>
+              <span class="font-medium text-gray-900 dark:text-white">{{ usdPrice }} USD</span>
             </template>
           </div>
 
           <!-- Mint Button -->
-          <div v-if="isLoading" class="h-12 bg-gray-200 animate-pulse rounded-lg w-32" />
+          <div v-if="isLoading" class="h-12 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded-lg w-32" />
           <LandingDropMintButton v-else :drop="drop" :is-minted-out="claimed === drop?.max" />
         </div>
       </div>

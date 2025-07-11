@@ -1,13 +1,20 @@
 export default function useWalletManager() {
   const walletStore = useWalletStore()
   const { selectedAccounts } = storeToRefs(walletStore)
-  const { disconnect: disconnectReown } = useReown()
 
   async function disconnectWallet(wallet: WalletExtension) {
     const vm = wallet.vm
 
     await execByVm({
-      EVM: () => disconnectReown(),
+      EVM: () => {
+        if (import.meta.client) {
+          const { disconnect: disconnectReown } = useReown()
+
+          return disconnectReown()
+        }
+
+        return Promise.resolve()
+      },
     }, { vm })
 
     walletStore.updateWallet(wallet.id, {

@@ -20,13 +20,15 @@ const { profile: profileFromAddress } = useFetchProfile(
   computed(() => props.address),
 )
 
+const { prefix } = usePrefix()
+
 const name = computed(() => profileFromAddress.value?.name || shortenAddress(props.address))
 </script>
 
 <template>
-  <div class="flex items-center gap-2 rounded-full p-1.5 pr-4 w-fit bg-gray-100" :class="{ 'bg-transparent': transparentBackground }">
+  <NuxtLink :to="`/${prefix}/u/${address}`" class="flex items-center gap-2 rounded-full pr-4 w-fit bg-gray-100 dark:bg-neutral-800" :class="{ 'bg-transparent': transparentBackground, 'p-1.5': !transparentBackground }">
     <ProfileAvatar :address="address" :size="avatarSize" />
     <slot name="name" :address-name="name" />
     <span v-if="!customName" class="text-ellipsis overflow-hidden whitespace-nowrap">{{ name }}</span>
-  </div>
+  </NuxtLink>
 </template>

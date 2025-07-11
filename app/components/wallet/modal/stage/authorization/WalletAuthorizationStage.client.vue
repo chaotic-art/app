@@ -1,60 +1,70 @@
 <script setup lang="ts">
-import WalletAuthorizationLoader from './WalletAuthorizationLoader.vue'
+import { formatSubAccounts } from '@/utils/wallet'
+import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
 
 const walletStore = useWalletStore()
 const { wallets } = storeToRefs(walletStore)
 const subWalletStore = useSubWalletStore()
 
-const queuedWallets = computed(() => wallets.value.filter(wallet => wallet.state === WalletStates.ConnectionQueued))
+const queuedWallets = computed(() => wallets.value.filter(wallet =>
+  wallet.state === WalletStates.AuthorizationQueued
+  || wallet.state === WalletStates.Authorizing
+  || wallet.state === WalletStates.AuthorizationFailed,
+))
 
-const currentExtension = ref<WalletExtension | undefined>(queuedWallets.value[0])
+const currentExtensionId = ref<string | undefined>(queuedWallets.value[0]?.id)
+const currentExtension = computed<WalletExtension | undefined>(() => queuedWallets.value.find(wallet => wallet.id === currentExtensionId.value))
 
-const { openModal } = useReown({
-  onAccountChange: ({ account, wallet }) => {
-    const { allAccounts: accounts } = account
+const { openModal, isReady: isReownReady } = useReown({
+  onWalletChange: (wallet) => {
     const extension = currentExtension.value
 
-    if (!extension) {
+    if (!extension || !wallet) {
       return
     }
 
-    setWalletConnected(extension, accounts.map(account => ({
-      id: `${extension.id}:${wallet.rdns}/${account.address}`,
-      vm: 'EVM',
-      address: account.address,
-      isSelected: false,
-      icon: wallet.icon,
-    })))
+    if (extension.id !== REOWN_WALLET_CONFIG.id) {
+      return
+    }
+
+    setWalletAuthorized(extension)
+  },
+  onModalOpenChange: (open) => {
+    if (!open && currentExtension.value && currentExtension.value.state !== WalletStates.Connected) {
+      setWalletConnectionFailed(currentExtension.value)
+    }
   },
 })
 
 async function initSubAuthorization(extension: WalletExtension): Promise<WalletAccount[]> {
-  await subWalletStore.init()
+  const accounts = await subWalletStore.connectWallet(extension.source as any)
 
-  const subWalletAccounts = await subWalletStore.connectWallet(extension.source as any)
-
-  const walletAccounts: WalletAccount[] = subWalletAccounts.map(account => ({
-    id: `${extension.id}:${account.address}`,
-    vm: 'SUB',
-    address: account.address,
-    isSelected: false,
-    name: account.name,
-  }))
-
-  return walletAccounts
+  return formatSubAccounts({ extension, accounts })
 }
 
-function setWalletConnected(extension: WalletExtension, accounts: WalletAccount[]) {
-  // for some reason from extensions return an account more than once
-  const uniqueAccounts = accounts.filter((account, index, self) => self.findIndex(a => a.id === account.id) === index)
-
+function setWalletConnectionFailed(extension: WalletExtension) {
   walletStore.updateWallet(extension.id, {
-    accounts: uniqueAccounts,
-    state: WalletStates.Connected,
-    isSelected: true,
+    state: WalletStates.AuthorizationFailed,
+    accounts: [],
   })
+}
 
-  currentExtension.value = queuedWallets.value[0]
+function setWalletAuthorized(extension: WalletExtension, accounts?: WalletAccount[]) {
+  const toUpdate = {
+    state: WalletStates.Authorized,
+    isSelected: true,
+  }
+
+  if (accounts) {
+    // for some reason from extensions return an account more than once
+    const uniqueAccounts = accounts.filter((account, index, self) => self.findIndex(a => a.id === account.id) === index)
+
+    Object.assign(toUpdate, { accounts: uniqueAccounts })
+  }
+
+  walletStore.updateWallet(extension.id, toUpdate)
+
+  currentExtensionId.value = queuedWallets.value[0]?.id
 }
 
 async function initEvmAuth() {
@@ -63,18 +73,23 @@ async function initEvmAuth() {
 
 async function initExtensionAuthorization(extension: WalletExtension) {
   try {
-    walletStore.updateWalletState(extension.id, WalletStates.Connecting)
+    walletStore.updateWalletState(extension.id, WalletStates.Authorizing)
 
     execByVm({
       SUB: async () => {
-        const walletAccounts = await initSubAuthorization(extension)
-        setWalletConnected(extension, walletAccounts)
+        try {
+          const walletAccounts = await initSubAuthorization(extension)
+          setWalletAuthorized(extension, walletAccounts)
+        }
+        catch {
+          walletStore.updateWalletState(extension.id, WalletStates.AuthorizationFailed)
+        }
       },
       EVM: async () => await initEvmAuth(),
     }, { vm: extension.vm })
   }
   catch {
-    walletStore.updateWalletState(extension.id, WalletStates.ConnectionFailed)
+    walletStore.updateWalletState(extension.id, WalletStates.AuthorizationFailed)
   }
 }
 
@@ -84,12 +99,33 @@ function handleQueue(extension?: WalletExtension) {
     return
   }
 
+  if (extension.state !== WalletStates.AuthorizationQueued) {
+    return
+  }
+
   initExtensionAuthorization(extension)
 }
 
-watch(currentExtension, handleQueue, { immediate: true })
+function handleRetry(extension: WalletExtension) {
+  walletStore.updateWalletState(extension.id, WalletStates.AuthorizationQueued)
+
+  initExtensionAuthorization(extension)
+}
+
+watch([currentExtension, isReownReady], ([extension, isReady]) => {
+  if (!isReady) {
+    return
+  }
+
+  handleQueue(extension)
+}, { immediate: true })
 </script>
 
 <template>
-  <WalletAuthorizationLoader :current-extension="currentExtension" />
+  <WalletAuthorizationLoader
+    :current-extension="currentExtension"
+    @retry="handleRetry"
+  />
+
+  <WalletAccountFooter />
 </template>

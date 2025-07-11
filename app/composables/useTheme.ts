@@ -19,9 +19,9 @@ export default function () {
   >(() => [
     {
       value: 'system',
-      icon: 'i-mdi:desktop-classic',
+      icon: 'i-lucide-laptop',
       label: isSystemMode.value
-        ? $i18n.t('theme.systemMode', [
+        ? $i18n.t('theme.system', [
             isDarkMode.value
               ? $i18n.t('theme.dark')
               : $i18n.t('theme.light'),
@@ -30,12 +30,12 @@ export default function () {
     },
     {
       value: 'light',
-      icon: 'i-mdi:weather-sunny',
+      icon: 'i-lucide-sun',
       label: $i18n.t('theme.lightMode'),
     },
     {
       value: 'dark',
-      icon: 'i-mdi:moon-waning-crescent',
+      icon: 'i-lucide-moon',
       label: $i18n.t('theme.darkMode'),
     },
   ])

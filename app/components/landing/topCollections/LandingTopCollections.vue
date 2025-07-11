@@ -2,7 +2,7 @@
 import TopCollectionsCard from './TopCollectionsCard.vue'
 import { useTopCollections } from './utils/useTopCollections'
 
-const limit = 8
+const limit = 12
 const { prefix } = usePrefix()
 const { data } = useTopCollections(limit)
 const fiatStore = useFiatStore()
@@ -15,8 +15,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="pt-8 md:pt-16 md:px-0">
-    <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 text-center md:text-left">
+  <section class="pt-8 md:pt-16 md:px-0 bg-background-color">
+    <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 text-center md:text-left text-gray-900 dark:text-white">
       {{ $t('collection.topCollections') }}
     </div>
     <div class="">
@@ -24,7 +24,7 @@ onMounted(() => {
         <TopCollectionsCard v-for="(collection, i) in data" :key="i" :collection="collection" />
       </div>
       <div class="flex justify-center mt-6 md:mt-8">
-        <UButton class="bg-white text-black border border-[#D9D9D9] rounded-full px-6 py-2 md:px-8" :to="`/${prefix}/explore/collectibles`">
+        <UButton class="bg-background-color-secondary text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-full px-6 py-2 md:px-8" :to="`/${prefix}/explore/collectibles`">
           {{ $t('collection.viewMore') }}
         </UButton>
       </div>
