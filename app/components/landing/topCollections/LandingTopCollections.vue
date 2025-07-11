@@ -2,7 +2,7 @@
 import TopCollectionsCard from './TopCollectionsCard.vue'
 import { useTopCollections } from './utils/useTopCollections'
 
-const limit = 8
+const limit = 12
 const { prefix } = usePrefix()
 const { data } = useTopCollections(limit)
 const fiatStore = useFiatStore()
