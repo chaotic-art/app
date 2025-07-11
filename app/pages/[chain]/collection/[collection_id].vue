@@ -2,6 +2,7 @@
 import type { Prefix } from '@kodadot1/static'
 import { CHAINS } from '@kodadot1/static'
 import { fetchOdaCollection } from '~/services/oda'
+import { copyAddress, getSubscanUrl, shortenAddress } from '~/utils/format/address'
 
 const route = useRoute()
 const { chain: chainPrefix, collection_id } = route.params
@@ -116,25 +117,39 @@ defineOgImageComponent('Frame', {
           <!-- Owner Info -->
           <div v-if="collection?.owner" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
             <div class="shrink-0">
-              <UserInfo :avatar-size="48" :address="collection.owner" />
+              <UserInfo :address="collection.owner" />
             </div>
-            <div class="flex-1 min-w-0">
+            <div class="flex-1 min-w-0 hidden md:block">
               <p class="text-sm font-medium text-gray-900 dark:text-white">
                 Collection Owner
               </p>
               <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
-                {{ collection.owner }}
+                {{ shortenAddress(collection.owner) }}
               </p>
             </div>
-            <FollowButton
-              :target="collection.owner"
-              class="shrink-0"
-              size="sm"
-            />
+            <div class="flex items-center gap-2 shrink-0">
+              <UButton
+                size="sm"
+                variant="outline"
+                icon="i-heroicons-clipboard-document"
+                @click="() => copyAddress(collection?.owner)"
+              >
+                Copy
+              </UButton>
+              <UButton
+                :to="getSubscanUrl(collection.owner, chain)"
+                target="_blank"
+                size="sm"
+                variant="outline"
+                icon="i-heroicons-arrow-top-right-on-square"
+              >
+                Subscan
+              </UButton>
+            </div>
           </div>
 
           <!-- Quick Stats -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
             <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
               <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                 {{ collection?.claimed || 0 }}
@@ -161,15 +176,6 @@ defineOgImageComponent('Frame', {
               </div>
               <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Floor Price
-              </div>
-            </div>
-
-            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
-              <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                {{ chain.toUpperCase() }}
-              </div>
-              <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Chain
               </div>
             </div>
           </div>
