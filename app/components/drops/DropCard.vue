@@ -28,7 +28,20 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <NuxtLink v-if="shouldShowDrop" :to="`/${prefix}/drops/${drop.alias}`" class="border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow hover-card-effect">
+  <NuxtLink v-if="shouldShowDrop" :to="`/${prefix}/drops/${drop.alias}`" class="relative border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group">
+    <!-- Collectors on Hover -->
+    <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-95">
+      <div class="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-2">
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1">
+            <UIcon name="mdi:account-group" class="text-gray-600 text-sm" />
+            <span class="text-xs font-medium text-gray-700">Collected by</span>
+          </div>
+          <DropCollectedBy :chain="prefix" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
+        </div>
+      </div>
+    </div>
+
     <img :src="sanitizeIpfsUrl(drop.image)" :alt="drop.name" class="aspect-square w-full object-cover">
 
     <div class="p-3 md:p-4">
@@ -36,33 +49,46 @@ onBeforeMount(async () => {
         {{ drop.name }}
       </p>
 
-      <div class="text-sm text-gray-500 rounded-full p-0.5">
-        <UserInfo :avatar-size="16" :address="drop.creator" :transparent-background="true" />
-      </div>
-
-      <div class="flex items-center justify-between mt-2">
-        <div class="text-xs text-gray-500 rounded-full p-0.5 flex items-end">
-          <span class="text-[var(--text-color)] text-sm">{{ formattedDrop?.minted }}</span>
-          /
-          <UIcon v-if="isUnlimited" name="mdi:infinity" class="self-center" />
-          <span v-else>{{ formattedDrop?.max }}</span>
-
-          <div class="ml-2 text-xs">
-            <div v-if="isTBA(formattedDrop?.price)">
-              TBA
-            </div>
-            <div v-else-if="Number(formattedDrop?.price)" class="flex items-end gap-1">
-              <span class="text-sm text-[var(--text-color)]">{{ usdPrice }}
-              </span>
-              <span class="text-xs">USD</span>
-            </div>
-            <div v-else class="text-[var(--text-color)]">
-              Free
-            </div>
+      <div class="flex items-center justify-between mt-3">
+        <!-- Minting Progress -->
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-1 text-xs text-gray-500">
+            <span class="font-medium">Minted</span>
+          </div>
+          <div class="flex items-center gap-1 font-mono">
+            <span class="text-sm font-semibold text-[var(--text-color)]">{{ formattedDrop?.minted }}</span>
+            <span class="text-xs text-gray-400">/</span>
+            <UIcon v-if="isUnlimited" name="mdi:infinity" class="text-sm text-gray-600" />
+            <span v-else class="text-sm text-gray-600">{{ formattedDrop?.max }}</span>
           </div>
         </div>
 
-        <DropCollectedBy :chain="prefix" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
+        <!-- Price Display -->
+        <div class="flex flex-col items-end gap-1">
+          <div class="text-xs text-gray-500 font-medium">
+            Price
+          </div>
+          <div class="text-right">
+            <div v-if="isTBA(formattedDrop?.price)" class="px-2 py-1 bg-gray-100 rounded-md">
+              <span class="text-xs font-medium text-gray-600">TBA</span>
+            </div>
+            <div v-else-if="Number(formattedDrop?.price)" class="flex items-baseline gap-1">
+              <span class="text-sm font-semibold text-[var(--text-color)]">{{ usdPrice }}</span>
+              <span class="text-xs text-gray-500">USD</span>
+            </div>
+            <div v-else class="px-2 py-1 bg-green-50 rounded-md">
+              <span class="text-xs font-medium text-green-600">Free</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Creator Section -->
+      <div class="mt-3 pt-3 border-t border-gray-100">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-500 font-medium">Created by</span>
+          <UserInfo :avatar-size="20" :address="drop.creator" :transparent-background="true" class="min-w-0" />
+        </div>
       </div>
     </div>
   </NuxtLink>
