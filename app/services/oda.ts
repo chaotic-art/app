@@ -14,6 +14,7 @@ export interface OnchainCollection {
   }
   supply: string
   claimed: string
+  owner?: string
 }
 
 export function fetchOdaCollection(chain: Prefix, address: string) {

@@ -29,3 +29,7 @@ body {
   font-family: var(--font-sans);
   color: var(--text-color);
 }
+
+.hover-card-effect {
+  @apply cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 hover:border hover:border-gray-300 dark:hover:border-neutral-600;
+}

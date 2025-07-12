@@ -103,3 +103,5 @@ export async function getDropAttributes(alias: string): Promise<DropItem | undef
     status: getLocalDropStatus(drop),
   }
 }
+
+export const isTBA = (price: unknown) => price === null || price === ''
