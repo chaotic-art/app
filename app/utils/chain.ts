@@ -18,4 +18,8 @@ export function tokenSymbolOf<T = string>(prefix: Prefix): T {
   return chainPropListOf(prefix).tokenSymbol as T
 }
 
+export function decimalsOf(prefix: Prefix): number {
+  return chainPropListOf(prefix).tokenDecimals
+}
+
 export const vmOfChain = (chain: Chain): ChainVM => vmOf(getPrefixOfChain(chain)!)
