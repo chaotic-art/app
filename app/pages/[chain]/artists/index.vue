@@ -1,0 +1,44 @@
+<script setup lang="ts">
+import { useQuery } from '@tanstack/vue-query'
+import { getDrops } from '@/services/fxart'
+
+const { data: dropItems } = useQuery({
+  queryKey: ['all-drop-artists', 'ahp'],
+  queryFn: () => getDrops({
+    active: [true],
+    chain: ['ahp'],
+    limit: 200,
+  }),
+})
+const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.creator).filter(Boolean))])
+</script>
+
+<template>
+  <UContainer>
+    <h1 class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 px-4 text-center md:text-left text-gray-900 dark:text-white">
+      {{ $t('artist.curated') }} <span class="text-gray-400 dark:text-gray-500">&lt;</span>{{ $t('artist.all') }}<span class="text-gray-400 dark:text-gray-500">&gt;</span>
+    </h1>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
+      <div
+        v-for="artist in allArtists"
+        :key="artist"
+        class="flex flex-col gap-4 items-start md:gap-0 md:flex-row md:items-center justify-between bg-background-color-secondary rounded-xl px-4 py-3 md:px-6 md:py-4 border border-gray-200 dark:border-neutral-700 hover-card-effect"
+      >
+        <UserInfo :address="artist" :avatar-size="72" :custom-name="true" :transparent-background="true">
+          <template #name="{ addressName, description }">
+            <div class="flex flex-col gap-2 ml-4 max-w-full">
+              <span class="text-[32px] font-serif italic font-medium text-nowrap max-w-[220px] md:max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-gray-900 dark:text-white">
+                {{ addressName }}
+              </span>
+              <div class="text-gray-500 dark:text-gray-300 break-all line-clamp-4 min-h-[100px]">
+                <MarkdownPreview :source="description || ''" />
+              </div>
+            </div>
+          </template>
+        </UserInfo>
+        <FollowButton :target="artist!" class="text-sm md:text-base" />
+      </div>
+    </div>
+  </UContainer>
+</template>

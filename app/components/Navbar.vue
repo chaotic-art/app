@@ -19,6 +19,10 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
       to: '/ahp/drops',
     },
     {
+      label: 'Artists',
+      to: '/ahp/artists',
+    },
+    {
       label: 'Create',
       to: '/create',
     },
