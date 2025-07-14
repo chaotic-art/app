@@ -78,5 +78,17 @@
     "light": "Light",
     "lightMode": "Light Mode",
     "system": "System Default"
-  }
+  },
+  "asset": {
+    "emptyAsset": "Empty Asset",
+    "addFunds": "Add Funds"
+  },
+  "general": {
+    "chain": "Chain",
+    "token": "Token",
+    "balance": "Balance",
+    "usd": "USD",
+    "total": "Total"
+  },
+  "viewProfile": "View Profile"
 }

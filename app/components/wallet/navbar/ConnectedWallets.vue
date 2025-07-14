@@ -25,10 +25,5 @@ const hasConnectedWallet = computed(() => evmConnected.value || subConnected.val
       v-if="subConnected"
       :account="getConnectedSubAccount!"
     />
-
-    <UIcon
-      name="i-lucide-chevron-down"
-      class="w-4 h-4 ml-2 text-gray-500 dark:text-gray-400"
-    />
   </div>
 </template>

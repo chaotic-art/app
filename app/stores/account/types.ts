@@ -6,6 +6,7 @@ export type TokenKey = SubTokenKey | EvmTokenKey
 
 export interface TokenDetail {
   balance: string
+  nativeBalance: string
 }
 
 export interface ChainData {

@@ -1,6 +1,7 @@
 export default function useWalletManager() {
   const walletStore = useWalletStore()
   const { selectedAccounts } = storeToRefs(walletStore)
+  const accountStore = useAccountStore()
 
   async function disconnectWallet(wallet: WalletExtension) {
     const vm = wallet.vm
@@ -24,6 +25,7 @@ export default function useWalletManager() {
 
     if (selectedAccounts.value[vm]?.includes(wallet.id)) {
       selectedAccounts.value[vm] = undefined
+      accountStore.clearAuth(vm)
     }
   }
 

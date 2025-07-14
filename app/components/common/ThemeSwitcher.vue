@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import useTheme from '@/composables/useTheme'
 
+defineProps<{
+  showLabel?: boolean
+}>()
+
 const { currentMode, switchToNextMode } = useTheme()
 </script>
 
@@ -16,6 +20,9 @@ const { currentMode, switchToNextMode } = useTheme()
         :name="currentMode?.icon || 'i-mdi:weather-sunny'"
         class="h-5 w-5"
       />
+      <span v-if="showLabel">
+        {{ currentMode?.label }}
+      </span>
     </UButton>
   </UTooltip>
 </template>

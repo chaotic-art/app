@@ -10,7 +10,6 @@ const USER_CONNECTED_WALLET_STATES: WalletState[] = [
 ]
 
 export const useWalletStore = defineStore('wallet', () => {
-  const isModalOpen = ref(false)
   const wallets = ref<WalletExtension[]>([])
   const selectedAccounts = ref<Record<ChainVM, string | undefined>>({ SUB: '', EVM: '' })
   const stage = ref<WalletStageType>(WalletStageTypes.Loading)
@@ -89,7 +88,6 @@ export const useWalletStore = defineStore('wallet', () => {
     setStage,
     setSelectedAccount,
     clearSelectedWallets,
-    isModalOpen,
   }
 }, {
   persist: {

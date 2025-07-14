@@ -1,6 +1,7 @@
 import type { ChainVM, Prefix } from '@kodadot1/static'
 import type { AccountVm, ChainData, TokenDetail, TokenKey } from './types'
 import type { Chain } from '@/types/chain'
+import format from '@/utils/format/balance'
 import { getDefaultAccount, getVMSupportedAssets, vmChains } from './utils'
 
 export const useAccountStore = defineStore('account', () => {
@@ -54,12 +55,18 @@ export const useAccountStore = defineStore('account', () => {
     const balanceMap = new Map(balances.map(b => [b.prefix, b.balance]))
 
     const assets = Object.fromEntries(
-      supportedTokens.map(({ token, prefix }) => [
-        token,
-        {
-          balance: String(balanceMap.get(prefix) || '0'),
-        } as TokenDetail,
-      ]),
+      supportedTokens.map(({ token, prefix }) => {
+        const nativeBalance = String(balanceMap.get(prefix) || '0')
+        const balance = format(nativeBalance, decimalsOf(prefix), false)
+
+        return [
+          token,
+          {
+            balance,
+            nativeBalance,
+          } as TokenDetail,
+        ]
+      }),
     )
 
     return { address, assets }
