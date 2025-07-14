@@ -48,61 +48,72 @@ export const useAccountStore = defineStore('account', () => {
     return accounts.value[vm]?.address
   }
 
-  const getUpdatedChainData = ({ vm, chain, address, balances }: { vm: ChainVM, chain: Chain, address: string, balances: GetBalancesResult }): ChainData => {
-    const chainPrefix = getPrefixOfChain(chain)
-    const supportedTokens = getVMSupportedAssets(vm).filter(({ prefix }) => prefix === chainPrefix)
+  const getTokenDetailFromBalance = ({ prefix, balance }: { prefix: Prefix, balance: bigint | string }): TokenDetail => {
+    const nativeBalance = String(balance || '0')
+    const formattedBalance = format(nativeBalance, decimalsOf(prefix), false)
 
-    const balanceMap = new Map(balances.map(b => [b.prefix, b.balance]))
+    return {
+      balance: formattedBalance,
+      nativeBalance,
+    }
+  }
+
+  const updateChainDataWithBalance = ({ vm, address, balance, prefix }: { vm: ChainVM, address: string, balance: bigint, prefix: Prefix }): ChainData => {
+    const supportedTokens = getVMSupportedAssets(vm).filter(({ prefix: tokenPrefix }) => tokenPrefix === prefix)
 
     const assets = Object.fromEntries(
-      supportedTokens.map(({ token, prefix }) => {
-        const nativeBalance = String(balanceMap.get(prefix) || '0')
-        const balance = format(nativeBalance, decimalsOf(prefix), false)
-
-        return [
-          token,
-          {
-            balance,
-            nativeBalance,
-          } as TokenDetail,
-        ]
-      }),
+      supportedTokens.map(({ token }) => [
+        token,
+        getTokenDetailFromBalance({ prefix, balance }),
+      ]),
     )
 
     return { address, assets }
   }
 
-  const updateAccountChainsBalances = ({ vm, balances }: { vm: ChainVM, balances: GetBalancesResult }) => {
-    accounts.value[vm].chains = Object.fromEntries(
-      vmChains[vm].map(chain => [
-        chain,
-        getUpdatedChainData({ vm, chain, address: accounts.value[vm].address, balances }),
-      ]),
-    )
-  }
-
   const fetchBalance = async () => {
-    const { getBalances } = useBalances()
+    const { getBalance } = useBalances()
 
     loading.value = true
 
-    try {
-      await Promise.all(Object.entries(accounts.value).map(async ([vm, account]) => {
-        const accounts = getVMSupportedAssets(vm as ChainVM).map(asset => ({
-          prefix: asset.prefix,
-          address: getChainAddress({ chain: asset.chain, address: account.address }),
-        }))
-
-        const balances = await getBalances(accounts)
-
-        updateAccountChainsBalances({
-          vm: vm as ChainVM,
-          balances,
-        })
+    const accountsToFetch = Object.entries(accounts.value).map(([vm, account]) => {
+      return getVMSupportedAssets(vm as ChainVM).map(asset => ({
+        prefix: asset.prefix,
+        address: getChainAddress({ chain: asset.chain, address: account.address }),
+        chain: asset.chain,
+        vm: vmOf(asset.prefix),
       }))
-    }
-    finally {
-      loading.value = false
+    }).flat()
+
+    let fetchedCount = 0
+
+    for (const { address, chain, vm, prefix } of accountsToFetch) {
+      const { balance } = await getBalance({
+        prefix,
+        address,
+      })
+
+      accounts.value = {
+        ...accounts.value,
+        [vm]: {
+          ...accounts.value[vm],
+          chains: {
+            ...accounts.value[vm].chains,
+            [chain]: updateChainDataWithBalance({
+              vm,
+              address,
+              balance,
+              prefix,
+            }),
+          },
+        },
+      }
+
+      fetchedCount++
+
+      if (fetchedCount === accountsToFetch.length) {
+        loading.value = false
+      }
     }
   }
 
