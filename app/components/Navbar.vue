@@ -2,6 +2,7 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 import ThemeSwitcher from '@/components/common/ThemeSwitcher.vue'
 
+const { accountId } = useAuth()
 const route = useRoute()
 const navItems = computed<NavigationMenuItem[][]>(() => [
   [
@@ -40,7 +41,7 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
           <UNavigationMenu
             :items="navItems"
           />
-          <ThemeSwitcher />
+          <ThemeSwitcher v-if="!accountId" />
         </div>
         <NavbarWallet />
       </div>

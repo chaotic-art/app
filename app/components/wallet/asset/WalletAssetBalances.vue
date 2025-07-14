@@ -28,7 +28,7 @@ const chainBalances = computed(() => {
           native: details.balance,
           formatted: String(formatted.value.split(' ')[0]),
           usd: usd.value,
-          fetchingUsd: tokenValue === null,
+          fetchingTokenValue: tokenValue === null,
           exactUsd: calculateExactUsdFromToken(
             Number(details.balance),
             Number(tokenValue),
@@ -45,9 +45,7 @@ const nonZeroBalances = computed(() => {
 
 const isEmptyBalanceOnAllChains = computed(() => !isBalanceLoading.value && chainBalances.value.reduce((acc, balance) => acc && Number(balance.native) === 0, true))
 
-const total = computed(() => {
-  return nonZeroBalances.value.reduce((acc, balance) => acc + Number(balance.exactUsd), 0)
-})
+const total = computed(() => nonZeroBalances.value.reduce((acc, balance) => acc + Number(balance.exactUsd), 0).toFixed(1))
 
 onMounted(() => {
   accountStore.fetchBalance()
@@ -95,7 +93,7 @@ onMounted(() => {
         :key="`${chainBalance.chain}-${chainBalance.token}`"
         class="balance-row text-base"
       >
-        <div class="capitalize flex-grow-3">
+        <div class="capitalize flex-grow-3 truncate">
           {{ chainBalance.name }}
         </div>
         <div class="text-right grow">
@@ -106,7 +104,7 @@ onMounted(() => {
           {{ chainBalance.formatted }}
         </div>
         <div class="text-right flex-grow-2 flex justify-end">
-          <USkeleton v-if="chainBalance.fetchingUsd" class="h-4 w-12 rounded" />
+          <USkeleton v-if="chainBalance.fetchingTokenValue" class="h-4 w-12 rounded" />
           <span v-else>{{ chainBalance.usd }}</span>
         </div>
       </div>

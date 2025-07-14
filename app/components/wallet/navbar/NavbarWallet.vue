@@ -1,15 +1,16 @@
 <script setup lang="ts">
-const { isModalOpen } = storeToRefs(useWalletStore())
-
-const isWalletAssetModalOpen = ref(false)
+const {
+  walletConnectModalOpen,
+  walletAccountModalOpen,
+} = storeToRefs(usePreferencesStore())
 </script>
 
 <template>
   <div>
     <client-only>
       <WalletDropdown
-        @open-wallet="isModalOpen = true"
-        @open-asset="isWalletAssetModalOpen = true"
+        @open-wallet="walletConnectModalOpen = true"
+        @open-asset="walletAccountModalOpen = true"
       />
       <template #fallback>
         <div class="flex items-center justify-center">
@@ -20,13 +21,13 @@ const isWalletAssetModalOpen = ref(false)
 
     <!-- Wallet Asset Modal -->
     <WalletAssetModal
-      v-model="isWalletAssetModalOpen"
+      v-model="walletAccountModalOpen"
     />
 
     <!-- Wallet Connect Modal -->
-    <WalletModal
-      v-model="isModalOpen"
-      @close="isModalOpen = false"
+    <WalletConnectModal
+      v-model="walletConnectModalOpen"
+      @close="walletConnectModalOpen = false"
     />
   </div>
 </template>
