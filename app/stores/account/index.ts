@@ -34,7 +34,7 @@ export const useAccountStore = defineStore('account', () => {
         const nativeToken = tokenSymbolOf<TokenKey>(prefix)
 
         if (chainData.assets[nativeToken]) {
-          result[prefix] = chainData.assets[nativeToken].balance
+          result[prefix] = chainData.assets[nativeToken].nativeBalance
         }
       }
     }
