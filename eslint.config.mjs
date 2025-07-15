@@ -5,7 +5,7 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 export default withNuxt(
   antfu({
     // ...@antfu/eslint-config options
-    ignores: ['**/*.papi/**'],
+    ignores: ['**/*.papi/**', 'app/descriptors/**'],
   }).toConfigs(),
   // ...other rules
 )
