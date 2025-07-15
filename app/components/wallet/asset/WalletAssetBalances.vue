@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Chain } from '@/types'
 import { chainNames } from '@kodadot1/static'
+import { useIntervalFn } from '@vueuse/core'
 
 const accountStore = useAccountStore()
 const { accounts, loading: isBalanceLoading } = storeToRefs(accountStore)
@@ -47,9 +48,9 @@ const isEmptyBalanceOnAllChains = computed(() => !isBalanceLoading.value && chai
 
 const total = computed(() => nonZeroBalances.value.reduce((acc, balance) => acc + Number(balance.exactUsd), 0).toFixed(1))
 
-onMounted(() => {
+useIntervalFn(() => {
   accountStore.fetchBalance()
-})
+}, 30000, { immediateCallback: true })
 </script>
 
 <template>
