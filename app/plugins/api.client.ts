@@ -1,9 +1,9 @@
 import type { Prefix } from '@kodadot1/static'
 import type { PolkadotClient, TypedApi } from 'polkadot-api'
-import { ahk, ahp, dot, ksm } from '@polkadot-api/descriptors'
 import { createClient } from 'polkadot-api'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
 import { getWsProvider } from 'polkadot-api/ws-provider/web'
+import { ahk, ahp, dot, ksm } from '~/descriptors'
 
 // TODO: provide more providers
 const config = {

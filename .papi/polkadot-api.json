@@ -1,6 +1,6 @@
 {
   "version": 0,
-  "descriptorPath": ".papi/descriptors",
+  "descriptorPath": "app/descriptors",
   "entries": {
     "ahp": {
       "chain": "polkadot_asset_hub",
@@ -22,5 +22,8 @@
       "metadata": ".papi/metadata/ksm.scale",
       "genesis": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
     }
+  },
+  "options": {
+    "noDescriptorsPackage": true
   }
 }
