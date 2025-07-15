@@ -44,6 +44,7 @@ export const exploreNfts = graphql(`
         $collections: [String!]
         $name: String
         $orderBy: [NFTEntityOrderByInput!]
+        $search: [NFTEntityWhereInput!]
     ) {
         tokenEntities: nftEntities(
             limit: $first
@@ -57,6 +58,7 @@ export const exploreNfts = graphql(`
                 }
                 burned_eq: false
                 metadata_isNull: false
+                AND: $search
             }
         ) {
             id

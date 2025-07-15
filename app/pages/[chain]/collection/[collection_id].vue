@@ -21,6 +21,45 @@ function clearCache() {
   clearOdaCache(chain.value, collection_id?.toString() ?? '', refresh)
 }
 
+const sortOptions = [
+  { label: 'Newest', value: 'newest', icon: 'i-heroicons-clock' },
+  { label: 'Oldest', value: 'oldest', icon: 'i-heroicons-archive-box' },
+  { label: 'Lowest Price', value: 'lowest_price', icon: 'i-heroicons-arrow-trending-down' },
+  { label: 'Higher Price', value: 'higher_price', icon: 'i-heroicons-arrow-trending-up' },
+]
+
+const selectedSort = ref('newest')
+
+const orderByValue = computed(() => {
+  switch (selectedSort.value) {
+    case 'newest':
+      return 'blockNumber_DESC'
+    case 'oldest':
+      return 'blockNumber_ASC'
+    case 'lowest_price':
+      return 'price_ASC'
+    case 'higher_price':
+      return 'price_DESC'
+    default:
+      return 'blockNumber_DESC'
+  }
+})
+
+const queryVariables = computed(() => {
+  const variables: any = {
+    collections: [collection_id],
+    orderBy: orderByValue.value,
+  }
+
+  if (selectedSort.value === 'lowest_price' || selectedSort.value === 'higher_price') {
+    variables.search = [
+      { price_gt: '0' },
+    ]
+  }
+
+  return variables
+})
+
 // Floor price data
 const { $api } = useNuxtApp()
 const floorPrice = ref(0)
@@ -220,16 +259,20 @@ defineOgImageComponent('Frame', {
           Collection Items
         </h2>
 
-        <div class="flex gap-2 md:gap-4">
-          <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Newest" variant="outline" />
-          <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Price" variant="outline" />
-          <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Rarity" variant="outline" />
+        <div class="w-full md:w-auto">
+          <USelect
+            v-model="selectedSort"
+            :items="sortOptions"
+            placeholder="Sort by..."
+            class="w-full md:w-48"
+          />
         </div>
       </div>
 
       <!-- Items Grid -->
       <LazyNftsGrid
-        :variables="{ collections: [collection_id], orderBy: 'blockNumber_DESC' }"
+        :key="selectedSort"
+        :variables="queryVariables"
         grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
         no-items-found-message="This collection doesn't have any items yet."
       />
