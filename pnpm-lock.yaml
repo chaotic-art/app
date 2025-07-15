@@ -50,9 +50,6 @@ importers:
       '@pinia/nuxt':
         specifier: 0.11.1
         version: 0.11.1(magicast@0.3.5)(pinia@3.0.3(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3)))
-      '@polkadot-api/descriptors':
-        specifier: file:.papi/descriptors
-        version: file:.papi/descriptors(polkadot-api@1.14.1(bufferutil@4.0.9)(jiti@2.4.2)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.0))
       '@polkadot/extension-dapp':
         specifier: ^0.61.1
         version: 0.61.1(@polkadot/api@15.10.2(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@polkadot/util-crypto@13.5.3(@polkadot/util@13.5.3))(@polkadot/util@13.5.3)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -1575,11 +1572,6 @@ packages:
 
   '@polkadot-api/codegen@0.16.4':
     resolution: {integrity: sha512-lHNTJ3rG0tBRoKzjAhQRs7qYRdrBtvpKIWDo7fgun2A1DEsWxZAvugDs+Qp1m4UcXP5YgjI8bv//a9Qu8SD1XA==}
-
-  '@polkadot-api/descriptors@file:.papi/descriptors':
-    resolution: {directory: .papi/descriptors, type: directory}
-    peerDependencies:
-      polkadot-api: '>=1.11.2'
 
   '@polkadot-api/ink-contracts@0.3.5':
     resolution: {integrity: sha512-91TO9TV0prCz+nDHVaxt/iXldxVY1xZykyook0Tqt+L2NpjM0Rgj7fQe9hysZfw5GUYlf5K2HI7BxRWEQGaorA==}
@@ -9937,10 +9929,6 @@ snapshots:
       '@polkadot-api/metadata-compatibility': 0.3.0
       '@polkadot-api/substrate-bindings': 0.14.0
       '@polkadot-api/utils': 0.2.0
-
-  '@polkadot-api/descriptors@file:.papi/descriptors(polkadot-api@1.14.1(bufferutil@4.0.9)(jiti@2.4.2)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.0))':
-    dependencies:
-      polkadot-api: 1.14.1(bufferutil@4.0.9)(jiti@2.4.2)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.0)
 
   '@polkadot-api/ink-contracts@0.3.5':
     dependencies:
