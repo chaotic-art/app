@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
-import { formatBalance } from '@polkadot/util'
-import { fetchMimeType, fetchOdaToken } from '~/services/oda'
 
 const props = defineProps<{
   tokenId: number
@@ -11,79 +9,16 @@ const props = defineProps<{
   name?: string | null
 }>()
 
-// Reactive data
-const token = ref<Awaited<ReturnType<typeof fetchOdaToken>> | null>(null)
-const queryPrice = ref<bigint | null>(null)
-const owner = ref<string | null>(null)
-const isLoading = ref(true)
-const error = ref<unknown | null>(null)
-const mimeType = ref<string | null>(null)
-
-const { $api } = useNuxtApp()
-const { decimals, chainSymbol } = useChain()
-
-// Calculate USD price from DOT price
-const { usd: usdPrice } = useAmount(computed(() => {
-  if (!queryPrice.value)
-    return undefined
-  return queryPrice.value.toString()
-}), decimals, chainSymbol)
-
-// Fetch data on component mount
-onMounted(async () => {
-  try {
-    // Fetch token metadata, price, and owner in parallel
-    const [tokenData, priceData, ownerData] = await Promise.all([
-      fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
-      $api(props.chain).query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId).catch(() => null),
-      $api(props.chain).query.Nfts.Item.getValue(props.collectionId, props.tokenId).catch(() => null),
-    ])
-
-    token.value = tokenData
-    queryPrice.value = priceData?.[0] || null
-    owner.value = ownerData?.owner || null
-
-    const media = tokenData?.metadata?.animation_url || tokenData?.metadata?.image || props.image
-    if (media) {
-      const mimeTypeData = await fetchMimeType(media)
-      mimeType.value = mimeTypeData.mime_type
-    }
-  }
-  catch (err) {
-    console.error('Failed to fetch token data:', err)
-    error.value = err
-  }
-  finally {
-    isLoading.value = false
-  }
-})
-
-const price = computed(() => {
-  if (!queryPrice.value)
-    return ''
-
-  const pricesString = formatBalance(queryPrice.value, { decimals: 10, withSi: false })
-  let float = Number.parseFloat(pricesString)
-  float = float > 1 ? Number(float.toFixed(0)) : Number(float.toFixed(4))
-
-  return `${float} DOT`
-})
-
-const mediaIcon = computed(() => {
-  if (!mimeType.value)
-    return 'i-heroicons-photo'
-
-  if (mimeType.value.includes('video'))
-    return 'i-heroicons-play-circle'
-  if (mimeType.value.includes('audio'))
-    return 'i-heroicons-musical-note'
-  if (mimeType.value.includes('image'))
-    return 'i-heroicons-photo'
-  if (mimeType.value.includes('html'))
-    return 'i-heroicons-code-bracket'
-
-  return 'i-heroicons-document'
-})
+const {
+  token,
+  owner,
+  isLoading,
+  error,
+  mimeType,
+  price,
+  usdPrice,
+  mediaIcon,
+} = useToken(props)
 </script>
 
 <template>
@@ -135,7 +70,7 @@ const mediaIcon = computed(() => {
             v-else-if="image || token?.metadata?.image"
             :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
             :alt="token?.metadata?.name || 'NFT'"
-            class="w-full h-full object-contain"
+            class="w-full h-full object-cover"
             @error="($event.target as HTMLImageElement).style.display = 'none'"
           >
           <div
@@ -170,7 +105,7 @@ const mediaIcon = computed(() => {
                 <div v-if="price" class="flex items-baseline gap-1">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ price }}</span>
                 </div>
-                <div v-else class="px-2 py-1 bg-gray-100 dark:bg-neutral-800 rounded-md">
+                <div v-else>
                   <span class="text-xs font-medium text-gray-600 dark:text-gray-300">No price set</span>
                 </div>
               </div>
@@ -185,7 +120,7 @@ const mediaIcon = computed(() => {
                 <div v-if="price" class="flex items-baseline gap-1">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ usdPrice || '$0.00' }}</span>
                 </div>
-                <div v-else class="px-2 py-1 bg-gray-100 dark:bg-neutral-800 rounded-md">
+                <div v-else>
                   <span class="text-xs font-medium text-gray-600 dark:text-gray-300">--</span>
                 </div>
               </div>
