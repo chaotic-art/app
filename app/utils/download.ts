@@ -4,7 +4,7 @@ export async function downloadImage(imageSrc: string, name = 'unnamed') {
   }
 
   const { data } = await useFetch(imageSrc, {
-    deep: true
+    deep: true,
   })
   const image = data.value
 
