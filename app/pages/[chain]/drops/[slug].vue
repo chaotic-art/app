@@ -128,10 +128,10 @@ onMounted(async () => {
         <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
           <iframe class="aspect-square w-full" :src="sanitizeIpfsUrl(generativeImageUrl)" frameborder="0" />
           <div class="flex flex-col sm:flex-row gap-2 mt-4 justify-center">
-            <UButton class="rounded-full bg-gray-100 text-xs md:text-sm cursor-pointer" variant="soft" trailing-icon="i-lucide-refresh-cw" :loading="isCapturingImage" @click="generateNft">
+            <UButton class="rounded-full bg-gray-100 dark:bg-gray-800 text-xs md:text-sm cursor-pointer" variant="soft" trailing-icon="i-lucide-refresh-cw" :loading="isCapturingImage" @click="generateNft">
               Preview Variation
             </UButton>
-            <UButton class="rounded-full bg-gray-100 text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
+            <UButton class="rounded-full bg-gray-100 dark:bg-gray-800 text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
               Controls
             </UButton>
           </div>
