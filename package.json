@@ -40,7 +40,7 @@
     "gql.tada": "^1.8.11",
     "jdenticon": "^3.3.0",
     "markdown-it": "^14.1.0",
-    "nuxt": "^3.17.6",
+    "nuxt": "^4.0.0",
     "ofetch": "1.4.1",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^4.4.1",
