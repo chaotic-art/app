@@ -41,9 +41,11 @@ export interface NFTMetadata {
   image: string
   animation_url: string
   attributes: Record<string, string>[]
+  mime_type?: string
+  animation_mime_type?: string
 }
 
-interface OdaToken {
+export interface OdaToken {
   metadata: NFTMetadata
   metadata_uri: string
 }
