@@ -49,8 +49,9 @@ const footerLinks: Array<
         <!-- Main Footer Content -->
         <div class="flex flex-col md:flex-row justify-between gap-8 md:gap-0">
           <!-- Become Artist Section -->
-          <div class="max-w-full md:max-w-xs mb-6 md:mb-0">
-            <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-6 w-full md:w-[400px] text-center md:text-left text-gray-900 dark:text-white">
+          <div class="max-w-full md:max-w-xs mb-6 md:mb-0 flex flex-col items-center md:items-start">
+            <img class="select-none w-10 h-10 md:w-14 md:h-14 mb-3" src="@/assets/svg/navbar-logo.svg" alt="logo">
+            <div class="text-2xl md:text-[42px] font-serif italic font-medium mb-4 md:mb-6 w-full md:w-[400px] text-center md:text-left text-gray-900 dark:text-white">
               {{ $t('footer.becomeArtist') }}
             </div>
             <div class="flex justify-center md:justify-start">
