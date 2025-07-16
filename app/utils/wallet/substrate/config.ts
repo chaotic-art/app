@@ -2,7 +2,7 @@ import type { SubstrateWalletMetadata, SubstrateWalletSource } from './types'
 import { isMobileDevice } from '@/utils/environment'
 import { SubstrateWalletSources } from './types'
 
-export const WalletRegistry: Record<SubstrateWalletSource, SubstrateWalletMetadata> = {
+const WalletRegistry: Record<SubstrateWalletSource, SubstrateWalletMetadata> = {
   [SubstrateWalletSources.PolkadotJs]: {
     id: SubstrateWalletSources.PolkadotJs,
     name: 'Polkadot.js',
@@ -86,13 +86,19 @@ export const WalletRegistry: Record<SubstrateWalletSource, SubstrateWalletMetada
   },
 }
 
-export const MobileWalletList = [
+// source as 'polkadot-js' in mobile app
+const WalletProxyMap: Record<string, SubstrateWalletSource> = {
+  [SubstrateWalletSources.Math]: SubstrateWalletSources.PolkadotJs, // mathwallet
+  [SubstrateWalletSources.Nova]: SubstrateWalletSources.PolkadotJs, // nova
+}
+
+const MobileWalletList = [
   SubstrateWalletSources.Nova,
   SubstrateWalletSources.SubWallet,
   SubstrateWalletSources.Math,
 ]
 
-export const BrowserWalletList = [
+const BrowserWalletList = [
   SubstrateWalletSources.Talisman,
   SubstrateWalletSources.SubWallet,
   SubstrateWalletSources.PolkadotJs,
@@ -102,13 +108,19 @@ export const BrowserWalletList = [
   SubstrateWalletSources.Ledger,
 ]
 
+function getWalletSource(source: string | SubstrateWalletSource): SubstrateWalletSource {
+  return WalletProxyMap[source] || source as SubstrateWalletSource
+}
+
 export function getAvailableWallets(): SubstrateWalletMetadata[] {
   const walletList = isMobileDevice ? MobileWalletList : BrowserWalletList
   return walletList
-    .map(id => WalletRegistry[id])
+    .map((source) => {
+      const metadata = WalletRegistry[source]
+      return {
+        ...metadata,
+        source: getWalletSource(source),
+      }
+    })
     .filter((wallet): wallet is SubstrateWalletMetadata => wallet !== undefined)
-}
-
-export function getWalletSource(source: string): string {
-  return SubstrateWalletSources[source as keyof typeof SubstrateWalletSources] || source
 }

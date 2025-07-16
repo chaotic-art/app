@@ -3,7 +3,9 @@ export async function downloadImage(imageSrc: string, name = 'unnamed') {
     return
   }
 
-  const { data } = await useFetch(imageSrc)
+  const { data } = await useFetch(imageSrc, {
+    deep: true,
+  })
   const image = data.value
 
   if (!(image instanceof Blob)) {

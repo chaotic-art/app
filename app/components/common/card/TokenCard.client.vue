@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
-import { formatBalance } from '@polkadot/util'
-import { fetchOdaToken } from '~/services/oda'
 
 const props = defineProps<{
   tokenId: number
@@ -11,49 +9,20 @@ const props = defineProps<{
   name?: string | null
 }>()
 
-// Reactive data
-const token = ref<Awaited<ReturnType<typeof fetchOdaToken>> | null>(null)
-const queryPrice = ref<bigint | null>(null)
-const isLoading = ref(true)
-const error = ref<unknown | null>(null)
-
-const { $api } = useNuxtApp()
-
-// Fetch data on component mount
-onMounted(async () => {
-  try {
-    // Fetch token metadata and price in parallel
-    const [tokenData, priceData] = await Promise.all([
-      fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
-      $api(props.chain).query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId).catch(() => null),
-    ])
-
-    token.value = tokenData
-    queryPrice.value = priceData?.[0] || null
-  }
-  catch (err) {
-    console.error('Failed to fetch token data:', err)
-    error.value = err
-  }
-  finally {
-    isLoading.value = false
-  }
-})
-
-const price = computed(() => {
-  if (!queryPrice.value)
-    return ''
-
-  const pricesString = formatBalance(queryPrice.value, { decimals: 10, withSi: false })
-  let float = Number.parseFloat(pricesString)
-  float = float > 1 ? Number(float.toFixed(0)) : Number(float.toFixed(4))
-
-  return `${float} DOT`
-})
+const {
+  token,
+  owner,
+  isLoading,
+  error,
+  mimeType,
+  price,
+  usdPrice,
+  mediaIcon,
+} = useToken(props)
 </script>
 
 <template>
-  <div class="border rounded-xl border-gray-300 dark:border-neutral-700 overflow-hidden bg-white dark:bg-neutral-900 hover-card-effect">
+  <div class="relative border rounded-xl border-gray-300 dark:border-neutral-700 overflow-hidden bg-white dark:bg-neutral-900 hover:shadow-lg transition-shadow hover-card-effect group">
     <!-- Loading State -->
     <template v-if="isLoading">
       <!-- Image Skeleton -->
@@ -62,7 +31,7 @@ const price = computed(() => {
       </div>
 
       <!-- Content Skeleton -->
-      <div class="p-4 space-y-3">
+      <div class="p-3 md:p-4 space-y-3">
         <!-- Title Skeleton -->
         <div class="h-4 bg-gray-200 dark:bg-neutral-800 rounded animate-pulse w-3/4" />
 
@@ -78,8 +47,8 @@ const price = computed(() => {
       <div class="aspect-square bg-red-50 dark:bg-red-900 flex items-center justify-center">
         <UIcon name="i-heroicons-exclamation-triangle" class="w-16 h-16 text-red-400 dark:text-red-300" />
       </div>
-      <div class="p-4">
-        <p class="text-red-600 dark:text-red-300 text-sm">
+      <div class="p-3 md:p-4">
+        <p class="text-red-600 dark:text-red-300 text-sm font-medium">
           Failed to load NFT
         </p>
       </div>
@@ -87,11 +56,18 @@ const price = computed(() => {
 
     <!-- Loaded State -->
     <template v-else>
-      <NuxtLink :to="`/${chain}/gallery/${collectionId}-${tokenId}`" class="block hover:shadow-lg transition-shadow">
-        <!-- NFT Image -->
-        <div class="aspect-square bg-gray-200 dark:bg-neutral-800 overflow-hidden">
+      <NuxtLink :to="`/${chain}/gallery/${collectionId}-${tokenId}`" class="block">
+        <!-- NFT Media -->
+        <div class="aspect-square bg-gray-200 dark:bg-neutral-800 overflow-hidden relative">
+          <video
+            v-if="mimeType?.includes('video') && (token?.metadata?.animation_url || token?.metadata?.image)"
+            :src="sanitizeIpfsUrl(token?.metadata?.animation_url || token?.metadata?.image)"
+            class="w-full h-full object-cover"
+            muted
+            @error="($event.target as HTMLVideoElement).style.display = 'none'"
+          />
           <img
-            v-if="image || token?.metadata?.image"
+            v-else-if="image || token?.metadata?.image"
             :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
             :alt="token?.metadata?.name || 'NFT'"
             class="w-full h-full object-cover"
@@ -103,18 +79,67 @@ const price = computed(() => {
           >
             <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
           </div>
+
+          <!-- Media type icon overlay -->
+          <div
+            v-if="mimeType && (token?.metadata?.animation_url || token?.metadata?.image || image)"
+            class="absolute top-2 right-2 w-6 h-6 bg-black/70 rounded-full shadow-md flex items-center justify-center"
+          >
+            <UIcon :name="mediaIcon" class="w-3 h-3 text-white" />
+          </div>
         </div>
 
         <!-- Card Content -->
-        <div class="p-4">
-          <p class="font-bold mb-2 text-gray-900 dark:text-white truncate">
+        <div class="p-3 md:p-4">
+          <h3 class="font-bold text-base md:text-lg mb-2 text-gray-900 dark:text-white line-clamp-1" :title="name || token?.metadata?.name || 'Untitled NFT'">
             {{ name || token?.metadata?.name || 'Untitled NFT' }}
-          </p>
+          </h3>
 
-          <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
-              {{ price || 'No price set' }}
-            </p>
+          <!-- Price Section -->
+          <div class="flex items-center justify-between mt-3">
+            <div class="flex flex-col gap-1">
+              <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                Price
+              </div>
+              <div class="text-right">
+                <div v-if="price" class="flex items-baseline gap-1">
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ price }}</span>
+                </div>
+                <div v-else>
+                  <span class="text-xs font-medium text-gray-600 dark:text-gray-300">No price set</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- USD Price -->
+            <div class="flex flex-col items-end gap-1">
+              <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                USD
+              </div>
+              <div class="text-right">
+                <div v-if="price" class="flex items-baseline gap-1">
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ usdPrice || '$0.00' }}</span>
+                </div>
+                <div v-else>
+                  <span class="text-xs font-medium text-gray-600 dark:text-gray-300">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Owner Section -->
+          <div class="mt-3 pt-3 border-t border-gray-100 dark:border-neutral-700">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Owner</span>
+              <UserInfo
+                v-if="owner"
+                :address="owner"
+                :avatar-size="20"
+                :transparent-background="true"
+                class="!bg-transparent !p-0"
+              />
+              <span v-else class="text-xs text-gray-600 dark:text-gray-300">N/A</span>
+            </div>
           </div>
         </div>
       </NuxtLink>

@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { useWalletStore } from '~/stores/wallet'
 
-const emit = defineEmits(['open'])
+defineEmits(['openWallet', 'openAsset'])
 
 const { getIsEvmConnected, getIsSubstrateConnected } = storeToRefs(useWalletStore())
-
-function openWalletModal() {
-  emit('open')
-}
 </script>
 
 <template>
@@ -17,13 +13,13 @@ function openWalletModal() {
       :label="$t('wallet.connect')"
       variant="solid"
       class="text-white rounded-full px-6 text-base cursor-pointer"
-      @click="openWalletModal"
+      @click="$emit('openWallet')"
     />
 
     <div
       v-else
       class="cursor-pointer"
-      @click="openWalletModal"
+      @click="$emit('openAsset')"
     >
       <ConnectedWallets />
     </div>

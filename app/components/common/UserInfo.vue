@@ -26,9 +26,9 @@ const name = computed(() => profileFromAddress.value?.name || shortenAddress(pro
 </script>
 
 <template>
-  <NuxtLink :to="`/${prefix}/u/${address}`" class="flex items-center gap-2 rounded-full pr-4 w-fit bg-gray-100 dark:bg-neutral-800" :class="{ 'bg-transparent': transparentBackground, 'p-1.5': !transparentBackground }">
+  <NuxtLink :to="`/${prefix}/u/${address}`" class="flex items-center gap-2 rounded-full pr-4 w-fit bg-gray-100 dark:bg-neutral-800" :class="{ '!bg-transparent': transparentBackground, 'p-1.5': !transparentBackground }">
     <ProfileAvatar :address="address" :size="avatarSize" />
-    <slot name="name" :address-name="name" />
+    <slot name="name" :address-name="name" :description="profileFromAddress?.description" />
     <span v-if="!customName" class="text-ellipsis overflow-hidden whitespace-nowrap">{{ name }}</span>
   </NuxtLink>
 </template>
