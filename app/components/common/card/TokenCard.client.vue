@@ -66,6 +66,18 @@ const {
             muted
             @error="($event.target as HTMLVideoElement).style.display = 'none'"
           />
+          <div
+            v-else-if="mimeType?.includes('audio') && (token?.metadata?.animation_url || token?.metadata?.image)"
+            class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-700 dark:to-gray-900 relative"
+          >
+            <UIcon name="i-heroicons-musical-note" class="w-16 h-16 text-gray-700 dark:text-gray-200 mb-4" />
+            <audio
+              :src="sanitizeIpfsUrl(token?.metadata?.animation_url || token?.metadata?.image)"
+              controls
+              class="w-4/5 max-w-xs"
+              @error="($event.target as HTMLAudioElement).style.display = 'none'"
+            />
+          </div>
           <img
             v-else-if="image || token?.metadata?.image"
             :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
