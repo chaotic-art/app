@@ -76,14 +76,17 @@ export const useAccountStore = defineStore('account', () => {
 
     loading.value = true
 
-    const accountsToFetch = Object.entries(accounts.value).map(([vm, account]) => {
-      return getVMSupportedAssets(vm as ChainVM).map(asset => ({
-        prefix: asset.prefix,
-        address: getChainAddress({ chain: asset.chain, address: account.address }),
-        chain: asset.chain,
-        vm: vmOf(asset.prefix),
-      }))
-    }).flat()
+    const accountsToFetch = Object.entries(accounts.value)
+      .filter(([_, account]) => Boolean(account.address))
+      .map(([vm, account]) => {
+        return getVMSupportedAssets(vm as ChainVM).map(asset => ({
+          prefix: asset.prefix,
+          address: getChainAddress({ chain: asset.chain, address: account.address }),
+          chain: asset.chain,
+          vm: vmOf(asset.prefix),
+        }))
+      })
+      .flat()
 
     let fetchedCount = 0
 
