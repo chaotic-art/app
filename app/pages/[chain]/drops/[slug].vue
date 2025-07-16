@@ -102,7 +102,7 @@ onMounted(async () => {
             </div>
           </div>
 
-          <div v-if="collection?.claimed" class="flex flex-col gap-2">
+          <div v-if="Number(collection?.claimed)" class="flex flex-col gap-2">
             <p class="text-sm text-gray-500">
               Collected By
             </p>
