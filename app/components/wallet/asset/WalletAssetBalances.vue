@@ -115,7 +115,7 @@ useIntervalFn(() => {
       </div>
     </div>
 
-    <hr class="my-2">
+    <USeparator class="my-2" />
 
     <p class="flex justify-between items-end">
       <span class="text-xs"> {{ $t('general.total') }}: </span>

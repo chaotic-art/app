@@ -17,7 +17,7 @@ const value = defineModel<boolean>({ required: true })
           <!-- Identity -->
           <WalletAssetIdentity />
 
-          <hr class="my-4">
+          <USeparator class="my-4" />
 
           <!-- Balances -->
           <WalletAssetBalances />
