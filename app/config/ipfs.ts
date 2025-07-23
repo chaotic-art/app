@@ -14,7 +14,7 @@ export type IPFSProviders
     | 'image'
     | 'nftStorage'
 
-export const kodaImage = isProduction ? SERVICES.image : SERVICES.imageBeta
+export const kodaImage = isProduction ? SERVICES.image : 'https://bucket.dotlab.workers.dev/'
 
 const ipfsProviders: Partial<Record<IPFSProviders, string>> = {
   pinata: 'https://kodadot.mypinata.cloud/',
