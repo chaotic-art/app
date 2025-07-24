@@ -1,7 +1,7 @@
 import {
   blake2AsHex,
   encodeAddress,
-} from '@polkadot/util-crypto'
+} from 'dedot/utils'
 
 export interface ImageDataPayload { hash: string, image: string }
 
@@ -54,7 +54,7 @@ function getHash(randomSs58Format: number, accountId: string) {
     initialValue = encodeAddress(accountId, ss58Format)
   }
 
-  return blake2AsHex(initialValue, 256, null, true)
+  return blake2AsHex(initialValue, 256)
 }
 
 function generateHash(range: EntropyRange, accountId: string) {

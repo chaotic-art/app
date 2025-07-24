@@ -1,5 +1,5 @@
 import type { Prefix } from '@kodadot1/static'
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto'
+import { decodeAddress, encodeAddress } from 'dedot/utils'
 
 export function formatAddress({
   address,

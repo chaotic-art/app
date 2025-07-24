@@ -1,8 +1,7 @@
-import type { InjectedWindow, InjectedWindowProvider } from '@polkadot/extension-inject/types'
 import type { SubstrateWalletSource } from './types'
 
-export function getInjectedExtension(source: SubstrateWalletSource): InjectedWindowProvider | undefined {
-  const injectedWindow = window as Window & InjectedWindow
+export function getInjectedExtension(source: SubstrateWalletSource) {
+  const injectedWindow = window
   return injectedWindow?.injectedWeb3?.[source]
 }
 

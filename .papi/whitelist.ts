@@ -8,6 +8,7 @@ import type {
 // TODO: Add more whitelists for other chains
 const assetHubWhitelist: AhkWhitelistEntry[] | AhpWhitelistEntry[] = [
     "query.Nfts.*",
+    'tx.System.remark'
 ]
 
 const chainWhitelist: DotWhitelistEntry[] | KsmWhitelistEntry[] = [
