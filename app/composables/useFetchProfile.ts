@@ -1,6 +1,6 @@
 import type { Profile } from '@/services/profile'
-import { isAddress } from '@polkadot/util-crypto'
 import { useQuery } from '@tanstack/vue-query'
+import { decodeAddress } from 'dedot/utils'
 import { fetchProfileByAddress, toSubstrateAddress } from '@/services/profile'
 
 export default function useFetchProfile(address: Ref<string | undefined>) {
@@ -12,9 +12,9 @@ export default function useFetchProfile(address: Ref<string | undefined>) {
   } = useQuery<Profile | null>({
     queryKey: [
       'user-profile',
-      computed(() => isAddress(address.value) && toSubstrateAddress(address.value)),
+      computed(() => address.value && decodeAddress(address.value) && toSubstrateAddress(address.value)),
     ],
-    queryFn: () => (isAddress(address.value) ? fetchProfileByAddress(address.value) : null),
+    queryFn: () => (address.value && decodeAddress(address.value) ? fetchProfileByAddress(address.value) : null),
     staleTime: 1000 * 10,
   })
 

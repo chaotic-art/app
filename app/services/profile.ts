@@ -1,5 +1,5 @@
 import type { FetchError } from 'ofetch'
-import { encodeAddress, isEthereumAddress } from '@polkadot/util-crypto'
+import { encodeAddress, isEvmAddress } from 'dedot/utils'
 import { $fetch } from 'ofetch'
 import { isProduction } from '@/utils/env'
 
@@ -83,7 +83,7 @@ export function toSubstrateAddress(address: string) {
     return ''
   }
 
-  return isEthereumAddress(address) ? address : encodeAddress(address, 42)
+  return isEvmAddress(address) ? address : encodeAddress(address, 42)
 }
 
 function convertToSubstrateAddress(body: FollowRequest): FollowRequest {

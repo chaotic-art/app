@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { polkadotIcon } from '@polkadot/ui-shared'
-import { isEthereumAddress } from '@polkadot/util-crypto'
+import { isEvmAddress } from 'dedot/utils'
 import { toSvg } from 'jdenticon'
 
 const props = withDefaults(
@@ -16,7 +15,7 @@ const props = withDefaults(
 
 const WRAPPER_CLASS = 'border border-border-color rounded-full overflow-hidden bg-background-color'
 
-const formattedAddress = computed(() => props.value.toLowerCase())
+const formattedAddress = computed(() => (props.value || '').toLowerCase())
 
 const evmAvatarSvg = computed(() =>
   toSvg(formattedAddress.value, props.size - 2, {
@@ -25,11 +24,12 @@ const evmAvatarSvg = computed(() =>
 )
 
 const isEVMAddress = computed(
-  () => props.value && isEthereumAddress(props.value),
+  () => props.value && isEvmAddress(props.value),
 )
 </script>
 
 <template>
+  <!-- EVM Address - Use jdenticon -->
   <div
     v-if="isEVMAddress"
     :class="WRAPPER_CLASS"
@@ -39,9 +39,24 @@ const isEVMAddress = computed(
     }"
     v-html="evmAvatarSvg"
   />
-  <div v-else>
-    <svg :width="size" :height="size" viewBox="0 0 64 64" :class="WRAPPER_CLASS">
-      <circle v-for="(icon, index) in polkadotIcon(value, { isAlternative: false })" :key="index" :cx="icon.cx" :cy="icon.cy" :r="icon.r" :fill="icon.fill" />
-    </svg>
+
+  <!-- Non-EVM Address - Use simple Iconify icon -->
+  <div
+    v-else
+    :class="WRAPPER_CLASS"
+    class="flex items-center justify-center"
+    :style="{
+      width: `${size}px`,
+      height: `${size}px`,
+    }"
+  >
+    <UIcon
+      name="i-lucide-user"
+      class="text-gray-500 dark:text-gray-400"
+      :style="{
+        width: `${size * 0.6}px`,
+        height: `${size * 0.6}px`,
+      }"
+    />
   </div>
 </template>
