@@ -8,7 +8,7 @@ import { sanitizeIpfsUrl } from '@/utils/ipfs'
 const props = defineProps<{ address: string }>()
 
 const { profile } = useFetchProfile(computed(() => props.address))
-
+const { accountId } = useAuth()
 const bannerUrl = computed(() => sanitizeIpfsUrl(profile?.value?.banner || ''))
 </script>
 
@@ -27,14 +27,18 @@ const bannerUrl = computed(() => sanitizeIpfsUrl(profile?.value?.banner || ''))
   </div>
 
   <div class="w-full px-4">
-    <div class="my-4 text-2xl font-bold">
-      <span v-if="profile?.name">
-        {{ profile?.name }}
-      </span>
-      <span v-else>
-        {{ shortenAddress(address) }}
-      </span>
+    <div class="flex items-center gap-2">
+      <div class="my-4 text-2xl font-bold">
+        <span v-if="profile?.name">
+          {{ profile?.name }}
+        </span>
+        <span v-else>
+          {{ shortenAddress(address) }}
+        </span>
+      </div>
+      <FollowButton v-if="accountId !== address" :target="address" />
     </div>
+
     <MarkdownPreview :source="profile?.description || ''" />
   </div>
 </template>

@@ -235,7 +235,11 @@ export async function unfollow(unFollowRequest: FollowRequest) {
   }
 }
 
-export async function isFollowing(follower: string, target: string): Promise<boolean> {
+export async function isFollowing(follower?: string, target?: string): Promise<boolean> {
+  if (!follower || !target) {
+    return false
+  }
+
   try {
     const response = await api<{ isFollowing: boolean }>(
       `/follow/${toSubstrateAddress(follower)}/follows/${toSubstrateAddress(target)}`,

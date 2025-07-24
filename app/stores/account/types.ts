@@ -17,6 +17,7 @@ export interface ChainData {
 export interface AccountVm {
   address: string
   chains: Partial<Record<Chain, ChainData>>
+  authSignature?: string
 }
 
 export interface SupportedAsset {
