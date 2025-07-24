@@ -3,6 +3,7 @@ import type { Prefix } from '@kodadot1/static'
 import { useFullscreen } from '@vueuse/core'
 import { shortenAddress } from '@/utils/format/address'
 import { MediaType, resolveMedia } from '@/utils/gallery/media'
+import { fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
 const CONTAINER_ID = 'nft-img-container'
 
@@ -13,9 +14,14 @@ const fullScreenDisabled = ref(false)
 const mediaItemRef = ref<HTMLDivElement & { toggleFullscreen: () => void } | null>(null)
 const { toggle, isFullscreen, isSupported } = useFullscreen(mediaItemRef)
 
-// Use the existing useToken composable
+const { data: tokenData } = await useAsyncData(`token:${chain}:${tokenId}`, () => fetchOdaToken(chain as Prefix, collectionId?.toString() ?? '', tokenId?.toString() ?? ''))
+
+const { data: collection } = await useAsyncData(
+  `collection:${chain}:${collectionId}`,
+  () => fetchOdaCollection(chain as Prefix, collectionId?.toString() ?? ''),
+)
+
 const {
-  token: tokenData,
   owner,
   isLoading,
   error,
@@ -52,6 +58,11 @@ function toggleFullscreen() {
     toggleMediaFullscreen()
   }
 }
+
+useSeoMeta({
+  title: tokenData.value?.metadata.name,
+  description: tokenData.value?.metadata.description.slice(0, 150),
+})
 </script>
 
 <template>
@@ -256,10 +267,23 @@ function toggleFullscreen() {
 
       <!-- Details Section -->
       <div class="space-y-4 md:space-y-6">
-        <!-- Title -->
-        <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white text-center lg:text-left leading-tight">
-          {{ tokenData?.metadata?.name || 'Untitled NFT' }}
-        </h1>
+        <div>
+          <!-- Title -->
+          <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white text-center lg:text-left leading-tight">
+            {{ tokenData?.metadata?.name || 'Untitled NFT' }}
+          </h1>
+
+          <!-- Collection Link -->
+          <div v-if="collection" class="text-center lg:text-left">
+            <NuxtLink
+              :to="`/${chain}/collection/${collectionId}`"
+              class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors font-medium"
+            >
+              <UIcon name="i-heroicons-rectangle-stack" class="w-4 h-4" />
+              {{ collection.metadata?.name || `Collection ${collectionId}` }}
+            </NuxtLink>
+          </div>
+        </div>
 
         <!-- Owner Section -->
         <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-3 md:p-4 bg-white dark:bg-neutral-900">
@@ -342,21 +366,64 @@ function toggleFullscreen() {
           </h3>
           <div class="space-y-3">
             <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Collection ID</span>
-              <NuxtLink
-                :to="`/${chain}/collection/${collectionId}`"
-                class="text-sm font-semibold text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
-              >
-                {{ collectionId }}
-              </NuxtLink>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Token ID</span>
-              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ tokenId }}</span>
-            </div>
-            <div class="flex justify-between items-center">
               <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Chain</span>
               <span class="text-sm font-semibold text-gray-900 dark:text-white capitalize">{{ chain }}</span>
+            </div>
+
+            <!-- Media Information -->
+            <div v-if="tokenData?.metadata?.image" class="flex justify-between items-center">
+              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Media</span>
+              <UButton
+                :to="sanitizeIpfsUrl(tokenData.metadata.image)"
+                target="_blank"
+                variant="ghost"
+                size="xs"
+                icon="i-heroicons-arrow-top-right-on-square"
+                class="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+              >
+                View
+              </UButton>
+            </div>
+
+            <!-- Animated Media Information -->
+            <div v-if="tokenData?.metadata?.animation_url" class="flex justify-between items-center">
+              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Animation</span>
+              <UButton
+                :to="sanitizeIpfsUrl(tokenData.metadata.animation_url)"
+                target="_blank"
+                variant="ghost"
+                size="xs"
+                icon="i-heroicons-arrow-top-right-on-square"
+                class="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+              >
+                View
+              </UButton>
+            </div>
+
+            <!-- MIME Types -->
+            <div v-if="tokenData?.metadata?.mime_type" class="flex justify-between items-center">
+              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Media Type</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ tokenData.metadata.mime_type }}</span>
+            </div>
+
+            <div v-if="tokenData?.metadata?.animation_mime_type" class="flex justify-between items-center">
+              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Animation Type</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ tokenData.metadata.animation_mime_type }}</span>
+            </div>
+
+            <!-- Metadata URL -->
+            <div v-if="tokenData?.metadata_uri" class="flex justify-between items-center">
+              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Metadata</span>
+              <UButton
+                :to="sanitizeIpfsUrl(tokenData.metadata_uri)"
+                target="_blank"
+                variant="ghost"
+                size="xs"
+                icon="i-heroicons-arrow-top-right-on-square"
+                class="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+              >
+                View
+              </UButton>
             </div>
           </div>
         </div>
