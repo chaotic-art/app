@@ -107,8 +107,8 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: collection.value?.metadata.name,
-  description: collection.value?.metadata.description.slice(0, 150),
+  title: collection.value?.metadata?.name,
+  description: collection.value?.metadata?.description?.slice(0, 150),
 })
 
 defineOgImageComponent('Frame', {
