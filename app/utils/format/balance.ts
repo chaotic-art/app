@@ -24,6 +24,10 @@ function format(
   }
 }
 
+export function calculateBalance(value: number, decimals = 12): number {
+  return Math.trunc(value * 10 ** decimals)
+}
+
 export function checkInvalidBalanceFilter(value: number) {
   if (value === Infinity) {
     return '0'

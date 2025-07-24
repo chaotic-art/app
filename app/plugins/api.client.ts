@@ -28,8 +28,10 @@ const config = {
 // Type definitions for each chain's API
 type AhpApi = TypedApi<typeof ahp>
 type AhkApi = TypedApi<typeof ahk>
+export type AssethubApi = AhpApi | AhkApi
 type DotApi = TypedApi<typeof dot>
 type KsmApi = TypedApi<typeof ksm>
+export type SubApi = AhpApi | AhkApi | DotApi | KsmApi
 
 // Function overloads for proper type inference
 function api(chain: 'ahp'): AhpApi

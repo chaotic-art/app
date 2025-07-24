@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { DropItem } from '@/types'
-import { parseCETDate } from '@/components/drops/utils'
+import { parseCETDate } from '@/components/drop/utils'
 import { formatToNow } from '@/utils/format/time'
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
 

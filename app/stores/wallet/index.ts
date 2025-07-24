@@ -94,12 +94,5 @@ export const useWalletStore = defineStore('wallet', () => {
     // SSR is disabled because wallet components are mostly available only on client side
     storage: import.meta.client ? localStorage : undefined,
     pick: ['wallets', 'selectedAccounts', 'stage'],
-    // remove, backwards compatibility
-    afterHydrate(context) {
-      if (!Array.isArray(context.store.wallets)) {
-        // @ts-expect-error state unmatch
-        context.store.$patch({ wallets: [] })
-      }
-    },
   },
 })
