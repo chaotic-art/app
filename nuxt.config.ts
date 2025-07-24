@@ -93,6 +93,23 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-11-27',
 
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes('zod'))
+              return 'zod'
+            if (id.includes('apollo'))
+              return 'apollo'
+            if (id.includes('reka-ui'))
+              return 'reka-ui'
+          },
+        },
+      },
+    },
+  },
+
   hooks: {
     'vite:extendConfig': function (viteConfig) {
       const logger = createLogger(viteConfig.logLevel)
