@@ -14,7 +14,7 @@ const { data: drop } = await useAsyncData(`drop:${slug}`, () => getDropById(slug
 const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
 const { imageDataPayload, imageDataLoaded } = useGenerativeIframeData()
 const isCapturingImage = ref(false)
-const generativeImageUrl = ref(collection.value?.metadata.generative_uri)
+const generativeImageUrl = ref(collection.value?.metadata?.generative_uri)
 const items = ref<number[]>([])
 
 const { start: startTimer } = useTimeoutFn(() => {
@@ -46,7 +46,7 @@ function generateNft() {
 }
 
 watch(collection, () => {
-  generativeImageUrl.value = collection.value?.metadata.generative_uri
+  generativeImageUrl.value = collection.value?.metadata?.generative_uri
 })
 
 watch(imageDataLoaded, () => {
@@ -81,7 +81,7 @@ onMounted(async () => {
           </UBadge>
         </div>
         <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center lg:text-left mb-6 lg:mb-0">
-          {{ collection?.metadata.name ?? '---' }}
+          {{ collection?.metadata?.name ?? '---' }}
         </h1>
 
         <div class="flex flex-col items-start md:flex-row md:items-center gap-4 justify-between my-6 lg:my-10">
@@ -118,7 +118,7 @@ onMounted(async () => {
 
         <!-- description section -->
         <div class="text-sm md:text-base">
-          <MarkdownPreview :source="collection?.metadata.description ?? '---'" />
+          <MarkdownPreview :source="collection?.metadata?.description ?? '---'" />
         </div>
       </div>
 
