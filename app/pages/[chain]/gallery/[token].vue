@@ -1,58 +1,32 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
-import { formatBalance } from '@polkadot/util'
 import { useFullscreen } from '@vueuse/core'
-import { fetchMimeType } from '@/services/oda'
+import { shortenAddress } from '@/utils/format/address'
 import { MediaType, resolveMedia } from '@/utils/gallery/media'
-
-export interface TokenDetail {
-  owner: string
-  price: string
-  metadata: {
-    name: string
-    description: string
-    image: string
-    animation_url: string
-    mime_type: string
-    animation_mime_type: string
-  }
-}
 
 const CONTAINER_ID = 'nft-img-container'
 
 const { token, chain } = useRoute().params
 const [collectionId, tokenId] = token?.toString().split('-') ?? []
 
-const { $api } = useNuxtApp()
-
-const loading = ref(true)
 const fullScreenDisabled = ref(false)
-
 const mediaItemRef = ref<HTMLDivElement & { toggleFullscreen: () => void } | null>(null)
 const { toggle, isFullscreen, isSupported } = useFullscreen(mediaItemRef)
 
-const tokenDetail = reactive<TokenDetail>({
-  owner: '',
-  price: '',
-  metadata: {
-    name: '',
-    description: '',
-    image: '',
-    animation_url: '',
-    mime_type: '',
-    animation_mime_type: '',
-  },
-})
-
-const formattedPrice = computed(() => {
-  if (!tokenDetail.price)
-    return ''
-
-  const pricesString = formatBalance(tokenDetail.price, { decimals: 10, withSi: false })
-  let float = Number.parseFloat(pricesString)
-  float = float > 1 ? Number(float.toFixed(0)) : Number(float.toFixed(4))
-
-  return `${float} DOT`
+// Use the existing useToken composable
+const {
+  token: tokenData,
+  owner,
+  isLoading,
+  error,
+  mimeType,
+  price: formattedPrice,
+  usdPrice,
+  mediaIcon,
+} = useToken({
+  tokenId: Number(tokenId),
+  collectionId: Number(collectionId),
+  chain: chain as Prefix,
 })
 
 function toggleMediaFullscreen() {
@@ -65,7 +39,12 @@ function toggleMediaFullscreen() {
 }
 
 function toggleFullscreen() {
-  const mediaType = resolveMedia(tokenDetail.metadata.animation_mime_type)
+  if (!mimeType.value) {
+    toggleMediaFullscreen()
+    return
+  }
+
+  const mediaType = resolveMedia(mimeType.value)
   if ([MediaType.VIDEO].includes(mediaType)) {
     mediaItemRef.value?.toggleFullscreen()
   }
@@ -73,109 +52,75 @@ function toggleFullscreen() {
     toggleMediaFullscreen()
   }
 }
-
-onMounted(async () => {
-  try {
-    const api = $api(chain as Prefix)
-
-    const [queryItem, queryMetadata, queryPrice] = await Promise.all([
-      api.query.Nfts.Item.getValue(Number(collectionId), Number(tokenId)),
-      api.query.Nfts.ItemMetadataOf.getValue(Number(collectionId), Number(tokenId)),
-      api.query.Nfts.ItemPriceOf.getValue(Number(collectionId), Number(tokenId)),
-    ])
-
-    tokenDetail.owner = queryItem?.owner.toString() ?? ''
-    tokenDetail.price = queryPrice?.[0].toString() ?? ''
-
-    if (queryMetadata?.data.asText()) {
-      const metadata = await $fetch(sanitizeIpfsUrl(queryMetadata.data.asText())) as {
-        name: string
-        description: string
-        image: string
-        animation_url: string
-      }
-
-      tokenDetail.metadata.name = metadata.name
-      tokenDetail.metadata.description = metadata.description
-      tokenDetail.metadata.image = metadata.image
-      tokenDetail.metadata.animation_url = metadata.animation_url
-
-      getTokenMimeType()
-    }
-  }
-  catch (error) {
-    console.error('Error fetching token data:', error)
-  }
-  finally {
-    loading.value = false
-  }
-})
-
-async function getTokenMimeType() {
-  const metadata = tokenDetail.metadata
-  const mimeTypeAnimation = tokenDetail.metadata.animation_url ? await fetchMimeType(tokenDetail.metadata.animation_url) : null
-  tokenDetail.metadata.animation_mime_type = mimeTypeAnimation?.mime_type || ''
-
-  const mimeType = metadata.image ? await fetchMimeType(metadata.image) : null
-  tokenDetail.metadata.mime_type = mimeType?.mime_type || ''
-}
 </script>
 
 <template>
-  <UContainer class="max-w-7xl px-4 md:px-6">
-    <!-- Loading Skeleton -->
-    <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-      <!-- left side skeleton - image -->
+  <UContainer class="px-4 md:px-6 py-4 md:py-6">
+    <!-- Loading State -->
+    <div v-if="isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
+      <!-- Media Skeleton -->
       <div class="order-2 lg:order-1">
-        <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
-          <USkeleton class="aspect-square w-full rounded-xl" />
+        <div class="relative border border-gray-200 dark:border-neutral-700 rounded-2xl overflow-hidden bg-white dark:bg-neutral-900 p-4">
+          <div class="aspect-square bg-gray-200 dark:bg-neutral-800 rounded-xl animate-pulse flex items-center justify-center">
+            <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
+          </div>
+          <!-- Toolbar skeleton -->
+          <div class="flex items-center justify-between mt-4">
+            <div class="flex items-center gap-2">
+              <USkeleton class="w-8 h-8 rounded-full" />
+              <USkeleton class="w-8 h-8 rounded-full" />
+            </div>
+            <USkeleton class="w-8 h-8 rounded-full" />
+          </div>
         </div>
       </div>
 
-      <!-- right side skeleton - details -->
-      <div class="order-1 lg:order-2">
-        <!-- badge skeleton -->
-        <div class="flex gap-2 mb-4 justify-center lg:justify-start">
-          <USkeleton class="h-6 w-16 rounded-full" />
-          <USkeleton class="h-6 w-20 rounded-full" />
-        </div>
+      <!-- Details Skeleton -->
+      <div class="order-1 lg:order-2 space-y-6">
+        <!-- Title skeleton -->
+        <USkeleton class="h-16 w-full" />
 
-        <!-- title skeleton -->
-        <USkeleton class="h-12 md:h-16 lg:h-20 w-full mb-6 lg:mb-8" />
-
-        <!-- owner section skeleton -->
-        <div class="flex justify-between items-center gap-4 my-6 lg:my-10">
-          <div class="flex items-center gap-3">
-            <USkeleton class="w-12 h-12 rounded-full" />
-            <USkeleton class="h-4 w-32" />
+        <!-- Owner section skeleton -->
+        <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 bg-white dark:bg-neutral-900">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <USkeleton class="w-12 h-12 rounded-full" />
+              <div class="space-y-2">
+                <USkeleton class="h-3 w-16" />
+                <USkeleton class="h-4 w-32" />
+              </div>
+            </div>
+            <USkeleton class="h-10 w-24 rounded-full" />
           </div>
-          <USkeleton class="h-10 w-24 rounded-full" />
         </div>
 
-        <!-- description skeleton -->
-        <div class="text-sm md:text-base mb-6 lg:mb-8 space-y-2">
+        <!-- Description skeleton -->
+        <div class="space-y-2">
           <USkeleton class="h-4 w-full" />
           <USkeleton class="h-4 w-3/4" />
           <USkeleton class="h-4 w-1/2" />
         </div>
 
-        <!-- price and actions skeleton -->
-        <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
-          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="text-center md:text-left">
-              <USkeleton class="h-8 md:h-10 w-32 mb-2" />
+        <!-- Price section skeleton -->
+        <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 bg-white dark:bg-neutral-900">
+          <div class="flex items-center justify-between mb-4">
+            <div class="space-y-2">
+              <USkeleton class="h-8 w-32" />
               <USkeleton class="h-4 w-20" />
             </div>
-
-            <div class="flex flex-col sm:flex-row gap-2 md:gap-4 w-full md:w-auto">
-              <USkeleton class="h-10 w-full sm:w-24 rounded-full" />
-              <USkeleton class="h-10 w-full sm:w-24 rounded-full" />
+            <div class="space-y-2">
+              <USkeleton class="h-4 w-8" />
+              <USkeleton class="h-6 w-16" />
             </div>
+          </div>
+          <div class="flex gap-2">
+            <USkeleton class="h-10 w-24 rounded-full" />
+            <USkeleton class="h-10 w-24 rounded-full" />
           </div>
         </div>
 
-        <!-- token info skeleton -->
-        <div class="mt-6 space-y-3">
+        <!-- Token info skeleton -->
+        <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 bg-white dark:bg-neutral-900 space-y-3">
           <div class="flex justify-between items-center">
             <USkeleton class="h-4 w-24" />
             <USkeleton class="h-4 w-16" />
@@ -192,129 +137,227 @@ async function getTokenMimeType() {
       </div>
     </div>
 
-    <!-- Actual Content -->
-    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-      <!-- left side - image -->
+    <!-- Error State -->
+    <div v-else-if="error" class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
       <div class="order-2 lg:order-1">
-        <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
+        <div class="relative border border-red-200 dark:border-red-800 rounded-2xl overflow-hidden bg-red-50 dark:bg-red-900/20 p-4">
+          <div class="aspect-square bg-red-100 dark:bg-red-900/40 rounded-xl flex items-center justify-center">
+            <UIcon name="i-heroicons-exclamation-triangle" class="w-16 h-16 text-red-400" />
+          </div>
+        </div>
+      </div>
+      <div class="order-1 lg:order-2">
+        <div class="text-center lg:text-left">
+          <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-red-600 dark:text-red-400 mb-4">
+            Failed to Load NFT
+          </h1>
+          <p class="text-gray-600 dark:text-gray-300 mb-6">
+            There was an error loading this NFT. Please try again later.
+          </p>
+          <UButton variant="outline" class="rounded-full" @click="$router.go(-1)">
+            Go Back
+          </UButton>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
+      <!-- Media Section -->
+      <div class="">
+        <div class="relative border border-gray-200 dark:border-neutral-700 rounded-2xl overflow-hidden bg-white dark:bg-neutral-900 p-3 md:p-4 hover:shadow-lg transition-shadow">
           <div
             :id="CONTAINER_ID"
             ref="mediaItemRef"
+            class="relative"
           >
-            <iframe
-              v-if="tokenDetail.metadata.animation_url"
-              :src="sanitizeIpfsUrl(tokenDetail.metadata.animation_url)"
-              :alt="tokenDetail.metadata.name"
+            <!-- Video Media -->
+            <video
+              v-if="mimeType?.includes('video') && (tokenData?.metadata?.animation_url || tokenData?.metadata?.image)"
+              :src="sanitizeIpfsUrl(tokenData?.metadata?.animation_url || tokenData?.metadata?.image)"
+              :alt="tokenData?.metadata?.name || 'NFT'"
               class="aspect-square w-full object-cover rounded-xl"
+              controls
+              muted
+              @error="($event.target as HTMLVideoElement).style.display = 'none'"
             />
+
+            <!-- Audio Media -->
+            <div
+              v-else-if="mimeType?.includes('audio') && (tokenData?.metadata?.animation_url || tokenData?.metadata?.image)"
+              class="aspect-square w-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-700 dark:to-gray-900 rounded-xl relative p-4 md:p-6"
+            >
+              <UIcon name="i-heroicons-musical-note" class="w-12 h-12 md:w-16 md:h-16 text-gray-700 dark:text-gray-200 mb-3 md:mb-4" />
+              <audio
+                :src="sanitizeIpfsUrl(tokenData?.metadata?.animation_url || tokenData?.metadata?.image)"
+                controls
+                class="w-full max-w-xs"
+                @error="($event.target as HTMLAudioElement).style.display = 'none'"
+              />
+            </div>
+
+            <!-- Iframe Media -->
+            <iframe
+              v-else-if="tokenData?.metadata?.animation_url"
+              :src="sanitizeIpfsUrl(tokenData?.metadata?.animation_url)"
+              :alt="tokenData?.metadata?.name || 'NFT'"
+              class="aspect-square w-full rounded-xl"
+              @error="($event.target as HTMLIFrameElement).style.display = 'none'"
+            />
+
+            <!-- Image Media -->
             <img
-              v-else
-              :src="sanitizeIpfsUrl(tokenDetail.metadata.image)"
-              :alt="tokenDetail.metadata.name"
+              v-else-if="tokenData?.metadata?.image"
+              :src="sanitizeIpfsUrl(tokenData?.metadata?.image)"
+              :alt="tokenData?.metadata?.name || 'NFT'"
               class="aspect-square w-full object-cover rounded-xl"
+              @error="($event.target as HTMLImageElement).style.display = 'none'"
             >
 
+            <!-- Fallback -->
+            <div
+              v-else
+              class="aspect-square w-full flex items-center justify-center bg-gray-100 dark:bg-neutral-700 rounded-xl"
+            >
+              <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
+            </div>
+
+            <!-- Media type icon overlay -->
+            <div
+              v-if="tokenData?.metadata?.animation_url || tokenData?.metadata?.image"
+              class="absolute top-2 right-2 w-6 h-6 bg-black/70 rounded-full shadow-md flex items-center justify-center"
+            >
+              <UIcon :name="mediaIcon" class="w-3 h-3 text-white" />
+            </div>
+
+            <!-- Fullscreen Back Button -->
             <ButtonConfig
               v-if="isFullscreen"
               :button="{
                 label: 'Go Back',
                 icon: 'i-heroicons-chevron-left',
                 variant: 'ghost',
-                classes: 'z-20 fixed top-4 left-4',
+                classes: 'z-20 fixed top-4 left-4 md:top-6 md:left-6',
                 onClick: toggleFullscreen,
               }"
             />
           </div>
-        </div>
 
-        <GalleryItemToolBar :nft="tokenDetail" :container-id="CONTAINER_ID" @toggle-fullscreen="toggleFullscreen" />
-      </div>
-
-      <!-- right side - details -->
-      <div class="order-1 lg:order-2">
-        <!-- badge section -->
-        <div class="flex gap-2 mb-4 justify-center lg:justify-start">
-          <UBadge class="rounded-full bg-gray-100 text-black" icon="i-heroicons-star">
-            NFT
-          </UBadge>
-          <UBadge class="rounded-full bg-gray-100 text-black" icon="i-token-polkadot">
-            Polkadot
-          </UBadge>
-        </div>
-
-        <!-- title -->
-        <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center lg:text-left mb-6 lg:mb-8">
-          {{ tokenDetail.metadata.name || '---' }}
-        </h1>
-
-        <!-- owner section -->
-        <div class="flex justify-between items-center gap-4 my-6 lg:my-10">
-          <div class="p-1 bg-gray-100 inline-block rounded-full">
-            <UserInfo :avatar-size="40" :address="tokenDetail.owner" />
-          </div>
-
-          <FollowButton
-            v-if="tokenDetail.owner"
-            :target="tokenDetail.owner"
-            class="px-4 py-2 w-full sm:w-auto"
+          <!-- Media Toolbar -->
+          <GalleryItemToolBar
+            v-if="tokenData"
+            :nft="tokenData"
+            :container-id="CONTAINER_ID"
+            class="mt-3 md:mt-4"
+            @toggle-fullscreen="toggleFullscreen"
           />
         </div>
+      </div>
 
-        <!-- description section -->
-        <div class="text-sm md:text-base mb-6 lg:mb-8">
-          <p class="text-gray-600">
-            {{ tokenDetail.metadata.description || '---' }}
+      <!-- Details Section -->
+      <div class="space-y-4 md:space-y-6">
+        <!-- Title -->
+        <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white text-center lg:text-left leading-tight">
+          {{ tokenData?.metadata?.name || 'Untitled NFT' }}
+        </h1>
+
+        <!-- Owner Section -->
+        <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-3 md:p-4 bg-white dark:bg-neutral-900">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="p-1 bg-gray-100 dark:bg-neutral-800 rounded-full">
+                <UserInfo :avatar-size="40" :address="owner || undefined" />
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
+                  Owner
+                </p>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                  {{ owner ? shortenAddress(owner) : 'Unknown' }}
+                </p>
+              </div>
+            </div>
+            <FollowButton
+              v-if="owner"
+              :target="owner"
+              class="rounded-full"
+            />
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div v-if="tokenData?.metadata?.description" class="space-y-2">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Description
+          </h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            {{ tokenData.metadata.description }}
           </p>
         </div>
 
-        <!-- price and actions section -->
-        <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
-          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="text-center md:text-left">
-              <p class="font-serif font-bold text-2xl md:text-3xl italic">
+        <!-- Price Section -->
+        <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-3 md:p-4 bg-white dark:bg-neutral-900">
+          <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider mb-1">
+                Price
+              </p>
+              <p class="text-2xl font-bold text-gray-900 dark:text-white">
                 {{ formattedPrice || 'Not for sale' }}
               </p>
-              <p v-if="formattedPrice" class="text-sm text-gray-500">
-                Current Price
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider mb-1">
+                USD
+              </p>
+              <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ formattedPrice ? (usdPrice || '$0.00') : '--' }}
               </p>
             </div>
+          </div>
 
-            <div class="flex flex-col sm:flex-row gap-2 md:gap-4 w-full md:w-auto">
-              <UButton
-                v-if="formattedPrice"
-                class="rounded-full px-4 md:px-6 py-2 md:py-3 w-full sm:w-auto"
-                color="primary"
-              >
-                Buy Now
-              </UButton>
-              <UButton
-                class="rounded-full px-4 md:px-6 py-2 md:py-3 w-full sm:w-auto"
-                variant="outline"
-              >
-                Make Offer
-              </UButton>
-            </div>
+          <div class="flex flex-col sm:flex-row gap-2 sm:gap-2">
+            <UButton
+              v-if="formattedPrice"
+              class="rounded-full flex-1"
+              color="primary"
+              size="lg"
+            >
+              Buy Now
+            </UButton>
+            <UButton
+              class="rounded-full flex-1"
+              variant="outline"
+              size="lg"
+            >
+              Make Offer
+            </UButton>
           </div>
         </div>
 
-        <!-- token info -->
-        <div class="mt-6 space-y-3">
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-gray-500">Collection ID</span>
-            <NuxtLink
-              :to="`/${chain}/collection/${collectionId}`"
-              class="font-medium text-primary-600 hover:text-primary-500 transition-colors cursor-pointer"
-            >
-              {{ collectionId }}
-            </NuxtLink>
-          </div>
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-gray-500">Token ID</span>
-            <span class="font-medium">{{ tokenId }}</span>
-          </div>
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-gray-500">Chain</span>
-            <span class="font-medium capitalize">{{ chain }}</span>
+        <!-- Token Information -->
+        <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-3 md:p-4 bg-white dark:bg-neutral-900">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 md:mb-4">
+            Token Information
+          </h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Collection ID</span>
+              <NuxtLink
+                :to="`/${chain}/collection/${collectionId}`"
+                class="text-sm font-semibold text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+              >
+                {{ collectionId }}
+              </NuxtLink>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Token ID</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ tokenId }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">Chain</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-white capitalize">{{ chain }}</span>
+            </div>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { TokenDetail } from '@/pages/[chain]/gallery/[token].vue'
+import type { OdaToken } from '@/services/oda'
 import { downloadImage } from '@/utils/download'
 import { isMobileDevice } from '@/utils/environment'
 import {
@@ -19,7 +19,7 @@ type ReloadElement
 
 const props = defineProps<{
   containerId: string
-  nft: TokenDetail
+  nft: OdaToken
 }>()
 
 defineEmits(['toggleFullscreen'])
