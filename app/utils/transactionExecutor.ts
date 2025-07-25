@@ -41,14 +41,11 @@ export type TxObserverOnResultCallback = (result: TxEvent) => void
 export function txObserver(
   onSuccess: TxObserverOnSuccessCallback,
   onError: TxObserverOnErrorCallback,
-  onResult: TxObserverOnResultCallback = console.log,
+  onResult?: TxObserverOnResultCallback,
 ): SubscriptionObserver {
   return {
     next(event) {
-      onResult(event)
-
-      console.log('tx type:', event.type)
-      console.log('tx hash:', event.txHash)
+      onResult?.(event)
 
       if (event.type === 'finalized') {
         onSuccess({
@@ -56,12 +53,6 @@ export function txObserver(
           txHash: event.txHash,
         })
       }
-    },
-    complete() {
-      // (OPTIONAL) DESTROY CLIENT ON COMPLETION
-      // console.log('Shutting down smoldot...');
-      // client.destroy();
-      console.log('Tx was completed successfully!')
     },
     error(err) {
       onError(err)

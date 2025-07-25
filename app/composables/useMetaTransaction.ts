@@ -34,7 +34,7 @@ export type HowAboutToExecute = (
 ) => Promise<void>
 
 function useMetaTransaction() {
-  // const { $i18n } = useNuxtApp()
+  const { $i18n } = useNuxtApp()
   const {
     isLoading,
     resolveStatus,
@@ -77,12 +77,12 @@ function useMetaTransaction() {
       const isCancelled = errorMessage.includes('cancelled') || errorMessage.includes('rejected')
 
       if (isCancelled) {
-        // warningMessage($i18n.t('general.tx.cancelled'), { reportable: false })
+        warningMessage($i18n.t('general.tx.cancelled'))
         status.value = TransactionStatus.Cancelled
       }
       else {
         isError.value = true
-        // warningMessage(e.toString())
+        warningMessage(error.toString())
       }
       isLoading.value = false
       // tx.value = undefined

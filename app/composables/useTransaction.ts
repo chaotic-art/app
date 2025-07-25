@@ -1,3 +1,4 @@
+import type { TxInBestBlocksFound } from 'polkadot-api'
 import type {
   ActionMintDrop,
   Actions,
@@ -8,13 +9,13 @@ import type {
   HowAboutToExecuteOnResultParam,
   HowAboutToExecute as SubstrateHowAboutToExecute,
 } from './useMetaTransaction'
-import type { SubApi } from '~/plugins/api.client'
+import type { SubApi } from '@/plugins/api.client'
 import {
   successMessage as successNotification,
   warningMessage,
 } from '@/utils/notification'
-import { hasOperationsDisabled } from '@/utils/prefix'
 
+import { hasOperationsDisabled } from '@/utils/prefix'
 import { execMintDrop } from './transaction/transactionMintDrop'
 import { NFTs } from './transaction/types'
 import { isActionValid } from './transaction/utils'
@@ -68,10 +69,7 @@ function useExecuteTransaction(options: TransactionOptions) {
   }: ExecuteTransactionParams) => {
     const successCb = ({
       blockNumber: block,
-      txHash: hash,
     }: HowAboutToExecuteOnSuccessParam) => {
-      blockNumber.value = block
-      txHash.value = hash
       if (options.disableSuccessNotification) {
         return
       }
@@ -91,7 +89,11 @@ function useExecuteTransaction(options: TransactionOptions) {
     }
 
     const resultCb = (param: HowAboutToExecuteOnResultParam) => {
-      txHash.value = param.txHash || undefined
+      txHash.value = param.event.txHash.toString()
+
+      if (param.event.type === 'txBestBlocksState') {
+        blockNumber.value = (param.event as TxInBestBlocksFound).block.number
+      }
     }
 
     // TODO: add doAfterCheckCurrentChainVM
