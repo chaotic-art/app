@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+import { useNftPallets } from '~/composables/onchain/useNftPallets'
+import { pinDirectory, pinJson } from '~/services/storage'
+
+const { createCollection } = useNftPallets()
+
 definePageMeta({
   title: 'Create Collection',
   layout: 'default',
@@ -24,12 +29,11 @@ const blockchains = [
   { label: 'Base', value: 'base' },
 ]
 
+const isLoading = ref(false)
+
 // File upload states
 const logoFile = ref<File | null>(null)
 const bannerFile = ref<File | null>(null)
-
-// Loading state
-const isSubmitting = ref(false)
 
 // Router
 const router = useRouter()
@@ -77,33 +81,51 @@ function validateForm() {
 
 // Submit handler
 async function handleSubmit() {
-  const errors = validateForm()
+  // const errors = validateForm()
 
-  if (errors.length > 0) {
-    console.error('Validation errors:', errors)
-    return
-  }
-
-  isSubmitting.value = true
+  // if (errors.length > 0) {
+  //   console.error('Validation errors:', errors)
+  //   return
+  // }
 
   try {
-    console.error('Creating collection with data:', {
+    isLoading.value = true
+
+    // eslint-disable-next-line no-console
+    console.log('Creating collection with data:', {
       ...form.value,
       logoFile: logoFile.value,
       bannerFile: bannerFile.value,
     })
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    if (!logoFile.value || !bannerFile.value) {
+      throw new Error('Logo and banner files are required')
+    }
 
-    // Navigate back with success
-    await navigateTo('/')
+    const cidImages = await pinDirectory([logoFile.value, bannerFile.value])
+
+    const cid = await pinJson({
+      name: form.value.name,
+      description: form.value.description,
+      image: `ipfs://${cidImages}/${logoFile.value.name}`,
+      banner: `ipfs://${cidImages}/${bannerFile.value.name}`,
+      // external_url: 'https://example.com', TODO: add external url
+    })
+    const ipfsUri = `ipfs://${cid}`
+
+    console.log('CID', ipfsUri, sanitizeIpfsUrl(ipfsUri))
+
+    await createCollection({
+      maxSupply: form.value.maxNfts === 'unlimited' ? undefined : form.value.maxNftsNumber,
+      metadataUri: ipfsUri,
+      royalty: form.value.royalties,
+    })
   }
   catch (error) {
     console.error('Error creating collection:', error)
   }
   finally {
-    isSubmitting.value = false
+    isLoading.value = false
   }
 }
 </script>
@@ -121,7 +143,20 @@ async function handleSubmit() {
     </div>
 
     <!-- Form -->
-    <UCard class="mb-8">
+    <UCard class="mb-8 relative">
+      <!-- Loading Overlay -->
+      <div
+        v-if="isLoading"
+        class="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg"
+      >
+        <div class="flex flex-col items-center gap-3">
+          <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-600 dark:text-gray-400 animate-spin" />
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+            Creating collection...
+          </p>
+        </div>
+      </div>
+
       <template #header>
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
           Collection Information
@@ -149,7 +184,7 @@ async function handleSubmit() {
                   label="Drop logo here"
                   description="PNG, JPG, GIF or SVG (max. 5MB)"
                   color="neutral"
-                  :disabled="isSubmitting"
+                  :disabled="isLoading"
                   class="w-full min-h-32"
                 />
               </UFormField>
@@ -168,7 +203,7 @@ async function handleSubmit() {
                   label="Drop banner here"
                   description="PNG, JPG, GIF or SVG (max. 10MB)"
                   color="neutral"
-                  :disabled="isSubmitting"
+                  :disabled="isLoading"
                   class="w-full min-h-32"
                 />
               </UFormField>
@@ -192,7 +227,7 @@ async function handleSubmit() {
                 <UInput
                   v-model="form.name"
                   placeholder="My Awesome Collection"
-                  :disabled="isSubmitting"
+                  :disabled="isLoading"
                   class="w-full"
                 />
               </UFormField>
@@ -209,7 +244,7 @@ async function handleSubmit() {
                   :items="blockchains"
                   value-key="value"
                   placeholder="Select a blockchain"
-                  :disabled="isSubmitting"
+                  :disabled="isLoading"
                   class="w-full"
                 />
               </UFormField>
@@ -228,7 +263,7 @@ async function handleSubmit() {
               v-model="form.description"
               placeholder="Tell people about your collection..."
               :rows="4"
-              :disabled="isSubmitting"
+              :disabled="isLoading"
               class="w-full"
             />
           </UFormField>
@@ -250,9 +285,10 @@ async function handleSubmit() {
                   v-model.number="form.royalties"
                   type="number"
                   min="0"
+                  max="100"
                   step="0.1"
                   placeholder="2.5"
-                  :disabled="isSubmitting"
+                  :disabled="isLoading"
                   class="w-full"
                 />
               </UFormField>
@@ -272,7 +308,7 @@ async function handleSubmit() {
                     ]"
                     value-key="value"
                     placeholder="Select limit type"
-                    :disabled="isSubmitting"
+                    :disabled="isLoading"
                     class="w-full"
                   />
 
@@ -283,7 +319,7 @@ async function handleSubmit() {
                     min="1"
                     step="1"
                     placeholder="1000"
-                    :disabled="isSubmitting"
+                    :disabled="isLoading"
                     class="w-full"
                   />
                 </div>
@@ -298,15 +334,15 @@ async function handleSubmit() {
           <UButton
             variant="ghost"
             color="neutral"
-            :disabled="isSubmitting"
+            :disabled="isLoading"
             @click="router.back()"
           >
             Cancel
           </UButton>
 
           <UButton
-            :loading="isSubmitting"
-            :disabled="isSubmitting"
+            :loading="isLoading"
+            :disabled="isLoading"
             @click="handleSubmit"
           >
             Create Collection
