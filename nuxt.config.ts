@@ -59,6 +59,7 @@ export default defineNuxtConfig({
     'pinia-plugin-persistedstate/nuxt',
     '@wagmi/vue/nuxt',
     '@nuxtjs/seo',
+    'nuxt-svgo',
   ],
 
   runtimeConfig: {
