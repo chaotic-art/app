@@ -38,7 +38,7 @@ const bannerFile = ref<File | null>(null)
 const router = useRouter()
 
 // Validation
-function validateForm() {
+function _validateForm() {
   const errors: string[] = []
 
   if (!form.value.name.trim())
@@ -101,20 +101,27 @@ async function handleSubmit() {
     }
 
     const cidImages = await pinDirectory([logoFile.value, bannerFile.value])
+    const image = `ipfs://${cidImages}/${logoFile.value.name}`
+    const banner = `ipfs://${cidImages}/${bannerFile.value.name}`
 
     const cid = await pinJson({
       name: form.value.name,
       description: form.value.description,
-      image: `ipfs://${cidImages}/${logoFile.value.name}`,
-      banner: `ipfs://${cidImages}/${bannerFile.value.name}`,
+      image,
+      banner,
       // external_url: 'https://example.com', TODO: add external url
     })
-    const ipfsUri = `ipfs://${cid}`
+    const metadataUri = `ipfs://${cid}`
 
     await createCollection({
       maxSupply: form.value.maxNfts === 'unlimited' ? undefined : form.value.maxNftsNumber,
-      metadataUri: ipfsUri,
+      metadataUri,
       royalty: form.value.royalties,
+      context: {
+        name: form.value.name,
+        description: form.value.description,
+        image,
+      },
     })
   }
   catch (error) {

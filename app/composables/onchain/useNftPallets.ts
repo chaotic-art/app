@@ -5,6 +5,11 @@ interface CreateCollectionParams {
   maxSupply?: number
   metadataUri: string
   royalty: number
+  context: {
+    name: string
+    description: string
+    image: string
+  }
 }
 
 export function useNftPallets() {
@@ -12,9 +17,9 @@ export function useNftPallets() {
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
   const api = $api('pas_asset_hub')
 
-  const { hash, error, status, reset } = useTransactionModal()
+  const { hash, error, status, reset, result } = useTransactionModal()
 
-  async function createCollection({ maxSupply, metadataUri, royalty }: CreateCollectionParams) {
+  async function createCollection({ maxSupply, metadataUri, royalty, context: collectionData }: CreateCollectionParams) {
     reset()
 
     if (!getConnectedSubAccount.value?.address) {
@@ -97,6 +102,18 @@ export function useNftPallets() {
 
         if (event.type === 'txBestBlocksState' && event.found) {
           hash.value = event.block.hash.toString()
+        }
+
+        if (event.type === 'finalized') {
+          result.value = {
+            type: 'collection',
+            id: nextId.toString(),
+            name: collectionData.name,
+            description: collectionData.description,
+            image: collectionData.image,
+            hash: hash.value,
+            prefix: 'ahp', // TODO: get prefix
+          }
         }
       },
       error: (err) => {
