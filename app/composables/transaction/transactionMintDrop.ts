@@ -3,9 +3,11 @@ import type {
   SubstrateMintDropParams,
 } from './types'
 import type { AssethubApi } from '~/plugins/api.client'
+import { Binary } from 'polkadot-api'
+import { asBatchAllTransaction } from '@/utils/papi'
+
 // import { AssethubApi } from './evm/utils'
 // import { useDrop } from '@/components/drops/useDrops'
-import { Binary } from 'polkadot-api'
 
 function execAssethubMintDrop({
   item,
@@ -44,21 +46,18 @@ function execAssethubMintDrop({
     })
   })
 
-  const arg: Parameters<typeof api.tx.Utility.batch_all>[0] = {
-    calls: [
-      ...calls,
-      api.tx.System.remark({
-        remark: Binary.fromText(JSON.stringify(nftsMetadata.value)),
-      }),
-    ].map(call => call.decodedCall),
-  }
+  const transactions = [
+    ...calls,
+    api.tx.System.remark({
+      remark: Binary.fromText(JSON.stringify(nftsMetadata.value)),
+    }),
+  ]
 
   isLoading.value = true
 
-  executeTransaction({
-    cb: api.tx.Utility.batch_all,
-    arg: [arg],
-  })
+  executeTransaction(
+    asBatchAllTransaction(api, transactions),
+  )
 }
 
 // async function execEvmMintDrop({ executeTransaction }: EvmMintDropParams) {

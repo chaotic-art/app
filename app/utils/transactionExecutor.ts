@@ -7,7 +7,7 @@ import { getWalletSigner } from '@/utils/extension'
 // export type Extrinsic = SubmittableExtrinsic<'promise'>
 
 export type UnsubscribeFn = () => string
-type Transaction = PapiTransaction<any, any, any, any>
+export type Transaction = PapiTransaction<any, any, any, any>
 type SubscriptionObserver = Partial<Observer<TxEvent>>
 
 async function exec(
