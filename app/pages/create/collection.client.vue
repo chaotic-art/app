@@ -3,6 +3,7 @@ import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 
 const { createCollection } = useNftPallets()
+const { isLoading, status } = useTransactionModal()
 
 definePageMeta({
   title: 'Create Collection',
@@ -28,8 +29,6 @@ const blockchains = [
   { label: 'Ethereum', value: 'ethereum' },
   { label: 'Base', value: 'base' },
 ]
-
-const isLoading = ref(false)
 
 // File upload states
 const logoFile = ref<File | null>(null)
@@ -81,6 +80,7 @@ function validateForm() {
 
 // Submit handler
 async function handleSubmit() {
+  status.value = 'start'
   // const errors = validateForm()
 
   // if (errors.length > 0) {
@@ -89,8 +89,6 @@ async function handleSubmit() {
   // }
 
   try {
-    isLoading.value = true
-
     // eslint-disable-next-line no-console
     console.log('Creating collection with data:', {
       ...form.value,
@@ -113,8 +111,6 @@ async function handleSubmit() {
     })
     const ipfsUri = `ipfs://${cid}`
 
-    console.log('CID', ipfsUri, sanitizeIpfsUrl(ipfsUri))
-
     await createCollection({
       maxSupply: form.value.maxNfts === 'unlimited' ? undefined : form.value.maxNftsNumber,
       metadataUri: ipfsUri,
@@ -123,9 +119,6 @@ async function handleSubmit() {
   }
   catch (error) {
     console.error('Error creating collection:', error)
-  }
-  finally {
-    isLoading.value = false
   }
 }
 </script>

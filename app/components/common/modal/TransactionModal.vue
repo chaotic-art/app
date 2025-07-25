@@ -3,6 +3,7 @@ const { hash, error, status, isLoading } = useTransactionModal()
 
 function getProgressValue() {
   switch (status.value) {
+    case 'start': return 0
     case 'signed': return 25
     case 'broadcasted': return 50
     case 'txBestBlocksState': return 75
@@ -10,6 +11,23 @@ function getProgressValue() {
     default: return 0
   }
 }
+
+function getStatusStep() {
+  switch (status.value) {
+    case 'signed': return 1
+    case 'broadcasted': return 2
+    case 'txBestBlocksState': return 3
+    case 'finalized': return 4
+    default: return 0
+  }
+}
+
+const steps = [
+  { label: 'Signing', icon: 'i-heroicons-pencil-square' },
+  { label: 'Broadcasting', icon: 'i-heroicons-radio' },
+  { label: 'In Block', icon: 'i-heroicons-cube' },
+  { label: 'Finalized', icon: 'i-heroicons-check-circle' },
+]
 </script>
 
 <template>
@@ -19,60 +37,72 @@ function getProgressValue() {
     :closable="false"
   >
     <template #content>
-      <div class="p-8">
-        <div class="text-center mb-6">
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            Processing Transaction
-          </h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            Please wait while your transaction is being processed
-          </p>
-        </div>
-
+      <div class="p-6">
         <!-- Loading State -->
         <div v-if="isLoading" class="space-y-6">
-          <!-- Modern Spinner -->
-          <div class="flex flex-col items-center space-y-4">
-            <div class="relative">
-              <!-- Outer ring -->
-              <div class="w-16 h-16 border-4 border-gray-200 dark:border-gray-700 rounded-full" />
-              <!-- Spinning ring -->
-              <div class="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-t-gray-600 dark:border-t-gray-400 rounded-full animate-spin" />
-              <!-- Inner pulsing dot -->
-              <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-gray-600 dark:bg-gray-400 rounded-full animate-pulse" />
-            </div>
+          <!-- Header with animated dots -->
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              Processing Transaction
+            </h3>
+          </div>
 
-            <!-- Percentage -->
-            <div class="text-center">
-              <div class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-1">
-                {{ getProgressValue() }}%
-              </div>
-              <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Complete
+          <!-- Step Indicators -->
+          <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+            <div class="grid grid-cols-4 gap-2">
+              <div
+                v-for="(step, index) in steps"
+                :key="index"
+                class="flex flex-col items-center space-y-2"
+              >
+                <div
+                  class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
+                  :class="[
+                    getStatusStep() > index ? 'bg-gray-600 text-white'
+                    : getStatusStep() === index + 1 ? 'bg-gray-300 text-gray-700 animate-pulse'
+                      : 'bg-gray-200 text-gray-400',
+                  ]"
+                >
+                  <UIcon :name="step.icon" class="text-sm" />
+                </div>
+                <span
+                  class="text-xs text-center transition-colors duration-300"
+                  :class="[
+                    getStatusStep() > index ? 'text-gray-700 dark:text-gray-300 font-medium'
+                    : getStatusStep() === index + 1 ? 'text-gray-600 dark:text-gray-400 font-medium'
+                      : 'text-gray-400 dark:text-gray-500',
+                  ]"
+                >
+                  {{ step.label }}
+                </span>
               </div>
             </div>
           </div>
 
-          <!-- Progress Bar -->
-          <div class="space-y-2">
+          <!-- Progress Card -->
+          <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Progress</span>
+              <span class="text-lg font-bold text-gray-800 dark:text-gray-200">{{ getProgressValue() }}%</span>
+            </div>
             <UProgress
               :value="getProgressValue()"
               color="neutral"
-              size="md"
-              class="transition-all duration-500 ease-out"
+              size="sm"
+              class="mb-2"
             />
-            <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>Processing...</span>
-              <span>{{ getProgressValue() }}/100</span>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              Step {{ getStatusStep() }} of 4
             </div>
           </div>
 
-          <!-- Transaction Hash -->
-          <div v-if="hash" class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
-              Transaction Hash
+          <!-- Transaction Hash Card -->
+          <div v-if="hash" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="flex items-center space-x-2 mb-2">
+              <UIcon name="i-heroicons-hashtag" class="text-sm text-gray-400" />
+              <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Transaction Hash</span>
             </div>
-            <div class="text-xs font-mono text-gray-700 dark:text-gray-300 break-all">
+            <div class="text-xs font-mono text-gray-700 dark:text-gray-300 break-all bg-gray-50 dark:bg-gray-800 rounded p-2">
               {{ hash }}
             </div>
           </div>
@@ -80,10 +110,8 @@ function getProgressValue() {
 
         <!-- Success State -->
         <div v-else-if="status === 'finalized' && !error" class="text-center space-y-4">
-          <div class="flex justify-center">
-            <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-              <UIcon name="i-heroicons-check-circle" class="text-3xl text-gray-600 dark:text-gray-400" />
-            </div>
+          <div class="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
+            <UIcon name="i-heroicons-check-circle" class="text-3xl text-green-600 dark:text-green-400" />
           </div>
           <div>
             <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -93,11 +121,12 @@ function getProgressValue() {
               Your transaction has been completed successfully
             </p>
           </div>
-          <div v-if="hash" class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
-              Transaction Hash
+          <div v-if="hash" class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="flex items-center space-x-2 mb-2">
+              <UIcon name="i-heroicons-hashtag" class="text-sm text-gray-400" />
+              <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Transaction Hash</span>
             </div>
-            <div class="text-xs font-mono text-gray-700 dark:text-gray-300 break-all">
+            <div class="text-xs font-mono text-gray-700 dark:text-gray-300 break-all bg-gray-50 dark:bg-gray-800 rounded p-2">
               {{ hash }}
             </div>
           </div>
@@ -105,10 +134,8 @@ function getProgressValue() {
 
         <!-- Error State -->
         <div v-else-if="error" class="text-center space-y-4">
-          <div class="flex justify-center">
-            <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-              <UIcon name="i-heroicons-exclamation-triangle" class="text-3xl text-gray-600 dark:text-gray-400" />
-            </div>
+          <div class="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto">
+            <UIcon name="i-heroicons-exclamation-triangle" class="text-3xl text-red-600 dark:text-red-400" />
           </div>
           <div>
             <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -117,9 +144,11 @@ function getProgressValue() {
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
               There was an error processing your transaction
             </p>
-            <p class="text-xs text-gray-500 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 rounded p-2">
-              {{ error.message }}
-            </p>
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+              <p class="text-xs text-red-700 dark:text-red-400">
+                {{ error.message }}
+              </p>
+            </div>
           </div>
         </div>
 

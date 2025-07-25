@@ -1,4 +1,3 @@
-import type { SubstrateWalletSource } from '~/utils/wallet/substrate/types'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 
@@ -11,21 +10,18 @@ interface CreateCollectionParams {
 export function useNftPallets() {
   const { $api } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
-  const { getSigner } = useSubWalletStore()
   const api = $api('pas_asset_hub')
 
-  const { hash, error, status } = useTransactionModal()
+  const { hash, error, status, reset } = useTransactionModal()
 
   async function createCollection({ maxSupply, metadataUri, royalty }: CreateCollectionParams) {
-    hash.value = ''
-    error.value = null
-    status.value = null
+    reset()
 
     if (!getConnectedSubAccount.value?.address) {
       throw new Error('No address found')
     }
 
-    const signer = await getSigner(getConnectedSubAccount.value?.extension?.id as SubstrateWalletSource, getConnectedSubAccount.value.address)
+    const signer = await getConnectedSubAccount.value.signer
 
     if (!signer) {
       throw new Error('No signer found')
