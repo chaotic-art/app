@@ -84,7 +84,7 @@ onBeforeMount(async () => {
       </div>
 
       <!-- Creator Section -->
-      <div class="mt-3 pt-3 border-t border-gray-100">
+      <div v-if="drop.creator" class="mt-3 pt-3 border-t border-gray-100">
         <div class="flex items-center gap-2">
           <span class="text-xs text-gray-500 font-medium">Created by</span>
           <UserInfo :avatar-size="20" :address="drop.creator" :transparent-background="true" class="min-w-0" />
