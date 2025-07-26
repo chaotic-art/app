@@ -85,7 +85,7 @@ onMounted(async () => {
         </h1>
 
         <div class="flex flex-col items-start md:flex-row md:items-center gap-4 justify-between my-6 lg:my-10">
-          <div class="flex flex-col gap-2">
+          <div v-if="drop?.creator" class="flex flex-col gap-2">
             <p class="text-sm text-gray-500">
               Created By
             </p>
@@ -95,7 +95,6 @@ onMounted(async () => {
               </div>
 
               <FollowButton
-                v-if="drop?.creator"
                 :target="drop.creator"
                 class="px-4 py-2 w-full sm:w-auto ml-0"
               />
