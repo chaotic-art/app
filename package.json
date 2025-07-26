@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "prepare": "husky",
-    "typecheck": "nuxi typecheck"
+    "typecheck": "papi --whitelist .papi/whitelist.ts && nuxi typecheck"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
