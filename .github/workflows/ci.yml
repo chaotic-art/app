@@ -26,21 +26,5 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
-          run_install: true
-
       - name: Type Check
-        run: pnpm exec nuxi typecheck
+        run: pnpm typecheck
