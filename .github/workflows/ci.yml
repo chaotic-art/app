@@ -43,7 +43,7 @@ jobs:
           run_install: true
 
       - name: Type Check
-        run: pnpm exec nuxi typecheck
+        run: npx nuxi typecheck
 
   build-cf-workers:
     runs-on: ubuntu-latest
