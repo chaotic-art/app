@@ -1,5 +1,6 @@
 import type { ChainVM } from '@kodadot1/static'
 import type { WalletAccount, WalletExtension, WalletStageType, WalletState } from './types'
+import type { SubstrateWalletSource } from '~/utils/wallet/substrate/types'
 import { defineStore } from 'pinia'
 import { WalletStageTypes, WalletStates } from './types'
 
@@ -31,7 +32,20 @@ export const useWalletStore = defineStore('wallet', () => {
     const [walletId] = accountId.split(':')
     if (!walletId)
       return undefined
-    return findWallet(walletId)?.accounts.find(account => account.id === accountId)
+    const account = findWallet(walletId)?.accounts.find(account => account.id === accountId)
+
+    if (!account)
+      return undefined
+
+    if (account.vm === 'EVM')
+      return account
+
+    const { getSigner } = useSubWalletStore()
+
+    return {
+      ...account,
+      signer: getSigner(walletId as SubstrateWalletSource, account.address),
+    }
   }
 
   function clear() {

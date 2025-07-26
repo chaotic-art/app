@@ -1,4 +1,5 @@
 import type { ChainVM } from '@kodadot1/static'
+import type { PolkadotSigner } from 'polkadot-api'
 
 export interface WalletAccount {
   id: `${string}:${string}`
@@ -6,6 +7,7 @@ export interface WalletAccount {
   address: string
   icon?: string
   name?: string
+  signer?: Promise<PolkadotSigner | undefined>
 }
 
 export const WalletStates = {
