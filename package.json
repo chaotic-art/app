@@ -8,10 +8,11 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "papi && nuxt prepare && npx gql-tada generate-output",
+    "postinstall": "nuxt prepare && npx gql-tada generate-output && papi",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typecheck": "nuxi typecheck"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
