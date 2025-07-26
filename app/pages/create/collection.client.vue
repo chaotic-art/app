@@ -1,111 +1,24 @@
 <script lang="ts" setup>
+import { useCollectionForm } from '~/composables/form/useCollectionForm'
+
 definePageMeta({
   title: 'Create Collection',
   layout: 'default',
 })
 
-// Form state
-const form = ref({
-  name: '',
-  description: '',
-  blockchain: '',
-  royalties: 0,
-  maxNfts: 'unlimited',
-  maxNftsNumber: 1000,
-})
-
-// Blockchains for select
-const blockchains = [
-  { label: 'Polkadot', value: 'polkadot' },
-  { label: 'Kusama', value: 'kusama' },
-  { label: 'Asset Hub Polkadot', value: 'ahp' },
-  { label: 'Asset Hub Kusama', value: 'ahk' },
-  { label: 'Ethereum', value: 'ethereum' },
-  { label: 'Base', value: 'base' },
-]
-
-// File upload states
-const logoFile = ref<File | null>(null)
-const bannerFile = ref<File | null>(null)
-
-// Loading state
-const isSubmitting = ref(false)
+// Use the collection form composable
+const {
+  state,
+  logoFile,
+  bannerFile,
+  blockchains,
+  validate,
+  onSubmit,
+  isLoading,
+} = useCollectionForm()
 
 // Router
 const router = useRouter()
-
-// Validation
-function validateForm() {
-  const errors: string[] = []
-
-  if (!form.value.name.trim())
-    errors.push('Collection name is required')
-  if (!form.value.description.trim())
-    errors.push('Description is required')
-  if (!form.value.blockchain.trim())
-    errors.push('Blockchain selection is required')
-  if (form.value.royalties < 0) {
-    errors.push('Royalties must be 0% or higher')
-  }
-  if (form.value.maxNfts === 'limited' && (!form.value.maxNftsNumber || form.value.maxNftsNumber < 1)) {
-    errors.push('Maximum NFTs must be at least 1 when limited')
-  }
-
-  // File validation
-  if (logoFile.value) {
-    const maxLogoSize = 5 * 1024 * 1024 // 5MB
-    if (logoFile.value.size > maxLogoSize) {
-      errors.push('Logo file size must be less than 5MB')
-    }
-    if (!logoFile.value.type.startsWith('image/')) {
-      errors.push('Logo must be an image file')
-    }
-  }
-
-  if (bannerFile.value) {
-    const maxBannerSize = 10 * 1024 * 1024 // 10MB
-    if (bannerFile.value.size > maxBannerSize) {
-      errors.push('Banner file size must be less than 10MB')
-    }
-    if (!bannerFile.value.type.startsWith('image/')) {
-      errors.push('Banner must be an image file')
-    }
-  }
-
-  return errors
-}
-
-// Submit handler
-async function handleSubmit() {
-  const errors = validateForm()
-
-  if (errors.length > 0) {
-    console.error('Validation errors:', errors)
-    return
-  }
-
-  isSubmitting.value = true
-
-  try {
-    console.error('Creating collection with data:', {
-      ...form.value,
-      logoFile: logoFile.value,
-      bannerFile: bannerFile.value,
-    })
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-
-    // Navigate back with success
-    await navigateTo('/')
-  }
-  catch (error) {
-    console.error('Error creating collection:', error)
-  }
-  finally {
-    isSubmitting.value = false
-  }
-}
 </script>
 
 <template>
@@ -121,14 +34,27 @@ async function handleSubmit() {
     </div>
 
     <!-- Form -->
-    <UCard class="mb-8">
+    <UCard class="mb-8 relative">
+      <!-- Loading Overlay -->
+      <div
+        v-if="isLoading"
+        class="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg"
+      >
+        <div class="flex flex-col items-center gap-3">
+          <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-600 dark:text-gray-400 animate-spin" />
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
+            Creating collection...
+          </p>
+        </div>
+      </div>
+
       <template #header>
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
           Collection Information
         </h2>
       </template>
 
-      <div class="space-y-6">
+      <UForm :state="state" :validate="validate" class="space-y-6" @submit="onSubmit">
         <!-- Visual Assets -->
         <div class="space-y-4">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -139,7 +65,9 @@ async function handleSubmit() {
             <!-- Logo Upload -->
             <div class="w-full">
               <UFormField
+                name="logo"
                 label="Collection Logo"
+                required
                 help="Recommended: 400x400px, Max 5MB"
               >
                 <UFileUpload
@@ -149,8 +77,8 @@ async function handleSubmit() {
                   label="Drop logo here"
                   description="PNG, JPG, GIF or SVG (max. 5MB)"
                   color="neutral"
-                  :disabled="isSubmitting"
-                  class="w-full min-h-32"
+                  :disabled="isLoading"
+                  class="w-full aspect-square"
                 />
               </UFormField>
             </div>
@@ -158,6 +86,7 @@ async function handleSubmit() {
             <!-- Banner Upload -->
             <div class="w-full">
               <UFormField
+                name="banner"
                 label="Collection Banner"
                 help="Recommended: 1200x400px, Max 10MB"
               >
@@ -168,8 +97,8 @@ async function handleSubmit() {
                   label="Drop banner here"
                   description="PNG, JPG, GIF or SVG (max. 10MB)"
                   color="neutral"
-                  :disabled="isSubmitting"
-                  class="w-full min-h-32"
+                  :disabled="isLoading"
+                  class="w-full aspect-square"
                 />
               </UFormField>
             </div>
@@ -185,14 +114,15 @@ async function handleSubmit() {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="w-full">
               <UFormField
+                name="name"
                 label="Collection Name"
                 required
                 help="This will be the name of your collection"
               >
                 <UInput
-                  v-model="form.name"
+                  v-model="state.name"
                   placeholder="My Awesome Collection"
-                  :disabled="isSubmitting"
+                  :disabled="isLoading"
                   class="w-full"
                 />
               </UFormField>
@@ -200,18 +130,21 @@ async function handleSubmit() {
 
             <div class="w-full">
               <UFormField
+                name="blockchain"
                 label="Blockchain"
                 required
                 help="Choose the blockchain network for your collection"
               >
-                <USelectMenu
-                  v-model="form.blockchain"
-                  :items="blockchains"
-                  value-key="value"
-                  placeholder="Select a blockchain"
-                  :disabled="isSubmitting"
-                  class="w-full"
-                />
+                <UTooltip text="Currently only Asset Hub Polkadot is supported">
+                  <USelectMenu
+                    v-model="state.blockchain"
+                    :items="blockchains"
+                    value-key="value"
+                    placeholder="Select a blockchain"
+                    :disabled="true"
+                    class="w-full"
+                  />
+                </UTooltip>
               </UFormField>
             </div>
           </div>
@@ -220,15 +153,16 @@ async function handleSubmit() {
         <!-- Description -->
         <div class="w-full">
           <UFormField
+            name="description"
             label="Description"
             required
             help="Describe your collection and what makes it unique"
           >
             <UTextarea
-              v-model="form.description"
+              v-model="state.description"
               placeholder="Tell people about your collection..."
               :rows="4"
-              :disabled="isSubmitting"
+              :disabled="isLoading"
               class="w-full"
             />
           </UFormField>
@@ -243,16 +177,18 @@ async function handleSubmit() {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="w-full">
               <UFormField
+                name="royalties"
                 label="Creator Royalties (%)"
                 help="Percentage you'll earn from secondary sales"
               >
                 <UInput
-                  v-model.number="form.royalties"
+                  v-model.number="state.royalties"
                   type="number"
                   min="0"
+                  max="100"
                   step="0.1"
                   placeholder="2.5"
-                  :disabled="isSubmitting"
+                  :disabled="isLoading"
                   class="w-full"
                 />
               </UFormField>
@@ -260,59 +196,63 @@ async function handleSubmit() {
 
             <div class="w-full">
               <UFormField
+                name="maxNfts"
                 label="Maximum NFTs"
                 help="Set the maximum number of NFTs in this collection"
               >
                 <div class="space-y-3">
                   <USelectMenu
-                    v-model="form.maxNfts"
+                    v-model="state.maxNfts"
                     :items="[
                       { label: 'Unlimited', value: 'unlimited' },
                       { label: 'Limited Number', value: 'limited' },
                     ]"
                     value-key="value"
                     placeholder="Select limit type"
-                    :disabled="isSubmitting"
+                    :disabled="isLoading"
                     class="w-full"
                   />
 
-                  <UInput
-                    v-if="form.maxNfts === 'limited'"
-                    v-model.number="form.maxNftsNumber"
-                    type="number"
-                    min="1"
-                    step="1"
-                    placeholder="1000"
-                    :disabled="isSubmitting"
-                    class="w-full"
-                  />
+                  <UFormField
+                    v-if="state.maxNfts === 'limited'"
+                    name="maxNftsNumber"
+                  >
+                    <UInput
+                      v-model.number="state.maxNftsNumber"
+                      type="number"
+                      min="1"
+                      step="1"
+                      placeholder="1000"
+                      :disabled="isLoading"
+                      class="w-full"
+                    />
+                  </UFormField>
                 </div>
               </UFormField>
             </div>
           </div>
         </div>
-      </div>
 
-      <template #footer>
-        <div class="flex items-center justify-between">
+        <!-- Form Footer -->
+        <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
           <UButton
             variant="ghost"
             color="neutral"
-            :disabled="isSubmitting"
+            :disabled="isLoading"
             @click="router.back()"
           >
             Cancel
           </UButton>
 
           <UButton
-            :loading="isSubmitting"
-            :disabled="isSubmitting"
-            @click="handleSubmit"
+            type="submit"
+            :loading="isLoading"
+            :disabled="isLoading"
           >
             Create Collection
           </UButton>
         </div>
-      </template>
+      </UForm>
     </UCard>
 
     <!-- Help Tips -->
