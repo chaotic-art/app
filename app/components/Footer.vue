@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import Logo from '@/assets/svg/navbar-logo.svg'
+
 interface FooterLinkItem {
   label: string
   href: string
@@ -44,13 +46,13 @@ const footerLinks: Array<
 
 <template>
   <UContainer class="mb-8 md:mb-16 mt-6 md:mt-8">
-    <footer class="bg-gray-50 dark:bg-neutral-900 rounded-[30px] overflow-hidden">
+    <footer class="bg-gray-50 dark:bg-neutral-800 rounded-[30px] overflow-hidden">
       <UContainer class="px-6 md:px-[60px] py-6 md:py-[40px]">
         <!-- Main Footer Content -->
         <div class="flex flex-col md:flex-row justify-between gap-8 md:gap-0">
           <!-- Become Artist Section -->
           <div class="max-w-full md:max-w-xs mb-6 md:mb-0 flex flex-col items-center md:items-start">
-            <img class="select-none w-10 h-10 md:w-14 md:h-14 mb-3" src="@/assets/svg/navbar-logo.svg" alt="logo">
+            <Logo class="select-none w-10 h-10 md:w-14 md:h-14 mb-3" :font-controlled="false" />
             <div class="text-2xl md:text-[42px] font-serif italic font-medium mb-4 md:mb-6 w-full md:w-[400px] text-center md:text-left text-gray-900 dark:text-white">
               {{ $t('footer.becomeArtist') }}
             </div>
