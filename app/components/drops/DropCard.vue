@@ -31,11 +31,11 @@ onBeforeMount(async () => {
   <NuxtLink v-if="shouldShowDrop" :to="`/${prefix}/drops/${drop.alias}`" class="relative border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group">
     <!-- Collectors on Hover -->
     <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-95">
-      <div class="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-2">
+      <div v-if="formattedDrop?.minted" class="bg-white/90 dark:bg-gray-800 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-2">
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1">
-            <UIcon name="mdi:account-group" class="text-gray-600 text-sm" />
-            <span class="text-xs font-medium text-gray-700">Collected by</span>
+            <UIcon name="mdi:account-group" class="text-gray-600 dark:text-gray-400 text-sm" />
+            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Collected by</span>
           </div>
           <DropCollectedBy :chain="prefix" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
         </div>
@@ -84,7 +84,7 @@ onBeforeMount(async () => {
       </div>
 
       <!-- Creator Section -->
-      <div class="mt-3 pt-3 border-t border-gray-100">
+      <div v-if="drop.creator" class="mt-3 pt-3 border-t border-gray-100">
         <div class="flex items-center gap-2">
           <span class="text-xs text-gray-500 font-medium">Created by</span>
           <UserInfo :avatar-size="20" :address="drop.creator" :transparent-background="true" class="min-w-0" />

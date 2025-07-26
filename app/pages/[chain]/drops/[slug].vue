@@ -14,7 +14,7 @@ const { data: drop } = await useAsyncData(`drop:${slug}`, () => getDropById(slug
 const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
 const { imageDataPayload, imageDataLoaded } = useGenerativeIframeData()
 const isCapturingImage = ref(false)
-const generativeImageUrl = ref(collection.value?.metadata.generative_uri)
+const generativeImageUrl = ref(collection.value?.metadata?.generative_uri)
 const items = ref<number[]>([])
 
 const { start: startTimer } = useTimeoutFn(() => {
@@ -46,7 +46,7 @@ function generateNft() {
 }
 
 watch(collection, () => {
-  generativeImageUrl.value = collection.value?.metadata.generative_uri
+  generativeImageUrl.value = collection.value?.metadata?.generative_uri
 })
 
 watch(imageDataLoaded, () => {
@@ -81,11 +81,11 @@ onMounted(async () => {
           </UBadge>
         </div>
         <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center lg:text-left mb-6 lg:mb-0">
-          {{ collection?.metadata.name ?? '---' }}
+          {{ collection?.metadata?.name ?? '---' }}
         </h1>
 
         <div class="flex flex-col items-start md:flex-row md:items-center gap-4 justify-between my-6 lg:my-10">
-          <div class="flex flex-col gap-2">
+          <div v-if="drop?.creator" class="flex flex-col gap-2">
             <p class="text-sm text-gray-500">
               Created By
             </p>
@@ -95,14 +95,13 @@ onMounted(async () => {
               </div>
 
               <FollowButton
-                v-if="drop?.creator"
                 :target="drop.creator"
                 class="px-4 py-2 w-full sm:w-auto ml-0"
               />
             </div>
           </div>
 
-          <div v-if="collection?.claimed" class="flex flex-col gap-2">
+          <div v-if="Number(collection?.claimed)" class="flex flex-col gap-2">
             <p class="text-sm text-gray-500">
               Collected By
             </p>
@@ -118,7 +117,7 @@ onMounted(async () => {
 
         <!-- description section -->
         <div class="text-sm md:text-base">
-          <MarkdownPreview :source="collection?.metadata.description ?? '---'" />
+          <MarkdownPreview :source="collection?.metadata?.description ?? '---'" />
         </div>
       </div>
 
@@ -128,10 +127,10 @@ onMounted(async () => {
         <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
           <iframe class="aspect-square w-full" :src="sanitizeIpfsUrl(generativeImageUrl)" frameborder="0" />
           <div class="flex flex-col sm:flex-row gap-2 mt-4 justify-center">
-            <UButton class="rounded-full bg-gray-100 text-xs md:text-sm cursor-pointer" variant="soft" trailing-icon="i-lucide-refresh-cw" :loading="isCapturingImage" @click="generateNft">
+            <UButton class="rounded-full bg-gray-100 dark:bg-gray-800 text-xs md:text-sm cursor-pointer" variant="soft" trailing-icon="i-lucide-refresh-cw" :loading="isCapturingImage" @click="generateNft">
               Preview Variation
             </UButton>
-            <UButton class="rounded-full bg-gray-100 text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
+            <UButton class="rounded-full bg-gray-100 dark:bg-gray-800 text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
               Controls
             </UButton>
           </div>

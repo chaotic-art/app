@@ -5,15 +5,15 @@ const BASE_URL = isProduction ? 'https://oda.koda.art' : 'https://oda-beta.koda.
 const api = $fetch.create({ baseURL: BASE_URL, retry: 3 })
 
 export interface OnchainCollection {
-  metadata: {
-    name: string
-    image: string
-    description: string
+  metadata?: {
+    name?: string
+    image?: string
+    description?: string
     generative_uri?: string
     banner?: string
   }
-  supply: string
-  claimed: string
+  supply?: string
+  claimed?: string
   owner?: string
 }
 
@@ -41,9 +41,11 @@ export interface NFTMetadata {
   image: string
   animation_url: string
   attributes: Record<string, string>[]
+  mime_type?: string
+  animation_mime_type?: string
 }
 
-interface OdaToken {
+export interface OdaToken {
   metadata: NFTMetadata
   metadata_uri: string
 }
