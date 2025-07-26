@@ -1,3 +1,4 @@
+import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
@@ -117,6 +118,7 @@ export function useCollectionForm() {
       const metadataUri = `ipfs://${cid}`
 
       await createCollection({
+        chain: event.data.blockchain as Prefix,
         maxSupply: event.data.maxNfts === 'unlimited' ? undefined : event.data.maxNftsNumber,
         metadataUri,
         royalty: event.data.royalties,

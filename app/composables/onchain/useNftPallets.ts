@@ -1,7 +1,9 @@
+import type { Prefix } from '@kodadot1/static'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 
 interface CreateCollectionParams {
+  chain: Prefix
   maxSupply?: number
   metadataUri: string
   royalty: number
@@ -15,11 +17,16 @@ interface CreateCollectionParams {
 export function useNftPallets() {
   const { $api } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
-  const api = $api('pas_asset_hub')
 
   const { hash, error, status, reset, result } = useTransactionModal()
 
-  async function createCollection({ maxSupply, metadataUri, royalty, context: collectionData }: CreateCollectionParams) {
+  async function createCollection({
+    chain,
+    maxSupply,
+    metadataUri,
+    royalty,
+    context: collectionData,
+  }: CreateCollectionParams) {
     reset()
 
     if (!getConnectedSubAccount.value?.address) {
@@ -32,6 +39,7 @@ export function useNftPallets() {
       throw new Error('No signer found')
     }
 
+    const api = $api(chain)
     await api.compatibilityToken
 
     // next collection id
@@ -112,7 +120,7 @@ export function useNftPallets() {
             description: collectionData.description,
             image: collectionData.image,
             hash: hash.value,
-            prefix: 'ahp', // TODO: get prefix
+            prefix: chain,
           }
         }
       },
