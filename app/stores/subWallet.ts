@@ -211,4 +211,6 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     getAllAccounts,
     getAccountsBySource,
   }
+}, {
+  persist: true,
 })
