@@ -36,14 +36,29 @@ export default function (prefix: Ref<Prefix>) {
       const api = $api(prefix.value)
       const chain = CHAINS[prefix.value]
 
-      // set deposit amount
-      existentialDeposit.value = Number(await api.constants.Balances.ExistentialDeposit())
-
       if (isAssetHub.value) {
-        collectionDeposit.value = Number(await api.constants.Nfts.CollectionDeposit())
-        itemDeposit.value = Number(await api.constants.Nfts.ItemDeposit())
-        metadataDeposit.value = Number(await api.constants.Nfts.MetadataDepositBase())
-        attributeDeposit.value = Number(await api.constants.Nfts.AttributeDepositBase())
+        const [
+          existentialDepositValue,
+          collectionDepositValue,
+          itemDepositValue,
+          metadataDepositValue,
+          attributeDepositValue,
+        ] = await Promise.all([
+          api.constants.Balances.ExistentialDeposit(),
+          api.constants.Nfts.CollectionDeposit(),
+          api.constants.Nfts.ItemDeposit(),
+          api.constants.Nfts.MetadataDepositBase(),
+          api.constants.Nfts.AttributeDepositBase(),
+        ])
+
+        existentialDeposit.value = Number(existentialDepositValue)
+        collectionDeposit.value = Number(collectionDepositValue)
+        itemDeposit.value = Number(itemDepositValue)
+        metadataDeposit.value = Number(metadataDepositValue)
+        attributeDeposit.value = Number(attributeDepositValue)
+      }
+      else {
+        existentialDeposit.value = Number(await api.constants.Balances.ExistentialDeposit())
       }
 
       totalCollectionDeposit.value = format(
