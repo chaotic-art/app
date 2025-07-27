@@ -1,12 +1,55 @@
 <script setup lang="ts">
+import useDropMassMintState from '@/composables/drop/massmint/useDropMassMintState'
+import StepOverview from './StepOverview.vue'
+
+defineProps<{ status: TransactionStatus }>()
 const emits = defineEmits(['confirm'])
+
+const ModalSteps = {
+  Overview: 'overview',
+  Signing: 'signing',
+  Succeded: 'succeded',
+} as const
+
+type ModalStep = typeof ModalSteps[keyof typeof ModalSteps]
+
 const isModalOpen = defineModel<boolean>({ required: true })
-const { formattedMinimumFunds, formattedMinimumFundsUSD } = useDropMinimumFunds()
-const { toMintNFTs, drop, loading } = storeToRefs(useDropStore())
+const modalStep = ref<ModalStep>(ModalSteps.Overview)
+
+const { canMint } = useDropMassMintState()
+const { minimumFunds } = useDropMinimumFunds()
+const { toMintNFTs } = storeToRefs(useDropStore())
+
+const loading = computed(() => !canMint.value)
+
+const isMintOverviewStep = computed(() => modalStep.value === ModalSteps.Overview)
+const isSigningStep = computed(() => modalStep.value === ModalSteps.Signing)
+const isSuccessfulDropStep = computed(() => modalStep.value === ModalSteps.Succeded)
+
+const mintButton = computed(() => {
+  if (loading.value) {
+    return {
+      label: 'Loading...',
+      disabled: true,
+    }
+  }
+
+  return {
+    label: 'Proceed to Signing',
+    disabled: false,
+  }
+})
 
 function onSubmit() {
   emits('confirm')
+  modalStep.value = ModalSteps.Signing
 }
+
+watch(isModalOpen, (open) => {
+  if (open) {
+    modalStep.value = ModalSteps.Overview
+  }
+})
 </script>
 
 <template>
@@ -18,39 +61,20 @@ function onSubmit() {
     }"
   >
     <template #body>
-      <div class="flex justify-between">
-        <USkeleton v-if="loading" class="h-4 w-full rounded" />
-        <template v-else>
-          <span class="font-bold">{{ drop.name }}</span>
-
-          <div>
-            {{ toMintNFTs.length }} x
-            <Money :value="toMintNFTs[0]?.price" inline />
-          </div>
-        </template>
+      <StepOverview
+        v-if="isMintOverviewStep"
+        :loading="loading"
+        :to-mint-nfts="toMintNFTs"
+        :minimum-funds="minimumFunds"
+        :mint-button="mintButton"
+        @confirm="onSubmit"
+      />
+      <div v-else-if="isSigningStep">
+        isSigningStep: {{ status }}
       </div>
-
-      <USeparator class="my-4" />
-
-      <div class="flex justify-between">
-        <USkeleton v-if="loading" class="h-4 w-full rounded" />
-        <template v-else>
-          <span>You Will Pay:</span>
-
-          <div class="flex items-center gap-2">
-            <div class="text-gray-500">
-              {{ formattedMinimumFunds }}
-            </div>
-            <div>
-              {{ formattedMinimumFundsUSD }}
-            </div>
-          </div>
-        </template>
+      <div v-else-if="isSuccessfulDropStep">
+        isSuccessfulDropStep
       </div>
-
-      <UButton class="rounded-full px-4 md:px-6 py-2 md:py-3 w-full mt-10" @click="onSubmit">
-        Proceed to Signing
-      </UButton>
     </template>
   </UModal>
 </template>

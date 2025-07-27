@@ -51,7 +51,9 @@
     "minted": "Minted",
     "seeListing": "See Listing",
     "generativeArtDrops": "Generative Art Drops",
-    "pastDrops": "Past Art Drops"
+    "pastDrops": "Past Art Drops",
+    "mintDropSuccess": "Drop minted successfully",
+    "mintDropError": "Error encountered, please retry. {0}"
   },
   "collection": {
     "topCollections": "Top Collections",
@@ -89,6 +91,5 @@
     "balance": "Balance",
     "usd": "USD",
     "total": "Total"
-  },
-  "viewProfile": "View Profile"
+  }
 }

@@ -1,47 +1,137 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
-import type { ActionMintDrop } from '@/composables/transaction/types'
+import { Binary } from 'polkadot-api'
 import useDropMassmint from '@/composables/drop/massmint/useDropMassmint'
-import { NFTs } from '@/composables/transaction/types'
+import { useUpdateMetadata } from '@/composables/drop/useGenerativeDropMint'
 
 const { chain } = useRoute().params
 const chainPrefix = computed(() => chain?.toString() as Prefix)
 const { prefix } = usePrefix()
+const { add: toast } = useToast()
+const { $i18n, $api } = useNuxtApp()
+const { accountId } = useAuth()
+const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
-const isModalOpen = ref(false)
-const { drop, amountToMint } = storeToRefs(useDropStore())
+const isMintModalOpen = ref(false)
+const { drop, loading, amountToMint, mintingSession, isCapturingImage, toMintNFTs } = storeToRefs(useDropStore())
 
 const { decimals, chainSymbol } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
 
-const {
-  transaction,
-  isLoading: isTransactionLoading,
-  status,
-  isError,
-  txHash,
-  blockNumber,
-} = useTransaction({
-  disableSuccessNotification: true,
-})
+const blockNumber = ref()
+const txHash = ref()
 
-const { massGenerate } = useDropMassmint()
-
-const dropAction = computed<ActionMintDrop>(() => ({
-  interaction: NFTs.MINT_DROP,
-  collectionId: drop.value?.collection,
-  price: drop.value?.price || null,
-  urlPrefix: prefix.value,
-}))
+const { massGenerate, clearMassMint } = useDropMassmint()
+const { status, resolveStatus, initTransactionLoader, isLoading: isTransactionLoading } = useTransactionStatus()
 
 function mint() {
   massGenerate()
-  isModalOpen.value = true
+  isMintModalOpen.value = true
 }
 
-function onConfirm() {
-  transaction(dropAction.value)
+async function executeSubTransaction() {
+  const api = $api(prefix.value)
+  const collectionId = drop.value?.collection
+  const price = drop.value?.price || null
+
+  const nftsMetadata = toMintNFTs.value.map((nft) => {
+    return {
+      chain: drop.value.chain,
+      collection: drop.value.collection,
+      metadata: nft.metadata,
+    }
+  })
+
+  const calls = toMintNFTs.value.map((allocatedNft) => {
+    return api.tx.Nfts.mint({
+      collection: Number(collectionId),
+      item: allocatedNft.nft,
+      mint_to: {
+        type: 'Id',
+        value: accountId.value!,
+      },
+      witness_data: {
+        mint_price: price ? BigInt(price) : undefined,
+      },
+    })
+  })
+
+  const transactions = [
+    ...calls,
+    api.tx.System.remark({
+      remark: Binary.fromText(JSON.stringify(nftsMetadata)),
+    }),
+  ]
+
+  const transaction = api.tx.Utility.batch_all({
+    calls: transactions.map(transaction => transaction.decodedCall),
+  })
+
+  const signer = await getConnectedSubAccount.value?.signer
+
+  if (!signer) {
+    return
+  }
+
+  initTransactionLoader()
+
+  transaction.signSubmitAndWatch(signer)
+    .subscribe({
+      next: (event) => {
+        resolveStatus(event)
+
+        if (event.type === 'finalized') {
+          txHash.value = event.txHash.toString()
+          blockNumber.value = event.block.number
+          toast({ title: $i18n.t('drop.mintDropSuccess') })
+          submitMints()
+        }
+      },
+      error: (error) => {
+        toast({ title: $i18n.t('drop.mintDropError', [error?.toString()]) })
+        stopMint()
+      },
+      complete: () => {
+        isTransactionLoading.value = false
+        closeMintModal()
+      },
+    })
 }
+
+function executeTransaction() {
+  execByVm({
+    SUB: executeSubTransaction,
+  })
+}
+
+async function submitMints() {
+  try {
+    await useUpdateMetadata({ blockNumber })
+
+    loading.value = false
+  }
+  catch (error) {
+    toast({ title: $i18n.t('drops.mintDropError', [error?.toString()]) })
+    isCapturingImage.value = false
+    closeMintModal()
+    throw error
+  }
+}
+
+function closeMintModal() {
+  isMintModalOpen.value = false
+  clearMassMint()
+}
+
+function stopMint() {
+  closeMintModal()
+  loading.value = false
+  clearMassMint()
+}
+
+watch(txHash, () => {
+  mintingSession.value.txHash = txHash.value
+})
 </script>
 
 <template>
@@ -142,7 +232,8 @@ function onConfirm() {
   </UContainer>
 
   <DropMintModal
-    v-model="isModalOpen"
-    @confirm="onConfirm"
+    v-model="isMintModalOpen"
+    :status="status"
+    @confirm="executeTransaction"
   />
 </template>

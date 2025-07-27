@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const { isLoading } = useDrop()
+useDrop()
 </script>
 
 <template>
-  <Drop />
+  <GenerativeDrop />
 </template>

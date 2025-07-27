@@ -165,8 +165,8 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     }
   }
 
-  function getSigner(source: SubstrateWalletSource, address: string): PolkadotSigner | undefined {
-    const wallet = enabledWallets.value.find(w => w.source === source)
+  async function getSigner(source: SubstrateWalletSource, address: string): Promise<PolkadotSigner | undefined> {
+    const wallet = await connectWallet(source)
 
     return wallet?.accounts.find(account => account.address === address)?.signer
   }

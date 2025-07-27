@@ -1,5 +1,6 @@
+import type { MintingSession } from '@/components/drop/types'
+import type { ToMassmintNFT } from '@/composables/drop/massmint/types'
 import type { DropItem, DropStatus } from '@/types'
-import type { ToMassmintNFT } from '~/composables/drop/massmint/types'
 
 const DEFAULT_DROP: Omit<DropItem, 'chain'> = {
   id: '',
@@ -28,7 +29,7 @@ export const useDropStore = defineStore('drop', () => {
   const loading = ref(false)
   const isCapturingImage = ref(false)
   const previewItem = ref<GenerativePreviewItem>()
-  const mintingSession = ref({ txHash: undefined, items: [] })
+  const mintingSession = ref<MintingSession>({ txHash: '', items: [] })
 
   // massmint
   const amountToMint = ref(1)
@@ -39,7 +40,7 @@ export const useDropStore = defineStore('drop', () => {
     loading.value = false
     toMintNFTs.value = []
     mintedNFTs.value = []
-    mintingSession.value = { txHash: undefined, items: [] }
+    mintingSession.value = { txHash: '', items: [] }
   }
 
   return {
