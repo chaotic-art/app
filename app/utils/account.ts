@@ -1,5 +1,5 @@
 import type { Prefix } from '@kodadot1/static'
-import { decodeAddress, encodeAddress } from 'dedot/utils'
+import { decodeAddress, encodeAddress, isEvmAddress } from 'dedot/utils'
 
 export function formatAddress({
   address,
@@ -21,4 +21,13 @@ export function isValidSubstrateAddress(address: string): boolean {
   catch {
     return false
   }
+}
+
+export function getss58AddressByPrefix(address: string, prefix: Prefix) {
+  if (isEvmAddress(address)) {
+    return address
+  }
+  const ss58Format = ss58Of(prefix)
+  const decodedAddress = decodeAddress(address)
+  return encodeAddress(decodedAddress, ss58Format)
 }

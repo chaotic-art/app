@@ -2,16 +2,19 @@
 import type { ButtonConfig } from './ButtonConfig.vue'
 import { useElementHover } from '@vueuse/core'
 import { follow, isFollowing, unfollow } from '@/services/profile'
+import { getss58AddressByPrefix } from '@/utils/account'
 
 const props = defineProps<{
   target: string
 }>()
 
+const emit = defineEmits(['followAction'])
 // const { doAfterLogin } = useDoAfterlogin()
 const showFollowing = ref(false)
 const loading = ref(false)
 const buttonRef = ref()
 
+const { prefix } = usePrefix()
 const { $i18n } = useNuxtApp()
 const { accountId } = useAuth()
 const { getSignaturePair } = useVerifyAccount()
@@ -61,10 +64,11 @@ const followConfig = computed<ButtonConfig>(() => ({
     await refreshFollowingStatus()
     loading.value = false
     showFollowing.value = isFollowingThisAccount.value || false
+    emit('followAction')
     // },
     // })
   },
-  classes: 'hover:bg-transparent!',
+  classes: 'hover:bg-transparent! hover:border-black dark:hover:border-white',
 }))
 
 const unfollowConfig = computed<ButtonConfig>(() => ({
@@ -96,8 +100,9 @@ const unfollowConfig = computed<ButtonConfig>(() => ({
     })
     await refreshFollowingStatus()
     loading.value = false
+    emit('followAction')
   },
-  classes: 'hover:border-red-500 hover:text-red-500 hover:bg-red-500/10',
+  classes: 'hover:bg-transparent! hover:border-red-500 hover:text-red-500 hover:bg-red-500/10',
 }))
 
 const followingConfig: ButtonConfig = {
@@ -137,10 +142,11 @@ defineExpose({ refresh: refreshFollowingStatus })
 <template>
   <div ref="buttonRef">
     <ButtonConfig
+      v-if="getss58AddressByPrefix(accountId || '', prefix) !== getss58AddressByPrefix(target, prefix)"
       :loading="loading"
       :button="{
         ...buttonConfig,
-        classes: `ml-4 px-6 py-2 rounded-full cursor-pointer border border-gray-300 dark:border-neutral-700 bg-background-color-secondary text-gray-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-neutral-700 ${buttonConfig.classes}`,
+        classes: `px-6 py-2 rounded-full cursor-pointer border border-gray-300 dark:border-neutral-700 bg-background-color-secondary text-gray-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-neutral-700 ${buttonConfig.classes}`,
       }"
       test-id="profile-button-multi-action"
       @click.stop
