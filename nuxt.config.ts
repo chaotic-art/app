@@ -99,14 +99,14 @@ export default defineNuxtConfig({
       rollupOptions: {
         output: {
           manualChunks: (id) => {
-            // if (id.includes('@reown/appkit-controllers'))
-            //   return '@reown/appkit-controllers'
-            // if (id.includes('@reown/appkit-ui'))
-            //   return '@reown/appkit-ui'
-            // if (id.includes('@reown/appkit-wallet'))
-            //   return '@reown/appkit-wallet'
-            // if (id.includes('@reown/appkit-adapter-wagmi'))
-            //   return '@reown/appkit-adapter-wagmi'
+            if (id.includes('@reown/appkit-controllers'))
+              return '@reown/appkit-controllers'
+            if (id.includes('@reown/appkit-ui'))
+              return '@reown/appkit-ui'
+            if (id.includes('@reown/appkit-wallet'))
+              return '@reown/appkit-wallet'
+            if (id.includes('@reown/appkit-adapter-wagmi'))
+              return '@reown/appkit-adapter-wagmi'
 
             // if (id.includes('@apollo/client'))
             //   return '@apollo/client'
