@@ -201,7 +201,7 @@ onKodahashRenderCompleted(({ payload }) => imageData.value = payload.image)
         <UIcon
           v-else
           name="i-mdi:arrow-top-right"
-          class="h-5 w-5 text-k-grey"
+          class="h-5 w-5 text-gray-500"
         />
       </span>
     </UTooltip>

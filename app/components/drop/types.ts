@@ -41,4 +41,7 @@ export interface MintedNFT {
 export interface MintingSession {
   txHash?: string
   items: MintedNFT[]
+  isLoading: boolean
+  failed: boolean
+  status: TransactionStatus
 }

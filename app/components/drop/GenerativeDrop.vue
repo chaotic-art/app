@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
+import type { TxInBestBlocksFound } from 'polkadot-api'
+import { watchDebounced } from '@vueuse/core'
 import { Binary } from 'polkadot-api'
 import useDropMassmint from '@/composables/drop/massmint/useDropMassmint'
 import { useUpdateMetadata } from '@/composables/drop/useGenerativeDropMint'
@@ -20,6 +22,7 @@ const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() 
 
 const blockNumber = ref()
 const txHash = ref()
+const isError = ref()
 
 const { massGenerate, clearMassMint } = useDropMassmint()
 const { status, resolveStatus, initTransactionLoader, isLoading: isTransactionLoading } = useTransactionStatus()
@@ -73,6 +76,7 @@ async function executeSubTransaction() {
     return
   }
 
+  isError.value = false
   initTransactionLoader()
 
   transaction.signSubmitAndWatch(signer)
@@ -80,20 +84,25 @@ async function executeSubTransaction() {
       next: (event) => {
         resolveStatus(event)
 
-        if (event.type === 'finalized') {
+        if (event.type === 'txBestBlocksState') {
           txHash.value = event.txHash.toString()
-          blockNumber.value = event.block.number
-          toast({ title: $i18n.t('drop.mintDropSuccess') })
+          blockNumber.value = (event as TxInBestBlocksFound).block.number
           submitMints()
         }
       },
       error: (error) => {
+        isError.value = true
         toast({ title: $i18n.t('drop.mintDropError', [error?.toString()]) })
+        if (!error.name.includes('cancelled')) {
+          status.value = TransactionStatus.Cancelled
+        }
+        else {
+          isError.value = true
+        }
         stopMint()
       },
       complete: () => {
         isTransactionLoading.value = false
-        closeMintModal()
       },
     })
 }
@@ -111,7 +120,7 @@ async function submitMints() {
     loading.value = false
   }
   catch (error) {
-    toast({ title: $i18n.t('drops.mintDropError', [error?.toString()]) })
+    toast({ title: $i18n.t('drop.mintDropError', [error?.toString()]) })
     isCapturingImage.value = false
     closeMintModal()
     throw error
@@ -129,9 +138,18 @@ function stopMint() {
   clearMassMint()
 }
 
-watch(txHash, () => {
+watchEffect(() => {
+  mintingSession.value.isLoading = isTransactionLoading.value
   mintingSession.value.txHash = txHash.value
+  mintingSession.value.failed = isError.value
+  mintingSession.value.status = status.value
 })
+
+watchDebounced(isMintModalOpen, (open) => {
+  if (!open) {
+    clearMassMint()
+  }
+}, { debounce: 500 })
 </script>
 
 <template>
@@ -233,7 +251,6 @@ watch(txHash, () => {
 
   <DropMintModal
     v-model="isMintModalOpen"
-    :status="status"
     @confirm="executeTransaction"
   />
 </template>

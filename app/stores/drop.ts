@@ -22,6 +22,14 @@ const DEFAULT_DROP: Omit<DropItem, 'chain'> = {
   abi: undefined,
 }
 
+const DEFAULT_MINTING_SESSION: MintingSession = {
+  txHash: '',
+  items: [],
+  isLoading: false,
+  failed: false,
+  status: TransactionStatus.Unknown,
+}
+
 export const useDropStore = defineStore('drop', () => {
   const { prefix } = usePrefix()
 
@@ -29,7 +37,7 @@ export const useDropStore = defineStore('drop', () => {
   const loading = ref(false)
   const isCapturingImage = ref(false)
   const previewItem = ref<GenerativePreviewItem>()
-  const mintingSession = ref<MintingSession>({ txHash: '', items: [] })
+  const mintingSession = ref<MintingSession>({ ...DEFAULT_MINTING_SESSION })
 
   // massmint
   const amountToMint = ref(1)
@@ -40,7 +48,7 @@ export const useDropStore = defineStore('drop', () => {
     loading.value = false
     toMintNFTs.value = []
     mintedNFTs.value = []
-    mintingSession.value = { txHash: '', items: [] }
+    mintingSession.value = { ...DEFAULT_MINTING_SESSION }
   }
 
   return {

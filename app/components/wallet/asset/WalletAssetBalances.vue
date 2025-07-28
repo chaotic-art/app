@@ -74,7 +74,7 @@ useIntervalFn(() => {
       v-else
       class="balance"
     >
-      <div class="balance-row text-k-grey text-xs">
+      <div class="balance-row text-gray-500 text-xs">
         <div class="flex-grow-3">
           {{ $t('general.chain') }}
         </div>

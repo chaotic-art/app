@@ -60,7 +60,7 @@ export default () => {
       logger.log('[MASSMINT::GENERATE] Generated', toRaw(toMintNFTs.value))
     }
     catch (error) {
-      errorMessage($i18n.t('drops.mintDropError', [error?.toString()]))
+      errorMessage($i18n.t('drop.mintDropError', [error?.toString()]))
       logger.log('[MASSMINT::GENERATE] Failed', error)
       loading.value = false
       throw error
