@@ -112,8 +112,8 @@ export default defineNuxtConfig({
 
             if (id.includes('@apollo/client'))
               return '@apollo/client'
-            // if (id.includes('viem'))
-            //   return 'viem'
+            if (id.includes('viem'))
+              return 'viem'
             if (id.includes('zod'))
               return 'zod'
             // if (id.includes('rxjs'))
