@@ -103,8 +103,8 @@ export default defineNuxtConfig({
             //   return 'reown'
             // if (id.includes('@reown/appkit-controllers'))
             //   return '@reown/appkit-controllers'
-            // if (id.includes('@reown/appkit-ui'))
-            //   return '@reown/appkit-ui'
+            if (id.includes('@reown/appkit-ui'))
+              return '@reown/appkit-ui'
             if (id.includes('@reown/appkit-wallet'))
               return '@reown/appkit-wallet'
             // if (id.includes('@reown/appkit-adapter-wagmi'))
