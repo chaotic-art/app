@@ -48,6 +48,10 @@ export const useAccountStore = defineStore('account', () => {
     return accounts.value[vm]?.address
   }
 
+  const getAuthSignature = (vm: ChainVM) => {
+    return accounts.value[vm]?.authSignature
+  }
+
   const getTokenDetailFromBalance = ({ prefix, balance }: { prefix: Prefix, balance: bigint | string }): TokenDetail => {
     const nativeBalance = String(balance || '0')
     const formattedBalance = format(nativeBalance, decimalsOf(prefix), false)
@@ -120,7 +124,7 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
-  const setAuth = async ({ vm, address }: { vm: ChainVM, address: string }) => {
+  const setAuth = async ({ vm, address, authSignature }: { vm: ChainVM, address: string, authSignature?: string }) => {
     accounts.value[vm] = {
       address,
       chains: Object.fromEntries(
@@ -130,6 +134,7 @@ export const useAccountStore = defineStore('account', () => {
             assets: {},
           }]),
       ),
+      authSignature,
     }
   }
 
@@ -147,6 +152,7 @@ export const useAccountStore = defineStore('account', () => {
     balances,
     balance,
     getAuthAddress,
+    getAuthSignature,
   }
 }, {
   persist: true,
