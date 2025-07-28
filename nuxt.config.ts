@@ -92,6 +92,12 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  icon: {
+    serverBundle: {
+      remote: 'unpkg',
+    },
+  },
+
   compatibilityDate: '2024-11-27',
 
   hooks: {
