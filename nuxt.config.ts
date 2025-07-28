@@ -99,9 +99,8 @@ export default defineNuxtConfig({
       rollupOptions: {
         output: {
           manualChunks: (id) => {
-            if (id.includes('reown')) {
-              return 'reown'
-            }
+            // if (id.includes('reown'))
+            //   return 'reown'
             // if (id.includes('@reown/appkit-controllers'))
             //   return '@reown/appkit-controllers'
             // if (id.includes('@reown/appkit-ui'))
@@ -111,8 +110,8 @@ export default defineNuxtConfig({
             // if (id.includes('@reown/appkit-adapter-wagmi'))
             //   return '@reown/appkit-adapter-wagmi'
 
-            // if (id.includes('@apollo/client'))
-            //   return '@apollo/client'
+            if (id.includes('@apollo/client'))
+              return '@apollo/client'
             // if (id.includes('viem'))
             //   return 'viem'
             if (id.includes('zod'))
@@ -121,8 +120,8 @@ export default defineNuxtConfig({
             //   return 'rxjs'
             if (id.includes('reka-ui'))
               return 'reka-ui'
-            // if (id.includes('@tanstack/query-core'))
-            //   return '@tanstack/query-core'
+            if (id.includes('@tanstack/query-core'))
+              return '@tanstack/query-core'
           },
         },
       },
