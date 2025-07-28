@@ -73,7 +73,7 @@ function closeModal() {
           />
           <ThemeSwitcher v-if="!accountId" />
         </div>
-        <NavbarWallet />
+        <LazyNavbarWallet />
       </div>
     </nav>
   </UContainer>

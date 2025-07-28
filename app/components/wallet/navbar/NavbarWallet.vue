@@ -8,7 +8,7 @@ const {
 <template>
   <div>
     <client-only>
-      <WalletDropdown
+      <LazyWalletDropdown
         @open-wallet="walletConnectModalOpen = true"
         @open-asset="walletAccountModalOpen = true"
       />
@@ -20,12 +20,12 @@ const {
     </client-only>
 
     <!-- Wallet Asset Modal -->
-    <WalletAssetModal
+    <LazyWalletAssetModal
       v-model="walletAccountModalOpen"
     />
 
     <!-- Wallet Connect Modal -->
-    <WalletConnectModal
+    <LazyWalletConnectModal
       v-model="walletConnectModalOpen"
       @close="walletConnectModalOpen = false"
     />
