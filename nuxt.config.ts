@@ -92,6 +92,12 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  icon: {
+    serverBundle: {
+      remote: 'jsdelivr',
+    },
+  },
+
   compatibilityDate: '2024-11-27',
 
   vite: {
