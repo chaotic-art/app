@@ -1,9 +1,6 @@
 import type { ProviderKeyType } from '@/config/ipfs'
 import { IPFS_REGEX, isCID, isHTTP } from '@kodadot1/minipfs'
-import {
-  getIPFSProvider,
-  kodaImage,
-} from '@/config/ipfs'
+import { CF_IMAGE_URL, getIPFSProvider, kodaImage } from '@/config/ipfs'
 
 export const ipfsUrlPrefix = 'ipfs://ipfs/'
 
@@ -68,4 +65,12 @@ export function toOriginalContentUrl(baseurl: string) {
   const url = new URL(baseurl)
   url.searchParams.append('original', 'true')
   return url.toString()
+}
+
+export function ipfsToCfImageUrl(ipfsUrl?: string) {
+  if (!ipfsUrl) {
+    return ''
+  }
+
+  return `${CF_IMAGE_URL}${fastExtract(ipfsUrl)}/public`
 }
