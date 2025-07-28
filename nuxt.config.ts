@@ -151,4 +151,8 @@ export default defineNuxtConfig({
       viteConfig.customLogger = logger
     },
   },
+
+  routeRules: {
+    '/': { prerender: true },
+  },
 })
