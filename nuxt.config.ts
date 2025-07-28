@@ -110,16 +110,16 @@ export default defineNuxtConfig({
 
             if (id.includes('@apollo/client'))
               return '@apollo/client'
-            if (id.includes('viem'))
-              return 'viem'
+            // if (id.includes('viem'))
+            //   return 'viem'
             if (id.includes('zod'))
               return 'zod'
             if (id.includes('rxjs'))
               return 'rxjs'
             if (id.includes('reka-ui'))
               return 'reka-ui'
-            if (id.includes('@tanstack/query-core'))
-              return '@tanstack/query-core'
+            // if (id.includes('@tanstack/query-core'))
+            //   return '@tanstack/query-core'
           },
         },
       },
