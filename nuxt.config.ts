@@ -94,7 +94,7 @@ export default defineNuxtConfig({
 
   icon: {
     serverBundle: {
-      remote: 'unpkg',
+      remote: 'jsdelivr',
     },
   },
 
