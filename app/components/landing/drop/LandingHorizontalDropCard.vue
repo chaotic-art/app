@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { DropItem } from '@/types'
-import { sanitizeIpfsUrl } from '@/utils/ipfs'
 
 const props = defineProps<{
   drop?: DropItem
@@ -18,7 +17,7 @@ useHead({
   link: [
     {
       rel: 'preload',
-      href: sanitizeIpfsUrl(props.drop?.banner),
+      href: ipfsToCfImageUrl(props.drop?.banner),
       as: 'image',
     },
   ],
@@ -28,11 +27,11 @@ useHead({
 <template>
   <div class="w-full rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 bg-background-color-secondary hover-card-effect" @click="emit('click', drop)">
     <!-- Banner Image Section -->
-    <div class="w-full h-[240px] md:h-[300px] bg-gray-200 dark:bg-neutral-800 relative">
+    <div class="w-full h-[320px] md:h-[300px] bg-gray-200 dark:bg-neutral-800 relative">
       <div v-if="isLoading" class="w-full h-full bg-gray-200 dark:bg-neutral-800 animate-pulse" />
       <img
         v-else
-        :src="sanitizeIpfsUrl(drop?.banner)"
+        :src="ipfsToCfImageUrl(drop?.banner)"
         :alt="drop?.name"
         class="w-full h-full object-cover"
         fetchpriority="high"
