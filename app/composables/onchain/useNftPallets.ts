@@ -147,13 +147,13 @@ export function useNftPallets() {
     })
   }
 
-  async function userCollection() {
+  async function userCollection(chain: Prefix) {
     if (!getConnectedSubAccount.value?.address) {
       // throw new Error('No address found')
       return []
     }
 
-    const api = $api('pas_asset_hub') // TODO: another nft-pallets chain
+    const api = $api(chain)
     const query = await api.query.Nfts.CollectionAccount.getEntries(getConnectedSubAccount.value.address)
     const collections = query.map(item => item.keyArgs[1])
     const collectionsData = await Promise.all(collections.map(async (collection) => {
@@ -201,7 +201,7 @@ export function useNftPallets() {
       throw new Error('No signer found')
     }
 
-    const api = $api('pas_asset_hub')
+    const api = $api(chain)
     await api.compatibilityToken
 
     // Get next item ID for the collection

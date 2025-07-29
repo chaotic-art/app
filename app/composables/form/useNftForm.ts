@@ -39,7 +39,7 @@ export function useNftForm() {
   onMounted(async () => {
     collectionsLoading.value = true
     try {
-      const userCollections = await userCollection()
+      const userCollections = await userCollection(state.blockchain as Prefix)
       collections.value = userCollections
         .filter((collection): collection is NonNullable<typeof collection> => Boolean(collection && collection.id))
         .map(collection => ({
