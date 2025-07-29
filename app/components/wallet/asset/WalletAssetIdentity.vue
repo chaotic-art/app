@@ -18,13 +18,7 @@ function handleWalletSettings() {
 
 <template>
   <div class="flex items-center justify-between">
-    <UserInfo :avatar-size="40" :address="accountId" :transparent-background="true" class="min-w-0">
-      <template #footer>
-        <div class="text-xs">
-          {{ $t('viewProfile') }}
-        </div>
-      </template>
-    </UserInfo>
+    <UserInfo :avatar-size="40" :address="accountId" :transparent-background="true" class="min-w-0" />
 
     <div class="flex items-center gap-2">
       <UButton

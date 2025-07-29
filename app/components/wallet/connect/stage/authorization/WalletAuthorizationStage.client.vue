@@ -37,7 +37,7 @@ const { openModal, isReady: isReownReady } = useReown({
 })
 
 async function initSubAuthorization(extension: WalletExtension): Promise<WalletAccount[]> {
-  const accounts = await subWalletStore.connectWallet(extension.source as any)
+  const { accounts } = await subWalletStore.connectWallet(extension.source as any)
 
   return formatSubAccounts({ extension, accounts })
 }

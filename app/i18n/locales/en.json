@@ -51,7 +51,11 @@
     "minted": "Minted",
     "seeListing": "See Listing",
     "generativeArtDrops": "Generative Art Drops",
-    "pastDrops": "Past Art Drops"
+    "pastDrops": "Past Art Drops",
+    "mintDropError": "Error encountered, please retry. {0}",
+    "youSuccessfullyClaimedNft": "You successfully minted {0} NFT",
+    "amountMintedSuccessfully": "{0} NFTs minted successfully",
+    "artBy": "{0} By"
   },
   "collection": {
     "topCollections": "Top Collections",
@@ -91,7 +95,27 @@
     "token": "Token",
     "balance": "Balance",
     "usd": "USD",
-    "total": "Total"
+    "total": "Total",
+    "viewTx": "View Tx",
+    "copy": "Copy",
+    "success": "Success",
+    "viewNft": "View NFT | View NFTs",
+    "copyToClipboard": "Copied to clipboard"
   },
-  "viewProfile": "View Profile"
+  "signing": {
+    "transaction": "Sign Transaction",
+    "tip": "Tip: Look for popups from your wallet extension for signing."
+  },
+  "transactionSteps": {
+    "broadcastingTx": "Broadcasting tx",
+    "completed": "Completed",
+    "error": "Failed to Sign",
+    "finishAbove": "Finish steps above first",
+    "loading": "Transaction in Progress",
+    "noSignatureRequired": "Signature not needed",
+    "uploading": "Uploading data to IPFS",
+    "waiting": "Awaiting Your Signature"
+  },
+  "confirmed": "Confirmed",
+  "finalazing": "Finalizing"
 }

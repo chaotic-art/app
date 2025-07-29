@@ -1,5 +1,8 @@
 import type { ChainProperties, Prefix } from '@kodadot1/static'
+import type { Chain } from '~/types'
+import { existentialDeposit as chainsExistentialDeposit } from '@kodadot1/static'
 import { chainPropListOf } from '@/utils/chain'
+import { prefixToChainMap } from '~/types'
 
 export function useChain() {
   const { prefix } = usePrefix()
@@ -29,6 +32,13 @@ export function useChain() {
 
     return Math.trunc(value * 10 ** decimals)
   }
+
+  const existentialDeposit = computed<number>(
+    () => chainsExistentialDeposit[prefix.value],
+  )
+
+  const currentChain = computed(() => prefixToChainMap[prefix.value] as Chain)
+
   return {
     vm,
     chainProperties,
@@ -36,5 +46,7 @@ export function useChain() {
     decimalsOf,
     withDecimals,
     chainSymbol,
+    existentialDeposit,
+    currentChain,
   }
 }

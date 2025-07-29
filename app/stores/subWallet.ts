@@ -18,6 +18,7 @@ function formatAccounts(source: SubstrateWalletSource, accounts: InjectedPolkado
     source,
     type: account.type,
     genesisHash: account.genesisHash,
+    signer: account.polkadotSigner,
   }))
 }
 
@@ -46,7 +47,6 @@ export const useSubWalletStore = defineStore('subWallet', () => {
           enabled: false,
           accounts: [],
           extension: undefined,
-          signer: undefined,
         }
       })
 
@@ -90,7 +90,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     wallet.unsub = unsub
   }
 
-  async function connectWallet(walletSource: SubstrateWalletSource): Promise<SubstrateWalletAccount[]> {
+  async function connectWallet(walletSource: SubstrateWalletSource): Promise<SubstrateWallet> {
     const wallet = wallets.value.find(w => w.source === walletSource)
 
     if (!wallet) {
@@ -110,10 +110,6 @@ export const useSubWalletStore = defineStore('subWallet', () => {
 
       const rawExtension = await connectInjectedExtension(walletSource, DAPP_NAME)
 
-      if (!rawExtension) {
-        throw new Error(`Failed to enable ${walletSource}`)
-      }
-
       const accounts = rawExtension.getAccounts()
       const walletAccounts = formatAccounts(wallet.source, accounts)
 
@@ -122,7 +118,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
       wallet.extension = rawExtension
       error.value = null
 
-      return walletAccounts
+      return wallet
     }
     catch (err) {
       console.error(`Failed to connect to wallet ${walletSource}:`, err)
@@ -143,6 +139,8 @@ export const useSubWalletStore = defineStore('subWallet', () => {
       if (!wallet) {
         throw new Error(`Wallet ${source} not found`)
       }
+
+      wallet.extension?.disconnect()
 
       updateWallet(wallet.source, { enabled: false })
 
