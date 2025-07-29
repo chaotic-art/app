@@ -95,7 +95,6 @@ async function executeSubTransaction() {
         }
       },
       error: (error) => {
-        isError.value = true
         toast({ title: $i18n.t('drop.mintDropError', [error?.toString()]) })
         if (!error.name.includes('cancelled')) {
           status.value = TransactionStatus.Cancelled
