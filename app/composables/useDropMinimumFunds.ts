@@ -25,7 +25,7 @@ export function useDropMinimumFunds() {
     tokenSymbol,
   )
 
-  const { formatted: formattedExistentialDeposit, usd: formattedExistentialDepositUSD } = useAmount(
+  const { formatted: formattedExistentialDeposit } = useAmount(
     existentialDeposit,
     tokenDecimals,
     tokenSymbol,
@@ -39,6 +39,5 @@ export function useDropMinimumFunds() {
     formattedMinimumFunds,
     formattedMinimumFundsUSD,
     formattedExistentialDeposit,
-    formattedExistentialDepositUSD,
   }
 }

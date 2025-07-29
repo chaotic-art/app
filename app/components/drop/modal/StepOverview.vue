@@ -2,7 +2,7 @@
 import type { ToMassmintNFT } from '@/composables/drop/massmint/types'
 
 const props = defineProps<{
-  loading?: boolean
+  loading: boolean
   toMintNfts: ToMassmintNFT[]
   minimumFunds: number
   mintButton: { label: string, disabled: boolean, loading?: boolean }

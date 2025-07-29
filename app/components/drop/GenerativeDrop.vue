@@ -28,6 +28,10 @@ const { massGenerate, clearMassMint } = useDropMassmint()
 const { status, resolveStatus, initTransactionLoader, isLoading: isTransactionLoading } = useTransactionStatus()
 
 function mint() {
+  if (!accountId.value) {
+    return
+  }
+
   massGenerate()
   isMintModalOpen.value = true
 }
