@@ -14,6 +14,27 @@ interface CreateCollectionParams {
   }
 }
 
+interface Property {
+  trait: string
+  value: string
+}
+
+interface MintNftParams {
+  chain: Prefix
+  collectionId: number
+  metadataUri: string
+  supply: number
+  autoNumbering: boolean
+  properties: Property[]
+  context: {
+    name: string
+    description: string
+    image: string
+    supply: number
+    autoNumbering: boolean
+  }
+}
+
 export function useNftPallets() {
   const { $api } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
@@ -131,7 +152,111 @@ export function useNftPallets() {
     })
   }
 
+  async function mintNft({
+    chain,
+    collectionId,
+    metadataUri,
+    supply,
+    autoNumbering,
+    properties,
+    context: nftData,
+  }: MintNftParams) {
+    reset()
+
+    if (!getConnectedSubAccount.value?.address) {
+      throw new Error('No address found')
+    }
+
+    const signer = await getConnectedSubAccount.value.signer
+
+    if (!signer) {
+      throw new Error('No signer found')
+    }
+
+    const api = $api(chain)
+    await api.compatibilityToken
+
+    // Get next item ID for the collection
+    const queryNextItemId = await api.query.Nfts.NextCollectionId.getValue()
+    let nextItemId = Number(queryNextItemId?.toString())
+
+    const calls = []
+
+    // Mint multiple NFTs if supply > 1
+    for (let i = 0; i < supply; i++) {
+      // Mint NFT
+      const _txMint = api.tx.Nfts.mint({
+        collection: collectionId,
+        item: nextItemId + i,
+        mint_to: MultiAddress.Id(getConnectedSubAccount.value.address),
+        witness_data: undefined,
+      })
+
+      // Set item metadata
+      const itemMetadata = autoNumbering && supply > 1
+        ? metadataUri.replace(nftData.name, `${nftData.name} #${i + 1}`)
+        : metadataUri
+
+      const _txItemMetadata = api.tx.Nfts.set_metadata({
+        collection: collectionId,
+        item: nextItemId + i,
+        data: Binary.fromText(itemMetadata),
+      })
+
+      calls.push(_txMint.decodedCall, _txItemMetadata.decodedCall)
+
+      // Add properties as attributes
+      properties.forEach((property) => {
+        const _txAttribute = api.tx.Nfts.set_attribute({
+          collection: collectionId,
+          maybe_item: nextItemId + i,
+          namespace: {
+            type: 'CollectionOwner',
+            value: undefined,
+          },
+          key: Binary.fromText(property.trait),
+          value: Binary.fromText(property.value),
+        })
+        calls.push(_txAttribute.decodedCall)
+      })
+    }
+
+    const transaction = api.tx.Utility.batch_all({ calls })
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        // eslint-disable-next-line no-console
+        console.log('event', event)
+
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+        }
+
+        if (event.type === 'finalized') {
+          result.value = {
+            type: 'nft',
+            collectionId: collectionId.toString(),
+            itemIds: Array.from({ length: supply }, (_, i) => (nextItemId + i).toString()),
+            name: nftData.name,
+            description: nftData.description,
+            image: nftData.image,
+            supply: nftData.supply,
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
+    mintNft,
   }
 }
