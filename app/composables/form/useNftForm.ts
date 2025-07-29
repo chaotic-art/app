@@ -171,7 +171,7 @@ export function useNftForm() {
 
       // Upload media file to IPFS
       const cidMedia = await pinDirectory([mediaFile.value!])
-      const image = `ipfs://${cidMedia}/${mediaFile.value!.name}`
+      const image = `ipfs://${cidMedia}`
 
       // Prepare NFT metadata
       const metadata: any = {
@@ -189,58 +189,38 @@ export function useNftForm() {
         }))
       }
 
-      // Handle multiple NFTs with auto-numbering
-      if (event.data.supply > 1 && event.data.autoNumbering) {
-        // For multiple NFTs with auto-numbering, we'll create individual metadata for each
-        const metadataPromises = Array.from({ length: event.data.supply }, async (_, i) => {
-          const numberedMetadata = {
-            ...metadata,
-            name: `${event.data.name} #${i + 1}`,
-          }
-          return await pinJson(numberedMetadata)
-        })
+      // Create metadata for each NFT
+      const metadataPromises = Array.from({ length: event.data.supply }, async (_, i) => {
+        let name = event.data.name
 
-        const cids = await Promise.all(metadataPromises)
-        // Use the first metadata URI as the base (the mintNft function will handle numbering)
-        const _metadataUri = `ipfs://${cids[0]}`
+        if (event.data.autoNumbering) {
+          name = `${event.data.name} #${i + 1}`
+        }
+        const nftMetadata = {
+          ...metadata,
+          name,
+        }
+        return await pinJson(nftMetadata)
+      })
 
-        await mintNft({
-          chain: event.data.blockchain as Prefix,
-          collectionId: Number.parseInt(event.data.collection),
-          metadataUri: _metadataUri,
+      const cids = await Promise.all(metadataPromises)
+      const metadataUris = event.data.supply === 1
+        ? `ipfs://${cids[0]}`
+        : cids.map(cid => `ipfs://${cid}`)
+
+      await mintNft({
+        chain: event.data.blockchain as Prefix,
+        collectionId: Number.parseInt(event.data.collection),
+        metadataUri: metadataUris,
+        supply: event.data.supply,
+        properties: validProperties,
+        context: {
+          name: event.data.name,
+          description: event.data.description,
+          image,
           supply: event.data.supply,
-          autoNumbering: event.data.autoNumbering,
-          properties: validProperties,
-          context: {
-            name: event.data.name,
-            description: event.data.description,
-            image,
-            supply: event.data.supply,
-            autoNumbering: event.data.autoNumbering,
-          },
-        })
-      }
-      else {
-        // Single NFT or multiple without auto-numbering
-        const cid = await pinJson(metadata)
-        const _metadataUri = `ipfs://${cid}`
-
-        await mintNft({
-          chain: event.data.blockchain as Prefix,
-          collectionId: Number.parseInt(event.data.collection),
-          metadataUri: _metadataUri,
-          supply: event.data.supply,
-          autoNumbering: false,
-          properties: validProperties,
-          context: {
-            name: event.data.name,
-            description: event.data.description,
-            image,
-            supply: event.data.supply,
-            autoNumbering: event.data.autoNumbering,
-          },
-        })
-      }
+        },
+      })
     }
     catch (error) {
       console.error('Error creating NFT:', error)

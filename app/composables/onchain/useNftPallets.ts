@@ -22,16 +22,14 @@ interface Property {
 interface MintNftParams {
   chain: Prefix
   collectionId: number
-  metadataUri: string
+  metadataUri: string | string[]
   supply: number
-  autoNumbering: boolean
   properties: Property[]
   context: {
     name: string
     description: string
     image: string
     supply: number
-    autoNumbering: boolean
   }
 }
 
@@ -188,7 +186,6 @@ export function useNftPallets() {
     collectionId,
     metadataUri,
     supply,
-    autoNumbering,
     properties,
     context: nftData,
   }: MintNftParams) {
@@ -223,10 +220,19 @@ export function useNftPallets() {
         witness_data: undefined,
       })
 
-      // Set item metadata
-      const itemMetadata = autoNumbering && supply > 1
-        ? metadataUri.replace(nftData.name, `${nftData.name} #${i + 1}`)
-        : metadataUri
+      // Set item metadata - use appropriate CID for each NFT
+      let itemMetadata: string
+      if (Array.isArray(metadataUri)) {
+        // Use the corresponding CID for each NFT, fallback to first if not enough CIDs
+        if (metadataUri.length === 0) {
+          throw new Error('No metadata URIs provided')
+        }
+        itemMetadata = metadataUri[i] ?? metadataUri[0]!
+      }
+      else {
+        // Single metadata URI for all NFTs
+        itemMetadata = metadataUri
+      }
 
       const _txItemMetadata = api.tx.Nfts.set_metadata({
         collection: collectionId,
