@@ -24,10 +24,15 @@ export function isValidSubstrateAddress(address: string): boolean {
 }
 
 export function getss58AddressByPrefix(address: string, prefix: Prefix) {
-  if (isEvmAddress(address)) {
-    return address
+  try {
+    if (isEvmAddress(address)) {
+      return address
+    }
+    const ss58Format = ss58Of(prefix)
+    const decodedAddress = decodeAddress(address)
+    return encodeAddress(decodedAddress, ss58Format)
   }
-  const ss58Format = ss58Of(prefix)
-  const decodedAddress = decodeAddress(address)
-  return encodeAddress(decodedAddress, ss58Format)
+  catch {
+    return ''
+  }
 }

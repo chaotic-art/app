@@ -140,9 +140,9 @@ defineExpose({ refresh: refreshFollowingStatus })
 </script>
 
 <template>
-  <div ref="buttonRef">
+  <div v-if="accountId" ref="buttonRef">
     <ButtonConfig
-      v-if="getss58AddressByPrefix(accountId || '', prefix) !== getss58AddressByPrefix(target, prefix)"
+      v-if="getss58AddressByPrefix(accountId, prefix) !== getss58AddressByPrefix(target, prefix)"
       :loading="loading"
       :button="{
         ...buttonConfig,
