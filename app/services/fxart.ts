@@ -1,4 +1,5 @@
 import type { Prefix } from '@kodadot1/static'
+import type { FetchError } from 'ofetch'
 import type { DropItem } from '@/types'
 import { $fetch } from 'ofetch'
 import { isProduction } from '@/utils/env'
@@ -60,25 +61,25 @@ export async function getDropMintedStatus(alias: string, accountId: string) {
   })
 }
 
-// export async function updateMetadata({ chain, collection, nft }) {
-//   try {
-//     const response = await api('/metadata/v1/dyndata/update', {
-//       method: 'post',
-//       body: {
-//         chain,
-//         collection,
-//         nft,
-//       },
-//     })
+export async function updateMetadata({ chain, collection, nft }: any) {
+  try {
+    const response = await api('/metadata/v1/dyndata/update', {
+      method: 'post',
+      body: {
+        chain,
+        collection,
+        nft,
+      },
+    })
 
-//     return response
-//   }
-//   catch (error) {
-//     throw new Error(
-//       `[FXART::UPDATE_METADATA] ERROR: ${(error as FetchError).data}`,
-//     )
-//   }
-// }
+    return response
+  }
+  catch (error) {
+    throw new Error(
+      `[FXART::UPDATE_METADATA] ERROR: ${(error as FetchError).data}`,
+    )
+  }
+}
 
 export interface DropCalendar {
   id: number

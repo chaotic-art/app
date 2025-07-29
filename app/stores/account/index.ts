@@ -100,20 +100,23 @@ export const useAccountStore = defineStore('account', () => {
         address,
       })
 
-      accounts.value = {
-        ...accounts.value,
-        [vm]: {
-          ...accounts.value[vm],
-          chains: {
-            ...accounts.value[vm].chains,
-            [chain]: updateChainDataWithBalance({
-              vm,
-              address,
-              balance,
-              prefix,
-            }),
+      // make sure account is still connected
+      if (accounts.value[vm].address) {
+        accounts.value = {
+          ...accounts.value,
+          [vm]: {
+            ...accounts.value[vm],
+            chains: {
+              ...accounts.value[vm].chains,
+              [chain]: updateChainDataWithBalance({
+                vm,
+                address,
+                balance,
+                prefix,
+              }),
+            },
           },
-        },
+        }
       }
 
       fetchedCount++

@@ -10,6 +10,10 @@ export function vmOf(prefix: Prefix): ChainVM {
   return chainPropListOf(prefix).vm
 }
 
+export function blockExplorerOf(prefix: Prefix): string {
+  return chainPropListOf(prefix).blockExplorer || ''
+}
+
 export function ss58Of(prefix: Prefix): number {
   return chainPropListOf(prefix).ss58Format
 }

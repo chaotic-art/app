@@ -74,7 +74,7 @@ useIntervalFn(() => {
       v-else
       class="balance"
     >
-      <div class="balance-row text-k-grey text-xs">
+      <div class="balance-row text-gray-500 text-xs">
         <div class="flex-grow-3">
           {{ $t('general.chain') }}
         </div>
@@ -115,7 +115,7 @@ useIntervalFn(() => {
       </div>
     </div>
 
-    <hr class="my-2">
+    <USeparator class="my-2" />
 
     <p class="flex justify-between items-end">
       <span class="text-xs"> {{ $t('general.total') }}: </span>
