@@ -27,7 +27,3 @@ export function decimalsOf(prefix: Prefix): number {
 }
 
 export const vmOfChain = (chain: Chain): ChainVM => vmOf(getPrefixOfChain(chain)!)
-
-export function getChainName(prefix: Prefix): string {
-  return chainNames[prefix]
-}
