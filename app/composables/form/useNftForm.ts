@@ -9,7 +9,7 @@ interface Property {
 }
 
 export function useNftForm() {
-  const { mintNft } = useNftPallets()
+  const { mintNft, userCollection } = useNftPallets()
   const { isLoading, status } = useTransactionModal()
 
   // Form state
@@ -31,12 +31,41 @@ export function useNftForm() {
     { label: 'Asset Hub Kusama', value: 'ahk' },
   ]
 
-  // Mock collections (in real app, this would be fetched from API)
-  const collections = [
-    { label: 'My Art Collection', value: '1' },
-    { label: 'Digital Portraits', value: '2' },
-    { label: 'Abstract Series', value: '3' },
-  ]
+  // Fetch user collections dynamically
+  const collections = ref<Array<{ label: string, value: string, name: string, description: string, image: string }>>([])
+  const collectionsLoading = ref(false)
+
+  // Fetch collections on component mount
+  onMounted(async () => {
+    collectionsLoading.value = true
+    try {
+      const userCollections = await userCollection()
+      collections.value = userCollections
+        .filter((collection): collection is NonNullable<typeof collection> => Boolean(collection && collection.id))
+        .map(collection => ({
+          label: `#${collection.id} - ${collection.name}`,
+          value: collection.id,
+          name: collection.name,
+          description: collection.description,
+          image: collection.image,
+        }))
+    }
+    catch (error) {
+      console.error('Error fetching collections:', error)
+      // Fallback to empty array if fetch fails
+      collections.value = []
+    }
+    finally {
+      collectionsLoading.value = false
+    }
+  })
+
+  // Get selected collection details
+  const selectedCollection = computed(() => {
+    if (!state.collection)
+      return null
+    return collections.value.find(collection => collection.value === state.collection) || null
+  })
 
   // Currency mapping based on blockchain
   const blockchainCurrencies: Record<string, string> = {
@@ -173,12 +202,12 @@ export function useNftForm() {
 
         const cids = await Promise.all(metadataPromises)
         // Use the first metadata URI as the base (the mintNft function will handle numbering)
-        const metadataUri = `ipfs://${cids[0]}`
+        const _metadataUri = `ipfs://${cids[0]}`
 
         await mintNft({
           chain: event.data.blockchain as Prefix,
           collectionId: Number.parseInt(event.data.collection),
-          metadataUri,
+          metadataUri: _metadataUri,
           supply: event.data.supply,
           autoNumbering: event.data.autoNumbering,
           properties: validProperties,
@@ -194,12 +223,12 @@ export function useNftForm() {
       else {
         // Single NFT or multiple without auto-numbering
         const cid = await pinJson(metadata)
-        const metadataUri = `ipfs://${cid}`
+        const _metadataUri = `ipfs://${cid}`
 
         await mintNft({
           chain: event.data.blockchain as Prefix,
           collectionId: Number.parseInt(event.data.collection),
-          metadataUri,
+          metadataUri: _metadataUri,
           supply: event.data.supply,
           autoNumbering: false,
           properties: validProperties,
@@ -224,7 +253,9 @@ export function useNftForm() {
     mediaFile,
     blockchains,
     collections,
+    collectionsLoading,
     selectedCurrency,
+    selectedCollection,
 
     // Functions
     validate,

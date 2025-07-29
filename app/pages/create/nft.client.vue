@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useNftForm } from '~/composables/form/useNftForm'
+import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 definePageMeta({
   title: 'Create NFT',
@@ -12,7 +13,9 @@ const {
   mediaFile,
   blockchains,
   collections,
+  collectionsLoading,
   selectedCurrency,
+  selectedCollection,
   validate,
   onSubmit,
   addProperty,
@@ -108,11 +111,9 @@ const router = useRouter()
                   required
                   help="Choose the blockchain network for your NFT"
                 >
-                  <USelectMenu
+                  <USelect
                     v-model="state.blockchain"
-                    :options="blockchains"
-                    value-attribute="value"
-                    option-attribute="label"
+                    :items="blockchains"
                     placeholder="Select a blockchain"
                     :disabled="isLoading"
                     class="w-full"
@@ -156,12 +157,16 @@ const router = useRouter()
                 >
                   <USelectMenu
                     v-model="state.collection"
-                    :options="collections"
-                    value-attribute="value"
-                    option-attribute="label"
+                    :items="collections"
+                    value-key="value"
                     placeholder="Select a collection"
-                    :disabled="isLoading"
+                    :search-input="{ placeholder: 'Search collections...' }"
+                    :disabled="isLoading || collectionsLoading"
+                    :loading="collectionsLoading"
                     class="w-full"
+                    :ui="{
+                      item: 'font-mono',
+                    }"
                   />
                 </UFormField>
               </div>
@@ -182,6 +187,43 @@ const router = useRouter()
                     class="w-full"
                   />
                 </UFormField>
+              </div>
+            </div>
+
+            <!-- Selected Collection Info -->
+            <div v-if="selectedCollection" class="space-y-3">
+              <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                Selected Collection
+              </h4>
+
+              <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                <div class="flex items-center gap-3">
+                  <div class="size-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                    <img
+                      v-if="selectedCollection.image"
+                      :src="sanitizeIpfsUrl(selectedCollection.image)"
+                      :alt="selectedCollection.name"
+                      class="w-full h-full object-cover"
+                    >
+                    <div v-else class="w-full h-full flex items-center justify-center">
+                      <UIcon name="i-heroicons-photo" class="text-sm text-gray-400" />
+                    </div>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <h5 class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {{ selectedCollection.name }}
+                      </h5>
+                      <span class="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded font-mono flex-shrink-0">
+                        #{{ selectedCollection.value }}
+                      </span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {{ selectedCollection.description }}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 

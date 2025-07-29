@@ -11,11 +11,25 @@ interface CollectionCategory {
   prefix: Prefix
 }
 
+interface NftCategory {
+  type: 'nft'
+  collectionId: string
+  itemIds: string[]
+  name: string
+  description: string
+  image: string
+  supply: number
+  hash: string
+  prefix: Prefix
+}
+
+type TransactionResult = CollectionCategory | NftCategory
+
 export default function useTransactionModal() {
   const hash = useState('transaction-hash', () => '')
   const error = useState<Error | null>('transaction-error', () => null)
   const status = useState<'start' | TxEvent['type'] | null>('transaction-status', () => null)
-  const result = useState<CollectionCategory | null>('transaction-result', () => null)
+  const result = useState<TransactionResult | null>('transaction-result', () => null)
 
   // Transaction status progression:
   // 1. status.value = 'signed'

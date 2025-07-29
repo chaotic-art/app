@@ -124,9 +124,6 @@ export function useNftPallets() {
 
     transaction.signSubmitAndWatch(signer).subscribe({
       next: (event) => {
-        // eslint-disable-next-line no-console
-        console.log('event', event)
-
         status.value = event.type
 
         if (event.type === 'txBestBlocksState' && event.found) {
@@ -152,6 +149,40 @@ export function useNftPallets() {
     })
   }
 
+  async function userCollection() {
+    if (!getConnectedSubAccount.value?.address) {
+      // throw new Error('No address found')
+      return []
+    }
+
+    const api = $api('pas_asset_hub') // TODO: another nft-pallets chain
+    const query = await api.query.Nfts.CollectionAccount.getEntries(getConnectedSubAccount.value.address)
+    const collections = query.map(item => item.keyArgs[1])
+    const collectionsData = await Promise.all(collections.map(async (collection) => {
+      const query = await api.query.Nfts.CollectionMetadataOf.getValue(collection)
+
+      if (query?.data.asText().length) {
+        const metadataData = await $fetch<{
+          id: string
+          name?: string
+          description?: string
+          image?: string
+        }>(sanitizeIpfsUrl(query?.data.asText()))
+
+        return {
+          id: collection.toString(),
+          name: metadataData?.name || 'Untitled',
+          description: metadataData?.description || 'No description',
+          image: metadataData?.image || 'https://placehold.co/600x400',
+        }
+      }
+
+      return null
+    }))
+
+    return collectionsData.filter(Boolean)
+  }
+
   async function mintNft({
     chain,
     collectionId,
@@ -173,12 +204,12 @@ export function useNftPallets() {
       throw new Error('No signer found')
     }
 
-    const api = $api(chain)
+    const api = $api('pas_asset_hub')
     await api.compatibilityToken
 
     // Get next item ID for the collection
-    const queryNextItemId = await api.query.Nfts.NextCollectionId.getValue()
-    let nextItemId = Number(queryNextItemId?.toString())
+    const queryNextItemId = await api.query.Nfts.Item.getEntries(collectionId)
+    const nextItemId = Math.max(...queryNextItemId.map(item => Number(item.keyArgs[1])), 0) + 1
 
     const calls = []
 
@@ -225,9 +256,6 @@ export function useNftPallets() {
 
     transaction.signSubmitAndWatch(signer).subscribe({
       next: (event) => {
-        // eslint-disable-next-line no-console
-        console.log('event', event)
-
         status.value = event.type
 
         if (event.type === 'txBestBlocksState' && event.found) {
@@ -258,5 +286,6 @@ export function useNftPallets() {
   return {
     createCollection,
     mintNft,
+    userCollection,
   }
 }
