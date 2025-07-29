@@ -1,6 +1,7 @@
-import type { Prefix } from '@kodadot1/static'
 import type BN from 'bn.js'
+import type { Prefix } from '@/types'
 import { formatBalance } from '@polkadot/util'
+import { chainToPrecisionMap, prefixToChainMap } from '@/types'
 
 function format(
   balance: number | string | BN | bigint,
@@ -60,7 +61,7 @@ export function formatAmountWithRound(value: string | number | bigint, tokenDeci
     const prefix = roundBy as Prefix
     if (prefix && isEvm(prefix)) {
       roundByPrefix = true
-      round = chainToPrecisionMap[prefixToChainMap[prefix]!]
+      round = chainToPrecisionMap[prefixToChainMap[prefix]]
     }
   }
   else {

@@ -73,12 +73,12 @@ export async function getDropAttributes(alias: string): Promise<DropItem | undef
   const onChainData = {
     max: Number(supply) || FALLBACK_DROP_COLLECTION_MAX,
     minted: Number(minted),
-    name: metadata.name,
-    collectionName: metadata.name,
-    collectionDescription: metadata.description,
-    image: metadata.image,
-    banner: metadata.banner || metadata.image,
-    content: metadata.generative_uri || campaign.content,
+    name: metadata?.name || '',
+    collectionName: metadata?.name || '',
+    collectionDescription: metadata?.description || '',
+    image: metadata?.image || '',
+    banner: metadata?.banner || metadata?.image || '',
+    content: metadata?.generative_uri || campaign.content,
     abi,
   }
 

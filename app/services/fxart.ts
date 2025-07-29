@@ -1,4 +1,5 @@
 import type { Prefix } from '@kodadot1/static'
+import type { FetchError } from 'ofetch'
 import type { DropItem } from '@/types'
 import { $fetch } from 'ofetch'
 import { isProduction } from '@/utils/env'

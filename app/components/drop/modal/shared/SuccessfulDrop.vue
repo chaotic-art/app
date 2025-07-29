@@ -42,7 +42,7 @@ onMounted(async () => {
 
   items.value.forEach((_, index) => {
     const metadata = metadatas[index]
-    if (metadata?.name) {
+    if (metadata?.name && items.value[index] && toMintNFTs.value[index]) {
       items.value[index].name = metadata.name
       toMintNFTs.value[index].name = metadata.name
     }

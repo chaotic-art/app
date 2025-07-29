@@ -1,5 +1,4 @@
 import type { DoResult } from '@/services/fxart'
-import { useSubscriptionGraphql } from '#imports'
 import { updateMetadata } from '@/services/fxart'
 
 export type DropMintedNft = DoResult & {
@@ -19,11 +18,11 @@ export interface DropCollectionById {
   }
 }
 
-export async function useUpdateMetadata({ blockNumber }: { blockNumber: Ref<number | undefined> }) {
+export async function useUpdateMetadata({ blockNumber: _blockNumber }: { blockNumber: Ref<number | undefined> }) {
   const { drop } = useDrop()
   const { toMintNFTs, mintingSession } = storeToRefs(useDropStore())
-  const { $consola } = useNuxtApp()
-  const { accountId } = useAuth()
+  // const { $consola } = useNuxtApp()
+  // const { accountId } = useAuth()
 
   const updateSubstrateMetadata = () => {
     mintingSession.value.items = toMintNFTs.value.map((item) => {
@@ -117,17 +116,17 @@ export default () => {
     () => drop.value.max && drop.value.minted < drop.value.max,
   )
 
-  const subscribeToMintedNft = (id: string, onReady: (data) => void) => {
-    useSubscriptionGraphql({
-      query: `nftEntityById(id: "${id}") {
-      id
-    }`,
-      onChange: onReady,
-    })
-  }
+  // const subscribeToMintedNft = (id: string, onReady: (data) => void) => {
+  //   useSubscriptionGraphql({
+  //     query: `nftEntityById(id: "${id}") {
+  //     id
+  //   }`,
+  //     onChange: onReady,
+  //   })
+  // }
 
   return {
     mintCountAvailable,
-    subscribeToMintedNft,
+    // subscribeToMintedNft,
   }
 }

@@ -71,7 +71,10 @@
     "all": "Artists"
   },
   "profile": {
-    "follow": "Follow"
+    "follow": "Follow",
+    "unfollow": "Unfollow",
+    "following": "Following",
+    "unfollowing": "Unfollowing"
   },
   "common": {
     "price": "Price"

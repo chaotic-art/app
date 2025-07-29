@@ -107,13 +107,13 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: collection.value?.metadata.name,
-  description: collection.value?.metadata.description.slice(0, 150),
+  title: collection.value?.metadata?.name,
+  description: collection.value?.metadata?.description?.slice(0, 150),
 })
 
 defineOgImageComponent('Frame', {
-  title: collection.value?.metadata.name,
-  image: sanitizeIpfsUrl(collection.value?.metadata.image),
+  title: collection.value?.metadata?.name,
+  image: sanitizeIpfsUrl(collection.value?.metadata?.image),
   items: collection.value?.supply,
   claimed: collection.value?.claimed,
   network: chain.value,

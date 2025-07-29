@@ -13,5 +13,7 @@ onMounted(async () => {
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+
+    <TransactionModal />
   </UApp>
 </template>

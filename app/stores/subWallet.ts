@@ -1,4 +1,4 @@
-import type { InjectedPolkadotAccount, PolkadotSigner } from 'polkadot-api/pjs-signer'
+import type { InjectedPolkadotAccount } from 'polkadot-api/pjs-signer'
 import type {
   SubstrateWallet,
   SubstrateWalletAccount,
@@ -6,7 +6,7 @@ import type {
 } from '@/utils/wallet/substrate/types'
 import { defineStore } from 'pinia'
 import { connectInjectedExtension } from 'polkadot-api/pjs-signer'
-import { getInjectedExtension, isExtensionInstalled } from '@/utils/wallet/substrate'
+import { isExtensionInstalled } from '@/utils/wallet/substrate'
 import { getAvailableWallets } from '@/utils/wallet/substrate/config'
 
 const DAPP_NAME = 'Chaotic'
@@ -108,23 +108,14 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     try {
       isLoading.value = true
 
-      if (!getInjectedExtension(walletSource)) {
-        throw new Error(`Injected extension not found for ${walletSource}`)
-      }
+      const rawExtension = await connectInjectedExtension(walletSource, DAPP_NAME)
 
-      const injectedExtension = await connectInjectedExtension(walletSource, DAPP_NAME)
-
-      if (!injectedExtension) {
-        throw new Error(`Failed to enable ${walletSource}`)
-      }
-
-      const accounts = injectedExtension.getAccounts()
-
+      const accounts = rawExtension.getAccounts()
       const walletAccounts = formatAccounts(wallet.source, accounts)
 
       wallet.accounts = walletAccounts
       wallet.enabled = true
-      wallet.extension = injectedExtension
+      wallet.extension = rawExtension
       error.value = null
 
       return wallet
@@ -165,10 +156,11 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     }
   }
 
-  async function getSigner(source: SubstrateWalletSource, address: string): Promise<PolkadotSigner | undefined> {
-    const wallet = await connectWallet(source)
+  async function getSigner(source: SubstrateWalletSource, address: string) {
+    const selectedExtension = await connectInjectedExtension(source)
+    const account = selectedExtension.getAccounts().find(account => account.address === address)
 
-    return wallet?.accounts.find(account => account.address === address)?.signer
+    return account?.polkadotSigner
   }
 
   function getInstalledWallets(): SubstrateWallet[] {
@@ -217,4 +209,6 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     getAllAccounts,
     getAccountsBySource,
   }
+}, {
+  persist: true,
 })

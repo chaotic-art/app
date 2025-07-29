@@ -1,11 +1,14 @@
 export function successMessage(message?: string) {
-  alert(message || 'Success')
+  const toast = useToast()
+  toast.add({ title: message || 'Success' })
 }
 
 export function warningMessage(message?: string) {
-  alert(message || 'Warning')
+  const toast = useToast()
+  toast.add({ title: message || 'Warning' })
 }
 
 export function errorMessage(message?: string) {
-  alert(message || 'Error')
+  const toast = useToast()
+  toast.add({ title: message || 'Error' })
 }

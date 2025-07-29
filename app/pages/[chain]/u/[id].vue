@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { CHAINS } from '@kodadot1/static'
-import { isAddress } from '@polkadot/util-crypto'
+import { encodeAddress } from 'dedot/utils'
 
 // Validate chain parameter
 definePageMeta({
   validate: async (route) => {
     const { chain, id } = route.params
     const isValidChain = typeof chain === 'string' && chain in CHAINS
-    const isValidAddress = isAddress(String(id))
-    return isValidChain && isValidAddress
+
+    try {
+      encodeAddress(String(id), 0)
+      return isValidChain
+    }
+    catch {
+      return false
+    }
   },
 })
 
