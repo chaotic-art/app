@@ -25,3 +25,6 @@ logs
 
 # GraphQL
 app/graphql/*.d.ts
+
+# Descriptors
+app/descriptors/*

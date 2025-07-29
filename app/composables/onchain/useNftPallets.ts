@@ -14,6 +14,25 @@ interface CreateCollectionParams {
   }
 }
 
+interface Property {
+  trait: string
+  value: string
+}
+
+interface MintNftParams {
+  chain: Prefix
+  collectionId: number
+  metadataUri: string | string[]
+  supply: number
+  properties: Property[]
+  context: {
+    name: string
+    description: string
+    image: string
+    supply: number
+  }
+}
+
 export function useNftPallets() {
   const { $api } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
@@ -103,9 +122,6 @@ export function useNftPallets() {
 
     transaction.signSubmitAndWatch(signer).subscribe({
       next: (event) => {
-        // eslint-disable-next-line no-console
-        console.log('event', event)
-
         status.value = event.type
 
         if (event.type === 'txBestBlocksState' && event.found) {
@@ -131,7 +147,151 @@ export function useNftPallets() {
     })
   }
 
+  async function userCollection(chain: Prefix) {
+    if (!getConnectedSubAccount.value?.address) {
+      // throw new Error('No address found')
+      return []
+    }
+
+    const api = $api(chain)
+    const query = await api.query.Nfts.CollectionAccount.getEntries(getConnectedSubAccount.value.address)
+    const collections = query.map(item => item.keyArgs[1])
+    const collectionsData = await Promise.all(collections.map(async (collection) => {
+      const query = await api.query.Nfts.CollectionMetadataOf.getValue(collection)
+
+      if (query?.data.asText().length) {
+        const metadataData = await $fetch<{
+          id: string
+          name?: string
+          description?: string
+          image?: string
+        }>(sanitizeIpfsUrl(query?.data.asText()))
+
+        return {
+          id: collection.toString(),
+          name: metadataData?.name || 'Untitled',
+          description: metadataData?.description || 'No description',
+          image: metadataData?.image || 'https://placehold.co/600x400',
+        }
+      }
+
+      return null
+    }))
+
+    return collectionsData.filter(Boolean)
+  }
+
+  async function mintNft({
+    chain,
+    collectionId,
+    metadataUri,
+    supply,
+    properties,
+    context: nftData,
+  }: MintNftParams) {
+    reset()
+
+    if (!getConnectedSubAccount.value?.address) {
+      throw new Error('No address found')
+    }
+
+    const signer = await getConnectedSubAccount.value.signer
+
+    if (!signer) {
+      throw new Error('No signer found')
+    }
+
+    const api = $api(chain)
+    await api.compatibilityToken
+
+    // Get next item ID for the collection
+    const queryNextItemId = await api.query.Nfts.Item.getEntries(collectionId)
+    const nextItemId = Math.max(...queryNextItemId.map(item => Number(item.keyArgs[1])), 0) + 1
+
+    const calls = []
+
+    // Mint multiple NFTs if supply > 1
+    for (let i = 0; i < supply; i++) {
+      // Mint NFT
+      const _txMint = api.tx.Nfts.mint({
+        collection: collectionId,
+        item: nextItemId + i,
+        mint_to: MultiAddress.Id(getConnectedSubAccount.value.address),
+        witness_data: undefined,
+      })
+
+      // Set item metadata - use appropriate CID for each NFT
+      let itemMetadata: string
+      if (Array.isArray(metadataUri)) {
+        // Use the corresponding CID for each NFT, fallback to first if not enough CIDs
+        if (metadataUri.length === 0) {
+          throw new Error('No metadata URIs provided')
+        }
+        itemMetadata = metadataUri[i] ?? metadataUri[0]!
+      }
+      else {
+        // Single metadata URI for all NFTs
+        itemMetadata = metadataUri
+      }
+
+      const _txItemMetadata = api.tx.Nfts.set_metadata({
+        collection: collectionId,
+        item: nextItemId + i,
+        data: Binary.fromText(itemMetadata),
+      })
+
+      calls.push(_txMint.decodedCall, _txItemMetadata.decodedCall)
+
+      // Add properties as attributes
+      properties.forEach((property) => {
+        const _txAttribute = api.tx.Nfts.set_attribute({
+          collection: collectionId,
+          maybe_item: nextItemId + i,
+          namespace: {
+            type: 'CollectionOwner',
+            value: undefined,
+          },
+          key: Binary.fromText(property.trait),
+          value: Binary.fromText(property.value),
+        })
+        calls.push(_txAttribute.decodedCall)
+      })
+    }
+
+    const transaction = api.tx.Utility.batch_all({ calls })
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+        }
+
+        if (event.type === 'finalized') {
+          result.value = {
+            type: 'nft',
+            collectionId: collectionId.toString(),
+            itemIds: Array.from({ length: supply }, (_, i) => (nextItemId + i).toString()),
+            name: nftData.name,
+            description: nftData.description,
+            image: nftData.image,
+            supply: nftData.supply,
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
+    mintNft,
+    userCollection,
   }
 }
