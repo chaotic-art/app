@@ -117,13 +117,16 @@ const router = useRouter()
                   required
                   help="Choose the blockchain network for your NFT"
                 >
-                  <USelect
-                    v-model="state.blockchain"
-                    :items="blockchains"
-                    placeholder="Select a blockchain"
-                    :disabled="isLoading"
-                    class="w-full"
-                  />
+                  <UTooltip text="Currently only Asset Hub Polkadot is supported">
+                    <USelectMenu
+                      v-model="state.blockchain"
+                      :items="blockchains"
+                      value-key="value"
+                      placeholder="Select a blockchain"
+                      :disabled="true"
+                      class="w-full"
+                    />
+                  </UTooltip>
                 </UFormField>
               </div>
             </div>
