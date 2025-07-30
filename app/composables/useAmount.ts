@@ -1,4 +1,4 @@
-import type { Prefix } from '@/types'
+import type { Prefix } from '@kodadot1/static'
 import { formatAmountWithRound } from '@/utils/format/balance'
 
 export default function (

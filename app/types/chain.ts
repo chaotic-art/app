@@ -1,13 +1,10 @@
-import type { Prefix as KodaPrefix } from '@kodadot1/static'
-
-export type Prefix = Extract<KodaPrefix, 'ahk' | 'ksm' | 'ahp' | 'dot' | 'ahw'>
-
 export const Chains = {
   Kusama: 'Kusama',
   AssetHubKusama: 'AssetHubKusama',
   AssetHubPolkadot: 'AssetHubPolkadot',
   Polkadot: 'Polkadot',
   AssetHubWestend: 'AssetHubWestend',
+  Base: 'Base',
 } as const
 
 export type Chain = typeof Chains[keyof typeof Chains]
@@ -18,6 +15,7 @@ export const prefixToChainMap = {
   ahp: Chains.AssetHubPolkadot,
   dot: Chains.Polkadot,
   ahw: Chains.AssetHubWestend,
+  base: Chains.Base,
 } as const
 
 export const chainToPrecisionMap: Record<Chain, number> = {
@@ -26,6 +24,7 @@ export const chainToPrecisionMap: Record<Chain, number> = {
   [Chains.AssetHubPolkadot]: 5,
   [Chains.Polkadot]: 4,
   [Chains.AssetHubWestend]: 5,
+  [Chains.Base]: 4,
 }
 
 export const chainToPrefixMap = {
@@ -34,4 +33,5 @@ export const chainToPrefixMap = {
   [Chains.AssetHubPolkadot]: 'ahp',
   [Chains.Polkadot]: 'dot',
   [Chains.AssetHubWestend]: 'ahw',
+  [Chains.Base]: 'base',
 } as const

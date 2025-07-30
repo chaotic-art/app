@@ -1,4 +1,4 @@
-import type { Prefix } from '@/types'
+import type { Prefix } from '@kodadot1/static'
 
 const prefix = ref<Prefix>('ahp')
 
