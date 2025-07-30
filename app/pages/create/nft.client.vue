@@ -1,11 +1,17 @@
 <script lang="ts" setup>
 import { useNftForm } from '~/composables/form/useNftForm'
+import { useWalletStore } from '~/stores/wallet'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 definePageMeta({
   title: 'Create NFT',
   layout: 'default',
 })
+
+// Wallet connection check
+const walletStore = useWalletStore()
+const { getConnectedSubAccount } = storeToRefs(walletStore)
+const isWalletConnected = computed(() => Boolean(getConnectedSubAccount.value))
 
 // Use the NFT form composable
 const {
@@ -363,9 +369,9 @@ const router = useRouter()
             <UButton
               type="submit"
               :loading="isLoading"
-              :disabled="isLoading"
+              :disabled="isLoading || !isWalletConnected"
             >
-              Create NFT
+              {{ !isWalletConnected ? 'Connect Wallet to Create NFT' : 'Create NFT' }}
             </UButton>
           </div>
         </template>
