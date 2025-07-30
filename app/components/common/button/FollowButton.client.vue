@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ButtonConfig } from './ButtonConfig.vue'
+import type { ButtonConfig } from './CommonButtonConfig.vue'
 import { useElementHover } from '@vueuse/core'
 import { follow, isFollowing, unfollow } from '@/services/profile'
 import { getss58AddressByPrefix } from '@/utils/account'
@@ -141,7 +141,7 @@ defineExpose({ refresh: refreshFollowingStatus })
 
 <template>
   <div ref="buttonRef">
-    <ButtonConfig
+    <CommonButtonConfig
       v-if="!accountId || getss58AddressByPrefix(accountId, prefix) !== getss58AddressByPrefix(target, prefix)"
       :loading="loading"
       :button="{
