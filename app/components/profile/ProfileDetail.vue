@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ButtonConfig } from '~/components/common/button/CommonButtonConfig.vue'
 import { computed } from 'vue'
 import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import useFetchProfile from '@/composables/useFetchProfile'
@@ -7,19 +8,39 @@ import { shortenAddress } from '@/utils/format/address'
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
 
 const props = defineProps<{ address: string }>()
-
+const { isCurrentAccount } = useAuth()
 const { profile } = useFetchProfile(computed(() => props.address))
+
 const bannerUrl = computed(() => sanitizeIpfsUrl(profile?.value?.banner || ''))
 const followButton = ref()
 const followModalTab = ref<'followers' | 'following'>('followers')
 const isFollowModalActive = ref(false)
-
+const isEditProfileModalActive = ref(false)
 const { data: followers, refresh: refreshFollowers } = useAsyncData(
   `followersof${props.address}`,
   () =>
     fetchFollowersOf(props.address, {
       limit: 3,
     }),
+)
+
+const editProfileConfig: ButtonConfig = {
+  label: 'Edit Profile',
+  icon: 'i-heroicons-pencil-square',
+  onClick: () => isEditProfileModalActive.value = true,
+  classes: 'rounded-full',
+}
+
+const createProfileConfig: ButtonConfig = {
+  label: 'Create Profile',
+  icon: 'i-heroicons-sparkles',
+  onClick: () => isEditProfileModalActive.value = true,
+  variant: 'solid',
+  classes: 'rounded-full',
+}
+
+const profileButtonConfig = computed<ButtonConfig>(() =>
+  profile.value ? editProfileConfig : createProfileConfig,
 )
 
 function onFollowersClick() {
@@ -69,20 +90,15 @@ const followingCount = computed(() => following.value?.totalCount ?? 0)
           </span>
           <span v-else>
             {{ shortenAddress(address) }}
-            <div class="flex items-center gap-2">
-              <div class="my-4 text-2xl font-bold">
-                <span v-if="profile?.name">
-                  {{ profile?.name }}
-                </span>
-                <span v-else>
-                  {{ shortenAddress(address) }}
-                </span>
-              </div>
-            </div>
-
           </span>
         </div>
-        <FollowButton ref="followButton" :target="address" @follow-action="refresh" />
+        <div class="flex items-center gap-2">
+          <CommonButtonConfig
+            v-if="isCurrentAccount(address)"
+            :button="profileButtonConfig"
+          />
+          <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
+        </div>
         <MarkdownPreview class="mt-6" :source="profile?.description || ''" />
       </div>
 
@@ -102,6 +118,13 @@ const followingCount = computed(() => following.value?.totalCount ?? 0)
       :followers-count="followersCount"
       :following-count="followingCount"
       @close="isFollowModalActive = false;refresh()"
+    />
+    <ProfileEditModal
+      v-model:open="isEditProfileModalActive"
+      :address="address"
+      @success="refresh()"
+      @deleted="refresh()"
+      @close="isEditProfileModalActive = false"
     />
   </div>
 </template>
