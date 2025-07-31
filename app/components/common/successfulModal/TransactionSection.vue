@@ -21,7 +21,7 @@ const isFinalized = computed(() => props.status === TransactionStatus.Finalized)
 
 <template>
   <div
-    class="border border-k-shade rounded-[4rem] py-[7px] px-2 flex items-center justify-between"
+    class="border border-gray-200 dark:border-gray-700 rounded-[4rem] py-[7px] px-2 flex items-center justify-between"
   >
     <div
       class="flex px-2 py-[6px] rounded-full gap-2"
