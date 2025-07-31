@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
-const { hash, error, status, isLoading, result, isSuccess, reset, close } = useTransactionModal()
+const { hash, error, status, isLoading, result, isSuccess, close } = useTransactionModal()
 
 function getProgressValue() {
   switch (status.value) {
@@ -37,7 +37,7 @@ const steps = [
     v-model:open="isLoading"
     :prevent-close="!isSuccess && !error"
     :closable="isSuccess || !!error"
-    @close="(isSuccess || error) && reset()"
+    @close="(isSuccess || error) && close()"
   >
     <template #content>
       <!-- TODO: extract success preview component each categories -->
@@ -106,7 +106,7 @@ const steps = [
             variant="solid"
             size="lg"
             class="flex-1 justify-center"
-            @click="reset()"
+            @click="close()"
           >
             <UIcon name="i-heroicons-eye" class="mr-2" />
             View Collection
@@ -227,7 +227,7 @@ const steps = [
             variant="solid"
             size="lg"
             class="flex-1 justify-center"
-            @click="reset()"
+            @click="close()"
           >
             <UIcon name="i-heroicons-eye" class="mr-2" />
             {{ result.supply > 1 ? 'View First NFT' : 'View NFT' }}
@@ -238,7 +238,7 @@ const steps = [
             variant="outline"
             size="lg"
             class="flex-1 justify-center"
-            @click="reset()"
+            @click="close()"
           >
             <UIcon name="i-heroicons-rectangle-stack" class="mr-2" />
             View Collection
@@ -299,6 +299,9 @@ const steps = [
             <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
               Processing Transaction
             </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Please wait while we process your transaction. This may take a few moments.
+            </p>
           </div>
 
           <!-- Step Indicators -->

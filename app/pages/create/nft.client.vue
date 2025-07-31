@@ -1,17 +1,11 @@
 <script lang="ts" setup>
 import { useNftForm } from '~/composables/form/useNftForm'
-import { useWalletStore } from '~/stores/wallet'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 definePageMeta({
   title: 'Create NFT',
   layout: 'default',
 })
-
-// Wallet connection check
-const walletStore = useWalletStore()
-const { getConnectedSubAccount } = storeToRefs(walletStore)
-const isWalletConnected = computed(() => Boolean(getConnectedSubAccount.value))
 
 // Use the NFT form composable
 const {
@@ -27,6 +21,7 @@ const {
   addProperty,
   removeProperty,
   isLoading,
+  isWalletConnected,
 } = useNftForm()
 
 // Router for navigation
@@ -81,7 +76,7 @@ const router = useRouter()
                   description="PNG, JPG, GIF, SVG, MP4, MP3, GLB, GLTF (max. 50MB)"
                   color="neutral"
                   :disabled="isLoading"
-                  class="w-full min-h-40"
+                  class="w-full aspect-square"
                 />
               </UFormField>
             </div>
