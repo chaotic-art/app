@@ -1,7 +1,7 @@
 import type { Prefix } from '@kodadot1/static'
 import type { TxEvent } from 'polkadot-api'
 
-interface CollectionCategory {
+export interface CollectionCategory {
   type: 'collection'
   id: string
   name: string
@@ -11,7 +11,7 @@ interface CollectionCategory {
   prefix: Prefix
 }
 
-interface NftCategory {
+export interface NftCategory {
   type: 'nft'
   collectionId: string
   itemIds: string[]
