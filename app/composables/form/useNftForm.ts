@@ -12,6 +12,10 @@ export function useNftForm() {
   const { mintNft, userCollection } = useNftPallets()
   const { isLoading, status } = useTransactionModal()
 
+  // Wallet connection check
+  const { getConnectedSubAccount } = storeToRefs(useWalletStore())
+  const isWalletConnected = computed(() => Boolean(getConnectedSubAccount.value?.address))
+
   // Form state
   const state = reactive({
     name: '',
@@ -36,7 +40,10 @@ export function useNftForm() {
   const collectionsLoading = ref(false)
 
   // Fetch collections on component mount
-  onMounted(async () => {
+  watchEffect(async () => {
+    if (!isWalletConnected.value)
+      return
+
     collectionsLoading.value = true
     try {
       const userCollections = await userCollection(state.blockchain as Prefix)
@@ -236,6 +243,7 @@ export function useNftForm() {
     collectionsLoading,
     selectedCurrency,
     selectedCollection,
+    isWalletConnected,
 
     // Functions
     validate,

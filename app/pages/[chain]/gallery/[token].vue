@@ -7,11 +7,11 @@ const CONTAINER_ID = 'nft-img-container'
 const { token, chain } = useRoute().params
 const [collectionId, tokenId] = token?.toString().split('-') ?? []
 
-const { data: tokenData } = await useAsyncData(
+const { data: tokenData } = await useLazyAsyncData(
   () => fetchOdaToken(chain as Prefix, collectionId?.toString() ?? '', tokenId?.toString() ?? ''),
 )
 
-const { data: collection } = await useAsyncData(
+const { data: collection } = await useLazyAsyncData(
   () => fetchOdaCollection(chain as Prefix, collectionId?.toString() ?? ''),
 )
 

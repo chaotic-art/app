@@ -9,7 +9,7 @@ const { chain: chainPrefix, collection_id } = route.params
 
 const chain = computed(() => chainPrefix as Prefix)
 
-const { data: collection, refresh } = await useAsyncData(
+const { data: collection, refresh } = await useLazyAsyncData(
   `collection:${chain.value}:${collection_id}`,
   () => fetchOdaCollection(chain.value, collection_id?.toString() ?? ''),
 )
