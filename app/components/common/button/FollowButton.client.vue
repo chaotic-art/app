@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['followAction'])
-// const { doAfterLogin } = useDoAfterlogin()
+const { doAfterLogin } = useDoAfterlogin()
 const showFollowing = ref(false)
 const loading = ref(false)
 const buttonRef = ref()
@@ -20,9 +20,6 @@ const { accountId } = useAuth()
 const { getSignaturePair } = useVerifyAccount()
 const isHovered = useElementHover(buttonRef)
 const toast = useToast()
-const {
-  walletConnectModalOpen,
-} = storeToRefs(usePreferencesStore())
 const { data: isFollowingThisAccount, refresh: refreshFollowingStatus }
   = useAsyncData(`${accountId.value}/isFollowing/${props.target}`, () =>
     isFollowing(accountId.value, props.target))
@@ -31,76 +28,74 @@ const followConfig = computed<ButtonConfig>(() => ({
   label: $i18n.t('profile.follow'),
   icon: 'i-lucide-plus',
   onClick: async () => {
-    if (!accountId.value) {
-      walletConnectModalOpen.value = true
-      return
-    }
-    // doAfterLogin({
-    //   onLoginSuccess: async () => {
-    loading.value = true
-    const signaturePair = await getSignaturePair().catch((e) => {
-      toast.add({
-        title: e.message,
-        color: 'error',
-      })
-      loading.value = false
-    })
+    doAfterLogin({
+      onLoginSuccess: async () => {
+        loading.value = true
+        const signaturePair = await getSignaturePair().catch((e) => {
+          toast.add({
+            title: e.message,
+            color: 'error',
+          })
+          loading.value = false
+        })
 
-    if (!signaturePair) {
-      loading.value = false
-      return
-    }
-    await follow({
-      initiatorAddress: accountId.value,
-      targetAddress: props.target,
-      signature: signaturePair.signature,
-      message: signaturePair.message,
-    }).catch(() => {
-      toast.add({
-        title: 'Failed to follow',
-        color: 'error',
-      })
+        if (!signaturePair) {
+          loading.value = false
+          return
+        }
+        await follow({
+          initiatorAddress: accountId.value,
+          targetAddress: props.target,
+          signature: signaturePair.signature,
+          message: signaturePair.message,
+        }).catch(() => {
+          toast.add({
+            title: 'Failed to follow',
+            color: 'error',
+          })
+        })
+        await refreshFollowingStatus()
+        loading.value = false
+        showFollowing.value = isFollowingThisAccount.value || false
+        emit('followAction')
+      },
     })
-    await refreshFollowingStatus()
-    loading.value = false
-    showFollowing.value = isFollowingThisAccount.value || false
-    emit('followAction')
-    // },
-    // })
   },
   classes: 'hover:bg-transparent! hover:border-black dark:hover:border-white',
 }))
 
 const unfollowConfig = computed<ButtonConfig>(() => ({
   label: $i18n.t('profile.unfollow'),
-  onClick: async () => {
-    if (!accountId.value) {
-      walletConnectModalOpen.value = true
-      return
-    }
-    loading.value = true
-    const signaturePair = await getSignaturePair().catch((e) => {
-      toast.add({
-        title: e.message,
-        color: 'error',
-      })
-      loading.value = false
-    })
+  onClick: () => {
+    doAfterLogin({
+      onLoginSuccess: async () => {
+        loading.value = true
 
-    if (!signaturePair) {
-      loading.value = false
-      return
-    }
+        const signaturePair = await getSignaturePair().catch((e) => {
+          toast.add({
+            title: e.message,
+            color: 'error',
+          })
+          loading.value = false
+        })
 
-    await unfollow({
-      initiatorAddress: accountId.value,
-      targetAddress: props.target,
-      signature: signaturePair.signature,
-      message: signaturePair.message,
+        if (!signaturePair) {
+          loading.value = false
+          return
+        }
+
+        await unfollow({
+          initiatorAddress: accountId.value,
+          targetAddress: props.target,
+          signature: signaturePair.signature,
+          message: signaturePair.message,
+        })
+
+        await refreshFollowingStatus()
+        loading.value = false
+        emit('followAction')
+      },
     })
-    await refreshFollowingStatus()
-    loading.value = false
-    emit('followAction')
   },
   classes: 'hover:bg-transparent! hover:border-red-500 hover:text-red-500 hover:bg-red-500/10',
 }))
