@@ -76,7 +76,7 @@ const router = useRouter()
                   description="PNG, JPG, GIF, SVG, MP4, MP3, GLB, GLTF (max. 50MB)"
                   color="neutral"
                   :disabled="isLoading"
-                  class="w-full aspect-square"
+                  class="size-80 mx-auto"
                 />
               </UFormField>
             </div>
