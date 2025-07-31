@@ -11,7 +11,7 @@ defineProps<{
 
 defineEmits(['primary', 'secondary'])
 
-const BASE_CLASSES = 'rounded-full px-4 md:px-6 py-2 md:py-3 w-full'
+const BASE_CLASSES = 'rounded-full px-4 md:px-6 py-2 md:py-3 w-full justify-center'
 </script>
 
 <template>

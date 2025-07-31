@@ -5,13 +5,11 @@ const props = withDefaults(
   defineProps<{
     title: string
     subtitle: string
-    showSubtitleDots?: boolean
     failed?: boolean
     status?: TransactionStatus
     customFormattedEstimation?: string
   }>(),
   {
-    showSubtitleDots: false,
     failed: false,
     customFormattedEstimation: undefined,
   },
@@ -52,7 +50,6 @@ const formattedEstimation = computed(
     <SkeletonLoader
       :title="title"
       :subtitle="subtitle"
-      :with-dots="showSubtitleDots"
       solid
     >
       <template v-if="failed">

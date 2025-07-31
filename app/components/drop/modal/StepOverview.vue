@@ -58,11 +58,10 @@ function onSubmit() {
     </div>
 
     <UButton
-      class="rounded-full px-4 md:px-6 py-2 md:py-3 w-full mt-10"
+      class="rounded-full px-4 md:px-6 py-2 md:py-3 w-full mt-10 justify-center"
       :disabled="mintButton.disabled"
+      :label="mintButton.label"
       @click="onSubmit"
-    >
-      {{ mintButton.label }}
-    </UButton>
+    />
   </div>
 </template>

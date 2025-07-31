@@ -217,7 +217,10 @@ if (import.meta.client) {
 
           <WalletAuthorizationStage v-else-if="stage === WalletStageTypes.Authorization" />
 
-          <AccountSelectionStage v-else-if="stage === WalletStageTypes.Account" />
+          <AccountSelectionStage
+            v-else-if="stage === WalletStageTypes.Account"
+            @select="payload => $emit('close', payload)"
+          />
         </div>
       </div>
     </template>

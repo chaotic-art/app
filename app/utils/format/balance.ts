@@ -1,5 +1,5 @@
+import type { Prefix } from '@kodadot1/static'
 import type BN from 'bn.js'
-import type { Prefix } from '@/types'
 import { formatBalance } from '@polkadot/util'
 import { chainToPrecisionMap, prefixToChainMap } from '@/types'
 

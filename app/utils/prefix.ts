@@ -12,9 +12,9 @@ export function getDenyList(prefix: string): string[] | undefined {
   }
 }
 
-export const hasOperationsDisabled = (_: string): boolean => false
-
 export const DEFAULT_PREFIX_MAP: Record<ChainVM, Prefix> = {
   EVM: 'ahw',
   SUB: 'ahp',
 }
+
+export const chainPrefixes: Prefix[] = ['ahp', 'ahk']

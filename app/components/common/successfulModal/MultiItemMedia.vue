@@ -34,15 +34,8 @@ const displayItems = computed(() =>
       :key="item.id"
       class="flex flex-row items-center gap-4"
     >
-      <!-- <BaseMediaItem
-        class="border border-k-shade aspect-square w-10! h-10! shrink-0"
-        :src="sanitizeIpfsUrl(item.image)"
-        :mime-type="item.mimeType"
-        preview
-        is-detail
-      /> -->
       <img
-        class="border border-k-shade aspect-square w-10! h-10! shrink-0"
+        class="border border-gray-200 dark:border-gray-700 aspect-square size-10! rounded shrink-0"
         :src="sanitizeIpfsUrl(item.image)"
       >
 

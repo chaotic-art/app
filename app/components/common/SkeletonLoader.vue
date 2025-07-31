@@ -3,22 +3,18 @@ const props = withDefaults(
   defineProps<{
     title?: string
     subtitle?: string
-    withDots?: boolean
     solid?: boolean
   }>(),
   {
-    withDots: false,
     solid: false,
   },
 )
-
-const DOTS_PLUS_MARGIN_WIDTH = 20// px
 
 const titleRef = ref<HTMLElement>()
 const subtitleRef = ref<HTMLElement>()
 const textContainerWidth = ref()
 
-const showDots = computed(() => props.withDots || !props.subtitle)
+const showDots = computed(() => !props.subtitle)
 
 function calculateTextContainerWidth() {
   if (!showDots.value) {
@@ -30,10 +26,9 @@ function calculateTextContainerWidth() {
   nextTick(() => {
     const title = titleRef.value?.clientWidth || 0
     const subtitle = subtitleRef.value?.clientWidth || 0
-    const subtitlePlusDots = subtitle + DOTS_PLUS_MARGIN_WIDTH
 
-    if (subtitle && subtitlePlusDots > title) {
-      textContainerWidth.value = `${subtitlePlusDots}px`
+    if (subtitle && subtitle > title) {
+      textContainerWidth.value = `${subtitle}px`
     }
   })
 }
@@ -45,11 +40,11 @@ watch([() => props.title, () => props.subtitle], calculateTextContainerWidth, {
 
 <template>
   <div class="w-full h-full relative">
-    <div v-if="solid" class="w-full h-full rounded-[20px]" />
+    <div v-if="solid" class="w-full h-full bg-gray-100 dark:bg-gray-800 rounded-2xl p-4" />
     <USkeleton
       v-else
       id="skeleton-backdrop"
-      class="z-2 w-full h-full rounded-[20px]"
+      class="z-2 w-full h-full rounded-2xl"
     />
 
     <div
@@ -58,8 +53,7 @@ watch([() => props.title, () => props.subtitle], calculateTextContainerWidth, {
       <slot>
         <UIcon
           name="i-mdi:loading"
-          class="spinner text-gray-500 mr-6 animate-spin"
-          size="large"
+          class="spinner text-gray-600 dark:text-gray-400 mr-6 animate-spin size-10"
         />
 
         <div :style="{ width: textContainerWidth }">
@@ -69,17 +63,13 @@ watch([() => props.title, () => props.subtitle], calculateTextContainerWidth, {
           >
             {{ title || $t('general.doingSomeMagic') }}
           </p>
-          <p class="capitalize text-base text-gray-500">
+          <p class="capitalize text-base text-gray-600 dark:text-gray-400">
             <span
               ref="subtitleRef"
               class="inline-block"
             >{{
               subtitle || $t('general.pleaseWait')
             }}</span>
-            <span
-              v-if="showDots"
-              class="dots ml-1"
-            />
           </p>
         </div>
       </slot>
