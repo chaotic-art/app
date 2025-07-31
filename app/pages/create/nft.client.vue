@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { watchDebounced } from '@vueuse/core'
+import { formatBalance } from 'dedot/utils'
 import { useNftForm } from '~/composables/form/useNftForm'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
@@ -22,10 +24,41 @@ const {
   removeProperty,
   isLoading,
   isWalletConnected,
+  estimatedFee,
+  isEstimatingFee,
+  estimateFee,
+  balance,
 } = useNftForm()
 
-// Router for navigation
-const router = useRouter()
+// Computed properties for cleaner logic
+const hasInsufficientFunds = computed(() => {
+  return estimatedFee.value !== null
+    && balance.value !== null
+    && balance.value < estimatedFee.value
+})
+
+const isSubmitDisabled = computed(() => {
+  return isLoading.value || !isWalletConnected.value || hasInsufficientFunds.value || isEstimatingFee.value
+})
+
+const submitButtonText = computed(() => {
+  if (!isWalletConnected.value)
+    return 'Connect Wallet to Create NFT'
+  if (hasInsufficientFunds.value)
+    return 'Insufficient Funds'
+  return 'Create NFT'
+})
+
+// Auto-estimate fees when form data changes (debounced to prevent excessive API calls)
+watchDebounced(
+  [isWalletConnected, mediaFile, () => state.collection, () => state.name, () => state.description, () => state.supply],
+  ([connected, file, collection, name, description, supply]) => {
+    if (connected && file && collection && name && description && supply > 0) {
+      estimateFee()
+    }
+  },
+  { debounce: 1000, maxWait: 5000 },
+)
 </script>
 
 <template>
@@ -185,6 +218,7 @@ const router = useRouter()
                     v-model.number="state.supply"
                     type="number"
                     min="1"
+                    max="100"
                     step="1"
                     placeholder="1"
                     :disabled="isLoading"
@@ -354,22 +388,49 @@ const router = useRouter()
         </div>
 
         <template #footer>
-          <div class="flex items-center justify-between">
-            <UButton
-              variant="ghost"
-              color="neutral"
-              :disabled="isLoading"
-              @click="router.back()"
-            >
-              Cancel
-            </UButton>
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Simple Fee & Balance -->
+            <div class="flex items-center justify-between text-sm">
+              <div class="flex flex-col">
+                <span class="text-gray-600 dark:text-gray-400 flex">
+                  <span class="w-16">Fee:</span>
+                  <span v-if="isEstimatingFee" class="text-gray-500">Calculating...</span>
+                  <span v-else-if="estimatedFee !== null" class="font-medium text-gray-900 dark:text-white">
+                    {{ formatBalance(estimatedFee, { decimals: 10, symbol: 'DOT' }) }}
+                  </span>
+                  <span v-else class="text-gray-600 dark:text-gray-400">
+                    ---
+                  </span>
+                </span>
 
+                <span class="text-gray-600 dark:text-gray-400 flex">
+                  <span class="w-16">Balance:</span>
+                  <span class="font-medium text-gray-900 dark:text-white">
+                    {{ formatBalance(balance, { decimals: 10, symbol: 'DOT' }) }}
+                  </span>
+                </span>
+              </div>
+
+              <div v-if="hasInsufficientFunds" class="flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
+                <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
+                <span class="text-xs font-medium">Insufficient</span>
+              </div>
+              <div v-else-if="estimatedFee !== null && balance" class="flex items-center gap-1 text-green-600 dark:text-green-400">
+                <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
+                <span class="text-xs font-medium">Ready</span>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
             <UButton
               type="submit"
+              size="xl"
+              class="w-full"
               :loading="isLoading"
-              :disabled="isLoading || !isWalletConnected"
+              :disabled="isSubmitDisabled"
+              :variant="isSubmitDisabled ? 'soft' : 'solid'"
             >
-              {{ !isWalletConnected ? 'Connect Wallet to Create NFT' : 'Create NFT' }}
+              {{ submitButtonText }}
             </UButton>
           </div>
         </template>

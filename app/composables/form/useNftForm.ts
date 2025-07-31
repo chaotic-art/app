@@ -9,8 +9,8 @@ interface Property {
 }
 
 export function useNftForm() {
-  const { mintNft, userCollection } = useNftPallets()
-  const { isLoading, status } = useTransactionModal()
+  const { mintNft, userCollection, userBalance } = useNftPallets()
+  const { isLoading } = useTransactionModal()
 
   // Wallet connection check
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
@@ -39,13 +39,16 @@ export function useNftForm() {
   const collections = ref<Array<{ label: string, value: string, name: string, description: string, image: string }>>([])
   const collectionsLoading = ref(false)
 
-  // Fetch collections on component mount
+  const balance = ref(0n)
+
+  // Fetch collections and user balance on component mount
   watchEffect(async () => {
     if (!isWalletConnected.value)
       return
 
     collectionsLoading.value = true
     try {
+      balance.value = await userBalance(state.blockchain as Prefix)
       const userCollections = await userCollection(state.blockchain as Prefix)
       collections.value = userCollections
         .filter((collection): collection is NonNullable<typeof collection> => Boolean(collection && collection.id))
@@ -87,6 +90,10 @@ export function useNftForm() {
 
   // File upload state
   const mediaFile = ref<File | null>(null)
+
+  // Fee estimation state
+  const estimatedFee = ref<bigint | null>(null)
+  const isEstimatingFee = ref(false)
 
   // Property management
   function addProperty() {
@@ -160,73 +167,116 @@ export function useNftForm() {
     return errors
   }
 
+  // Shared function to prepare NFT data
+  async function prepareNftData(formData: typeof state) {
+    // Filter out empty properties
+    const validProperties = formData.properties.filter(
+      (prop: Property) => prop.trait.trim() && prop.value.trim(),
+    )
+
+    // Upload media file to IPFS
+    const cidMedia = await pinDirectory([mediaFile.value!])
+    const image = `ipfs://${cidMedia}`
+
+    // Prepare NFT metadata
+    const metadata: any = {
+      name: formData.name,
+      description: formData.description,
+      image,
+      // external_url: 'https://example.com', TODO: add external url
+    }
+
+    // Add properties as attributes if they exist
+    if (validProperties.length > 0) {
+      metadata.attributes = validProperties.map((prop: Property) => ({
+        trait_type: prop.trait,
+        value: prop.value,
+      }))
+    }
+
+    // Create metadata for each NFT
+    const metadataPromises = Array.from({ length: formData.supply }, async (_, i) => {
+      let name = formData.name
+
+      if (formData.autoNumbering) {
+        name = `${formData.name} #${i + 1}`
+      }
+      const nftMetadata = {
+        ...metadata,
+        name,
+      }
+      return await pinJson(nftMetadata)
+    })
+
+    const cids = await Promise.all(metadataPromises)
+    const metadataUris = formData.supply === 1
+      ? `ipfs://${cids[0]}`
+      : cids.map(cid => `ipfs://${cid}`)
+
+    return {
+      validProperties,
+      image,
+      metadataUris,
+      context: {
+        name: formData.name,
+        description: formData.description,
+        image,
+        supply: formData.supply,
+      },
+    }
+  }
+
+  // Fee estimation function
+  async function estimateFee() {
+    if (!isWalletConnected.value || !mediaFile.value || !state.collection || !state.name || !state.description) {
+      estimatedFee.value = null
+      return
+    }
+
+    isEstimatingFee.value = true
+    try {
+      const { validProperties, metadataUris, context } = await prepareNftData(state)
+
+      const fee = await mintNft({
+        chain: 'ahp',
+        type: 'estimate',
+        collectionId: Number.parseInt(state.collection),
+        metadataUri: metadataUris,
+        supply: state.supply,
+        properties: validProperties,
+        context,
+      })
+
+      estimatedFee.value = fee || null
+    }
+    catch (error) {
+      console.error('Error estimating fee:', error)
+      estimatedFee.value = null
+    }
+    finally {
+      isEstimatingFee.value = false
+    }
+  }
+
   // Submit handler
   async function onSubmit(event: FormSubmitEvent<typeof state>) {
     try {
-      status.value = 'start'
-
       // eslint-disable-next-line no-console
       console.log('Creating NFT with data:', {
         ...event.data,
         mediaFile: mediaFile.value,
       })
 
-      // Filter out empty properties
-      const validProperties = event.data.properties.filter(
-        (prop: Property) => prop.trait.trim() && prop.value.trim(),
-      )
-
-      // Upload media file to IPFS
-      const cidMedia = await pinDirectory([mediaFile.value!])
-      const image = `ipfs://${cidMedia}`
-
-      // Prepare NFT metadata
-      const metadata: any = {
-        name: event.data.name,
-        description: event.data.description,
-        image,
-        // external_url: 'https://example.com', TODO: add external url
-      }
-
-      // Add properties as attributes if they exist
-      if (validProperties.length > 0) {
-        metadata.attributes = validProperties.map((prop: Property) => ({
-          trait_type: prop.trait,
-          value: prop.value,
-        }))
-      }
-
-      // Create metadata for each NFT
-      const metadataPromises = Array.from({ length: event.data.supply }, async (_, i) => {
-        let name = event.data.name
-
-        if (event.data.autoNumbering) {
-          name = `${event.data.name} #${i + 1}`
-        }
-        const nftMetadata = {
-          ...metadata,
-          name,
-        }
-        return await pinJson(nftMetadata)
-      })
-
-      const cids = await Promise.all(metadataPromises)
-      const metadataUris = event.data.supply === 1
-        ? `ipfs://${cids[0]}`
-        : cids.map(cid => `ipfs://${cid}`)
+      const { validProperties, metadataUris, context } = await prepareNftData(event.data)
 
       await mintNft({
-        chain: event.data.blockchain as Prefix,
+        chain: 'ahp',
+        type: 'submit',
         collectionId: Number.parseInt(event.data.collection),
         metadataUri: metadataUris,
         supply: event.data.supply,
         properties: validProperties,
-        context: {
-          name: event.data.name,
-          description: event.data.description,
-          image,
-          supply: event.data.supply,
-        },
+        context,
       })
     }
     catch (error) {
@@ -244,12 +294,16 @@ export function useNftForm() {
     selectedCurrency,
     selectedCollection,
     isWalletConnected,
+    estimatedFee,
+    isEstimatingFee,
+    balance,
 
     // Functions
     validate,
     onSubmit,
     addProperty,
     removeProperty,
+    estimateFee,
 
     // Status
     isLoading,

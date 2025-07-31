@@ -1,6 +1,9 @@
 import type { Prefix } from '@kodadot1/static'
+import { formatBalance } from 'dedot/utils'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
+
+type TxType = 'submit' | 'estimate'
 
 interface CreateCollectionParams {
   chain: Prefix
@@ -19,8 +22,9 @@ interface Property {
   value: string
 }
 
-interface MintNftParams {
+interface CreateNftParams {
   chain: Prefix
+  type: TxType
   collectionId: number
   metadataUri: string | string[]
   supply: number
@@ -147,6 +151,17 @@ export function useNftPallets() {
     })
   }
 
+  async function userBalance(chain: Prefix) {
+    if (!getConnectedSubAccount.value?.address) {
+      // throw new Error('No address found')
+      return 0n
+    }
+
+    const api = $api(chain)
+    const query = await api.query.System.Account.getValue(getConnectedSubAccount.value.address)
+    return query?.data.free ?? 0n
+  }
+
   async function userCollection(chain: Prefix) {
     if (!getConnectedSubAccount.value?.address) {
       // throw new Error('No address found')
@@ -161,7 +176,6 @@ export function useNftPallets() {
 
       if (query?.data.asText().length) {
         const metadataData = await $fetch<{
-          id: string
           name?: string
           description?: string
           image?: string
@@ -183,12 +197,13 @@ export function useNftPallets() {
 
   async function mintNft({
     chain,
+    type,
     collectionId,
     metadataUri,
     supply,
     properties,
     context: nftData,
-  }: MintNftParams) {
+  }: CreateNftParams) {
     reset()
 
     if (!getConnectedSubAccount.value?.address) {
@@ -260,6 +275,13 @@ export function useNftPallets() {
 
     const transaction = api.tx.Utility.batch_all({ calls })
 
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(getConnectedSubAccount.value.address)
+      // eslint-disable-next-line no-console
+      console.log('estimatedFees', estimatedFees, formatBalance(estimatedFees, { decimals: 10, symbol: 'PAS' }))
+      return estimatedFees
+    }
+
     transaction.signSubmitAndWatch(signer).subscribe({
       next: (event) => {
         status.value = event.type
@@ -293,5 +315,6 @@ export function useNftPallets() {
     createCollection,
     mintNft,
     userCollection,
+    userBalance,
   }
 }
