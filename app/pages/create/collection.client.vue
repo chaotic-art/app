@@ -1,10 +1,16 @@
 <script lang="ts" setup>
 import { useCollectionForm } from '~/composables/form/useCollectionForm'
+import { useWalletStore } from '~/stores/wallet'
 
 definePageMeta({
   title: 'Create Collection',
   layout: 'default',
 })
+
+// Wallet connection check
+const walletStore = useWalletStore()
+const { getConnectedSubAccount } = storeToRefs(walletStore)
+const isWalletConnected = computed(() => Boolean(getConnectedSubAccount.value))
 
 // Use the collection form composable
 const {
@@ -247,9 +253,9 @@ const router = useRouter()
           <UButton
             type="submit"
             :loading="isLoading"
-            :disabled="isLoading"
+            :disabled="isLoading || !isWalletConnected"
           >
-            Create Collection
+            {{ !isWalletConnected ? 'Connect Wallet to Create Collection' : 'Create Collection' }}
           </UButton>
         </div>
       </UForm>

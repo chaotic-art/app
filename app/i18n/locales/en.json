@@ -76,6 +76,14 @@
     "following": "Following",
     "unfollowing": "Unfollowing"
   },
+  "profiles": {
+    "created": "Profile Created",
+    "delete": "Reset all Fields - start over",
+    "deleteConfirm": "You sure? - click again",
+    "finishCustomization": "Finish Customization",
+    "profileReset": "Profile Reset",
+    "waitSeconds": "Wait {0} Seconds"
+  },
   "common": {
     "price": "Price"
   },

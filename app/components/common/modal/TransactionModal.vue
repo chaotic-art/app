@@ -35,9 +35,9 @@ const steps = [
 <template>
   <UModal
     v-model:open="isLoading"
-    :prevent-close="!isSuccess"
-    :closable="isSuccess"
-    @close="isSuccess && reset()"
+    :prevent-close="!isSuccess && !error"
+    :closable="isSuccess || !!error"
+    @close="(isSuccess || error) && reset()"
   >
     <template #content>
       <!-- TODO: extract success preview component each categories -->
@@ -256,6 +256,40 @@ const steps = [
         </div>
       </div>
 
+      <!-- Error State -->
+      <div v-else-if="error" class="text-center space-y-4 p-6">
+        <div class="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto">
+          <UIcon name="i-heroicons-exclamation-triangle" class="text-3xl text-red-600 dark:text-red-400" />
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            Transaction Failed
+          </h4>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            There was an error processing your transaction
+          </p>
+          <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-6">
+            <p class="text-xs text-red-700 dark:text-red-400">
+              {{ error.message }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="lg"
+            class="flex-1 justify-center"
+            @click="close"
+          >
+            <UIcon name="i-heroicons-x-mark" class="mr-2" />
+            Close
+          </UButton>
+        </div>
+      </div>
+
       <!-- loading state -->
       <div v-else class="p-6">
         <!-- Loading State -->
@@ -324,26 +358,6 @@ const steps = [
             </div>
             <div class="text-xs font-mono text-gray-700 dark:text-gray-300 break-all bg-gray-50 dark:bg-gray-800 rounded p-2">
               {{ hash }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Error State -->
-        <div v-else-if="error" class="text-center space-y-4">
-          <div class="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto">
-            <UIcon name="i-heroicons-exclamation-triangle" class="text-3xl text-red-600 dark:text-red-400" />
-          </div>
-          <div>
-            <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              Transaction Failed
-            </h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              There was an error processing your transaction
-            </p>
-            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-              <p class="text-xs text-red-700 dark:text-red-400">
-                {{ error.message }}
-              </p>
             </div>
           </div>
         </div>

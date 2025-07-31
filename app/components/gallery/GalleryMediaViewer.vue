@@ -112,7 +112,7 @@ defineExpose({
       </div>
 
       <!-- Fullscreen Back Button -->
-      <ButtonConfig
+      <CommonButtonConfig
         v-if="isFullscreen"
         :button="{
           label: 'Go Back',

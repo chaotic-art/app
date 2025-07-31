@@ -1,7 +1,6 @@
+import type { SignaturePair } from '@/types'
 import { useSignMessage } from '@wagmi/vue'
 import { isEvmAddress, toU8a, u8aToHex } from 'dedot/utils'
-
-export interface SignaturePair { signature: string, message: string }
 
 async function signMessagePolkadot(address: string, message: string) {
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
