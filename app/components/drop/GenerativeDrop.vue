@@ -11,6 +11,7 @@ const chainPrefix = computed(() => chain?.toString() as Prefix)
 const { prefix } = usePrefix()
 const { add: toast } = useToast()
 const { $i18n, $api } = useNuxtApp()
+const { doAfterLogin } = useDoAfterlogin()
 const { accountId } = useAuth()
 const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
@@ -28,12 +29,12 @@ const { massGenerate, clearMassMint } = useDropMassmint()
 const { status, resolveStatus, initTransactionLoader, isLoading: isTransactionLoading } = useTransactionStatus()
 
 function mint() {
-  if (!accountId.value) {
-    return
-  }
-
-  massGenerate()
-  isMintModalOpen.value = true
+  doAfterLogin({
+    onLoginSuccess: () => {
+      massGenerate()
+      isMintModalOpen.value = true
+    },
+  })
 }
 
 async function executeSubTransaction() {

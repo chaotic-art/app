@@ -25,7 +25,7 @@ const {
     />
 
     <!-- Wallet Connect Modal -->
-    <WalletConnectModal
+    <LazyWalletConnectModal
       v-model="walletConnectModalOpen"
       @close="walletConnectModalOpen = false"
     />
