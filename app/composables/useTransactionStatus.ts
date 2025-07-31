@@ -1,12 +1,12 @@
 import type { TxEvent } from 'polkadot-api'
 
 export enum TransactionStatus {
-  Broadcast = 'loader.broadcast',
-  Casting = 'loader.casting',
+  Unknown = '',
   Sign = 'loader.sign',
+  Casting = 'loader.casting',
+  Broadcast = 'loader.broadcast',
   Block = 'loader.block',
   Finalized = 'loader.finalized',
-  Unknown = '',
   IPFS = 'loader.ipfs',
   Cancelled = 'loader.cancelled',
 }

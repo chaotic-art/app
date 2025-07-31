@@ -1,8 +1,8 @@
 <script setup lang="ts">
+const emit = defineEmits(['select'])
+
 const walletStore = useWalletStore()
 const accountStore = useAccountStore()
-
-const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
 
 const { wallets } = storeToRefs(walletStore)
 
@@ -39,9 +39,15 @@ function handleAccountSelect(accountId: string) {
     return
   }
 
+  const accountAuth = {
+    vm: wallet.vm,
+    address: account.address,
+  }
+
   walletStore.setSelectedAccount(wallet.vm, accountId)
-  accountStore.setAuth({ vm: wallet.vm, address: account.address })
-  walletConnectModalOpen.value = false
+  accountStore.setAuth(accountAuth)
+
+  emit('select', accountAuth)
 }
 </script>
 

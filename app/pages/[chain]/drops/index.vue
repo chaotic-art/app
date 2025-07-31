@@ -9,7 +9,7 @@ const sortedMintedDrops = computed(() => isEvm(prefix.value) ? mintedDrops.getMi
 
 const { data: drops } = await useAsyncData('drops', () => getDrops({
   active: [true],
-  chain: ['ahp'],
+  chain: [isProduction ? 'ahp' : prefix.value],
   limit: 200,
 }))
 </script>

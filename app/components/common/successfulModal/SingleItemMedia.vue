@@ -22,17 +22,8 @@ const { usd, formatted } = useAmount(
 
 <template>
   <div class="flex flex-col items-center">
-    <!-- <BaseMediaItem
-      class="border border-k-shade w-[200px] h-[200px]"
-      :src="src"
-      :animation-src="src"
-      :mime-type="mediaMimeType"
-      preview
-      is-detail
-    /> -->
-
     <img
-      class="border border-k-shade w-[200px] h-[200px]"
+      class="border rounded-xl border-gray-200 dark:border-gray-700 w-[200px] h-[200px]"
       :src="src"
     >
 
