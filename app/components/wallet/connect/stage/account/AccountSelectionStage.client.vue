@@ -4,8 +4,6 @@ const emit = defineEmits(['select'])
 const walletStore = useWalletStore()
 const accountStore = useAccountStore()
 
-const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
-
 const { wallets } = storeToRefs(walletStore)
 
 const searchQuery = ref('')
@@ -48,7 +46,6 @@ function handleAccountSelect(accountId: string) {
 
   walletStore.setSelectedAccount(wallet.vm, accountId)
   accountStore.setAuth(accountAuth)
-  walletConnectModalOpen.value = false
 
   emit('select', accountAuth)
 }

@@ -28,6 +28,7 @@ const {
     <LazyWalletConnectModal
       v-model="walletConnectModalOpen"
       @close="walletConnectModalOpen = false"
+      @select="walletConnectModalOpen = false"
     />
   </div>
 </template>
