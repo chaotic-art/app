@@ -10,7 +10,7 @@ interface Property {
 
 export function useNftForm() {
   const { mintNft, userCollection, userBalance } = useNftPallets()
-  const { isLoading } = useTransactionModal()
+  const { isLoading, status } = useTransactionModal()
 
   // Wallet connection check
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
@@ -261,6 +261,8 @@ export function useNftForm() {
   // Submit handler
   async function onSubmit(event: FormSubmitEvent<typeof state>) {
     try {
+      status.value = 'start'
+
       // eslint-disable-next-line no-console
       console.log('Creating NFT with data:', {
         ...event.data,

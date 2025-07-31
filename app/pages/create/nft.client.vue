@@ -391,9 +391,9 @@ watchDebounced(
           <div class="grid grid-cols-2 gap-4">
             <!-- Simple Fee & Balance -->
             <div class="flex items-center justify-between text-sm">
-              <div class="flex flex-col">
+              <div class="flex flex-col font-mono">
                 <span class="text-gray-600 dark:text-gray-400 flex">
-                  <span class="w-16">Fee:</span>
+                  <span class="w-18">Fee:</span>
                   <span v-if="isEstimatingFee" class="text-gray-500">Calculating...</span>
                   <span v-else-if="estimatedFee !== null" class="font-medium text-gray-900 dark:text-white">
                     {{ formatBalance(estimatedFee, { decimals: 10, symbol: 'DOT' }) }}
@@ -404,7 +404,7 @@ watchDebounced(
                 </span>
 
                 <span class="text-gray-600 dark:text-gray-400 flex">
-                  <span class="w-16">Balance:</span>
+                  <span class="w-18">Balance:</span>
                   <span class="font-medium text-gray-900 dark:text-white">
                     {{ formatBalance(balance, { decimals: 10, symbol: 'DOT' }) }}
                   </span>
