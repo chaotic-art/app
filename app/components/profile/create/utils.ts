@@ -1,23 +1,23 @@
 import type { ProfileFormData } from '@/components/profile/types'
 import type { SocialLink } from '@/services/profile'
 import type { SignaturePair } from '@/types'
-import { uploadImage } from '@/services/profile'
+import { Socials, uploadImage } from '@/services/profile'
 
 export function constructSocials(profileData: ProfileFormData): SocialLink[] {
   return [
     {
       handle: profileData.farcasterHandle || '',
-      platform: 'Farcaster',
+      platform: Socials.Farcaster,
       link: `https://warpcast.com/${profileData.farcasterHandle}`,
     },
     {
       handle: profileData.twitterHandle || '',
-      platform: 'Twitter',
+      platform: Socials.Twitter,
       link: `https://twitter.com/${profileData.twitterHandle}`,
     },
     {
       handle: profileData.website || '',
-      platform: 'Website',
+      platform: Socials.Website,
       link: profileData.website || '',
     },
   ].filter(social => Boolean(social.handle))
@@ -47,13 +47,6 @@ export async function uploadProfileImage({
   })
 
   return response.url
-}
-
-export function addHttpToUrl(url: string): string {
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    return `https://${url}`
-  }
-  return url
 }
 
 interface LinkableBlock {

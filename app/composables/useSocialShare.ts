@@ -4,7 +4,7 @@ import { URLS } from '@/utils/constants'
 export default function () {
   const route = useRoute()
 
-  const fullPathShare = ref(`${window.location.origin}${route.fullPath}`)
+  const fullPathShare = ref(`${window?.location.origin}${route.fullPath}`)
 
   const open = (url: string) => {
     window.open(url, '_blank')

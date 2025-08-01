@@ -2,20 +2,22 @@
 import type { ButtonConfig } from '~/components/common/button/CommonButtonConfig.vue'
 import { computed } from 'vue'
 import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
+import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
 import useFetchProfile from '@/composables/useFetchProfile'
 import { fetchFollowersOf, fetchFollowing } from '@/services/profile'
-import { shortenAddress } from '@/utils/format/address'
+import { copyAddress, getSubscanUrl, shortenAddress } from '@/utils/format/address'
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
 
 const props = defineProps<{ address: string }>()
 const { isCurrentAccount } = useAuth()
+const { prefix } = usePrefix()
 const { profile } = useFetchProfile(computed(() => props.address))
-
 const bannerUrl = computed(() => sanitizeIpfsUrl(profile?.value?.banner || ''))
 const followButton = ref()
 const followModalTab = ref<'followers' | 'following'>('followers')
 const isFollowModalActive = ref(false)
 const isEditProfileModalActive = ref(false)
+
 const { data: followers, refresh: refreshFollowers } = useAsyncData(
   `followersof${props.address}`,
   () =>
@@ -25,7 +27,7 @@ const { data: followers, refresh: refreshFollowers } = useAsyncData(
 )
 
 const editProfileConfig: ButtonConfig = {
-  label: 'Edit Profile',
+  label: 'Edit Existing Profile',
   icon: 'i-heroicons-pencil-square',
   onClick: () => isEditProfileModalActive.value = true,
   classes: 'rounded-full',
@@ -81,30 +83,70 @@ const followingCount = computed(() => following.value?.totalCount ?? 0)
     </div>
   </div>
 
-  <div class="w-full ">
-    <div class="flex justify-between gap-2 px-4">
-      <div>
-        <div class="my-4 text-2xl font-bold">
-          <span v-if="profile?.name">
-            {{ profile?.name }}
-          </span>
-          <span v-else>
-            {{ shortenAddress(address) }}
-          </span>
+  <div class="w-full border-b border-gray-200 dark:border-gray-700">
+    <div class="flex justify-between flex-col md:flex-row gap-12 px-4">
+      <div class="flex flex-col flex-1">
+        <div class="my-4 flex flex-col md:flex-row justify-between items-start gap-2 w-full">
+          <div class="">
+            <div class="text-2xl font-bold">
+              <span v-if="profile?.name">
+                {{ profile?.name }}
+              </span>
+              <span v-else>
+                {{ shortenAddress(address) }}
+              </span>
+            </div>
+            <div class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+              {{ shortenAddress(address) }}
+              <UButton
+                icon="i-lucide-copy"
+                size="xs"
+                color="neutral"
+                variant="ghost"
+                class="opacity-60 hover:opacity-100 transition-opacity"
+                @click.prevent="copyAddress(address)"
+              />
+
+              <UButton
+                :to="getSubscanUrl(address, prefix)"
+                target="_blank"
+                size="sm"
+                variant="ghost"
+                class="opacity-60 hover:opacity-100 transition-opacity"
+              >
+                Subscan
+              </UButton>
+            </div>
+          </div>
+          <ProfileSocialsLinks
+            v-if="profile"
+            :profile="profile"
+          />
         </div>
+
         <div class="flex items-center gap-2">
           <CommonButtonConfig
             v-if="isCurrentAccount(address)"
             :button="profileButtonConfig"
           />
           <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
+
+          <UButton
+            icon="i-lucide-dollar-sign"
+            variant="outline"
+            size="lg"
+            class="rounded-full"
+          >
+            Transfer
+          </UButton>
+
+          <ProfileShareDropdown />
         </div>
         <MarkdownPreview class="mt-6" :source="profile?.description || ''" />
       </div>
 
       <ProfileActivitySummery
-        class="pt-4 max-md:hidden w-50"
-
+        class="pt-4 w-auto md:w-40 "
         :followers-count="followersCount"
         :following-count="followingCount"
         @click-followers="onFollowersClick"
