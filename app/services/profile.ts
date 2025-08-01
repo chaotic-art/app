@@ -11,6 +11,12 @@ const api = $fetch.create({
   baseURL: BASE_URL,
 })
 
+export enum Socials {
+  Twitter = 'Twitter',
+  Website = 'Website',
+  Farcaster = 'Farcaster',
+}
+
 // Types for API request and response objects
 export interface Profile {
   address: string
@@ -30,7 +36,7 @@ export interface Follower {
 
 export interface SocialLink {
   handle?: string
-  platform: string
+  platform: Socials
   link: string
 }
 

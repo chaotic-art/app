@@ -3,8 +3,8 @@ import type { ProfileFormData } from '@/components/profile/types'
 import type { Profile } from '@/services/profile'
 import { useNow } from '@vueuse/core'
 import SelectImageField from '@/components/profile/create/SelectImageField.vue'
-import { addHttpToUrl } from '@/components/profile/create/utils'
 import { toSubstrateAddress } from '@/services/profile'
+import { addHttpToUrl } from '@/utils/format/url'
 
 const props = defineProps<{
   profile?: Profile | null
