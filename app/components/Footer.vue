@@ -35,10 +35,8 @@ const footerLinks: Array<
     title: 'Social',
     type: 'buttons',
     items: [
-      { label: 'Twitter', href: '#' },
-      { label: 'Youtube', href: '#' },
-      { label: 'Instagram', href: '#' },
-      { label: 'Telegram', href: '#' },
+      { label: 'Twitter', href: 'https://x.com/ChaoticApp' },
+      { label: 'Telegram', href: 'https://t.me/+A3xwht0aOIMxMjQ0' },
     ],
   },
 ]
@@ -78,6 +76,8 @@ const footerLinks: Array<
                     v-for="item in col.items"
                     :key="item.label"
                     :label="item.label"
+                    :href="item.href"
+                    target="_blank"
                     variant="outline"
                     class="rounded-full text-gray-500 dark:text-gray-400 w-fit"
                   />
