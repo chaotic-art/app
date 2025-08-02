@@ -63,23 +63,23 @@ function handleCancel() {
           </div>
 
           <!-- Sent -->
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between text-red-600">
             <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-arrow-up" class="w-4 h-4 text-gray-500" />
-              <span class="text-sm text-gray-600">Sent</span>
+              <UIcon name="i-heroicons-arrow-up" class="w-4 h-4" />
+              <span class="text-sm ">Sent</span>
             </div>
             <div class="text-right">
-              <div class="text-sm font-medium text-gray-900">
+              <div class="text-sm font-medium">
                 {{ transaction.amount }}
               </div>
             </div>
           </div>
 
           <!-- Received -->
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between text-green-600">
             <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-arrow-down" class="w-4 h-4 text-gray-500" />
-              <span class="text-sm text-gray-600">Received</span>
+              <UIcon name="i-heroicons-arrow-down" class="w-4 h-4" />
+              <span class="text-sm ">Received</span>
             </div>
             <div class="flex items-center gap-2">
               <div class="w-8 h-8 rounded-lg overflow-hidden bg-gray-100">
@@ -93,7 +93,7 @@ function handleCancel() {
                   <UIcon name="i-heroicons-photo" class="w-4 h-4 text-gray-500" />
                 </div>
               </div>
-              <span class="text-sm font-medium text-gray-900">
+              <span class="text-sm font-medium">
                 {{ collectionName || 'Collection Created' }}
               </span>
             </div>
