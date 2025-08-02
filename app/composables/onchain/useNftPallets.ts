@@ -7,6 +7,7 @@ type TxType = 'submit' | 'estimate'
 
 interface CreateCollectionParams {
   chain: Prefix
+  type: TxType
   maxSupply?: number
   metadataUri: string
   royalty: number
@@ -45,6 +46,7 @@ export function useNftPallets() {
 
   async function createCollection({
     chain,
+    type,
     maxSupply,
     metadataUri,
     royalty,
@@ -54,12 +56,6 @@ export function useNftPallets() {
 
     if (!getConnectedSubAccount.value?.address) {
       throw new Error('No address found')
-    }
-
-    const signer = await getConnectedSubAccount.value.signer
-
-    if (!signer) {
-      throw new Error('No signer found')
     }
 
     const api = $api(chain)
@@ -123,6 +119,19 @@ export function useNftPallets() {
         _txRecipient.decodedCall,
       ],
     })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(getConnectedSubAccount.value.address)
+      // eslint-disable-next-line no-console
+      console.log('estimatedFees', estimatedFees, formatBalance(estimatedFees, { decimals: 10, symbol: 'PAS' }))
+      return estimatedFees
+    }
+
+    const signer = await getConnectedSubAccount.value.signer
+
+    if (!signer) {
+      throw new Error('No signer found')
+    }
 
     transaction.signSubmitAndWatch(signer).subscribe({
       next: (event) => {
