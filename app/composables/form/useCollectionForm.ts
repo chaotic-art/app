@@ -1,8 +1,6 @@
 import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
-import { Binary } from 'polkadot-api'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
-import { MultiAddress } from '~/descriptors/dist'
 import { pinDirectory, pinJson } from '~/services/storage'
 
 export function useCollectionForm() {
@@ -63,7 +61,7 @@ export function useCollectionForm() {
     }
   })
 
-  // Custom validation function
+  // Custom validation function. TODO: use valibot/zod
   function validate(state: any): FormError[] {
     const errors: FormError[] = []
 
@@ -154,34 +152,45 @@ export function useCollectionForm() {
     }
   }
 
-  // Fee estimation function
-  async function estimateFee() {
-    if (!isWalletConnected.value || !logoFile.value || !state.name || !state.description) {
-      estimatedFee.value = null
+  // Combined function to handle both fee estimation and collection creation
+  async function handleCollectionOperation(formData: typeof state, type: 'estimate' | 'submit') {
+    if (!isWalletConnected.value || !logoFile.value || !formData.name || !formData.description) {
+      if (type === 'estimate') {
+        estimatedFee.value = null
+      }
       return
     }
 
-    isEstimatingFee.value = true
-    try {
-      const { metadataUri, context } = await prepareCollectionData(state)
+    if (type === 'estimate') {
+      isEstimatingFee.value = true
+    }
 
-      const fee = await createCollection({
-        chain: state.blockchain as Prefix,
-        type: 'estimate',
-        maxSupply: state.maxNfts === 'unlimited' ? undefined : state.maxNftsNumber,
+    try {
+      const { metadataUri, context } = await prepareCollectionData(formData)
+
+      const result = await createCollection({
+        chain: formData.blockchain as Prefix,
+        type,
+        maxSupply: formData.maxNfts === 'unlimited' ? undefined : formData.maxNftsNumber,
         metadataUri,
-        royalty: state.royalties,
+        royalty: formData.royalties,
         context,
       })
 
-      estimatedFee.value = fee || null
+      if (type === 'estimate') {
+        estimatedFee.value = result || null
+      }
     }
     catch (error) {
-      console.error('Error estimating fee:', error)
-      estimatedFee.value = null
+      console.error(`Error ${type === 'estimate' ? 'estimating fee' : 'creating collection'}:`, error)
+      if (type === 'estimate') {
+        estimatedFee.value = null
+      }
     }
     finally {
-      isEstimatingFee.value = false
+      if (type === 'estimate') {
+        isEstimatingFee.value = false
+      }
     }
   }
 
@@ -197,16 +206,7 @@ export function useCollectionForm() {
         bannerFile: bannerFile.value,
       })
 
-      const { metadataUri, context } = await prepareCollectionData(event.data)
-
-      await createCollection({
-        chain: event.data.blockchain as Prefix,
-        type: 'submit',
-        maxSupply: event.data.maxNfts === 'unlimited' ? undefined : event.data.maxNftsNumber,
-        metadataUri,
-        royalty: event.data.royalties,
-        context,
-      })
+      await handleCollectionOperation(event.data, 'submit')
     }
     catch (error) {
       console.error('Error creating collection:', error)
@@ -228,7 +228,7 @@ export function useCollectionForm() {
     // Functions
     validate,
     onSubmit,
-    estimateFee,
+    handleCollectionOperation,
 
     // Status
     isLoading,

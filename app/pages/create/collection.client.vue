@@ -2,7 +2,6 @@
 import { watchDebounced } from '@vueuse/core'
 import { formatBalance } from 'dedot/utils'
 import { useCollectionForm } from '~/composables/form/useCollectionForm'
-import { useWalletStore } from '~/stores/wallet'
 
 definePageMeta({
   title: 'Create Collection',
@@ -21,7 +20,7 @@ const {
   isWalletConnected,
   estimatedFee,
   isEstimatingFee,
-  estimateFee,
+  handleCollectionOperation,
   balance,
 } = useCollectionForm()
 
@@ -49,7 +48,7 @@ watchDebounced(
   [isWalletConnected, logoFile, () => state.name, () => state.description, () => state.royalties, () => state.maxNfts, () => state.maxNftsNumber],
   ([connected, file, name, description, _royalties, _maxNfts, _maxNftsNumber]) => {
     if (connected && file && name && description) {
-      estimateFee()
+      handleCollectionOperation(state, 'estimate')
     }
   },
   { debounce: 1000, maxWait: 5000 },
