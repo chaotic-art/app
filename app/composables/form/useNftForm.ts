@@ -226,35 +226,46 @@ export function useNftForm() {
     }
   }
 
-  // Fee estimation function
-  async function estimateFee() {
-    if (!isWalletConnected.value || !mediaFile.value || !state.collection || !state.name || !state.description) {
-      estimatedFee.value = null
+  // Combined function to handle both fee estimation and NFT creation
+  async function handleNftOperation(formData: typeof state, type: 'estimate' | 'submit') {
+    if (!isWalletConnected.value || !mediaFile.value || !formData.collection || !formData.name || !formData.description) {
+      if (type === 'estimate') {
+        estimatedFee.value = null
+      }
       return
     }
 
-    isEstimatingFee.value = true
-    try {
-      const { validProperties, metadataUris, context } = await prepareNftData(state)
+    if (type === 'estimate') {
+      isEstimatingFee.value = true
+    }
 
-      const fee = await mintNft({
+    try {
+      const { validProperties, metadataUris, context } = await prepareNftData(formData)
+
+      const result = await mintNft({
         chain: 'ahp',
-        type: 'estimate',
-        collectionId: Number.parseInt(state.collection),
+        type,
+        collectionId: Number.parseInt(formData.collection),
         metadataUri: metadataUris,
-        supply: state.supply,
+        supply: formData.supply,
         properties: validProperties,
         context,
       })
 
-      estimatedFee.value = fee || null
+      if (type === 'estimate') {
+        estimatedFee.value = result || null
+      }
     }
     catch (error) {
-      console.error('Error estimating fee:', error)
-      estimatedFee.value = null
+      console.error(`Error ${type === 'estimate' ? 'estimating fee' : 'creating NFT'}:`, error)
+      if (type === 'estimate') {
+        estimatedFee.value = null
+      }
     }
     finally {
-      isEstimatingFee.value = false
+      if (type === 'estimate') {
+        isEstimatingFee.value = false
+      }
     }
   }
 
@@ -269,17 +280,7 @@ export function useNftForm() {
         mediaFile: mediaFile.value,
       })
 
-      const { validProperties, metadataUris, context } = await prepareNftData(event.data)
-
-      await mintNft({
-        chain: 'ahp',
-        type: 'submit',
-        collectionId: Number.parseInt(event.data.collection),
-        metadataUri: metadataUris,
-        supply: event.data.supply,
-        properties: validProperties,
-        context,
-      })
+      await handleNftOperation(event.data, 'submit')
     }
     catch (error) {
       console.error('Error creating NFT:', error)
@@ -305,7 +306,7 @@ export function useNftForm() {
     onSubmit,
     addProperty,
     removeProperty,
-    estimateFee,
+    handleNftOperation,
 
     // Status
     isLoading,

@@ -26,7 +26,7 @@ const {
   isWalletConnected,
   estimatedFee,
   isEstimatingFee,
-  estimateFee,
+  handleNftOperation,
   balance,
 } = useNftForm()
 
@@ -54,7 +54,7 @@ watchDebounced(
   [isWalletConnected, mediaFile, () => state.collection, () => state.name, () => state.description, () => state.supply],
   ([connected, file, collection, name, description, supply]) => {
     if (connected && file && collection && name && description && supply > 0) {
-      estimateFee()
+      handleNftOperation(state, 'estimate')
     }
   },
   { debounce: 1000, maxWait: 5000 },
