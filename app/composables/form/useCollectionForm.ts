@@ -1,11 +1,17 @@
 import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import { formatBalance } from 'dedot/utils'
+import SignConfirmationModal from '~/components/common/modal/SignConfirmationModal.vue'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 
 export function useCollectionForm() {
   const { createCollection, userBalance } = useNftPallets()
   const { isLoading, status } = useTransactionModal()
+
+  // Programmatic modal setup
+  const overlay = useOverlay()
+  const modalConfirmation = overlay.create(SignConfirmationModal)
 
   // Wallet connection check
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
@@ -194,19 +200,69 @@ export function useCollectionForm() {
     }
   }
 
-  // Submit handler
+  // Submit handler with confirmation modal
   async function onSubmit(event: FormSubmitEvent<typeof state>) {
+    // Check wallet connection first
+    if (!isWalletConnected.value) {
+      return
+    }
+
+    // Check if user has insufficient funds
+    if (estimatedFee.value !== null && balance.value !== null && balance.value < estimatedFee.value) {
+      return
+    }
+
+    // Get actual wallet data
+    const connectedAccount = getConnectedSubAccount.value
+    const actualWalletAddress = connectedAccount?.address || ''
+    // TODO: select chains
+    const selectedChain = event.data.blockchain === 'ahp' ? 'Asset Hub Polkadot' : 'Asset Hub Kusama'
+    const selectedCurrency = event.data.blockchain === 'ahp' ? 'DOT' : 'KSM'
+
+    // Create transaction details for the sign confirmation
+    const transactionDetails = {
+      from: actualWalletAddress,
+      to: 'Collection Contract',
+      amount: formatBalance(estimatedFee.value || 0, { decimals: 10, symbol: selectedCurrency }),
+      chain: selectedChain,
+      estimatedFee: formatBalance(estimatedFee.value || 0, { decimals: 10, symbol: selectedCurrency }),
+      estimatedTime: '24 sec',
+    }
+
+    // Open modal programmatically
+    try {
+      const instance = modalConfirmation.open({
+        transaction: transactionDetails,
+        walletAddress: actualWalletAddress,
+        walletBalance: formatBalance(balance.value || 0, { decimals: 10, symbol: selectedCurrency }),
+        collectionName: event.data.name,
+        collectionImage: logoFile.value ? URL.createObjectURL(logoFile.value) : undefined,
+      })
+
+      const confirmed = await instance.result
+
+      if (confirmed) {
+        await submitAfterConfirmation()
+      }
+    }
+    catch (error) {
+      console.error('Error opening modal:', error)
+    }
+  }
+
+  // Actual submission after confirmation
+  async function submitAfterConfirmation() {
     try {
       status.value = 'start'
 
       // eslint-disable-next-line no-console
       console.log('Creating collection with data:', {
-        ...event.data,
+        ...state,
         logoFile: logoFile.value,
         bannerFile: bannerFile.value,
       })
 
-      await handleCollectionOperation(event.data, 'submit')
+      await handleCollectionOperation(state, 'submit')
     }
     catch (error) {
       console.error('Error creating collection:', error)
@@ -228,6 +284,7 @@ export function useCollectionForm() {
     // Functions
     validate,
     onSubmit,
+    submitAfterConfirmation,
     handleCollectionOperation,
 
     // Status
