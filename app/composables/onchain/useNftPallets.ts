@@ -1,5 +1,4 @@
 import type { Prefix } from '@kodadot1/static'
-import { formatBalance } from 'dedot/utils'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 
