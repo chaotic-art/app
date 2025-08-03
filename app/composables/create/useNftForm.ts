@@ -1,5 +1,7 @@
 import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import { formatBalance } from 'dedot/utils'
+import SignConfirmationModal from '~/components/common/modal/SignConfirmationModal.vue'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 
@@ -10,7 +12,11 @@ interface Property {
 
 export function useNftForm() {
   const { mintNft, userCollection, userBalance } = useNftPallets()
-  const { isLoading, status } = useTransactionModal()
+  const { status } = useTransactionModal()
+
+  // Programmatic modal setup
+  const overlay = useOverlay()
+  const modalConfirmation = overlay.create(SignConfirmationModal)
 
   // Wallet connection check
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
@@ -243,7 +249,7 @@ export function useNftForm() {
       const { validProperties, metadataUris, context } = await prepareNftData(formData)
 
       const result = await mintNft({
-        chain: 'ahp',
+        chain: state.blockchain as Prefix,
         type,
         collectionId: Number.parseInt(formData.collection),
         metadataUri: metadataUris,
@@ -269,18 +275,61 @@ export function useNftForm() {
     }
   }
 
-  // Submit handler
+  // Submit handler with confirmation modal
   async function onSubmit(event: FormSubmitEvent<typeof state>) {
+    // Check wallet connection first
+    if (!isWalletConnected.value) {
+      return
+    }
+
+    // Check if user has insufficient funds
+    if (estimatedFee.value !== null && balance.value !== null && balance.value < estimatedFee.value) {
+      return
+    }
+
+    // Get actual wallet data
+    const connectedAccount = getConnectedSubAccount.value
+    const actualWalletAddress = connectedAccount?.address || ''
+    const selectedChain = event.data.blockchain === 'ahp' ? 'Asset Hub Polkadot' : 'Asset Hub Kusama'
+    const selectedCurrency = event.data.blockchain === 'ahp' ? 'DOT' : 'KSM'
+
+    // Open modal programmatically
+    try {
+      const instance = modalConfirmation.open({
+        chain: selectedChain,
+        estimatedFee: formatBalance(estimatedFee.value || 0, { decimals: 10, symbol: selectedCurrency }),
+        walletAddress: actualWalletAddress,
+        walletBalance: formatBalance(balance.value || 0, { decimals: 10, symbol: selectedCurrency }),
+        title: 'Create NFT',
+        items: Array.from({ length: event.data.supply }, () => ({
+          name: event.data.name,
+          image: mediaFile.value ? URL.createObjectURL(mediaFile.value) : '',
+        })),
+      })
+
+      const confirmed = await instance.result
+
+      if (confirmed) {
+        await submitAfterConfirmation()
+      }
+    }
+    catch (error) {
+      console.error('Error opening modal:', error)
+    }
+  }
+
+  // Actual submission after confirmation
+  async function submitAfterConfirmation() {
     try {
       status.value = 'start'
 
       // eslint-disable-next-line no-console
       console.log('Creating NFT with data:', {
-        ...event.data,
+        ...state,
         mediaFile: mediaFile.value,
       })
 
-      await handleNftOperation(event.data, 'submit')
+      await handleNftOperation(state, 'submit')
     }
     catch (error) {
       console.error('Error creating NFT:', error)
@@ -307,8 +356,5 @@ export function useNftForm() {
     addProperty,
     removeProperty,
     handleNftOperation,
-
-    // Status
-    isLoading,
   }
 }

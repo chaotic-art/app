@@ -21,7 +21,7 @@ export function useCollectionForm() {
   const state = reactive({
     name: '',
     description: '',
-    blockchain: 'ahp', // Default to Asset Hub Polkadot
+    blockchain: 'pas_asset_hub', // Default to Paseo Asset Hub
     royalties: 0,
     maxNfts: 'unlimited' as 'unlimited' | 'limited',
     maxNftsNumber: 1000,
@@ -29,8 +29,7 @@ export function useCollectionForm() {
 
   // Blockchains for select
   const blockchains = [
-    { label: 'Asset Hub Polkadot', value: 'ahp' },
-    { label: 'Asset Hub Kusama', value: 'ahk' },
+    { label: 'Paseo Asset Hub', value: 'pas_asset_hub' },
   ]
 
   // File upload states
@@ -44,8 +43,7 @@ export function useCollectionForm() {
 
   // Currency mapping based on blockchain
   const blockchainCurrencies: Record<string, string> = {
-    ahp: 'DOT',
-    ahk: 'KSM',
+    pas_asset_hub: 'PAS',
   }
 
   // Get currency based on selected blockchain
@@ -219,24 +217,20 @@ export function useCollectionForm() {
     const selectedChain = event.data.blockchain === 'ahp' ? 'Asset Hub Polkadot' : 'Asset Hub Kusama'
     const selectedCurrency = event.data.blockchain === 'ahp' ? 'DOT' : 'KSM'
 
-    // Create transaction details for the sign confirmation
-    const transactionDetails = {
-      from: actualWalletAddress,
-      to: 'Collection Contract',
-      amount: formatBalance(estimatedFee.value || 0, { decimals: 10, symbol: selectedCurrency }),
-      chain: selectedChain,
-      estimatedFee: formatBalance(estimatedFee.value || 0, { decimals: 10, symbol: selectedCurrency }),
-      estimatedTime: '24 sec',
-    }
-
     // Open modal programmatically
     try {
       const instance = modalConfirmation.open({
-        transaction: transactionDetails,
+        chain: selectedChain,
+        estimatedFee: formatBalance(estimatedFee.value || 0, { decimals: 10, symbol: selectedCurrency }),
         walletAddress: actualWalletAddress,
         walletBalance: formatBalance(balance.value || 0, { decimals: 10, symbol: selectedCurrency }),
-        collectionName: event.data.name,
-        collectionImage: logoFile.value ? URL.createObjectURL(logoFile.value) : undefined,
+        title: 'Create Collection',
+        items: [
+          {
+            name: event.data.name,
+            image: logoFile.value ? URL.createObjectURL(logoFile.value) : '',
+          },
+        ],
       })
 
       const confirmed = await instance.result
@@ -284,7 +278,6 @@ export function useCollectionForm() {
     // Functions
     validate,
     onSubmit,
-    submitAfterConfirmation,
     handleCollectionOperation,
   }
 }

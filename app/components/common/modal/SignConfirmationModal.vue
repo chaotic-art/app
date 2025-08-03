@@ -1,19 +1,14 @@
 <script setup lang="ts">
-interface TransactionDetails {
-  from: string
-  to: string
-  amount: string
+interface Props {
   chain: string
   estimatedFee: string
-  estimatedTime: string
-}
-
-interface Props {
-  transaction: TransactionDetails
   walletAddress: string
   walletBalance: string
-  collectionName?: string
-  collectionImage?: string
+  title: string
+  items: {
+    name: string
+    image: string
+  }[]
 }
 
 defineProps<Props>()
@@ -49,7 +44,7 @@ function handleCancel() {
                   Signing with <span class="font-bold">{{ addressName }}</span>
                 </span>
                 <span class="text-xs text-gray-500">
-                  <span class="font-bold">{{ walletBalance }}</span> on {{ transaction.chain }}
+                  <span class="font-bold">{{ walletBalance }}</span> on {{ chain }}
                 </span>
               </div>
             </template>
@@ -59,7 +54,7 @@ function handleCancel() {
         <!-- Simulated Result -->
         <div class="bg-gray-50 rounded-lg p-4 space-y-3">
           <div class="text-sm font-medium text-gray-700 mb-3">
-            Simulated Result
+            Simulated Result - {{ title }}
           </div>
 
           <!-- Sent -->
@@ -70,32 +65,68 @@ function handleCancel() {
             </div>
             <div class="text-right">
               <div class="text-sm font-medium">
-                {{ transaction.amount }}
+                {{ estimatedFee }}
               </div>
             </div>
           </div>
 
           <!-- Received -->
-          <div class="flex items-center justify-between text-green-600">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-arrow-down" class="w-4 h-4" />
-              <span class="text-sm ">Received</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-lg overflow-hidden bg-gray-100">
-                <img
-                  v-if="collectionImage"
-                  :src="collectionImage"
-                  :alt="collectionName || 'Collection'"
-                  class="w-full h-full object-cover"
-                >
-                <div v-else class="w-full h-full bg-gray-300 flex items-center justify-center">
-                  <UIcon name="i-heroicons-photo" class="w-4 h-4 text-gray-500" />
+          <div class="text-green-600">
+            <!-- Items display -->
+            <div v-if="items.length > 0" :class="items.length > 1 ? 'space-y-2' : ''">
+              <div
+                v-for="(item, index) in items.slice(0, 3)"
+                :key="index"
+                class="flex items-center justify-between"
+              >
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-arrow-down" class="w-4 h-4 " />
+                  <span class="text-sm font-medium">Received</span>
+                </div>
+
+                <div class="text-right flex items-center gap-2">
+                  <div class="size-10 rounded-lg overflow-hidden bg-gray-100">
+                    <img
+                      v-if="item.image"
+                      :src="item.image"
+                      :alt="item.name || 'Item'"
+                      class="w-full h-full object-cover"
+                    >
+                    <div v-else class="w-full h-full bg-gray-300 flex items-center justify-center">
+                      <UIcon name="i-heroicons-photo" class="w-3 h-3 text-gray-500" />
+                    </div>
+                  </div>
+                  <span class="text-sm font-medium">
+                    {{ item.name || (items.length === 1 ? 'Item Created' : `Item ${index + 1}`) }}
+                  </span>
                 </div>
               </div>
-              <span class="text-sm font-medium">
-                {{ collectionName || 'Collection Created' }}
-              </span>
+
+              <!-- Show +N indicator if there are more than 3 items -->
+              <div v-if="items.length > 3" class="flex items-center justify-between ">
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-heroicons-arrow-down" class="w-4 h-4 " />
+                  <span class="text-sm font-medium">Received</span>
+                </div>
+                <div class="text-right flex items-center gap-2">
+                  <span class="text-sm font-medium">
+                    +{{ items.length - 3 }} more items
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- No items fallback -->
+            <div v-else class="flex items-center gap-2">
+              <UIcon name="i-heroicons-arrow-down" class="w-4 h-4 text-gray-400" />
+              <span class="text-sm font-medium">received</span>
+              <UIcon name="i-heroicons-arrow-down" class="w-4 h-4 text-gray-400" />
+              <div class="w-6 h-6 rounded-lg overflow-hidden bg-gray-100">
+                <div class="w-full h-full bg-gray-300 flex items-center justify-center">
+                  <UIcon name="i-heroicons-photo" class="w-3 h-3 text-gray-500" />
+                </div>
+              </div>
+              <span class="text-sm font-medium">Item Created</span>
             </div>
           </div>
 
@@ -105,7 +136,7 @@ function handleCancel() {
               <UIcon name="i-heroicons-globe-alt" class="w-4 h-4 text-gray-500" />
               <span class="text-sm text-gray-600">Chain</span>
             </div>
-            <span class="text-sm text-gray-900">{{ transaction.chain }}</span>
+            <span class="text-sm text-gray-900">{{ chain }}</span>
           </div>
         </div>
 
@@ -118,7 +149,7 @@ function handleCancel() {
             </div>
             <div class="text-right">
               <div class="text-sm font-medium text-gray-900">
-                {{ transaction.estimatedFee }}
+                {{ estimatedFee }}
               </div>
             </div>
           </div>

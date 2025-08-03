@@ -23,7 +23,7 @@ const displayItems = computed(() =>
 
 <template>
   <div
-    class="flex flex-col gap-3"
+    class="flex flex-col items-center gap-3"
     :class="{
       'max-h-[260px] overflow-hidden': !expanded,
       'max-h-[390px] overflow-y-auto': expanded,
@@ -64,14 +64,14 @@ const displayItems = computed(() =>
       >
         +{{ moreItems }}
       </div>
-      <span class="text-gray-500 text-xs">{{ $t('items') }}</span>
+      <span class="text-gray-500 text-xs">Items</span>
     </div>
 
     <a
       class="text-xs text-gray-500"
       @click="expanded = !expanded"
     >{{
-      expanded ? $t('showLess') : $t('showAll')
+      expanded ? 'Show Less' : 'Show All'
     }}</a>
   </div>
 

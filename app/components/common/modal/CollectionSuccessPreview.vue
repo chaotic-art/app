@@ -9,6 +9,8 @@ interface Props {
 const props = defineProps<Props>()
 const router = useRouter()
 
+const { close } = useTransactionModal()
+
 const modalData = computed(() => {
   const collectionId = props.result.id
 
@@ -22,6 +24,7 @@ const modalData = computed(() => {
       primary: {
         label: 'View Collection',
         onClick: () => {
+          close()
           router.push(`/${props.result?.prefix}/collection/${collectionId}`)
         },
       },

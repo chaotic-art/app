@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { hash, error, result, isSuccess, close, status, open } = useTransactionModal()
+const { error, result, isSuccess, close, status, open } = useTransactionModal()
 
 const resolvedStatus = computed(() => {
   if (status.value === 'broadcasted') {
@@ -43,8 +43,7 @@ const resolvedStatus = computed(() => {
       <NFTSuccessPreview
         v-else-if="isSuccess && result?.type === 'nft'"
         :result="result"
-        :hash="hash"
-        :close="close"
+        :status="resolvedStatus"
       />
 
       <!-- Error State -->
