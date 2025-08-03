@@ -16,7 +16,6 @@ const {
   blockchains,
   validate,
   onSubmit,
-  isLoading,
   isWalletConnected,
   estimatedFee,
   isEstimatingFee,
@@ -32,7 +31,7 @@ const hasInsufficientFunds = computed(() => {
 })
 
 const isSubmitDisabled = computed(() => {
-  return isLoading.value || !isWalletConnected.value || hasInsufficientFunds.value || isEstimatingFee.value
+  return !isWalletConnected.value || hasInsufficientFunds.value || isEstimatingFee.value
 })
 
 const submitButtonText = computed(() => {
@@ -69,19 +68,6 @@ watchDebounced(
 
     <!-- Form -->
     <UCard class="mb-8 relative">
-      <!-- Loading Overlay -->
-      <div
-        v-if="isLoading"
-        class="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg"
-      >
-        <div class="flex flex-col items-center gap-3">
-          <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-600 dark:text-gray-400 animate-spin" />
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-            Creating collection...
-          </p>
-        </div>
-      </div>
-
       <template #header>
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
           Collection Information
@@ -111,7 +97,6 @@ watchDebounced(
                   label="Drop logo here"
                   description="PNG, JPG, GIF or SVG (max. 5MB)"
                   color="neutral"
-                  :disabled="isLoading"
                   class="w-full aspect-square"
                 />
               </UFormField>
@@ -131,7 +116,6 @@ watchDebounced(
                   label="Drop banner here"
                   description="PNG, JPG, GIF or SVG (max. 10MB)"
                   color="neutral"
-                  :disabled="isLoading"
                   class="w-full aspect-square"
                 />
               </UFormField>
@@ -156,7 +140,6 @@ watchDebounced(
                 <UInput
                   v-model="state.name"
                   placeholder="My Awesome Collection"
-                  :disabled="isLoading"
                   class="w-full"
                 />
               </UFormField>
@@ -196,7 +179,6 @@ watchDebounced(
               v-model="state.description"
               placeholder="Tell people about your collection..."
               :rows="4"
-              :disabled="isLoading"
               class="w-full"
             />
           </UFormField>
@@ -222,7 +204,6 @@ watchDebounced(
                   max="100"
                   step="0.1"
                   placeholder="2.5"
-                  :disabled="isLoading"
                   class="w-full"
                 />
               </UFormField>
@@ -243,7 +224,6 @@ watchDebounced(
                     ]"
                     value-key="value"
                     placeholder="Select limit type"
-                    :disabled="isLoading"
                     class="w-full"
                   />
 
@@ -257,7 +237,6 @@ watchDebounced(
                       min="1"
                       step="1"
                       placeholder="1000"
-                      :disabled="isLoading"
                       class="w-full"
                     />
                   </UFormField>
@@ -306,7 +285,6 @@ watchDebounced(
             type="submit"
             size="xl"
             class="w-full"
-            :loading="isLoading"
             :disabled="isSubmitDisabled"
             :variant="isSubmitDisabled ? 'soft' : 'solid'"
           >

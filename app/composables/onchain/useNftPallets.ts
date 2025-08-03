@@ -139,9 +139,7 @@ export function useNftPallets() {
 
         if (event.type === 'txBestBlocksState' && event.found) {
           hash.value = event.block.hash.toString()
-        }
 
-        if (event.type === 'finalized') {
           result.value = {
             type: 'collection',
             id: nextId.toString(),

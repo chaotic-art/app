@@ -30,6 +30,7 @@ export default function useTransactionModal() {
   const error = useState<Error | null>('transaction-error', () => null)
   const status = useState<'start' | TxEvent['type'] | null>('transaction-status', () => null)
   const result = useState<TransactionResult | null>('transaction-result', () => null)
+  const open = useState('transaction-open', () => false)
 
   // Transaction status progression:
   // 1. status.value = 'signed'
@@ -52,12 +53,17 @@ export default function useTransactionModal() {
     reset()
   }
 
+  watchEffect(() => {
+    open.value = isLoading.value
+  })
+
   return {
     // State
     hash,
     error,
     status,
     result,
+    open,
 
     // Computed
     isLoading,
