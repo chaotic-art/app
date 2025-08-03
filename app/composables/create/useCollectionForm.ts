@@ -21,7 +21,7 @@ export function useCollectionForm() {
   const state = reactive({
     name: '',
     description: '',
-    blockchain: 'pas_asset_hub', // Default to Paseo Asset Hub
+    blockchain: 'ahp', // Default to Asset Hub Polkadot
     royalties: 0,
     maxNfts: 'unlimited' as 'unlimited' | 'limited',
     maxNftsNumber: 1000,
@@ -29,7 +29,8 @@ export function useCollectionForm() {
 
   // Blockchains for select
   const blockchains = [
-    { label: 'Paseo Asset Hub', value: 'pas_asset_hub' },
+    { label: 'Asset Hub Polkadot', value: 'ahp' },
+    { label: 'Asset Hub Kusama', value: 'ahk' },
   ]
 
   // File upload states
@@ -43,7 +44,8 @@ export function useCollectionForm() {
 
   // Currency mapping based on blockchain
   const blockchainCurrencies: Record<string, string> = {
-    pas_asset_hub: 'PAS',
+    ahp: 'DOT',
+    ahk: 'KSM',
   }
 
   // Get currency based on selected blockchain

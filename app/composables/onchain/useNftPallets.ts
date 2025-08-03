@@ -122,8 +122,6 @@ export function useNftPallets() {
 
     if (type === 'estimate') {
       const estimatedFees = await transaction.getEstimatedFees(getConnectedSubAccount.value.address)
-      // eslint-disable-next-line no-console
-      console.log('estimatedFees', estimatedFees, formatBalance(estimatedFees, { decimals: 10, symbol: 'PAS' }))
       return estimatedFees
     }
 
@@ -284,8 +282,6 @@ export function useNftPallets() {
 
     if (type === 'estimate') {
       const estimatedFees = await transaction.getEstimatedFees(getConnectedSubAccount.value.address)
-      // eslint-disable-next-line no-console
-      console.log('estimatedFees', estimatedFees, formatBalance(estimatedFees, { decimals: 10, symbol: 'PAS' }))
       return estimatedFees
     }
 
