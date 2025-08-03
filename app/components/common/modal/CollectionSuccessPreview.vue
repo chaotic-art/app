@@ -7,6 +7,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const router = useRouter()
 
 const modalData = computed(() => {
   const collectionId = props.result.id
@@ -21,7 +22,7 @@ const modalData = computed(() => {
       primary: {
         label: 'View Collection',
         onClick: () => {
-          window.open(`${window.location.origin}/${props.result?.prefix}/collection/${collectionId}`, '_blank')
+          router.push(`/${props.result?.prefix}/collection/${collectionId}`)
         },
       },
     },

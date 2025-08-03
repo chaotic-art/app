@@ -25,13 +25,13 @@ export interface NftCategory {
 
 type TransactionResult = CollectionCategory | NftCategory
 
-export default function useTransactionModal() {
-  const hash = useState('transaction-hash', () => '')
-  const error = useState<Error | null>('transaction-error', () => null)
-  const status = useState<'start' | TxEvent['type'] | null>('transaction-status', () => null)
-  const result = useState<TransactionResult | null>('transaction-result', () => null)
-  const open = useState('transaction-open', () => false)
+const hash = ref('')
+const error = ref<Error | null>(null)
+const status = ref<'start' | TxEvent['type'] | null>(null)
+const result = ref<TransactionResult | null>(null)
+const open = ref(false)
 
+export default function useTransactionModal() {
   // Transaction status progression:
   // 1. status.value = 'signed'
   // 2. status.value = 'broadcasted'

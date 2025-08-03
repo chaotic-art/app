@@ -7,7 +7,7 @@ import { pinDirectory, pinJson } from '~/services/storage'
 
 export function useCollectionForm() {
   const { createCollection, userBalance } = useNftPallets()
-  const { isLoading, status } = useTransactionModal()
+  const { status } = useTransactionModal()
 
   // Programmatic modal setup
   const overlay = useOverlay()
@@ -130,7 +130,7 @@ export function useCollectionForm() {
     }
 
     const cidImages = await pinDirectory(filesToPin)
-    const image = `ipfs://${cidImages}/${logoFile.value!.name}`
+    const image = `ipfs://${cidImages}`
     const banner = bannerFile.value ? `ipfs://${cidImages}/${bannerFile.value.name}` : undefined
 
     const metadata: any = {
@@ -286,8 +286,5 @@ export function useCollectionForm() {
     onSubmit,
     submitAfterConfirmation,
     handleCollectionOperation,
-
-    // Status
-    isLoading,
   }
 }
