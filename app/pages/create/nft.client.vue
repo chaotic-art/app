@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core'
 import { formatBalance } from 'dedot/utils'
-import { useNftForm } from '~/composables/form/useNftForm'
+import { useNftForm } from '~/composables/create/useNftForm'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 definePageMeta({

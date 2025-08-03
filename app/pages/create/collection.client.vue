@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core'
 import { formatBalance } from 'dedot/utils'
-import { useCollectionForm } from '~/composables/form/useCollectionForm'
+import { useCollectionForm } from '~/composables/create/useCollectionForm'
 
 definePageMeta({
   title: 'Create Collection',
