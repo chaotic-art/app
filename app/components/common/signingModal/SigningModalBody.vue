@@ -33,7 +33,7 @@ const formattedEstimation = computed(
 
 <template>
   <slot>
-    <div class="py-5 flex items-start">
+    <div class="pb-5 flex items-start">
       <UIcon
         name="i-mdi:lightbulb"
         size="small"

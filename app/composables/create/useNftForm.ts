@@ -1,5 +1,7 @@
 import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import { LazyConfirmationModal } from '#components'
+import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 
@@ -10,7 +12,11 @@ interface Property {
 
 export function useNftForm() {
   const { mintNft, userCollection, userBalance } = useNftPallets()
-  const { isLoading, status } = useTransactionModal()
+  const { open } = useTransactionModal()
+
+  // Programmatic modal setup
+  const overlay = useOverlay()
+  const modalConfirmation = overlay.create(LazyConfirmationModal)
 
   // Wallet connection check
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
@@ -226,60 +232,104 @@ export function useNftForm() {
     }
   }
 
-  // Fee estimation function
-  async function estimateFee() {
-    if (!isWalletConnected.value || !mediaFile.value || !state.collection || !state.name || !state.description) {
-      estimatedFee.value = null
+  // Combined function to handle both fee estimation and NFT creation
+  async function handleNftOperation(formData: typeof state, type: 'estimate' | 'submit') {
+    if (!isWalletConnected.value || !mediaFile.value || !formData.collection || !formData.name || !formData.description) {
+      if (type === 'estimate') {
+        estimatedFee.value = null
+      }
       return
     }
 
-    isEstimatingFee.value = true
-    try {
-      const { validProperties, metadataUris, context } = await prepareNftData(state)
+    if (type === 'estimate') {
+      isEstimatingFee.value = true
+    }
 
-      const fee = await mintNft({
-        chain: 'ahp',
-        type: 'estimate',
-        collectionId: Number.parseInt(state.collection),
+    try {
+      const { validProperties, metadataUris, context } = await prepareNftData(formData)
+
+      const result = await mintNft({
+        chain: state.blockchain as Prefix,
+        type,
+        collectionId: Number.parseInt(formData.collection),
         metadataUri: metadataUris,
-        supply: state.supply,
+        supply: formData.supply,
         properties: validProperties,
         context,
       })
 
-      estimatedFee.value = fee || null
+      if (type === 'estimate') {
+        estimatedFee.value = result || null
+      }
     }
     catch (error) {
-      console.error('Error estimating fee:', error)
-      estimatedFee.value = null
+      console.error(`Error ${type === 'estimate' ? 'estimating fee' : 'creating NFT'}:`, error)
+      if (type === 'estimate') {
+        estimatedFee.value = null
+      }
     }
     finally {
-      isEstimatingFee.value = false
+      if (type === 'estimate') {
+        isEstimatingFee.value = false
+      }
     }
   }
 
-  // Submit handler
+  // Submit handler with confirmation modal
   async function onSubmit(event: FormSubmitEvent<typeof state>) {
+    // Check wallet connection first
+    if (!isWalletConnected.value) {
+      return
+    }
+
+    // Check if user has insufficient funds
+    if (estimatedFee.value !== null && balance.value !== null && balance.value < estimatedFee.value) {
+      return
+    }
+
+    // Get actual wallet data
+    const connectedAccount = getConnectedSubAccount.value
+    const actualWalletAddress = connectedAccount?.address || ''
+    const selectedChain = event.data.blockchain === 'ahp' ? 'Asset Hub Polkadot' : 'Asset Hub Kusama'
+    const selectedCurrency = event.data.blockchain === 'ahp' ? 'DOT' : 'KSM'
+
+    // Open modal programmatically
     try {
-      status.value = 'start'
+      const instance = modalConfirmation.open({
+        chain: selectedChain,
+        estimatedFee: formatBalance(estimatedFee.value || 0, { decimals: 10, symbol: selectedCurrency }),
+        walletAddress: actualWalletAddress,
+        walletBalance: formatBalance(balance.value || 0, { decimals: 10, symbol: selectedCurrency }),
+        title: 'Create NFT',
+        items: Array.from({ length: event.data.supply }, () => ({
+          name: event.data.name,
+          image: mediaFile.value ? URL.createObjectURL(mediaFile.value) : '',
+        })),
+      })
+
+      const confirmed = await instance.result
+
+      if (confirmed) {
+        await submitAfterConfirmation()
+      }
+    }
+    catch (error) {
+      console.error('Error opening modal:', error)
+    }
+  }
+
+  // Actual submission after confirmation
+  async function submitAfterConfirmation() {
+    try {
+      open.value = true
 
       // eslint-disable-next-line no-console
       console.log('Creating NFT with data:', {
-        ...event.data,
+        ...state,
         mediaFile: mediaFile.value,
       })
 
-      const { validProperties, metadataUris, context } = await prepareNftData(event.data)
-
-      await mintNft({
-        chain: 'ahp',
-        type: 'submit',
-        collectionId: Number.parseInt(event.data.collection),
-        metadataUri: metadataUris,
-        supply: event.data.supply,
-        properties: validProperties,
-        context,
-      })
+      await handleNftOperation(state, 'submit')
     }
     catch (error) {
       console.error('Error creating NFT:', error)
@@ -305,9 +355,6 @@ export function useNftForm() {
     onSubmit,
     addProperty,
     removeProperty,
-    estimateFee,
-
-    // Status
-    isLoading,
+    handleNftOperation,
   }
 }

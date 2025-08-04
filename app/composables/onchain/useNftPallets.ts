@@ -1,5 +1,4 @@
 import type { Prefix } from '@kodadot1/static'
-import { formatBalance } from 'dedot/utils'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 
@@ -7,6 +6,7 @@ type TxType = 'submit' | 'estimate'
 
 interface CreateCollectionParams {
   chain: Prefix
+  type: TxType
   maxSupply?: number
   metadataUri: string
   royalty: number
@@ -41,25 +41,18 @@ export function useNftPallets() {
   const { $api } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
-  const { hash, error, status, reset, result } = useTransactionModal()
+  const { hash, error, status, result } = useTransactionModal()
 
   async function createCollection({
     chain,
+    type,
     maxSupply,
     metadataUri,
     royalty,
     context: collectionData,
   }: CreateCollectionParams) {
-    reset()
-
     if (!getConnectedSubAccount.value?.address) {
       throw new Error('No address found')
-    }
-
-    const signer = await getConnectedSubAccount.value.signer
-
-    if (!signer) {
-      throw new Error('No signer found')
     }
 
     const api = $api(chain)
@@ -124,15 +117,24 @@ export function useNftPallets() {
       ],
     })
 
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(getConnectedSubAccount.value.address)
+      return estimatedFees
+    }
+
+    const signer = await getConnectedSubAccount.value.signer
+
+    if (!signer) {
+      throw new Error('No signer found')
+    }
+
     transaction.signSubmitAndWatch(signer).subscribe({
       next: (event) => {
         status.value = event.type
 
         if (event.type === 'txBestBlocksState' && event.found) {
           hash.value = event.block.hash.toString()
-        }
 
-        if (event.type === 'finalized') {
           result.value = {
             type: 'collection',
             id: nextId.toString(),
@@ -204,8 +206,6 @@ export function useNftPallets() {
     properties,
     context: nftData,
   }: CreateNftParams) {
-    reset()
-
     if (!getConnectedSubAccount.value?.address) {
       throw new Error('No address found')
     }
@@ -277,8 +277,6 @@ export function useNftPallets() {
 
     if (type === 'estimate') {
       const estimatedFees = await transaction.getEstimatedFees(getConnectedSubAccount.value.address)
-      // eslint-disable-next-line no-console
-      console.log('estimatedFees', estimatedFees, formatBalance(estimatedFees, { decimals: 10, symbol: 'PAS' }))
       return estimatedFees
     }
 
@@ -288,9 +286,7 @@ export function useNftPallets() {
 
         if (event.type === 'txBestBlocksState' && event.found) {
           hash.value = event.block.hash.toString()
-        }
 
-        if (event.type === 'finalized') {
           result.value = {
             type: 'nft',
             collectionId: collectionId.toString(),

@@ -44,11 +44,11 @@ const isFinalized = computed(() => props.status === TransactionStatus.Finalized)
     <div class="flex items-center">
       <a
         :href="txUrl"
-        class="ml-3 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
+        class="mr-2.5 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500 flex items-center gap-1"
         target="_blank"
         rel="nofollow noopener noreferrer"
       >
-        {{ $t('general.viewTx') }}
+        <span>{{ $t('general.viewTx') }}</span>
         <UIcon name="i-mdi:arrow-top-right" />
       </a>
 

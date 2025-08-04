@@ -21,10 +21,10 @@
       <LandingDropBanner />
     </UContainer>
 
-    <LazyLandingArtistsList :hydrate-on-visible="{ rootMargin: '300px' }" />
+    <LazyLandingArtistsList :hydrate-on-visible="{ rootMargin: '600px' }" />
 
     <UContainer>
-      <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '300px' }" />
+      <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '600px' }" />
       <!-- <LazyArticles :hydrate-on-visible="{ rootMargin: '300px' }" /> -->
     </UContainer>
   </div>

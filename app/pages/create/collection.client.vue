@@ -1,16 +1,12 @@
 <script lang="ts" setup>
-import { useCollectionForm } from '~/composables/form/useCollectionForm'
-import { useWalletStore } from '~/stores/wallet'
+import { watchDebounced } from '@vueuse/core'
+import { formatBalance } from 'dedot/utils'
+import { useCollectionForm } from '~/composables/create/useCollectionForm'
 
 definePageMeta({
   title: 'Create Collection',
   layout: 'default',
 })
-
-// Wallet connection check
-const walletStore = useWalletStore()
-const { getConnectedSubAccount } = storeToRefs(walletStore)
-const isWalletConnected = computed(() => Boolean(getConnectedSubAccount.value))
 
 // Use the collection form composable
 const {
@@ -20,11 +16,42 @@ const {
   blockchains,
   validate,
   onSubmit,
-  isLoading,
+  isWalletConnected,
+  estimatedFee,
+  isEstimatingFee,
+  handleCollectionOperation,
+  balance,
 } = useCollectionForm()
 
-// Router
-const router = useRouter()
+// Computed properties for cleaner logic
+const hasInsufficientFunds = computed(() => {
+  return estimatedFee.value !== null
+    && balance.value !== null
+    && balance.value < estimatedFee.value
+})
+
+const isSubmitDisabled = computed(() => {
+  return !isWalletConnected.value || hasInsufficientFunds.value || isEstimatingFee.value
+})
+
+const submitButtonText = computed(() => {
+  if (!isWalletConnected.value)
+    return 'Connect Wallet to Create Collection'
+  if (hasInsufficientFunds.value)
+    return 'Insufficient Funds'
+  return 'Create Collection'
+})
+
+// Auto-estimate fees when form data changes (debounced to prevent excessive API calls)
+watchDebounced(
+  [isWalletConnected, logoFile, () => state.name, () => state.description, () => state.royalties, () => state.maxNfts, () => state.maxNftsNumber],
+  ([connected, file, name, description, _royalties, _maxNfts, _maxNftsNumber]) => {
+    if (connected && file && name && description) {
+      handleCollectionOperation(state, 'estimate')
+    }
+  },
+  { debounce: 1000, maxWait: 5000 },
+)
 </script>
 
 <template>
@@ -41,19 +68,6 @@ const router = useRouter()
 
     <!-- Form -->
     <UCard class="mb-8 relative">
-      <!-- Loading Overlay -->
-      <div
-        v-if="isLoading"
-        class="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg"
-      >
-        <div class="flex flex-col items-center gap-3">
-          <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-600 dark:text-gray-400 animate-spin" />
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">
-            Creating collection...
-          </p>
-        </div>
-      </div>
-
       <template #header>
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
           Collection Information
@@ -83,7 +97,6 @@ const router = useRouter()
                   label="Drop logo here"
                   description="PNG, JPG, GIF or SVG (max. 5MB)"
                   color="neutral"
-                  :disabled="isLoading"
                   class="w-full aspect-square"
                 />
               </UFormField>
@@ -103,7 +116,6 @@ const router = useRouter()
                   label="Drop banner here"
                   description="PNG, JPG, GIF or SVG (max. 10MB)"
                   color="neutral"
-                  :disabled="isLoading"
                   class="w-full aspect-square"
                 />
               </UFormField>
@@ -128,7 +140,6 @@ const router = useRouter()
                 <UInput
                   v-model="state.name"
                   placeholder="My Awesome Collection"
-                  :disabled="isLoading"
                   class="w-full"
                 />
               </UFormField>
@@ -168,7 +179,6 @@ const router = useRouter()
               v-model="state.description"
               placeholder="Tell people about your collection..."
               :rows="4"
-              :disabled="isLoading"
               class="w-full"
             />
           </UFormField>
@@ -194,7 +204,6 @@ const router = useRouter()
                   max="100"
                   step="0.1"
                   placeholder="2.5"
-                  :disabled="isLoading"
                   class="w-full"
                 />
               </UFormField>
@@ -215,7 +224,6 @@ const router = useRouter()
                     ]"
                     value-key="value"
                     placeholder="Select limit type"
-                    :disabled="isLoading"
                     class="w-full"
                   />
 
@@ -229,7 +237,6 @@ const router = useRouter()
                       min="1"
                       step="1"
                       placeholder="1000"
-                      :disabled="isLoading"
                       class="w-full"
                     />
                   </UFormField>
@@ -240,22 +247,48 @@ const router = useRouter()
         </div>
 
         <!-- Form Footer -->
-        <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-          <UButton
-            variant="ghost"
-            color="neutral"
-            :disabled="isLoading"
-            @click="router.back()"
-          >
-            Cancel
-          </UButton>
+        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <!-- Simple Fee & Balance -->
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex flex-col font-mono">
+              <span class="text-gray-600 dark:text-gray-400 flex">
+                <span class="w-18">Fee:</span>
+                <span v-if="isEstimatingFee" class="text-gray-500">Calculating...</span>
+                <span v-else-if="estimatedFee !== null" class="font-medium text-gray-900 dark:text-white">
+                  {{ formatBalance(estimatedFee, { decimals: 10, symbol: 'DOT' }) }}
+                </span>
+                <span v-else class="text-gray-600 dark:text-gray-400">
+                  ---
+                </span>
+              </span>
 
+              <span class="text-gray-600 dark:text-gray-400 flex">
+                <span class="w-18">Balance:</span>
+                <span class="font-medium text-gray-900 dark:text-white">
+                  {{ formatBalance(balance, { decimals: 10, symbol: 'DOT' }) }}
+                </span>
+              </span>
+            </div>
+
+            <div v-if="hasInsufficientFunds" class="flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
+              <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
+              <span class="text-xs font-medium">Insufficient</span>
+            </div>
+            <div v-else-if="estimatedFee !== null && balance" class="flex items-center gap-1 text-green-600 dark:text-green-400">
+              <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
+              <span class="text-xs font-medium">Ready</span>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
           <UButton
             type="submit"
-            :loading="isLoading"
-            :disabled="isLoading || !isWalletConnected"
+            size="xl"
+            class="w-full"
+            :disabled="isSubmitDisabled"
+            :variant="isSubmitDisabled ? 'soft' : 'solid'"
           >
-            {{ !isWalletConnected ? 'Connect Wallet to Create Collection' : 'Create Collection' }}
+            {{ submitButtonText }}
           </UButton>
         </div>
       </UForm>

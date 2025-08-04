@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core'
 import { formatBalance } from 'dedot/utils'
-import { useNftForm } from '~/composables/form/useNftForm'
+import { useNftForm } from '~/composables/create/useNftForm'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 definePageMeta({
@@ -22,11 +22,10 @@ const {
   onSubmit,
   addProperty,
   removeProperty,
-  isLoading,
   isWalletConnected,
   estimatedFee,
   isEstimatingFee,
-  estimateFee,
+  handleNftOperation,
   balance,
 } = useNftForm()
 
@@ -38,7 +37,7 @@ const hasInsufficientFunds = computed(() => {
 })
 
 const isSubmitDisabled = computed(() => {
-  return isLoading.value || !isWalletConnected.value || hasInsufficientFunds.value || isEstimatingFee.value
+  return !isWalletConnected.value || hasInsufficientFunds.value || isEstimatingFee.value
 })
 
 const submitButtonText = computed(() => {
@@ -54,7 +53,7 @@ watchDebounced(
   [isWalletConnected, mediaFile, () => state.collection, () => state.name, () => state.description, () => state.supply],
   ([connected, file, collection, name, description, supply]) => {
     if (connected && file && collection && name && description && supply > 0) {
-      estimateFee()
+      handleNftOperation(state, 'estimate')
     }
   },
   { debounce: 1000, maxWait: 5000 },
@@ -108,7 +107,6 @@ watchDebounced(
                   label="Drop your media here"
                   description="PNG, JPG, GIF, SVG, MP4, MP3, GLB, GLTF (max. 50MB)"
                   color="neutral"
-                  :disabled="isLoading"
                   class="size-80 mx-auto"
                 />
               </UFormField>
@@ -132,7 +130,7 @@ watchDebounced(
                   <UInput
                     v-model="state.name"
                     placeholder="My Awesome NFT"
-                    :disabled="isLoading"
+
                     class="w-full"
                   />
                 </UFormField>
@@ -172,7 +170,6 @@ watchDebounced(
                 v-model="state.description"
                 placeholder="Tell people about your NFT..."
                 :rows="4"
-                :disabled="isLoading"
                 class="w-full"
               />
             </UFormField>
@@ -198,7 +195,7 @@ watchDebounced(
                     value-key="value"
                     placeholder="Select a collection"
                     :search-input="{ placeholder: 'Search collections...' }"
-                    :disabled="isLoading || collectionsLoading"
+                    :disabled="collectionsLoading"
                     :loading="collectionsLoading"
                     class="w-full"
                     :ui="{
@@ -221,7 +218,6 @@ watchDebounced(
                     max="100"
                     step="1"
                     placeholder="1"
-                    :disabled="isLoading"
                     class="w-full"
                   />
                 </UFormField>
@@ -270,7 +266,6 @@ watchDebounced(
               <div class="flex items-center gap-3">
                 <UCheckbox
                   v-model="state.autoNumbering"
-                  :disabled="isLoading"
                 />
                 <div>
                   <label class="text-sm font-medium text-gray-900 dark:text-white">
@@ -289,7 +284,6 @@ watchDebounced(
             <div class="flex items-center gap-3">
               <UCheckbox
                 v-model="state.listDirectly"
-                :disabled="isLoading"
               />
               <div>
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -317,7 +311,7 @@ watchDebounced(
                       min="0"
                       step="0.001"
                       placeholder="1.5"
-                      :disabled="isLoading"
+
                       class="w-full pr-16"
                     />
                     <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -339,7 +333,7 @@ watchDebounced(
                 variant="ghost"
                 size="sm"
                 icon="i-heroicons-plus"
-                :disabled="isLoading"
+
                 @click="addProperty"
               >
                 Add Property
@@ -357,7 +351,7 @@ watchDebounced(
                     <UInput
                       v-model="property.trait"
                       placeholder="e.g., Color, Rarity, Style"
-                      :disabled="isLoading"
+
                       class="w-full"
                     />
                   </UFormField>
@@ -367,7 +361,7 @@ watchDebounced(
                     <UInput
                       v-model="property.value"
                       placeholder="e.g., Blue, Rare, Abstract"
-                      :disabled="isLoading"
+
                       class="w-full"
                     />
                   </UFormField>
@@ -378,7 +372,7 @@ watchDebounced(
                   color="neutral"
                   size="sm"
                   icon="i-heroicons-trash"
-                  :disabled="isLoading"
+
                   class="mb-0"
                   @click="removeProperty(index)"
                 />
@@ -426,7 +420,6 @@ watchDebounced(
               type="submit"
               size="xl"
               class="w-full"
-              :loading="isLoading"
               :disabled="isSubmitDisabled"
               :variant="isSubmitDisabled ? 'soft' : 'solid'"
             >
