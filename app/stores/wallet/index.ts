@@ -34,9 +34,11 @@ export const useWalletStore = defineStore('wallet', () => {
     if (!walletId)
       return undefined
 
-    const account = findWallet(walletId)?.accounts.find(account => account.id === accountId)
+    const wallet = findWallet(walletId)
 
-    if (!account)
+    const account = wallet?.accounts.find(account => account.id === accountId)
+
+    if (!wallet || !account)
       return undefined
 
     if (account.vm === 'EVM')
@@ -46,7 +48,7 @@ export const useWalletStore = defineStore('wallet', () => {
 
     return {
       ...account,
-      signer: getSigner(walletId as SubstrateWalletSource, account.address),
+      signer: getSigner(wallet.source as SubstrateWalletSource, account.address),
     }
   }
 
