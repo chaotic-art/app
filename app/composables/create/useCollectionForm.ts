@@ -7,7 +7,7 @@ import { pinDirectory, pinJson } from '~/services/storage'
 
 export function useCollectionForm() {
   const { createCollection, userBalance } = useNftPallets()
-  const { status } = useTransactionModal()
+  const { open } = useTransactionModal()
 
   // Programmatic modal setup
   const overlay = useOverlay()
@@ -249,7 +249,7 @@ export function useCollectionForm() {
   // Actual submission after confirmation
   async function submitAfterConfirmation() {
     try {
-      status.value = 'start'
+      open.value = true
 
       // eslint-disable-next-line no-console
       console.log('Creating collection with data:', {

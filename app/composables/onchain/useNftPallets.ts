@@ -41,7 +41,7 @@ export function useNftPallets() {
   const { $api } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
-  const { hash, error, status, reset, result } = useTransactionModal()
+  const { hash, error, status, result } = useTransactionModal()
 
   async function createCollection({
     chain,
@@ -51,8 +51,6 @@ export function useNftPallets() {
     royalty,
     context: collectionData,
   }: CreateCollectionParams) {
-    reset()
-
     if (!getConnectedSubAccount.value?.address) {
       throw new Error('No address found')
     }
@@ -208,8 +206,6 @@ export function useNftPallets() {
     properties,
     context: nftData,
   }: CreateNftParams) {
-    reset()
-
     if (!getConnectedSubAccount.value?.address) {
       throw new Error('No address found')
     }

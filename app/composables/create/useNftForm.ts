@@ -1,7 +1,7 @@
 import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import { LazySignConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
-import SignConfirmationModal from '~/components/common/modal/SignConfirmationModal.vue'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 
@@ -12,11 +12,11 @@ interface Property {
 
 export function useNftForm() {
   const { mintNft, userCollection, userBalance } = useNftPallets()
-  const { status } = useTransactionModal()
+  const { open } = useTransactionModal()
 
   // Programmatic modal setup
   const overlay = useOverlay()
-  const modalConfirmation = overlay.create(SignConfirmationModal)
+  const modalConfirmation = overlay.create(LazySignConfirmationModal)
 
   // Wallet connection check
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
@@ -321,7 +321,7 @@ export function useNftForm() {
   // Actual submission after confirmation
   async function submitAfterConfirmation() {
     try {
-      status.value = 'start'
+      open.value = true
 
       // eslint-disable-next-line no-console
       console.log('Creating NFT with data:', {
