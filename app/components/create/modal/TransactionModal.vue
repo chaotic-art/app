@@ -34,14 +34,14 @@ const resolvedStatus = computed(() => {
     @after:leave="close"
   >
     <template #body>
-      <CollectionSuccessPreview
+      <LazySuccessCollection
         v-if="isSuccess && result?.type === 'collection'"
         :result="result"
         :status="resolvedStatus"
       />
 
       <!-- NFT success preview -->
-      <NFTSuccessPreview
+      <LazySuccessNft
         v-else-if="isSuccess && result?.type === 'nft'"
         :result="result"
         :status="resolvedStatus"
@@ -68,7 +68,7 @@ const resolvedStatus = computed(() => {
       </div>
 
       <!-- loading state -->
-      <SigningModalBody
+      <LazySigningModalBody
         v-else
         title="Processing Transaction"
         subtitle="Please wait . . ."

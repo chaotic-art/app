@@ -1,7 +1,7 @@
 import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
-import SignConfirmationModal from '~/components/common/modal/SignConfirmationModal.vue'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 
@@ -11,7 +11,7 @@ export function useCollectionForm() {
 
   // Programmatic modal setup
   const overlay = useOverlay()
-  const modalConfirmation = overlay.create(SignConfirmationModal)
+  const modalConfirmation = overlay.create(LazyConfirmationModal)
 
   // Wallet connection check
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
