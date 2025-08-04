@@ -87,9 +87,8 @@ const WalletRegistry: Record<SubstrateWalletSource, SubstrateWalletMetadata> = {
 }
 
 // source as 'polkadot-js' in mobile app
-const WalletProxyMap: Record<string, SubstrateWalletSource> = {
+const WalletProxyMap: Partial<Record<SubstrateWalletSource, SubstrateWalletSource>> = {
   [SubstrateWalletSources.Math]: SubstrateWalletSources.PolkadotJs, // mathwallet
-  [SubstrateWalletSources.Nova]: SubstrateWalletSources.PolkadotJs, // nova
 }
 
 const MobileWalletList = [
@@ -109,7 +108,7 @@ const BrowserWalletList = [
 ]
 
 function getWalletSource(source: string | SubstrateWalletSource): SubstrateWalletSource {
-  return WalletProxyMap[source] || source as SubstrateWalletSource
+  return WalletProxyMap[source as SubstrateWalletSource] || source as SubstrateWalletSource
 }
 
 export function getAvailableWallets(): SubstrateWalletMetadata[] {

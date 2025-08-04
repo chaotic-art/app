@@ -4,7 +4,7 @@ export const SubstrateWalletSources = {
   PolkadotJs: 'polkadot-js',
   SubWallet: 'subwallet-js',
   Talisman: 'talisman',
-  Nova: 'nova',
+  Nova: 'nova-wallet',
   Math: 'mathwallet',
   Enkrypt: 'enkrypt',
   PolkaGate: 'polkagate',
@@ -13,11 +13,6 @@ export const SubstrateWalletSources = {
 } as const
 
 export type SubstrateWalletSource = typeof SubstrateWalletSources[keyof typeof SubstrateWalletSources]
-
-export const WalletProxyMap: Partial<Record<SubstrateWalletSource, SubstrateWalletSource>> = {
-  [SubstrateWalletSources.Math]: SubstrateWalletSources.PolkadotJs,
-  [SubstrateWalletSources.Nova]: SubstrateWalletSources.PolkadotJs,
-}
 
 export interface SubstrateWalletAccount {
   address: string
