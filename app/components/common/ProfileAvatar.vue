@@ -24,19 +24,21 @@ const profileImageUrl = computed(
 <template>
   <div
     v-if="profileImageUrl"
-    class="rounded-full overflow-hidden bg-white border aspect-square"
+    class="rounded-full overflow-hidden bg-white border aspect-square flex-shrink-0"
     :style="{
       width: `${size}px`,
       height: `${size}px`,
+      minWidth: `${size}px`,
+      minHeight: `${size}px`,
       padding: `${Math.round(size / 16)}px`,
     }"
   >
     <img
       :src="profileImageUrl"
       :sizes="`${size}px`"
-      title="User Avatar"
-      class="object-cover overflow-hidden rounded-full h-full w-full shadow-none!"
-      inner-class="object-cover"
+      alt="User Avatar"
+      class="object-cover rounded-full w-full h-full"
+      style="object-position: center center;"
     >
   </div>
   <NativeAvatar
