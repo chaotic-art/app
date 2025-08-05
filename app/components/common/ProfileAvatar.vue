@@ -24,7 +24,7 @@ const profileImageUrl = computed(
 <template>
   <div
     v-if="profileImageUrl"
-    class="rounded-full overflow-hidden bg-white border min-w-fit aspect-square"
+    class="rounded-full overflow-hidden bg-white border aspect-square"
     :style="{
       width: `${size}px`,
       height: `${size}px`,
