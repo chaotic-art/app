@@ -172,13 +172,7 @@ const title = computed(() => {
   return ''
 })
 
-if (import.meta.client) {
-  watch(isModalOpen, (open) => {
-    if (open) {
-      init()
-    }
-  }, { once: true })
-}
+onMounted(init)
 </script>
 
 <template>
