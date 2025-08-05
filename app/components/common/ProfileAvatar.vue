@@ -24,7 +24,7 @@ const profileImageUrl = computed(
 <template>
   <div
     v-if="profileImageUrl"
-    class="rounded-full overflow-hidden bg-white border"
+    class="rounded-full overflow-hidden bg-white border flex-shrink-0"
     :style="{
       width: `${size}px`,
       height: `${size}px`,
@@ -42,6 +42,7 @@ const profileImageUrl = computed(
   </div>
   <NativeAvatar
     v-else
+    class="flex-shrink-0"
     :size="size"
     :value="address"
   />
