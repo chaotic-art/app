@@ -41,11 +41,11 @@ watch(isHovered, (newHover, oldHover) => {
 <template>
   <div class="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:shadow-sm transition-shadow">
     <NuxtLink
-      class="flex items-center flex-1 min-w-0"
+      class="flex items-center flex-1 min-w-0 gap-4"
       :to="`/${prefix}/u/${prefixUserAddress}`"
     >
       <ProfileAvatar
-        class="mr-4 flex-shrink-0"
+        class="flex-shrink-0"
         :address="user.address"
         :size="48"
       />
