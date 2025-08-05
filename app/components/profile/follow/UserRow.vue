@@ -45,7 +45,6 @@ watch(isHovered, (newHover, oldHover) => {
       :to="`/${prefix}/u/${prefixUserAddress}`"
     >
       <ProfileAvatar
-        class="flex-shrink-0"
         :address="user.address"
         :size="48"
       />

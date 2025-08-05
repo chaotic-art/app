@@ -148,7 +148,7 @@ const {
                 :address="owner"
                 :avatar-size="20"
                 :transparent-background="true"
-                class="!bg-transparent !p-0"
+                class="!p-0"
               />
               <span v-else class="text-xs text-gray-600 dark:text-gray-300">N/A</span>
             </div>
