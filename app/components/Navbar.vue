@@ -9,6 +9,7 @@ const router = useRouter()
 
 // Modal state
 const isCreateModalOpen = ref(false)
+const isBottomSheetOpen = ref(false)
 
 const navItems = computed<NavigationMenuItem[][]>(() => [
   [
@@ -54,6 +55,16 @@ function handleCreateNft() {
 function closeModal() {
   isCreateModalOpen.value = false
 }
+
+function handleNavClick(item: NavigationMenuItem, event?: Event) {
+  isBottomSheetOpen.value = false
+  if (item.onSelect && typeof item.onSelect === 'function') {
+    item.onSelect(event || new Event('click'))
+  }
+  else if (item.to) {
+    router.push(item.to)
+  }
+}
 </script>
 
 <template>
@@ -67,16 +78,71 @@ function closeModal() {
       </div>
 
       <div class="flex items-center gap-3 md:gap-6">
-        <div class="hidden md:flex  items-center">
+        <div class="hidden md:flex items-center">
           <UNavigationMenu
             :items="navItems"
           />
           <ThemeSwitcher v-if="!accountId" />
         </div>
-        <NavbarWallet />
+
+        <!-- Desktop Wallet -->
+        <div class="hidden md:block">
+          <NavbarWallet />
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <UButton
+          icon="i-heroicons-bars-3"
+          color="neutral"
+          variant="ghost"
+          size="sm"
+          class="md:hidden"
+          @click="isBottomSheetOpen = true"
+        />
       </div>
     </nav>
   </UContainer>
+
+  <!-- Mobile Bottom Sheet -->
+  <USlideover
+    v-model:open="isBottomSheetOpen"
+    side="bottom"
+    title="Navigation"
+    class="md:hidden"
+  >
+    <template #body>
+      <div class="space-y-4">
+        <!-- Navigation Items -->
+        <div class="space-y-2">
+          <UButton
+            v-for="item in navItems[0]"
+            :key="item.label"
+            :variant="item.active ? 'solid' : 'ghost'"
+            :color="item.active ? 'primary' : 'neutral'"
+            size="lg"
+            class="w-full justify-start"
+            @click="handleNavClick(item)"
+          >
+            <div class="flex items-center gap-3">
+              <span>{{ item.label }}</span>
+              <UIcon
+                v-if="item.active"
+                name="i-heroicons-check"
+                class="ml-auto"
+              />
+            </div>
+          </UButton>
+        </div>
+
+        <USeparator />
+
+        <!-- Mobile Wallet -->
+        <div class="md:hidden">
+          <NavbarWallet />
+        </div>
+      </div>
+    </template>
+  </USlideover>
 
   <!-- Create Modal -->
   <LazyCreateModal
