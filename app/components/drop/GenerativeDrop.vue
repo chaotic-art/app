@@ -247,7 +247,8 @@ watchDebounced(isMintModalOpen, (open) => {
     <USeparator class="my-12 md:my-20" />
 
     <DropItemsGrid
-      v-if="drop"
+      v-if="drop.collection"
+      :key="drop.collection"
       :collection-id="drop.collection"
     />
   </UContainer>
