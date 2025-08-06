@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
 import { CHAINS } from '@kodadot1/static'
+import { useSortOptions } from '~/composables/useSortOptions'
 import { fetchOdaCollection } from '~/services/oda'
 import { copyAddress, getSubscanUrl, shortenAddress } from '~/utils/format/address'
 
@@ -21,44 +22,11 @@ function clearCache() {
   clearOdaCache(chain.value, collection_id?.toString() ?? '', refresh)
 }
 
-const sortOptions = [
-  { label: 'Newest', value: 'newest', icon: 'i-heroicons-clock' },
-  { label: 'Oldest', value: 'oldest', icon: 'i-heroicons-archive-box' },
-  { label: 'Lowest Price', value: 'lowest_price', icon: 'i-heroicons-arrow-trending-down' },
-  { label: 'Higher Price', value: 'higher_price', icon: 'i-heroicons-arrow-trending-up' },
-]
+const { selectedSort, createQueryVariables } = useSortOptions()
 
-const selectedSort = ref('newest')
-
-const orderByValue = computed(() => {
-  switch (selectedSort.value) {
-    case 'newest':
-      return 'blockNumber_DESC'
-    case 'oldest':
-      return 'blockNumber_ASC'
-    case 'lowest_price':
-      return 'price_ASC'
-    case 'higher_price':
-      return 'price_DESC'
-    default:
-      return 'blockNumber_DESC'
-  }
-})
-
-const queryVariables = computed(() => {
-  const variables: any = {
-    collections: [collection_id],
-    orderBy: orderByValue.value,
-  }
-
-  if (selectedSort.value === 'lowest_price' || selectedSort.value === 'higher_price') {
-    variables.search = [
-      { price_gt: '0' },
-    ]
-  }
-
-  return variables
-})
+const queryVariables = computed(() =>
+  createQueryVariables([collection_id?.toString() ?? '']),
+)
 
 // Floor price data
 const { $api } = useNuxtApp()
@@ -260,10 +228,8 @@ defineOgImageComponent('Frame', {
         </h2>
 
         <div class="w-full md:w-auto">
-          <USelect
+          <SortOptions
             v-model="selectedSort"
-            :items="sortOptions"
-            placeholder="Sort by..."
             class="w-full md:w-48"
           />
         </div>

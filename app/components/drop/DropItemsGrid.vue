@@ -1,13 +1,15 @@
 <script setup lang="ts">
+import { useSortOptions } from '~/composables/useSortOptions'
+
 const props = defineProps<{
   collectionId: string
 }>()
 
-const selectedSort = ref('newest')
+const { selectedSort, createQueryVariables } = useSortOptions()
 
-const queryVariables = computed(() => ({
-  collections: [props.collectionId],
-}))
+const queryVariables = computed(() =>
+  createQueryVariables([props.collectionId]),
+)
 </script>
 
 <template>
@@ -16,9 +18,11 @@ const queryVariables = computed(() => ({
       Latest NFT Mints
     </p>
 
-    <div class="flex gap-2 md:gap-4">
-      <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Newest" variant="outline" />
-      <UButton class="rounded-full px-3 md:px-4 py-2 text-sm" label="Buy Now" variant="outline" />
+    <div class="w-full md:w-auto">
+      <SortOptions
+        v-model="selectedSort"
+        class="w-full md:w-48"
+      />
     </div>
   </div>
 
