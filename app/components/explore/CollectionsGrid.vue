@@ -11,6 +11,8 @@ const props = withDefaults(defineProps<Props>(), {
   prefix: 'ahp',
 })
 
+const emit = defineEmits(['totalCountChange'])
+
 // Use the collections infinite query composable
 const {
   collections,
@@ -27,6 +29,10 @@ const {
 
 onMounted(async () => {
   await initialize()
+})
+
+watch(totalCount, (newCount) => {
+  emit('totalCountChange', newCount)
 })
 </script>
 
