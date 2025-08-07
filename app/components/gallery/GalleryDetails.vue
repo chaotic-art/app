@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import type { Prefix } from '@kodadot1/static'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 
 interface Props {
   tokenData?: OdaToken
   collection?: OnchainCollection
-  chain: string
+  chain: Prefix
   collectionId: string
   owner?: string
   formattedPrice?: string

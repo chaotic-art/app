@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
+import { tokenEntries } from '~/api/nft-pallets'
 import { fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
 const CONTAINER_ID = 'nft-img-container'
@@ -27,6 +28,19 @@ const {
   tokenId: Number(tokenId),
   collectionId: Number(collectionId),
   chain: chain as Prefix,
+})
+
+const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
+
+onMounted(async () => {
+  try {
+    const entries = await tokenEntries({ prefix: chain as Prefix, collectionId: Number(collectionId), max: 7 })
+    // Filter out the current token from the results
+    moreFromCollection.value = entries.filter(entry => entry.keyArgs[1] !== Number(tokenId)).slice(0, 6)
+  }
+  catch (error) {
+    console.error('Failed to fetch more from collection:', error)
+  }
 })
 
 useSeoMeta({
@@ -60,11 +74,46 @@ useSeoMeta({
         <GalleryDetails
           :token-data="tokenData"
           :collection="collection"
-          :chain="chain as string"
+          :chain="chain as Prefix"
           :collection-id="collectionId ?? ''"
           :owner="owner || undefined"
           :formatted-price="formattedPrice || undefined"
           :usd-price="usdPrice"
+        />
+      </div>
+    </div>
+
+    <!-- more from this collection -->
+    <div v-if="moreFromCollection.length > 0" class="mt-12 md:mt-16">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+            More from this collection
+          </h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Discover other NFTs from {{ collection?.metadata?.name || `Collection ${collectionId}` }}
+          </p>
+        </div>
+
+        <NuxtLink
+          :to="`/${chain}/collection/${collectionId}`"
+          class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+        >
+          View all
+          <UIcon name="i-heroicons-arrow-right" class="w-4 h-4" />
+        </NuxtLink>
+      </div>
+
+      <!-- Grid Layout -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
+        <TokenCard
+          v-for="nft in moreFromCollection"
+          :key="nft.keyArgs[1]"
+          :token-id="nft.keyArgs[1]"
+          :collection-id="nft.keyArgs[0]"
+          :chain="chain as Prefix"
+          :image="nft.metadata.image"
+          :name="nft.metadata.name"
         />
       </div>
     </div>
