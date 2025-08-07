@@ -4,11 +4,14 @@ import Logo from '@/assets/svg/navbar-logo.svg'
 import ThemeSwitcher from '@/components/common/ThemeSwitcher.vue'
 
 const { accountId } = useAuth()
+const { prefix } = usePrefix()
 const route = useRoute()
 const router = useRouter()
 
 // Modal state
 const isCreateModalOpen = ref(false)
+
+const routePrefix = computed(() => isProduction ? 'ahp' : prefix.value)
 
 const navItems = computed<NavigationMenuItem[][]>(() => [
   [
@@ -18,15 +21,15 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
     },
     {
       label: 'Explore',
-      to: '/ahp/explore/collectibles',
+      to: `/${routePrefix.value}/explore/collectibles`,
     },
     {
       label: 'Drops',
-      to: '/ahp/drops',
+      to: `/${routePrefix.value}/drops`,
     },
     {
       label: 'Artists',
-      to: '/ahp/artists',
+      to: `/${routePrefix.value}/artists`,
     },
     {
       label: 'Create',

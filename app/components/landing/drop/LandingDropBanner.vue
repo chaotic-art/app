@@ -6,14 +6,16 @@ import { fetchOdaCollection } from '@/services/oda'
 
 type DropItemWithCollection = DropItem & OnchainCollection
 
+const { prefix } = usePrefix()
+
 const { data: dropItems } = await useLazyAsyncData(() => (getDrops({
   active: [true],
-  chain: ['ahp'],
+  chain: [isProduction ? 'ahp' : prefix.value],
   limit: 3,
 })), {
   transform: async (data) => {
     return await Promise.all(data.map(async (drop) => {
-      const collection = await fetchOdaCollection('ahp', drop.collection)
+      const collection = await fetchOdaCollection(drop.chain, drop.collection)
       return {
         ...drop,
         ...collection,
