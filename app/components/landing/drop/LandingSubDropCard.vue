@@ -60,7 +60,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
 
         <div class="flex flex-col items-center md:flex-row gap-3 md:gap-1 md:justify-between">
           <div class="text-gray-400 dark:text-gray-300 text-center md:text-left">
-            {{ formatToNow(parseCETDate(drop?.start_at || '')) }}
+            {{ drop?.start_at ? formatToNow(parseCETDate(drop.start_at || '')) : 'N/A' }}
           </div>
           <LandingDropMintButton :drop="drop" :is-minted-out="claimed === drop?.max" />
         </div>
