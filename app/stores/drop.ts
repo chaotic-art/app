@@ -51,6 +51,17 @@ export const useDropStore = defineStore('drop', () => {
     mintingSession.value = { ...DEFAULT_MINTING_SESSION }
   }
 
+  const reset = () => {
+    isCapturingImage.value = false
+    previewItem.value = undefined
+    drop.value = { ...DEFAULT_DROP, chain: prefix.value }
+    amountToMint.value = 1
+    loading.value = false
+    toMintNFTs.value = []
+    mintedNFTs.value = []
+    mintingSession.value = { ...DEFAULT_MINTING_SESSION }
+  }
+
   return {
     loading,
     isCapturingImage,
@@ -61,5 +72,6 @@ export const useDropStore = defineStore('drop', () => {
     mintedNFTs,
     mintingSession,
     resetMassmint,
+    reset,
   }
 })
