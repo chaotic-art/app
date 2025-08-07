@@ -52,6 +52,8 @@ export const exploreNfts = graphql(`
             orderBy: $orderBy
             where: {
                 issuer_not_in: $denyList
+                currentOwner_eq: $owner
+                issuer_eq: $issuer
                 name_containsInsensitive: $name
                 collection: {
                     id_in: $collections
