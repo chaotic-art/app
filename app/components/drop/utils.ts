@@ -94,7 +94,6 @@ export async function getEnrichedDrop(campaign: DropItem): Promise<DropItem | un
     ...onChainData,
     isMintedOut: onChainData.minted >= onChainData.max,
     isFree: !Number(offChainData.price),
-    isUnlimited: onChainData.max !== undefined && onChainData.max >= Number.MAX_SAFE_INTEGER,
     dropStartTime,
   }
 
