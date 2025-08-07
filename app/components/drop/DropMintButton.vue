@@ -38,12 +38,12 @@ const label = computed(() => {
     return $i18n.t('drop.seeListing')
   }
 
-  if (!isLogIn.value) {
-    return $i18n.t('general.connectWallet')
-  }
-
   if (isMintNotLive.value) {
     return $i18n.t('drop.mintingNotLive')
+  }
+
+  if (!isLogIn.value && props.isDropPage) {
+    return $i18n.t('general.connectWallet')
   }
 
   return $i18n.t('drop.mint')
