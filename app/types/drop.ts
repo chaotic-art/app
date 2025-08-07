@@ -45,5 +45,6 @@ export interface DropItem {
   dropStartTime?: Date
   isMintedOut: boolean
   isFree: boolean
+  isUnlimited: boolean
   status: DropStatus
 }

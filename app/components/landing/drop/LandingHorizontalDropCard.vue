@@ -3,8 +3,6 @@ import type { DropItem } from '@/types'
 
 const props = defineProps<{
   drop?: DropItem
-  description?: string
-  claimed?: number
 }>()
 
 const emit = defineEmits(['click'])
@@ -67,7 +65,7 @@ useHead({
                 <div class="h-3 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-4/5" />
                 <div class="h-3 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-3/5" />
               </div>
-              <MarkdownPreview v-else :source="description || ''" />
+              <MarkdownPreview v-else :source="drop?.collectionDescription || ''" />
             </div>
           </div>
         </div>
@@ -82,7 +80,7 @@ useHead({
               <div class="h-4 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded w-16" />
             </template>
             <template v-else>
-              <span class="font-medium text-gray-900 dark:text-white">{{ claimed }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
+              <span class="font-medium text-gray-900 dark:text-white">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
               <span class="font-bold text-gray-500 dark:text-gray-300">·</span>
               <span class="font-medium text-gray-900 dark:text-white">{{ usdPrice }} USD</span>
             </template>
@@ -90,7 +88,11 @@ useHead({
 
           <!-- Mint Button -->
           <div v-if="isLoading" class="h-12 bg-gray-200 dark:bg-neutral-800 animate-pulse rounded-lg w-32" />
-          <LandingDropMintButton v-else :drop="drop" :is-minted-out="claimed === drop?.max" />
+          <DropMintButton
+            v-else
+            class="w-fit md:w-auto"
+            :drop="drop" size="sm"
+          />
         </div>
       </div>
     </UContainer>

@@ -38,6 +38,7 @@ export const useDropStore = defineStore('drop', () => {
   const isCapturingImage = ref(false)
   const previewItem = ref<GenerativePreviewItem>()
   const mintingSession = ref<MintingSession>({ ...DEFAULT_MINTING_SESSION })
+  const walletConnecting = ref(false)
 
   // massmint
   const amountToMint = ref(1)
@@ -65,6 +66,7 @@ export const useDropStore = defineStore('drop', () => {
   return {
     loading,
     isCapturingImage,
+    walletConnecting,
     previewItem,
     drop,
     amountToMint,

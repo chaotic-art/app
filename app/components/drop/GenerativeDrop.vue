@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
-import useDropMint from '~/composables/drop/useDropMint'
 
 const { chain } = useRoute().params
 const chainPrefix = computed(() => chain?.toString() as Prefix)
@@ -9,8 +8,6 @@ const { drop, amountToMint } = storeToRefs(useDropStore())
 
 const { decimals, chainSymbol } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
-
-const { mint } = useDropMint()
 </script>
 
 <template>
@@ -92,9 +89,10 @@ const { mint } = useDropMint()
                   base: 'rounded-full px-4 md:px-6 py-2 md:py-3',
                 }"
               />
-              <UButton class="rounded-full px-4 md:px-6 py-2 md:py-3 w-full sm:w-auto" @click="mint">
-                Mint Drop
-              </UButton>
+              <DropMintButton
+                :drop="drop"
+                is-drop-page
+              />
             </div>
           </div>
         </div>

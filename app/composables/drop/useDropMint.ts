@@ -13,7 +13,7 @@ export default function useDropMint() {
 
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
   const dropStore = useDropStore()
-  const { drop, loading, isCapturingImage, toMintNFTs } = storeToRefs(dropStore)
+  const { drop, loading, isCapturingImage, toMintNFTs, walletConnecting } = storeToRefs(dropStore)
 
   const blockNumber = ref<number>()
   const txHash = ref<string>()
@@ -29,13 +29,27 @@ export default function useDropMint() {
     isLoading: isTransactionLoading.value,
   }))
 
+  function openMintModal() {
+    massGenerate()
+    isModalOpen.value = true
+  }
+
   function mint() {
-    doAfterLogin({
-      onLoginSuccess: () => {
-        massGenerate()
-        isModalOpen.value = true
-      },
-    })
+    if (!accountId.value) {
+      walletConnecting.value = true
+      doAfterLogin({
+        onLoginSuccess: () => {
+          walletConnecting.value = false
+          openMintModal()
+        },
+        onCancel: () => {
+          walletConnecting.value = false
+        },
+      })
+      return
+    }
+
+    openMintModal()
   }
 
   async function executeSubTransaction() {

@@ -39,10 +39,9 @@ function getLocalDropStatus(drop: Pick<DropItem, 'dropStartTime' | 'minted' | 'm
 
 export const FALLBACK_DROP_COLLECTION_MAX = 64
 
-export async function getDropAttributes(alias: string): Promise<DropItem | undefined> {
+export async function getEnrichedDrop(campaign: DropItem): Promise<DropItem | undefined> {
   // get some offchain data
   // ----------------------
-  const campaign = await getDropById(alias)
   const offChainData = {
     id: campaign.id,
     chain: campaign.chain,
@@ -95,6 +94,7 @@ export async function getDropAttributes(alias: string): Promise<DropItem | undef
     ...onChainData,
     isMintedOut: onChainData.minted >= onChainData.max,
     isFree: !Number(offChainData.price),
+    isUnlimited: onChainData.max !== undefined && onChainData.max >= Number.MAX_SAFE_INTEGER,
     dropStartTime,
   }
 
@@ -102,6 +102,12 @@ export async function getDropAttributes(alias: string): Promise<DropItem | undef
     ...drop,
     status: getLocalDropStatus(drop),
   }
+}
+
+export async function getDropAttributes(alias: string): Promise<DropItem | undefined> {
+  const campaign = await getDropById(alias)
+
+  return getEnrichedDrop(campaign)
 }
 
 export const isTBA = (price: unknown) => price === null || price === ''
