@@ -38,6 +38,7 @@ export const useDropStore = defineStore('drop', () => {
   const isCapturingImage = ref(false)
   const previewItem = ref<GenerativePreviewItem>()
   const mintingSession = ref<MintingSession>({ ...DEFAULT_MINTING_SESSION })
+  const walletConnecting = ref(false)
 
   // massmint
   const amountToMint = ref(1)
@@ -51,9 +52,21 @@ export const useDropStore = defineStore('drop', () => {
     mintingSession.value = { ...DEFAULT_MINTING_SESSION }
   }
 
+  const reset = () => {
+    isCapturingImage.value = false
+    previewItem.value = undefined
+    drop.value = { ...DEFAULT_DROP, chain: prefix.value }
+    amountToMint.value = 1
+    loading.value = false
+    toMintNFTs.value = []
+    mintedNFTs.value = []
+    mintingSession.value = { ...DEFAULT_MINTING_SESSION }
+  }
+
   return {
     loading,
     isCapturingImage,
+    walletConnecting,
     previewItem,
     drop,
     amountToMint,
@@ -61,5 +74,6 @@ export const useDropStore = defineStore('drop', () => {
     mintedNFTs,
     mintingSession,
     resetMassmint,
+    reset,
   }
 })

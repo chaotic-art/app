@@ -1,29 +1,22 @@
 <script setup lang="ts">
-import type { OnchainCollection } from '@/services/oda'
 import type { DropItem } from '@/types/drop'
+import { getEnrichedDrop } from '@/components/drop/utils'
 import { getDrops } from '@/services/fxart'
-import { fetchOdaCollection } from '@/services/oda'
 
-type DropItemWithCollection = DropItem & OnchainCollection
+const { prefix } = usePrefix()
 
 const { data: dropItems } = await useLazyAsyncData(() => (getDrops({
   active: [true],
-  chain: ['ahp'],
+  chain: [isProduction ? 'ahp' : prefix.value],
   limit: 3,
 })), {
   transform: async (data) => {
-    return await Promise.all(data.map(async (drop) => {
-      const collection = await fetchOdaCollection('ahp', drop.collection)
-      return {
-        ...drop,
-        ...collection,
-      }
-    }))
+    return await Promise.all(data.map(getEnrichedDrop))
   },
 })
 
-function onDropClick(drop: DropItemWithCollection) {
-  navigateTo(Number(drop.claimed) === drop.max ? `/${drop?.chain}/collection/${drop?.collection}` : `/${drop?.chain}/drops/${drop?.alias}`)
+function onDropClick(drop: DropItem) {
+  navigateTo(drop.isMintedOut ? `/${drop?.chain}/collection/${drop?.collection}` : `/${drop?.chain}/drops/${drop?.alias}`)
 }
 
 const subDrops = computed(() => dropItems.value?.slice(1, 3))
@@ -33,8 +26,6 @@ const subDrops = computed(() => dropItems.value?.slice(1, 3))
   <div class="flex flex-col mb-12 xl:mb-[75px] px-4 xl:px-0">
     <LandingHorizontalDropCard
       :drop="dropItems?.[0]"
-      :description="dropItems?.[0]?.metadata?.description"
-      :claimed="Number(dropItems?.[0]?.claimed)"
       @click="onDropClick"
     />
 
@@ -43,8 +34,6 @@ const subDrops = computed(() => dropItems.value?.slice(1, 3))
         v-for="subDrop in subDrops"
         :key="subDrop?.id"
         :drop="subDrop"
-        :description="subDrop?.metadata?.description"
-        :claimed="Number(subDrop?.claimed)"
         @click="onDropClick"
       />
     </div>

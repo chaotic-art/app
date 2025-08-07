@@ -48,7 +48,9 @@ watch(drop, (drop) => {
   generativeImageUrl.value = drop?.content
 }, { once: true })
 
-// generate preview item on mounted
+watch([accountId], () => {
+  generateNft()
+}, { immediate: true })
 </script>
 
 <template>

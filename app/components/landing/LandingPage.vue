@@ -27,5 +27,7 @@
       <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '600px' }" />
       <!-- <LazyArticles :hydrate-on-visible="{ rootMargin: '300px' }" /> -->
     </UContainer>
+
+    <LazyDropMintModal />
   </div>
 </template>

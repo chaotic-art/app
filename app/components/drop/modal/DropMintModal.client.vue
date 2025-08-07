@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import useDropMassMintState from '@/composables/drop/massmint/useDropMassMintState'
+import useDropMint from '~/composables/drop/useDropMint'
 import StepOverview from './StepOverview.vue'
-
-const emits = defineEmits(['confirm'])
 
 const ModalSteps = {
   Overview: 'overview',
@@ -12,13 +11,14 @@ const ModalSteps = {
 
 type ModalStep = typeof ModalSteps[keyof typeof ModalSteps]
 
-const isModalOpen = defineModel<boolean>({ required: true })
 const modalStep = ref<ModalStep>(ModalSteps.Overview)
 
 const { $i18n } = useNuxtApp()
 const { canMint } = useDropMassMintState()
 const { minimumFunds } = useDropMinimumFunds()
 const { toMintNFTs, mintingSession } = storeToRefs(useDropStore())
+
+const { executeTransaction, isModalOpen, transaction } = useDropMint()
 
 const status = computed(() => mintingSession.value.status)
 
@@ -76,8 +76,8 @@ const title = computed(() => {
 })
 
 function onSubmit() {
-  emits('confirm')
   modalStep.value = ModalSteps.Signing
+  executeTransaction()
 }
 
 watch(isModalOpen, (open) => {
@@ -87,11 +87,16 @@ watch(isModalOpen, (open) => {
 })
 
 watchEffect(() => {
-  if (
-    moveSuccessfulDrop.value
-  ) {
+  if (moveSuccessfulDrop.value) {
     modalStep.value = ModalSteps.Succeded
   }
+})
+
+watchEffect(() => {
+  mintingSession.value.isLoading = transaction.value.isLoading
+  mintingSession.value.txHash = transaction.value.txHash
+  mintingSession.value.failed = transaction.value.isError
+  mintingSession.value.status = transaction.value.status
 })
 </script>
 
