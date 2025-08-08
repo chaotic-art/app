@@ -9,16 +9,13 @@ const { token, chain } = useRoute().params
 const chainPrefix = computed(() => chain?.toString() as Prefix)
 const [collectionId, tokenId] = token?.toString().split('-') ?? []
 
-const { data: tokenData } = await useLazyAsyncData(
-  () => fetchOdaToken(chainPrefix.value, collectionId?.toString() ?? '', tokenId?.toString() ?? ''),
-)
+const { data: tokenData } = await useLazyAsyncData(token?.toString() ?? '', () => fetchOdaToken(chainPrefix.value, collectionId?.toString() ?? '', tokenId?.toString() ?? ''))
 
-const { data: collection } = await useLazyAsyncData(
-  () => fetchOdaCollection(chainPrefix.value, collectionId?.toString() ?? ''),
-)
+const { data: collection } = await useLazyAsyncData(collectionId?.toString() ?? '', () => fetchOdaCollection(chainPrefix.value, collectionId?.toString() ?? ''))
 
 const {
   owner,
+  collectionCreator,
   isLoading,
   error,
   mimeType,
@@ -81,6 +78,9 @@ useSeoMeta({
           :formatted-price="formattedPrice || undefined"
           :usd-price="usdPrice"
         />
+
+        <p>CollectionCreator: {{ collectionCreator }}</p>
+        <p>Owner: {{ owner }}</p>
       </div>
     </div>
 
