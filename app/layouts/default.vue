@@ -16,7 +16,7 @@ useHead({
   <div class="min-h-full flex flex-col overflow-hidden">
     <Navbar />
 
-    <main class="grow py-8">
+    <main class="grow">
       <div class="container-fluid">
         <slot />
       </div>
