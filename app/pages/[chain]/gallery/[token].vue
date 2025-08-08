@@ -6,14 +6,15 @@ import { fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 const CONTAINER_ID = 'nft-img-container'
 
 const { token, chain } = useRoute().params
+const chainPrefix = computed(() => chain?.toString() as Prefix)
 const [collectionId, tokenId] = token?.toString().split('-') ?? []
 
 const { data: tokenData } = await useLazyAsyncData(
-  () => fetchOdaToken(chain as Prefix, collectionId?.toString() ?? '', tokenId?.toString() ?? ''),
+  () => fetchOdaToken(chainPrefix.value, collectionId?.toString() ?? '', tokenId?.toString() ?? ''),
 )
 
 const { data: collection } = await useLazyAsyncData(
-  () => fetchOdaCollection(chain as Prefix, collectionId?.toString() ?? ''),
+  () => fetchOdaCollection(chainPrefix.value, collectionId?.toString() ?? ''),
 )
 
 const {
@@ -27,14 +28,14 @@ const {
 } = useToken({
   tokenId: Number(tokenId),
   collectionId: Number(collectionId),
-  chain: chain as Prefix,
+  chain: chainPrefix.value,
 })
 
 const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
 
 onMounted(async () => {
   try {
-    const entries = await tokenEntries({ prefix: chain as Prefix, collectionId: Number(collectionId), max: 7 })
+    const entries = await tokenEntries({ prefix: chainPrefix.value, collectionId: Number(collectionId), max: 7 })
     // Filter out the current token from the results
     moreFromCollection.value = entries.filter(entry => entry.keyArgs[1] !== Number(tokenId)).slice(0, 6)
   }
@@ -44,8 +45,8 @@ onMounted(async () => {
 })
 
 useSeoMeta({
-  title: tokenData.value?.metadata.name,
-  description: tokenData.value?.metadata.description.slice(0, 150),
+  title: tokenData.value?.metadata?.name,
+  description: tokenData.value?.metadata?.description?.slice(0, 150),
 })
 </script>
 
@@ -74,7 +75,7 @@ useSeoMeta({
         <GalleryDetails
           :token-data="tokenData"
           :collection="collection"
-          :chain="chain as Prefix"
+          :chain="chainPrefix"
           :collection-id="collectionId ?? ''"
           :owner="owner || undefined"
           :formatted-price="formattedPrice || undefined"
@@ -111,9 +112,9 @@ useSeoMeta({
           :key="nft.keyArgs[1]"
           :token-id="nft.keyArgs[1]"
           :collection-id="nft.keyArgs[0]"
-          :chain="chain as Prefix"
-          :image="nft.metadata.image"
-          :name="nft.metadata.name"
+          :chain="chainPrefix"
+          :image="nft.metadata?.image"
+          :name="nft.metadata?.name"
         />
       </div>
     </div>

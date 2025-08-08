@@ -101,6 +101,9 @@ importers:
       prismjs:
         specifier: ^1.30.0
         version: 1.30.0
+      try:
+        specifier: 1.0.0-beta.10
+        version: 1.0.0-beta.10
       vue:
         specifier: ^3.5.18
         version: 3.5.18(typescript@5.8.3)
@@ -7772,6 +7775,9 @@ packages:
   triple-beam@1.4.1:
     resolution: {integrity: sha512-aZbgViZrg1QNcG+LULa7nhZpJTZSLm/mXnHXnbAbjmN5aSa0y7V+wvv6+4WaBtpISJzThKy+PIPxc1Nq1EJ9mg==}
     engines: {node: '>= 14.0.0'}
+
+  try@1.0.0-beta.10:
+    resolution: {integrity: sha512-g/I/r0keF5pnxdMO4PJ1K7+c+N1U0Q0xtNDfrI/1UQz6q/85ipgbL4bSnowAy1DSAIfHkDiaARihADoqGM2qeA==}
 
   ts-api-utils@2.1.0:
     resolution: {integrity: sha512-CUgTZL1irw8u29bzrOD/nH85jqyc74D6SshFgujOIA7osm2Rz7dYH77agkx7H4FBNxDq7Cjf+IjaX/8zwFW+ZQ==}
@@ -19422,6 +19428,8 @@ snapshots:
   tree-kill@1.2.2: {}
 
   triple-beam@1.4.1: {}
+
+  try@1.0.0-beta.10: {}
 
   ts-api-utils@2.1.0(typescript@5.8.3):
     dependencies:

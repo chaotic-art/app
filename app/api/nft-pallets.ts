@@ -1,4 +1,5 @@
 import type { Prefix } from '@kodadot1/static'
+import { t } from 'try'
 import { fetchOdaToken } from '~/services/oda'
 
 function getApi(prefix: Prefix) {
@@ -8,9 +9,10 @@ function getApi(prefix: Prefix) {
 
 /**
  * Get the entries for a collection
- * @param prefix - The prefix of the chain
- * @param collectionId - The ID of the collection
- * @param max - The maximum number of entries to return
+ * @param params - The parameters object
+ * @param params.prefix - The prefix of the chain
+ * @param params.collectionId - The ID of the collection
+ * @param params.max - The maximum number of entries to return
  * @returns The entries for the collection
  */
 export async function tokenEntries({ prefix, collectionId, max }: { prefix: Prefix, collectionId: number, max?: number }) {
@@ -18,7 +20,7 @@ export async function tokenEntries({ prefix, collectionId, max }: { prefix: Pref
     throw new Error('This function is only available on Asset Hub chains')
   }
 
-  const api = await getApi(prefix)
+  const api = getApi(prefix)
   const query = await api.query.Nfts.Item.getEntries(collectionId)
 
   let entries = query
@@ -28,13 +30,16 @@ export async function tokenEntries({ prefix, collectionId, max }: { prefix: Pref
   }
 
   const items = await Promise.all(entries.map(async (entry) => {
-    const { keyArgs } = entry
-    const [, tokenId] = keyArgs
+    const [, tokenId] = entry.keyArgs
 
-    const metadata = await fetchOdaToken(prefix, collectionId.toString(), tokenId.toString())
+    const [ok, err, metadata] = await t(fetchOdaToken(prefix, collectionId.toString(), tokenId.toString()))
+
+    if (!ok) {
+      console.error('Error fetching token', err)
+    }
 
     return { ...entry, ...metadata }
   }))
 
-  return items
+  return items.filter(item => item.metadata)
 }

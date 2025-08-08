@@ -46,7 +46,7 @@ export interface NFTMetadata {
 }
 
 export interface OdaToken {
-  metadata: NFTMetadata
+  metadata: NFTMetadata | null
   metadata_uri: string
 }
 export function fetchOdaToken(chain: Prefix, address: string, tokenId: string) {

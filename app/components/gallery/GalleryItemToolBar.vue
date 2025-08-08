@@ -26,10 +26,10 @@ defineEmits(['toggleFullscreen'])
 
 // const { getNft: nft, getNftImage: nftImage, getNftMetadata: nftMetadata, getNftMimeType: nftMimeType, getNftAnimation: nftAnimation, getNftAnimationMimeType: nftAnimationMimeType } = storeToRefs(useNftStore())
 
-const nftImageUrl = computed(() => sanitizeIpfsUrl(props.nft.metadata.image))
-const nftAnimation = computed(() => sanitizeIpfsUrl(props.nft.metadata.animation_url))
-const nftMimeType = computed(() => props.nft.metadata.mime_type)
-const nftAnimationMimeType = computed(() => props.nft.metadata.animation_mime_type)
+const nftImageUrl = computed(() => sanitizeIpfsUrl(props.nft.metadata?.image))
+const nftAnimation = computed(() => sanitizeIpfsUrl(props.nft.metadata?.animation_url))
+const nftMimeType = computed(() => props.nft.metadata?.mime_type)
+const nftAnimationMimeType = computed(() => props.nft.metadata?.animation_mime_type)
 
 const isLoading = ref(false)
 const toast = useToast()
@@ -69,7 +69,7 @@ async function downloadMedia() {
 
   try {
     toast.add({ title: $i18n.t('toast.downloadImage') })
-    downloadImage(imageUrl, props.nft.metadata.name)
+    downloadImage(imageUrl, props.nft.metadata?.name ?? '')
   }
   catch (error) {
     console.warn('[ERR] unable to fetch image', error)
