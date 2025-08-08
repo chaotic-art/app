@@ -11,13 +11,12 @@ export enum TransactionStatus {
   Cancelled = 'loader.cancelled',
 }
 
-function useTransactionStatus() {
+export default function useTransactionStatus() {
   const status = ref<TransactionStatus>(TransactionStatus.Unknown)
   const isLoading = ref(false)
 
   const resolveStatus = (
     event: TxEvent,
-    omitFinalized?: boolean,
   ): void => {
     if (event.type === 'broadcasted') {
       status.value = TransactionStatus.Broadcast
@@ -35,9 +34,7 @@ function useTransactionStatus() {
     }
 
     if (event.type === 'finalized') {
-      status.value = omitFinalized
-        ? TransactionStatus.Unknown
-        : TransactionStatus.Finalized
+      status.value = TransactionStatus.Finalized
       return
     }
 
@@ -62,5 +59,3 @@ function useTransactionStatus() {
     stopLoader,
   }
 }
-
-export default useTransactionStatus

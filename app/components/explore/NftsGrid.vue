@@ -13,6 +13,8 @@ const props = withDefaults(defineProps<Props>(), {
   noItemsFoundMessage: 'Try adjusting your search or filters to see more results.',
 })
 
+const emit = defineEmits(['totalCountChange'])
+
 // Use the NFTs infinite query composable
 const {
   nfts,
@@ -30,6 +32,10 @@ const {
 
 onMounted(async () => {
   await initialize()
+})
+
+watch(totalCount, (newCount) => {
+  emit('totalCountChange', newCount)
 })
 </script>
 

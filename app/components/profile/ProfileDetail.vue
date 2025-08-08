@@ -18,6 +18,24 @@ const followModalTab = ref<'followers' | 'following'>('followers')
 const isFollowModalActive = ref(false)
 const isEditProfileModalActive = ref(false)
 
+const tabsItems = ref([
+  {
+    label: 'Owned',
+    name: 'Owned',
+    slot: 'owned',
+  },
+  {
+    label: 'Created',
+    name: 'Created',
+    slot: 'created',
+  },
+  {
+    label: 'Collections',
+    name: 'Collections',
+    slot: 'collections',
+  },
+])
+
 const { data: followers, refresh: refreshFollowers } = useAsyncData(
   `followersof${props.address}`,
   () =>
@@ -67,106 +85,128 @@ function refresh({ fetchFollowing = true } = {}) {
 }
 const followersCount = computed(() => followers.value?.totalCount ?? 0)
 const followingCount = computed(() => following.value?.totalCount ?? 0)
+
+function onTotalCountChange(slot: string, totalCount: number) {
+  const tab = tabsItems.value.find(tab => tab.slot === slot)
+  if (tab) {
+    tab.label = totalCount > 0 ? `${tab.name} (${totalCount})` : tab.name
+  }
+}
 </script>
 
 <template>
-  <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">
-    <div
-      class="absolute inset-0 w-full h-full bg-gray-200 dark:bg-neutral-800"
-      :style="bannerUrl ? { backgroundImage: `url('${bannerUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
-    />
+  <div>
+    <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">
+      <div
+        class="absolute inset-0 w-full h-full bg-gray-200 dark:bg-neutral-800"
+        :style="bannerUrl ? { backgroundImage: `url('${bannerUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
+      />
 
-    <div class="relative flex items-center px-8 py-8 z-10">
-      <div class="flex flex-col items-center">
-        <ProfileAvatar :address="props.address" :profile-image="profile?.image" :size="140" />
+      <div class="relative flex items-center px-8 py-8 z-10">
+        <div class="flex flex-col items-center">
+          <ProfileAvatar :address="props.address" :profile-image="profile?.image" :size="140" />
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="w-full border-b border-gray-200 dark:border-gray-700">
-    <div class="flex justify-between flex-col md:flex-row gap-12 px-4">
-      <div class="flex flex-col flex-1">
-        <div class="my-4 flex flex-col md:flex-row justify-between items-start gap-2 w-full">
-          <div class="">
-            <div class="text-2xl font-bold">
-              <span v-if="profile?.name">
-                {{ profile?.name }}
-              </span>
-              <span v-else>
+    <div class="w-full border-b border-gray-200 dark:border-gray-700">
+      <div class="flex justify-between flex-col md:flex-row gap-12 px-4">
+        <div class="flex flex-col flex-1">
+          <div class="my-4 flex flex-col md:flex-row justify-between items-start gap-2 w-full">
+            <div class="">
+              <div class="text-2xl font-bold">
+                <span v-if="profile?.name">
+                  {{ profile?.name }}
+                </span>
+                <span v-else>
+                  {{ shortenAddress(address) }}
+                </span>
+              </div>
+              <div class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                 {{ shortenAddress(address) }}
-              </span>
-            </div>
-            <div class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-              {{ shortenAddress(address) }}
-              <UButton
-                icon="i-lucide-copy"
-                size="xs"
-                color="neutral"
-                variant="ghost"
-                class="opacity-60 hover:opacity-100 transition-opacity"
-                @click.prevent="copyAddress(address)"
-              />
+                <UButton
+                  icon="i-lucide-copy"
+                  size="xs"
+                  color="neutral"
+                  variant="ghost"
+                  class="opacity-60 hover:opacity-100 transition-opacity"
+                  @click.prevent="copyAddress(address)"
+                />
 
-              <UButton
-                :to="getSubscanUrl(address, prefix)"
-                target="_blank"
-                size="sm"
-                variant="ghost"
-                class="opacity-60 hover:opacity-100 transition-opacity"
-              >
-                Subscan
-              </UButton>
+                <UButton
+                  :to="getSubscanUrl(address, prefix)"
+                  target="_blank"
+                  size="sm"
+                  variant="ghost"
+                  class="opacity-60 hover:opacity-100 transition-opacity"
+                >
+                  Subscan
+                </UButton>
+              </div>
             </div>
+            <ProfileSocialsLinks
+              v-if="profile"
+              :profile="profile"
+            />
           </div>
-          <ProfileSocialsLinks
-            v-if="profile"
-            :profile="profile"
-          />
+
+          <div class="flex items-center gap-2">
+            <CommonButtonConfig
+              v-if="isCurrentAccount(address)"
+              :button="profileButtonConfig"
+            />
+            <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
+
+            <UButton
+              icon="i-lucide-dollar-sign"
+              variant="outline"
+              size="lg"
+              class="rounded-full"
+            >
+              Transfer
+            </UButton>
+
+            <ProfileShareDropdown />
+          </div>
+          <MarkdownPreview class="mt-6" :source="profile?.description || ''" />
         </div>
 
-        <div class="flex items-center gap-2">
-          <CommonButtonConfig
-            v-if="isCurrentAccount(address)"
-            :button="profileButtonConfig"
-          />
-          <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
-
-          <UButton
-            icon="i-lucide-dollar-sign"
-            variant="outline"
-            size="lg"
-            class="rounded-full"
-          >
-            Transfer
-          </UButton>
-
-          <ProfileShareDropdown />
-        </div>
-        <MarkdownPreview class="mt-6" :source="profile?.description || ''" />
+        <ProfileActivitySummery
+          class="pt-4 w-auto md:w-40 "
+          :followers-count="followersCount"
+          :following-count="followingCount"
+          @click-followers="onFollowersClick"
+          @click-following="onFollowingClick"
+        />
       </div>
 
-      <ProfileActivitySummery
-        class="pt-4 w-auto md:w-40 "
+      <LazyProfileFollowModal
+        :key="`${followersCount}-${followingCount}`"
+        v-model="isFollowModalActive"
+        :initial-tab="followModalTab"
         :followers-count="followersCount"
         :following-count="followingCount"
-        @click-followers="onFollowersClick"
-        @click-following="onFollowingClick"
+        @close="isFollowModalActive = false;refresh()"
+      />
+      <ProfileEditModal
+        v-model:open="isEditProfileModalActive"
+        :address="address"
+        @success="refresh()"
+        @deleted="refresh()"
+        @close="isEditProfileModalActive = false"
       />
     </div>
-    <LazyProfileFollowModal
-      :key="`${followersCount}-${followingCount}`"
-      v-model="isFollowModalActive"
-      :initial-tab="followModalTab"
-      :followers-count="followersCount"
-      :following-count="followingCount"
-      @close="isFollowModalActive = false;refresh()"
-    />
-    <ProfileEditModal
-      v-model:open="isEditProfileModalActive"
-      :address="address"
-      @success="refresh()"
-      @deleted="refresh()"
-      @close="isEditProfileModalActive = false"
-    />
+
+    <UTabs color="neutral" :items="tabsItems" class="w-full my-4">
+      <template #owned>
+        <ProfileNftsList :extra-variables="{ owner: address }" @total-count-change="onTotalCountChange('owned', $event)" />
+      </template>
+      <template #created>
+        <ProfileNftsList :extra-variables="{ issuer: address }" @total-count-change="onTotalCountChange('created', $event)" />
+      </template>
+      <template #collections>
+        <ProfileCollectionsList :issuer="address" @total-count-change="onTotalCountChange('collections', $event)" />
+      </template>
+    </UTabs>
   </div>
 </template>

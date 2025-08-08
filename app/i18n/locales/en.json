@@ -55,7 +55,8 @@
     "mintDropError": "Error encountered, please retry. {0}",
     "youSuccessfullyClaimedNft": "You successfully minted {0} NFT",
     "amountMintedSuccessfully": "{0} NFTs minted successfully",
-    "artBy": "{0} By"
+    "artBy": "{0} By",
+    "mintingNotLive": "Minting Not Started Yet"
   },
   "collection": {
     "topCollections": "Top Collections",
@@ -108,7 +109,8 @@
     "copy": "Copy",
     "success": "Success",
     "viewNft": "View NFT | View NFTs",
-    "copyToClipboard": "Copied to clipboard"
+    "copyToClipboard": "Copied to clipboard",
+    "connectWallet": "Connect Wallet"
   },
   "signing": {
     "transaction": "Sign Transaction",

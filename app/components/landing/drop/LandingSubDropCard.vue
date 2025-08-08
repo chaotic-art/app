@@ -5,8 +5,6 @@ import { formatToNow } from '@/utils/format/time'
 
 const props = defineProps<{
   drop?: DropItem
-  description?: string
-  claimed?: number
 }>()
 const emit = defineEmits(['click'])
 
@@ -18,8 +16,8 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 rounded-xl h-auto md:h-[440px] overflow-hidden border border-gray-200 dark:border-neutral-700 bg-background-color-secondary hover-card-effect" @click="emit('click', drop)">
-    <div class="h-full bg-gray-200 dark:bg-neutral-800 relative rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700">
+  <div class="grid grid-cols-1 md:grid-cols-2 rounded-xl h-auto md:h-[440px] overflow-hidden border border-gray-200 dark:border-neutral-700 bg-background-color-secondary">
+    <div class="h-full bg-gray-200 dark:bg-neutral-800 relative rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 cursor-pointer" @click="emit('click', drop)">
       <img
         :src="ipfsToCfImageUrl(drop?.banner)"
         :alt="drop?.name"
@@ -38,14 +36,14 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
           />
         </div>
         <div class="text-gray-500 dark:text-gray-300 max-w-full md:max-w-[300px] line-clamp-3 md:line-clamp-4">
-          <MarkdownPreview :source="description || ''" />
+          <MarkdownPreview :source="drop?.collectionDescription || ''" />
         </div>
       </div>
 
       <div class="flex flex-col gap-4 md:gap-6 mt-4 md:mt-2">
         <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-0">
           <div class="flex items-center gap-2 justify-center md:justify-start">
-            <span class="text-gray-900 dark:text-white">{{ claimed }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
+            <span class="text-gray-900 dark:text-white">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
             <span class="font-bold text-gray-400 dark:text-gray-300">·</span>
             <span class="text-gray-900 dark:text-white">{{ usdPrice }} USD</span>
           </div>
@@ -60,9 +58,9 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
 
         <div class="flex flex-col items-center md:flex-row gap-3 md:gap-1 md:justify-between">
           <div class="text-gray-400 dark:text-gray-300 text-center md:text-left">
-            {{ formatToNow(parseCETDate(drop?.start_at || '')) }}
+            {{ drop?.start_at ? formatToNow(parseCETDate(drop.start_at || '')) : 'N/A' }}
           </div>
-          <LandingDropMintButton :drop="drop" :is-minted-out="claimed === drop?.max" />
+          <DropMintButton class="w-fit md:w-auto" :drop="drop" size="sm" />
         </div>
       </div>
     </div>

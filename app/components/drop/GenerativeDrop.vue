@@ -1,159 +1,13 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
-import type { TxInBestBlocksFound } from 'polkadot-api'
-import { watchDebounced } from '@vueuse/core'
-import { Binary } from 'polkadot-api'
-import useDropMassmint from '@/composables/drop/massmint/useDropMassmint'
-import { useUpdateMetadata } from '@/composables/drop/useGenerativeDropMint'
 
 const { chain } = useRoute().params
 const chainPrefix = computed(() => chain?.toString() as Prefix)
-const { prefix } = usePrefix()
-const { add: toast } = useToast()
-const { $i18n, $api } = useNuxtApp()
-const { doAfterLogin } = useDoAfterlogin()
-const { accountId } = useAuth()
-const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
-const isMintModalOpen = ref(false)
-const { drop, loading, amountToMint, mintingSession, isCapturingImage, toMintNFTs } = storeToRefs(useDropStore())
+const { drop, amountToMint } = storeToRefs(useDropStore())
 
 const { decimals, chainSymbol } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
-
-const blockNumber = ref()
-const txHash = ref()
-const isError = ref()
-
-const { massGenerate, clearMassMint } = useDropMassmint()
-const { status, resolveStatus, initTransactionLoader, isLoading: isTransactionLoading } = useTransactionStatus()
-
-function mint() {
-  doAfterLogin({
-    onLoginSuccess: () => {
-      massGenerate()
-      isMintModalOpen.value = true
-    },
-  })
-}
-
-async function executeSubTransaction() {
-  const api = $api(prefix.value)
-  const collectionId = drop.value?.collection
-  const price = drop.value?.price || null
-
-  const nftsMetadata = toMintNFTs.value.map((nft) => {
-    return {
-      chain: drop.value.chain,
-      collection: drop.value.collection,
-      metadata: nft.metadata,
-    }
-  })
-
-  const calls = toMintNFTs.value.map((allocatedNft) => {
-    return api.tx.Nfts.mint({
-      collection: Number(collectionId),
-      item: allocatedNft.nft,
-      mint_to: {
-        type: 'Id',
-        value: accountId.value!,
-      },
-      witness_data: {
-        mint_price: price ? BigInt(price) : undefined,
-      },
-    })
-  })
-
-  const transactions = [
-    ...calls,
-    api.tx.System.remark({
-      remark: Binary.fromText(JSON.stringify(nftsMetadata)),
-    }),
-  ]
-
-  const transaction = api.tx.Utility.batch_all({
-    calls: transactions.map(transaction => transaction.decodedCall),
-  })
-
-  const signer = await getConnectedSubAccount.value?.signer
-
-  if (!signer) {
-    return
-  }
-
-  isError.value = false
-  initTransactionLoader()
-
-  transaction.signSubmitAndWatch(signer)
-    .subscribe({
-      next: (event) => {
-        resolveStatus(event)
-
-        if (event.type === 'txBestBlocksState') {
-          txHash.value = event.txHash.toString()
-          blockNumber.value = (event as TxInBestBlocksFound).block.number
-          submitMints()
-        }
-      },
-      error: (error) => {
-        toast({ title: $i18n.t('drop.mintDropError', [error?.toString()]) })
-        if (!error.name.includes('cancelled')) {
-          status.value = TransactionStatus.Cancelled
-        }
-        else {
-          isError.value = true
-        }
-        stopMint()
-      },
-      complete: () => {
-        isTransactionLoading.value = false
-      },
-    })
-}
-
-function executeTransaction() {
-  execByVm({
-    SUB: executeSubTransaction,
-  })
-}
-
-async function submitMints() {
-  try {
-    await useUpdateMetadata({ blockNumber })
-
-    loading.value = false
-  }
-  catch (error) {
-    toast({ title: $i18n.t('drop.mintDropError', [error?.toString()]) })
-    isCapturingImage.value = false
-    closeMintModal()
-    throw error
-  }
-}
-
-function closeMintModal() {
-  isMintModalOpen.value = false
-  clearMassMint()
-}
-
-function stopMint() {
-  closeMintModal()
-  loading.value = false
-  clearMassMint()
-}
-
-watchEffect(() => {
-  mintingSession.value.isLoading = isTransactionLoading.value
-  mintingSession.value.txHash = txHash.value
-  mintingSession.value.failed = isError.value
-  mintingSession.value.status = status.value
-})
-
-watchDebounced(isMintModalOpen, (open) => {
-  if (!open) {
-    clearMassMint()
-  }
-}, { debounce: 500 })
 </script>
 
 <template>
@@ -235,9 +89,10 @@ watchDebounced(isMintModalOpen, (open) => {
                   base: 'rounded-full px-4 md:px-6 py-2 md:py-3',
                 }"
               />
-              <UButton class="rounded-full px-4 md:px-6 py-2 md:py-3 w-full sm:w-auto" @click="mint">
-                Mint Drop
-              </UButton>
+              <DropMintButton
+                :drop="drop"
+                is-drop-page
+              />
             </div>
           </div>
         </div>
@@ -253,8 +108,5 @@ watchDebounced(isMintModalOpen, (open) => {
     />
   </UContainer>
 
-  <DropMintModal
-    v-model="isMintModalOpen"
-    @confirm="executeTransaction"
-  />
+  <DropMintModal />
 </template>

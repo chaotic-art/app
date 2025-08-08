@@ -8,6 +8,8 @@ interface UseInfiniteNftsOptions {
   pageSize?: number
   distance?: number
   search?: string
+  owner?: string
+  issuer?: string
   variables?: Record<string, any> // Allow any additional GraphQL variables
 }
 
@@ -18,6 +20,8 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     pageSize = 40,
     distance = 300,
     search = '',
+    owner,
+    issuer,
     variables = {},
   } = options
 
@@ -28,6 +32,8 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     variables: {
       denyList: getDenyList(prefix.value) || [],
       name: search || undefined,
+      owner: owner || undefined,
+      issuer: issuer || undefined,
       ...variables,
     },
     extractData: data => data.tokenEntities,
