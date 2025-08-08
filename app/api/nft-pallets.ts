@@ -22,16 +22,10 @@ export async function tokenEntries({ prefix, collectionId, max }: { prefix: Pref
 
   const api = getApi(prefix)
   const query = await api.query.Nfts.Item.getEntries(collectionId)
-
-  let entries = query
-
-  if (max) {
-    entries = entries.slice(0, max)
-  }
+  const entries = max ? query.slice(0, max) : query
 
   const items = await Promise.all(entries.map(async (entry) => {
     const [, tokenId] = entry.keyArgs
-
     const [ok, err, metadata] = await t(fetchOdaToken(prefix, collectionId.toString(), tokenId.toString()))
 
     if (!ok) {
