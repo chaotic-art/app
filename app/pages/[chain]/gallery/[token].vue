@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
 import { tokenEntries } from '~/api/nft-pallets'
-import { fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
 const CONTAINER_ID = 'nft-img-container'
 
@@ -12,10 +11,6 @@ const [collectionId, tokenId] = token?.toString().split('-') ?? []
 const safeCollectionId = computed(() => collectionId?.toString() ?? '')
 const safeTokenId = computed(() => tokenId?.toString() ?? '')
 
-const { data: tokenData } = await useLazyAsyncData(token?.toString() ?? '', () => fetchOdaToken(chainPrefix.value, safeCollectionId.value, tokenId?.toString() ?? ''))
-
-const { data: collection } = await useLazyAsyncData(safeCollectionId.value, () => fetchOdaCollection(chainPrefix.value, safeCollectionId.value))
-
 const {
   owner,
   collectionCreator,
@@ -25,6 +20,8 @@ const {
   price: formattedPrice,
   usdPrice,
   mediaIcon,
+  token: tokenData,
+  collection,
 } = useToken({
   tokenId: Number(tokenId),
   collectionId: Number(collectionId),
@@ -35,9 +32,13 @@ const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
 
 onMounted(async () => {
   try {
-    const entries = await tokenEntries({ prefix: chainPrefix.value, collectionId: Number(collectionId), max: 10 })
-    // Filter out the current token from the results
-    moreFromCollection.value = entries.filter(entry => entry.keyArgs[1] !== Number(tokenId)).slice(0, 6)
+    const entries = await tokenEntries({
+      prefix: chainPrefix.value,
+      collectionId: Number(collectionId),
+      max: 6,
+      excludeTokenId: Number(tokenId),
+    })
+    moreFromCollection.value = entries
   }
   catch (error) {
     console.error('Failed to fetch more from collection:', error)
@@ -45,8 +46,8 @@ onMounted(async () => {
 })
 
 useSeoMeta({
-  title: tokenData.value?.metadata?.name,
-  description: tokenData.value?.metadata?.description?.slice(0, 150),
+  title: () => tokenData.value?.metadata?.name,
+  description: () => tokenData.value?.metadata?.description?.slice(0, 150),
 })
 </script>
 
@@ -90,6 +91,7 @@ useSeoMeta({
       </div>
     </UContainer>
 
+    <!-- Additional Content -->
     <div class="border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 py-12 my-12">
       <UContainer class="space-y-6">
         <!-- Item Activity and Token Details Grid -->

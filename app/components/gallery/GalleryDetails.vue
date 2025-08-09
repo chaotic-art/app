@@ -4,8 +4,8 @@ import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { refreshOdaTokenMetadata } from '~/services/oda'
 
 interface Props {
-  tokenData?: OdaToken
-  collection?: OnchainCollection
+  tokenData: OdaToken | null
+  collection: OnchainCollection | null
   chain: Prefix
   collectionId: string
   tokenId: string

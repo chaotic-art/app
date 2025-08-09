@@ -4,7 +4,7 @@ import { useFullscreen } from '@vueuse/core'
 import { MediaType, resolveMedia } from '@/utils/gallery/media'
 
 interface Props {
-  tokenData?: OdaToken
+  tokenData: OdaToken | null
   mimeType?: string
   mediaIcon: string
   containerId: string
