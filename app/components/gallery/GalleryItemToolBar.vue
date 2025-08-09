@@ -159,64 +159,68 @@ onKodahashRenderCompleted(({ payload }) => imageData.value = payload.image)
 </script>
 
 <template>
-  <div
-    class="w-full mt-6 px-6 py-3 h-11 rounded-[43px] gap-8 flex justify-center border border-gray-400"
-  >
-    <UTooltip
-      text="Reload"
-      :popper="{ placement: 'top' }"
-    >
-      <span>
-        <UIcon
-          :name="isLoading ? 'i-mdi:loading' : 'i-mdi:arrow-u-left-top'"
-          class="h-5 w-5 hover:cursor-pointer"
+  <div class="flex justify-center mt-4 md:mt-6">
+    <div class="inline-flex items-center gap-1 p-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+      <!-- Reload Button -->
+      <UTooltip text="Reload" :popper="{ placement: 'top' }">
+        <UButton
+          :icon="isLoading ? 'i-heroicons-arrow-path' : 'i-heroicons-arrow-path'"
+          variant="ghost"
+          color="neutral"
+          size="sm"
           :class="{ 'animate-spin': isLoading }"
+          class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           @click="handleReloadClick"
         />
-      </span>
-    </UTooltip>
-    <UTooltip
-      text="Fullscreen"
-      :popper="{ placement: 'top' }"
-    >
-      <span>
-        <UIcon
-          name="i-mdi:arrow-top-right-bottom-left"
-          class="h-5 w-5 hover:cursor-pointer"
+      </UTooltip>
+
+      <!-- Separator -->
+      <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+
+      <!-- Fullscreen Button -->
+      <UTooltip text="Fullscreen" :popper="{ placement: 'top' }">
+        <UButton
+          icon="i-heroicons-arrows-pointing-out"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           @click="$emit('toggleFullscreen')"
         />
-      </span>
-    </UTooltip>
-    <UTooltip
-      text="Open in New Tab"
-      :popper="{ placement: 'top' }"
-    >
-      <span>
-        <UIcon
-          v-if="disableNewTab"
-          name="i-mdi:arrow-top-right"
-          class="h-5 w-5 hover:cursor-pointer"
-          @click="handleNewTab"
+      </UTooltip>
+
+      <!-- Separator -->
+      <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+
+      <!-- Open in New Tab Button -->
+      <UTooltip text="Open in New Tab" :popper="{ placement: 'top' }">
+        <UButton
+          icon="i-heroicons-arrow-top-right-on-square"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          :disabled="!disableNewTab"
+          :class="disableNewTab
+            ? 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors'
+            : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'"
+          @click="disableNewTab ? handleNewTab() : undefined"
         />
-        <UIcon
-          v-else
-          name="i-mdi:arrow-top-right"
-          class="h-5 w-5 text-gray-500"
-        />
-      </span>
-    </UTooltip>
-    <UTooltip
-      v-if="isDownloadEnabled"
-      text="Download"
-      :popper="{ placement: 'top' }"
-    >
-      <span>
-        <UIcon
-          name="i-mdi:arrow-collapse-down"
-          class="h-5 w-5 hover:cursor-pointer"
+      </UTooltip>
+
+      <!-- Separator -->
+      <div v-if="isDownloadEnabled" class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+
+      <!-- Download Button -->
+      <UTooltip v-if="isDownloadEnabled" text="Download" :popper="{ placement: 'top' }">
+        <UButton
+          icon="i-heroicons-arrow-down-tray"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           @click="downloadMedia"
         />
-      </span>
-    </UTooltip>
+      </UTooltip>
+    </div>
   </div>
 </template>

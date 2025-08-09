@@ -34,32 +34,14 @@ const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
 
 onMounted(async () => {
   try {
-    const entries = await tokenEntries({ prefix: chainPrefix.value, collectionId: Number(collectionId), max: 6 })
+    const entries = await tokenEntries({ prefix: chainPrefix.value, collectionId: Number(collectionId), max: 10 })
     // Filter out the current token from the results
-    moreFromCollection.value = entries.filter(entry => entry.keyArgs[1] !== Number(tokenId)).slice(0, 5)
+    moreFromCollection.value = entries.filter(entry => entry.keyArgs[1] !== Number(tokenId)).slice(0, 6)
   }
   catch (error) {
     console.error('Failed to fetch more from collection:', error)
   }
 })
-
-// Breadcrumb items
-const breadcrumbItems = computed(() => [
-  {
-    label: 'Home',
-    to: '/',
-    icon: 'i-heroicons-home',
-  },
-  {
-    label: collection.value?.metadata?.name || `Collection ${safeCollectionId.value}`,
-    to: `/${chain}/collection/${safeCollectionId.value}`,
-    icon: 'i-heroicons-rectangle-stack',
-  },
-  {
-    label: tokenData.value?.metadata?.name || `Token ${tokenId?.toString() || ''}`,
-    icon: 'i-heroicons-photo',
-  },
-])
 
 useSeoMeta({
   title: tokenData.value?.metadata?.name,
@@ -68,7 +50,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <UContainer class="px-4 md:px-6 max-w-7xl">
+  <UContainer class="px-4 md:px-6">
     <!-- Loading State -->
     <GalleryLoadingState v-if="isLoading" />
 
@@ -77,11 +59,6 @@ useSeoMeta({
 
     <!-- Content -->
     <div v-else>
-      <!-- Breadcrumb Navigation -->
-      <div class="mb-6">
-        <UBreadcrumb :items="breadcrumbItems" />
-      </div>
-
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         <!-- Media Section -->
         <div class="order-2 lg:order-1">
@@ -131,7 +108,7 @@ useSeoMeta({
       </div>
 
       <!-- Grid Layout -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
         <TokenCard
           v-for="nft in moreFromCollection"
           :key="nft.keyArgs[1]"

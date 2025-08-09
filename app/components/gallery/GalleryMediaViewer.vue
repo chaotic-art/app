@@ -52,16 +52,6 @@ defineExpose({
       ref="mediaItemRef"
       class="relative"
     >
-      <!-- Action Icons -->
-      <div class="absolute top-2 right-2 z-10 flex items-center gap-2">
-        <button class="w-8 h-8 bg-black/70 rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
-          <UIcon name="i-heroicons-share" class="w-4 h-4 text-white" />
-        </button>
-        <button class="w-8 h-8 bg-black/70 rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
-          <UIcon name="i-heroicons-arrow-top-right-on-square" class="w-4 h-4 text-white" />
-        </button>
-      </div>
-
       <!-- Video Media -->
       <video
         v-if="mimeType?.includes('video') && (tokenData?.metadata?.animation_url || tokenData?.metadata?.image)"
