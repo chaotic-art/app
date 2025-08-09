@@ -129,6 +129,7 @@ defineExpose({
       v-if="tokenData"
       :nft="tokenData"
       :container-id="containerId"
+      :mime-type="mimeType"
       class="mt-3 md:mt-4"
       @toggle-fullscreen="toggleFullscreen"
     />

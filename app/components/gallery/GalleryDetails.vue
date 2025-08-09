@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import { refreshOdaTokenMetadata } from '~/services/oda'
 
 interface Props {
   tokenData?: OdaToken
   collection?: OnchainCollection
   chain: Prefix
-  collectionId: string | null
+  collectionId: string
+  tokenId: string
   owner?: string
   collectionCreator?: string
   formattedPrice?: string
@@ -33,6 +35,31 @@ function shareToken() {
   }
 }
 
+async function handleRefreshMetadata() {
+  try {
+    toast.add({
+      title: 'Refreshing metadata...',
+      description: 'This may take a few moments',
+    })
+
+    await refreshOdaTokenMetadata(props.chain, props.collectionId, props.tokenId)
+
+    toast.add({
+      title: 'Metadata refreshed successfully',
+      description: 'Please refresh the page to see updated metadata',
+      color: 'success',
+    })
+  }
+  catch (error) {
+    console.error('Failed to refresh metadata:', error)
+    toast.add({
+      title: 'Failed to refresh metadata',
+      description: 'Please try again later',
+      color: 'error',
+    })
+  }
+}
+
 // Action items for dropdown menu
 const actionItems = computed(() => [
   [
@@ -46,8 +73,7 @@ const actionItems = computed(() => [
     {
       label: 'Refresh Metadata',
       icon: 'i-heroicons-arrow-path',
-      onSelect: () => {},
-      disabled: true,
+      onSelect: handleRefreshMetadata,
     },
     {
       label: 'Report',

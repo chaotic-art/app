@@ -10,6 +10,7 @@ const chainPrefix = computed(() => chain?.toString() as Prefix)
 const [collectionId, tokenId] = token?.toString().split('-') ?? []
 
 const safeCollectionId = computed(() => collectionId?.toString() ?? '')
+const safeTokenId = computed(() => tokenId?.toString() ?? '')
 
 const { data: tokenData } = await useLazyAsyncData(token?.toString() ?? '', () => fetchOdaToken(chainPrefix.value, safeCollectionId.value, tokenId?.toString() ?? ''))
 
@@ -77,6 +78,7 @@ useSeoMeta({
             :collection="collection"
             :chain="chainPrefix"
             :collection-id="safeCollectionId"
+            :token-id="safeTokenId"
             :owner="owner || undefined"
             :collection-creator="collectionCreator || undefined"
             :formatted-price="formattedPrice || undefined"

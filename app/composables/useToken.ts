@@ -96,6 +96,7 @@ export function useToken(props: {
     isLoading,
     error,
     mimeType,
+
     // Computed properties
     price,
     usdPrice,
