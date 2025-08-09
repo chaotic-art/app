@@ -35,5 +35,5 @@ export async function tokenEntries({ prefix, collectionId, max }: { prefix: Pref
     return { ...entry, ...metadata }
   }))
 
-  return items.filter(item => item.metadata)
+  return items
 }
