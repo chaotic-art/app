@@ -46,7 +46,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="relative overflow-hidden">
+  <div class="relative overflow-hidden group">
     <div
       :id="containerId"
       ref="mediaItemRef"
@@ -114,16 +114,20 @@ defineExpose({
           onClick: toggleFullscreen,
         }"
       />
-    </div>
 
-    <!-- Media Toolbar -->
-    <GalleryItemToolBar
-      v-if="tokenData"
-      :nft="tokenData"
-      :container-id="containerId"
-      :mime-type="mimeType"
-      class="mt-3 md:mt-4"
-      @toggle-fullscreen="toggleFullscreen"
-    />
+      <!-- Media Toolbar -->
+      <GalleryItemToolBar
+        v-if="tokenData"
+        :nft="tokenData"
+        :container-id="containerId"
+        :mime-type="mimeType"
+        class="
+          md:absolute md:bottom-4 md:left-1/2 md:transform md:-translate-x-1/2
+          md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-200 md:z-10
+          mt-3 md:mt-0
+        "
+        @toggle-fullscreen="toggleFullscreen"
+      />
+    </div>
   </div>
 </template>
