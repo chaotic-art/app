@@ -57,15 +57,39 @@ const badgeText = computed(() => {
     return 'Minted Out'
   return 'Coming Soon'
 })
+
+// Function to share the drop
+function shareDrop() {
+  if (!featuredDrop.value)
+    return
+
+  const url = `${window.location.origin}/${featuredDrop.value.chain}/drops/${featuredDrop.value.alias}`
+  if (navigator.share) {
+    navigator.share({
+      title: featuredDrop.value.name || 'Untitled Collection',
+      text: featuredDrop.value.collectionDescription || 'Check out this amazing collection!',
+      url,
+    }).catch((error) => {
+      console.error('Error sharing drop:', error)
+    })
+  }
+  else {
+    // Fallback for browsers that do not support Web Share API
+    navigator.clipboard.writeText(url).catch((err) => {
+      console.error('Error copying drop URL:', err)
+    })
+  }
+}
 </script>
 
 <template>
   <section class="py-16 lg:py-24">
     <UContainer>
       <div class="text-center mb-12">
-        <UBadge variant="soft" class="mb-6">
-          Featured Collection
-        </UBadge>
+        <div class="inline-flex items-center space-x-2 bg-white/80 dark:bg-neutral-800/80 backdrop-blur rounded-full px-4 py-2 mb-6 border border-neutral-200 dark:border-neutral-700 mx-auto">
+          <UIcon name="i-heroicons-star" class="h-4 w-4 text-neutral-700 dark:text-neutral-300" />
+          <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Featured Collection</span>
+        </div>
         <h2 class="text-3xl lg:text-4xl xl:text-5xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
           Trending This <span class="text-neutral-500 italic">Week</span>
         </h2>
@@ -106,10 +130,12 @@ const badgeText = computed(() => {
                 </UBadge>
               </div>
               <div class="absolute top-4 right-4 flex space-x-2">
-                <UButton size="sm" variant="soft" class="bg-white/90 backdrop-blur dark:bg-neutral-700/90">
-                  <UIcon name="i-heroicons-heart" class="h-4 w-4" />
-                </UButton>
-                <UButton size="sm" variant="soft" class="bg-white/90 backdrop-blur dark:bg-neutral-700/90">
+                <UButton
+                  size="sm"
+                  variant="soft"
+                  class="bg-white/90 backdrop-blur dark:bg-neutral-700/90"
+                  @click="shareDrop"
+                >
                   <UIcon name="i-heroicons-share" class="h-4 w-4" />
                 </UButton>
               </div>
