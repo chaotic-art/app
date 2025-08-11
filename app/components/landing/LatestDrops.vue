@@ -26,18 +26,13 @@ const filteredDrops = computed(() => latestDrops.value?.filter((drop): drop is N
 <template>
   <section class="py-16 lg:py-24 bg-neutral-50 dark:bg-neutral-900">
     <UContainer>
-      <div class="flex items-center justify-between mb-12">
-        <div>
-          <h2 class="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
-            Latest Generative Art
-          </h2>
-          <p class="text-neutral-600 dark:text-neutral-400">
-            Discover the most recent generative art collections from talented artists worldwide
-          </p>
-        </div>
-        <UButton variant="outline" color="neutral" class="hidden sm:flex">
-          View All
-        </UButton>
+      <div class="text-center mb-12">
+        <h2 class="text-3xl lg:text-4xl xl:text-5xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
+          Latest <span class="text-neutral-500 italic">Generative Art</span>
+        </h2>
+        <p class="text-lg text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto leading-relaxed">
+          Discover the most recent generative art collections from talented artists worldwide
+        </p>
       </div>
 
       <!-- Loading State -->

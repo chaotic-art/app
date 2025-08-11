@@ -20,9 +20,9 @@
           </div>
 
           <!-- Main Heading -->
-          <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold text-neutral-900 dark:text-white mb-6 leading-tight">
+          <h1 class="text-4xl sm:text-5xl lg:text-7xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
             Your
-            <span class="text-neutral-900 dark:text-white">
+            <span class="text-neutral-500 italic">
               Polkadot
             </span>
             NFT
@@ -31,7 +31,7 @@
           </h1>
 
           <!-- Description -->
-          <p class="text-xl text-neutral-600 dark:text-neutral-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p class="text-xl text-neutral-600 dark:text-neutral-400 mb-10 max-w-3xl mx-auto leading-relaxed">
             Create, collect, and sell extraordinary NFTs on the most advanced blockchain. Join thousands of artists and
             collectors in the decentralized future.
           </p>

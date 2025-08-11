@@ -63,13 +63,13 @@ const badgeText = computed(() => {
   <section class="py-16 lg:py-24">
     <UContainer>
       <div class="text-center mb-12">
-        <UBadge variant="soft" class="mb-4">
+        <UBadge variant="soft" class="mb-6">
           Featured Collection
         </UBadge>
-        <h2 class="text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-white mb-4">
-          Trending This Week
+        <h2 class="text-3xl lg:text-4xl xl:text-5xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
+          Trending This <span class="text-neutral-500 italic">Week</span>
         </h2>
-        <p class="text-neutral-600 dark:text-neutral-400 max-w-2xl mx-auto">
+        <p class="text-lg text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto leading-relaxed">
           Discover the most sought-after digital art pieces from our curated collection
         </p>
       </div>

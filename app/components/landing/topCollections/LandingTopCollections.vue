@@ -15,9 +15,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="pt-8 md:pt-16 md:px-0 bg-background-color">
-    <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 text-center md:text-left text-gray-900 dark:text-white">
-      {{ $t('collection.topCollections') }}
+  <section class="py-16 md:pt-16 md:px-0 bg-background-color">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl lg:text-4xl xl:text-5xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
+        Top <span class="text-neutral-500 italic">Collections</span>
+      </h2>
+      <p class="text-lg text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto leading-relaxed">
+        Discover the most popular and trending NFT collections from our vibrant community of creators and collectors.
+      </p>
     </div>
     <div class="">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
