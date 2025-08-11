@@ -72,8 +72,8 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
 
 <template>
   <UContainer>
-    <nav class="bg-background-color rounded-[15px] border border-gray-200 dark:border-neutral-700 my-4 md:my-[26px] px-4 md:px-6 py-2 flex items-center gap-2 justify-between mx-auto overflow-hidden">
-      <div class="flex items-center gap-2">
+    <nav class="bg-background-color rounded-full border border-gray-200 dark:border-neutral-700 my-4 md:my-[26px] p-2 flex items-center gap-2 justify-between mx-auto overflow-hidden">
+      <div class="flex items-center gap-2 ml-4">
         <Logo class="select-none w-6 h-6 md:w-8 md:h-8" :font-controlled="false" />
         <NuxtLink to="/" class="text-lg md:text-xl font-bold font-serif italic text-gray-900 dark:text-white">
           Chaotic
@@ -81,7 +81,7 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
       </div>
 
       <div class="flex items-center gap-3 md:gap-6">
-        <div class="hidden md:flex items-center">
+        <div class="hidden md:flex items-center h-10">
           <UNavigationMenu
             :items="navItems"
           />
