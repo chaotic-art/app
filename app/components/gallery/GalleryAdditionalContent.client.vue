@@ -2,6 +2,8 @@
 import type { Prefix } from '@kodadot1/static'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { tokenEntries } from '~/api/nft-pallets'
+import TokenCard from '~/components/common/card/TokenCard.client.vue'
+import TokenActivity from '~/components/gallery/TokenActivity.vue'
 
 interface Props {
   tokenData: OdaToken | null
@@ -12,26 +14,8 @@ interface Props {
   mimeType?: string
 }
 
-type ActivityFilter = 'mints' | 'sales' | 'listings' | 'transfers' | 'burns'
-
-interface FilterOption {
-  value: ActivityFilter
-  label: string
-  icon: string
-}
-
 const props = defineProps<Props>()
-
 const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
-const selectedFilters = ref<ActivityFilter[]>(['mints', 'transfers'])
-
-const filterOptions: FilterOption[] = [
-  { value: 'mints', label: 'Mints', icon: 'i-heroicons-plus-circle' },
-  { value: 'sales', label: 'Sales', icon: 'i-heroicons-banknotes' },
-  { value: 'listings', label: 'Listings', icon: 'i-heroicons-tag' },
-  { value: 'transfers', label: 'Transfers', icon: 'i-heroicons-arrow-right-circle' },
-  { value: 'burns', label: 'Burns', icon: 'i-heroicons-fire' },
-]
 
 onMounted(async () => {
   try {
@@ -57,53 +41,11 @@ onMounted(async () => {
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
         <!-- Item Activity (3/5) -->
         <div class="lg:col-span-3">
-          <div class="space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <h2 class="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">
-                Item Activity
-              </h2>
-
-              <USelect
-                v-model="selectedFilters"
-                :items="filterOptions"
-                multiple
-                placeholder="Filter activity"
-                value-key="value"
-                :content="{ align: 'end', side: 'bottom' }"
-                class="w-full sm:w-48 shrink-0"
-                color="neutral"
-                variant="outline"
-                size="sm"
-              />
-            </div>
-
-            <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
-              <!-- Activity Header -->
-              <div class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900">
-                <div class="grid grid-cols-4 gap-4 text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                  <span>Event</span>
-                  <span>Price</span>
-                  <span>From</span>
-                  <span>Date</span>
-                </div>
-              </div>
-
-              <!-- Activity Content -->
-              <div class="p-6">
-                <div class="text-center py-12">
-                  <div class="w-16 h-16 bg-neutral-100 dark:bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <UIcon name="i-heroicons-clock" class="w-8 h-8 text-neutral-400" />
-                  </div>
-                  <h3 class="text-lg font-medium text-neutral-900 dark:text-white mb-2">
-                    No activity yet
-                  </h3>
-                  <p class="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto">
-                    When someone buys, sells, or transfers this item, it will show up here.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TokenActivity
+            :chain="chain"
+            :collection-id="collectionId"
+            :token-id="tokenId"
+          />
         </div>
 
         <!-- Token Details (2/5) -->
