@@ -194,6 +194,7 @@ const badgeText = computed(() => {
                   variant="solid"
                   class="flex-1 text-lg"
                   size="lg"
+                  block
                   :to="`/${featuredDrop.chain}/drops/${featuredDrop.alias}`"
                 >
                   {{ featuredDrop.status === 'minting_live' ? 'Mint Now' : 'View Details' }}
@@ -205,6 +206,7 @@ const badgeText = computed(() => {
                   variant="outline"
                   class="flex-1 text-lg"
                   size="lg"
+                  block
                   :to="`/${featuredDrop.chain}/collection/${featuredDrop.collection}`"
                 >
                   View Collection

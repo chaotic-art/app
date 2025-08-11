@@ -9,7 +9,7 @@
     <section class="relative py-20 lg:py-32 overflow-hidden">
       <!-- Background -->
       <div class="absolute inset-0 bg-neutral-50 dark:bg-neutral-900" />
-      <div class="absolute inset-0 bg-[url('/img/landing/landing-bg.png')] opacity-5 dark:opacity-10" />
+      <!-- <div class="absolute inset-0 bg-[url('/img/landing/landing-bg.png')] opacity-5 dark:opacity-10" /> -->
 
       <UContainer class="relative">
         <div class="text-center max-w-4xl mx-auto">
@@ -60,6 +60,9 @@
 
     <!-- Featured NFT Section -->
     <FeaturedNFT />
+
+    <!-- Latest Drops Section -->
+    <LatestDrops />
 
     <UContainer>
       <div class="flex flex-col items-center justify-center mt-4 mb-6 md:mt-[25px] md:mb-[35px]">
