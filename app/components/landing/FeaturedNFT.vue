@@ -3,7 +3,7 @@ import { formatBalance } from 'dedot/utils'
 import { getEnrichedDrop } from '@/components/drop/utils'
 import { getDrops } from '@/services/fxart'
 import { calculateTokenUSD } from '@/utils/coinPrice'
-import { sanitizeIpfsUrl } from '@/utils/ipfs'
+import { ipfsToCfImageUrl } from '@/utils/ipfs'
 
 const { prefix } = usePrefix()
 
@@ -120,7 +120,7 @@ function shareDrop() {
             <!-- Image Section -->
             <div class="relative aspect-square">
               <img
-                :src="sanitizeIpfsUrl(featuredDrop.image || featuredDrop.banner)"
+                :src="ipfsToCfImageUrl(featuredDrop.image || featuredDrop.banner, 'detail')"
                 :alt="featuredDrop.name"
                 class="w-full h-full object-contain"
               >
