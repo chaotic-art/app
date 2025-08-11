@@ -36,19 +36,20 @@ export function fetchOdaCollectionOwners(chain: Prefix, address: string) {
 }
 
 export interface NFTMetadata {
-  name: string
-  description: string
-  image: string
-  animation_url: string
-  attributes: Record<string, string>[]
+  name?: string
+  description?: string
+  image?: string
+  animation_url?: string
+  attributes?: Record<string, string>[]
   mime_type?: string
   animation_mime_type?: string
 }
 
 export interface OdaToken {
-  metadata: NFTMetadata
-  metadata_uri: string
+  metadata: NFTMetadata | null
+  metadata_uri?: string
 }
+
 export function fetchOdaToken(chain: Prefix, address: string, tokenId: string) {
   return api<OdaToken>(`/v1/${chain}/collection/${address}/token/${tokenId}`)
 }

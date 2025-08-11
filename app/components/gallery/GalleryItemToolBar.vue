@@ -2,36 +2,23 @@
 import type { OdaToken } from '@/services/oda'
 import { downloadImage } from '@/utils/download'
 import { isMobileDevice } from '@/utils/environment'
-import {
-  determineElementType,
-  MediaType,
-  mediaTypeElementSelectors,
-  resolveMedia,
-} from '@/utils/gallery/media'
 import { sanitizeIpfsUrl, toOriginalContentUrl } from '@/utils/ipfs'
 import { onKodahashRenderCompleted } from '@/utils/kodahash'
-
-type ReloadElement
-  = | HTMLIFrameElement
-    | HTMLVideoElement
-    | HTMLImageElement
-    | null
 
 const props = defineProps<{
   containerId: string
   nft: OdaToken
+  mimeType?: string
 }>()
 
 defineEmits(['toggleFullscreen'])
 
-// const { getNft: nft, getNftImage: nftImage, getNftMetadata: nftMetadata, getNftMimeType: nftMimeType, getNftAnimation: nftAnimation, getNftAnimationMimeType: nftAnimationMimeType } = storeToRefs(useNftStore())
+const nftImageUrl = computed(() => sanitizeIpfsUrl(props.nft.metadata?.image))
+const nftAnimation = computed(() => sanitizeIpfsUrl(props.nft.metadata?.animation_url))
 
-const nftImageUrl = computed(() => sanitizeIpfsUrl(props.nft.metadata.image))
-const nftAnimation = computed(() => sanitizeIpfsUrl(props.nft.metadata.animation_url))
-const nftMimeType = computed(() => props.nft.metadata.mime_type)
-const nftAnimationMimeType = computed(() => props.nft.metadata.animation_mime_type)
+// Use passed mimeType prop or fallback to metadata
+const nftMimeType = computed(() => props.mimeType || props.nft.metadata?.mime_type)
 
-const isLoading = ref(false)
 const toast = useToast()
 const { $i18n } = useNuxtApp()
 const imageData = ref()
@@ -69,7 +56,7 @@ async function downloadMedia() {
 
   try {
     toast.add({ title: $i18n.t('toast.downloadImage') })
-    downloadImage(imageUrl, props.nft.metadata.name)
+    downloadImage(imageUrl, props.nft.metadata?.name ?? '')
   }
   catch (error) {
     console.warn('[ERR] unable to fetch image', error)
@@ -77,146 +64,73 @@ async function downloadMedia() {
   }
 }
 
-const mediaAndImageType = computed(() => {
-  const animationMediaType = resolveMedia(nftAnimationMimeType.value)
-  const imageMediaType = resolveMedia(nftMimeType.value)
-  return { animationMediaType, imageMediaType }
-})
-
-function getElementSelector({
-  imageMediaType,
-  animationMediaType,
-}: {
-  imageMediaType: MediaType | undefined
-  animationMediaType: MediaType | undefined
-}) {
-  const elementType = determineElementType(animationMediaType!, imageMediaType!)
-  return mediaTypeElementSelectors[elementType as keyof typeof mediaTypeElementSelectors]
-}
-
-function reloadElement(selector: string) {
-  setTimeout(() => {
-    isLoading.value = false
-    const element: ReloadElement = document.querySelector(selector)
-
-    if (!element) {
-      return
-    }
-    if (mediaTypeElementSelectors[MediaType.IMAGE] === selector) {
-      const timestamp = new Date().getTime()
-      const url = new URL(element.src)
-      url.searchParams.set('t', timestamp.toString())
-      element.src = url.toString()
-    }
-    else {
-      element.src += ''
-    }
-  }, 500)
-}
-
-function handleReloadClick() {
-  isLoading.value = true
-  const { animationMediaType, imageMediaType } = mediaAndImageType.value
-
-  return reloadElement(
-    getElementSelector({ animationMediaType, imageMediaType }),
-  )
-}
-
-function openInNewTab(selector: string, attribute: string = 'src') {
-  const element = document.querySelector(`#${props.containerId} ${selector}`)
-  if (element) {
-    const src = element.getAttribute(attribute)
-    if (src) {
-      window.open(src, '_blank')
-      return true
-    }
-  }
-  return false
-}
-
 function handleNewTab() {
-  const { animationMediaType, imageMediaType } = mediaAndImageType.value
-  const elementSelector = getElementSelector({
-    animationMediaType,
-    imageMediaType,
-  })
-
-  if (!openInNewTab(elementSelector)) {
-    window.open(nftAnimation.value || nftImageUrl.value, '_blank')
+  // Open animation if it exists, otherwise open image
+  if (nftAnimation.value) {
+    window.open(nftAnimation.value, '_blank')
+  }
+  else if (nftImageUrl.value) {
+    window.open(nftImageUrl.value, '_blank')
   }
 }
 
-const disableNewTab = computed(() => {
-  if (nftAnimation.value && nftAnimationMimeType.value) {
-    return true
-  }
-
-  return nftImageUrl.value && nftMimeType.value
+const isNewTabEnabled = computed(() => {
+  // Enable if we have animation or image URL
+  return (nftAnimation.value || nftImageUrl.value) && nftMimeType.value
 })
 
-onKodahashRenderCompleted(({ payload }) => imageData.value = payload.image)
+onKodahashRenderCompleted(({ payload }) => {
+  imageData.value = payload.image
+})
 </script>
 
 <template>
-  <div
-    class="w-full mt-6 px-6 py-3 h-11 rounded-[43px] gap-8 flex justify-center border border-gray-400"
-  >
-    <UTooltip
-      text="Reload"
-      :popper="{ placement: 'top' }"
-    >
-      <span>
-        <UIcon
-          :name="isLoading ? 'i-mdi:loading' : 'i-mdi:arrow-u-left-top'"
-          class="h-5 w-5 hover:cursor-pointer"
-          :class="{ 'animate-spin': isLoading }"
-          @click="handleReloadClick"
-        />
-      </span>
-    </UTooltip>
-    <UTooltip
-      text="Fullscreen"
-      :popper="{ placement: 'top' }"
-    >
-      <span>
-        <UIcon
-          name="i-mdi:arrow-top-right-bottom-left"
-          class="h-5 w-5 hover:cursor-pointer"
+  <div class="flex justify-center mt-4 md:mt-6">
+    <div class="inline-flex items-center gap-1 p-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+      <!-- Fullscreen Button -->
+      <UTooltip text="Fullscreen" :popper="{ placement: 'top' }">
+        <UButton
+          icon="i-heroicons-arrows-pointing-out"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           @click="$emit('toggleFullscreen')"
         />
-      </span>
-    </UTooltip>
-    <UTooltip
-      text="Open in New Tab"
-      :popper="{ placement: 'top' }"
-    >
-      <span>
-        <UIcon
-          v-if="disableNewTab"
-          name="i-mdi:arrow-top-right"
-          class="h-5 w-5 hover:cursor-pointer"
-          @click="handleNewTab"
+      </UTooltip>
+
+      <!-- Separator -->
+      <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+
+      <!-- Open in New Tab Button -->
+      <UTooltip text="Open in New Tab" :popper="{ placement: 'top' }">
+        <UButton
+          icon="i-heroicons-arrow-top-right-on-square"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          :disabled="!isNewTabEnabled"
+          :class="isNewTabEnabled
+            ? 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors'
+            : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'"
+          @click="isNewTabEnabled ? handleNewTab() : undefined"
         />
-        <UIcon
-          v-else
-          name="i-mdi:arrow-top-right"
-          class="h-5 w-5 text-gray-500"
-        />
-      </span>
-    </UTooltip>
-    <UTooltip
-      v-if="isDownloadEnabled"
-      text="Download"
-      :popper="{ placement: 'top' }"
-    >
-      <span>
-        <UIcon
-          name="i-mdi:arrow-collapse-down"
-          class="h-5 w-5 hover:cursor-pointer"
+      </UTooltip>
+
+      <!-- Separator -->
+      <div v-if="isDownloadEnabled" class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+
+      <!-- Download Button -->
+      <UTooltip v-if="isDownloadEnabled" text="Download" :popper="{ placement: 'top' }">
+        <UButton
+          icon="i-heroicons-arrow-down-tray"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
           @click="downloadMedia"
         />
-      </span>
-    </UTooltip>
+      </UTooltip>
+    </div>
   </div>
 </template>

@@ -43,7 +43,7 @@ const footerLinks: Array<
 </script>
 
 <template>
-  <UContainer class="mb-8 md:mb-16 mt-6 md:mt-8">
+  <UContainer class="mb-8 md:mb-16">
     <footer class="bg-gray-50 dark:bg-neutral-800 rounded-[30px] overflow-hidden">
       <UContainer class="px-6 md:px-[60px] py-6 md:py-[40px]">
         <!-- Main Footer Content -->

@@ -1,6 +1,6 @@
 import type { Prefix } from '@kodadot1/static'
 import { formatBalance } from '@polkadot/util'
-import { fetchMimeType, fetchOdaToken } from '~/services/oda'
+import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
 export function useToken(props: {
   tokenId: number
@@ -11,8 +11,10 @@ export function useToken(props: {
 }) {
   // Reactive data
   const token = ref<Awaited<ReturnType<typeof fetchOdaToken>> | null>(null)
+  const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
   const queryPrice = ref<bigint | null>(null)
   const owner = ref<string | null>(null)
+  const collectionCreator = ref<string | null>(null)
   const isLoading = ref(true)
   const error = ref<unknown | null>(null)
   const mimeType = ref<string | null>(null)
@@ -29,19 +31,35 @@ export function useToken(props: {
 
   // Fetch data on component mount
   onMounted(async () => {
+    const api = $api(props.chain)
+
     try {
       // Fetch token metadata, price, and owner in parallel
-      const [tokenData, priceData, ownerData] = await Promise.all([
+      const [tokenData, collectionData, priceData, ownerData, collectionConfig, collectionMetadata] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
-        $api(props.chain).query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId).catch(() => null),
-        $api(props.chain).query.Nfts.Item.getValue(props.collectionId, props.tokenId).catch(() => null),
+        fetchOdaCollection(props.chain, props.collectionId.toString()),
+        api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId).catch(() => null),
+        api.query.Nfts.Item.getValue(props.collectionId, props.tokenId).catch(() => null),
+        api.query.Nfts.Collection.getValue(props.collectionId).catch(() => null),
+        api.query.Nfts.CollectionMetadataOf.getValue(props.collectionId).catch(() => null),
       ])
 
       token.value = tokenData
+      collection.value = collectionData
       queryPrice.value = priceData?.[0] || null
       owner.value = ownerData?.owner || null
+      collectionCreator.value = collectionConfig?.owner || null
 
-      const media = tokenData?.metadata?.animation_url || tokenData?.metadata?.image || props.image
+      if (!tokenData.metadata && collectionData?.metadata) {
+        // fallback to collection metadata
+        token.value = {
+          ...tokenData,
+          metadata: collectionData?.metadata,
+          metadata_uri: collectionMetadata?.data.asText(),
+        }
+      }
+
+      const media = token.value?.metadata?.animation_url || token.value?.metadata?.image || props.image
       if (media) {
         const mimeTypeData = await fetchMimeType(media)
         mimeType.value = mimeTypeData.mime_type
@@ -86,10 +104,13 @@ export function useToken(props: {
   return {
     // Reactive data
     token,
+    collection,
     owner,
+    collectionCreator,
     isLoading,
     error,
     mimeType,
+
     // Computed properties
     price,
     usdPrice,
