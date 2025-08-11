@@ -11,23 +11,26 @@
 @theme static {
   --ui-container: 1680px;
 
-
-  --text-color: #000000;
   --ui-primary: #000000;
-  --background-color: #ffffff;
-  --background-color-secondary: #ffffff;
+
+  --color-text-color: #000000;
+  --color-background-color: #ffffff;
+  --color-background-color-secondary: #ffffff;
+
+
 }
 
 .dark {
-  --text-color: #ffffff;
   --ui-primary: #ffffff;
-  --background-color: #18181b;
-  --background-color-secondary: #232329;
+
+  --color-text-color: #ffffff;
+  --color-background-color: var(--color-slate-900);
+  --color-background-color-secondary: var(--color-slate-800);
 }
 
 body {
   font-family: var(--font-sans);
-  color: var(--text-color);
+  color: var(--color-text-color);
 }
 
 .hover-card-effect {
