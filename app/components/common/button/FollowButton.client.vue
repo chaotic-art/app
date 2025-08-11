@@ -4,9 +4,12 @@ import { useElementHover } from '@vueuse/core'
 import { follow, isFollowing, unfollow } from '@/services/profile'
 import { getss58AddressByPrefix } from '@/utils/account'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   target: string
-}>()
+  height?: number
+}>(), {
+  height: 40,
+})
 
 const emit = defineEmits(['followAction'])
 const { doAfterLogin } = useDoAfterlogin()
@@ -141,7 +144,7 @@ defineExpose({ refresh: refreshFollowingStatus })
       :loading="loading"
       :button="{
         ...buttonConfig,
-        classes: `px-6 py-2 rounded-full cursor-pointer border border-gray-300 dark:border-neutral-700 bg-background-color-secondary text-gray-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-neutral-700 ${buttonConfig.classes}`,
+        classes: `px-6 py-2 rounded-full cursor-pointer border border-gray-300 dark:border-neutral-700 bg-background-color-secondary text-gray-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-neutral-700 h-[${height}px] ${buttonConfig.classes}`,
       }"
       test-id="profile-button-multi-action"
       @click.stop
