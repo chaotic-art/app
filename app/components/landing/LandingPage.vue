@@ -7,15 +7,20 @@
     <section class="relative py-20 lg:py-32 overflow-hidden">
       <!-- Background -->
       <div class="absolute inset-0 bg-neutral-50 dark:bg-neutral-900" />
-      <!-- <div class="absolute inset-0 bg-[url('/img/landing/landing-bg.png')] opacity-5 dark:opacity-10" /> -->
 
       <UContainer class="relative">
         <div class="text-center max-w-4xl mx-auto">
           <!-- Badge -->
-          <div class="inline-flex items-center space-x-2 bg-white/80 dark:bg-neutral-800/80 backdrop-blur rounded-full px-4 py-2 mb-8 border border-neutral-200 dark:border-neutral-700">
-            <UIcon name="i-heroicons-sparkles" class="h-4 w-4 text-neutral-700 dark:text-neutral-300" />
-            <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">New: Polkadot Integration Live</span>
-          </div>
+          <UButton
+            href="https://medium.com/chaoticart/chaotic-a-fresh-start-for-polkadot-nfts-c285c2d724f4"
+            target="_blank"
+            variant="outline"
+            size="sm"
+            class="mb-8 rounded-full"
+          >
+            <UIcon name="i-heroicons-sparkles" class="h-4 w-4" />
+            <span class="text-sm font-medium">New: Chaotic NFT Marketplace Launch</span>
+          </UButton>
 
           <!-- Main Heading -->
           <h1 class="text-4xl sm:text-5xl lg:text-7xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
@@ -37,17 +42,19 @@
           <!-- Action Buttons -->
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <UButton
+              to="/ahp/explore/collectibles"
               size="lg"
               variant="solid"
-              class="px-8 py-3 text-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-100"
+              class="px-8 py-3 text-lg"
             >
               Start Exploring
               <UIcon name="i-heroicons-arrow-right" class="ml-2 h-5 w-5" />
             </UButton>
             <UButton
+              to="/create/nft"
               size="lg"
               variant="outline"
-              class="px-8 py-3 text-lg border-2 bg-transparent border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800"
+              class="px-8 py-3 text-lg"
             >
               Create NFT
             </UButton>
