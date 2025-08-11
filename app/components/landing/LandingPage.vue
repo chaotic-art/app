@@ -3,8 +3,6 @@
 
 <template>
   <div class="bg-background-color">
-    <Navbar />
-
     <!-- Hero Section -->
     <section class="relative py-20 lg:py-32 overflow-hidden">
       <!-- Background -->
