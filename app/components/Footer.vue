@@ -43,9 +43,14 @@ const footerLinks: Array<
 </script>
 
 <template>
-  <UContainer class="mb-8 md:mb-16">
-    <footer class="bg-gray-50 dark:bg-neutral-800 rounded-[30px] overflow-hidden">
-      <UContainer class="px-6 md:px-[60px] py-6 md:py-[40px]">
+  <footer class="bg-gradient-to-br from-neutral-200 to-neutral-300 dark:from-neutral-700 dark:to-neutral-600 py-16 lg:py-24 relative overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-10 dark:opacity-20">
+      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 24px 24px;" />
+    </div>
+
+    <UContainer class="relative">
+      <div class="px-6 md:px-[60px] py-6 md:py-[40px]">
         <!-- Main Footer Content -->
         <div class="flex flex-col md:flex-row justify-between gap-8 md:gap-0">
           <!-- Become Artist Section -->
@@ -86,8 +91,7 @@ const footerLinks: Array<
             </template>
           </div>
         </div>
-      </UContainer>
-      <div class="bg-cover bg-center bg-no-repeat h-[80px] md:h-[112px]" style="background-image: url('/imgs/footer-bottom-bg.png');" />
-    </footer>
-  </UContainer>
+      </div>
+    </UContainer>
+  </footer>
 </template>
