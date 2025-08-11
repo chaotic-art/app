@@ -82,7 +82,7 @@ const {
             v-else-if="image || token?.metadata?.image"
             :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
             :alt="token?.metadata?.name || 'NFT'"
-            class="w-full h-full object-cover"
+            class="w-full h-full object-contain"
             @error="($event.target as HTMLImageElement).style.display = 'none'"
           >
           <div

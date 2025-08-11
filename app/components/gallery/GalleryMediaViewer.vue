@@ -91,7 +91,7 @@ defineExpose({
         v-else-if="tokenData?.metadata?.image"
         :src="sanitizeIpfsUrl(tokenData?.metadata?.image)"
         :alt="tokenData?.metadata?.name || 'NFT'"
-        class="aspect-square w-full object-cover"
+        class="aspect-square w-full object-contain"
         @error="($event.target as HTMLImageElement).style.display = 'none'"
       >
 

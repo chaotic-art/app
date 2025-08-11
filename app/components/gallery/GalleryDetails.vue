@@ -177,34 +177,6 @@ const actionItems = computed(() => [
           ({{ usdPrice }})
         </p>
       </div>
-
-      <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row gap-3">
-        <UButton
-          v-if="formattedPrice"
-          class="flex-1 rounded-md"
-          color="primary"
-          size="lg"
-        >
-          <template #leading>
-            <UIcon name="i-heroicons-bolt" class="w-5 h-5" />
-          </template>
-          Buy Now
-        </UButton>
-        <UTooltip text="Coming Soon">
-          <UButton
-            class="flex-1 rounded-md"
-            variant="soft"
-            size="lg"
-            disabled
-          >
-            <template #leading>
-              <UIcon name="i-heroicons-tag" class="w-5 h-5" />
-            </template>
-            Make Offer
-          </UButton>
-        </UTooltip>
-      </div>
     </div>
   </div>
 </template>
