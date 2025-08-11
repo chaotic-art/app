@@ -115,7 +115,7 @@ function shareDrop() {
         </div>
 
         <!-- Featured Drop Content -->
-        <div v-else-if="featuredDrop" class="bg-white dark:bg-neutral-800 rounded-3xl shadow-2xl overflow-hidden border border-neutral-200 dark:border-neutral-700">
+        <div v-else-if="featuredDrop" class="bg-white dark:bg-neutral-800 rounded-3xl shadow-2xl overflow-hidden border border-neutral-200 dark:border-neutral-700 group">
           <div class="grid lg:grid-cols-2 gap-0">
             <!-- Image Section -->
             <div class="relative aspect-square">
@@ -129,15 +129,14 @@ function shareDrop() {
                   {{ badgeText }}
                 </UBadge>
               </div>
-              <div class="absolute top-4 right-4 flex space-x-2">
+              <div class="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <UButton
                   size="sm"
-                  variant="soft"
-                  class="bg-white/90 backdrop-blur dark:bg-neutral-700/90"
+                  color="info"
+                  class="backdrop-blur"
+                  icon="i-heroicons-share"
                   @click="shareDrop"
-                >
-                  <UIcon name="i-heroicons-share" class="h-4 w-4" />
-                </UButton>
+                />
               </div>
             </div>
 

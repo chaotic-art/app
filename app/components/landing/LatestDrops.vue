@@ -60,7 +60,12 @@ const filteredDrops = computed(() => latestDrops.value?.filter((drop): drop is N
       </div>
 
       <div class="text-center mt-12">
-        <UButton variant="outline" size="lg" color="neutral" class="sm:hidden">
+        <UButton
+          variant="outline"
+          color="neutral"
+          :to="`/${prefix}/drops`"
+          class="px-8 py-2 rounded-full"
+        >
           View All Drops
         </UButton>
       </div>

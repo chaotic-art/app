@@ -143,12 +143,11 @@ watchEffect(async () => {
       <div class="text-center">
         <UButton
           variant="outline"
-          size="lg"
           color="neutral"
-          class="px-8 bg-transparent"
-          :to="`/${prefix}/artists`"
+          to="/ahp/artists"
+          class="px-8 py-2 rounded-full"
         >
-          View More Artists
+          Explore Artists
         </UButton>
       </div>
     </UContainer>

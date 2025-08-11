@@ -29,8 +29,13 @@ onMounted(() => {
         <TopCollectionsCard v-for="(collection, i) in data" :key="i" :collection="collection" />
       </div>
       <div class="flex justify-center mt-6 md:mt-8">
-        <UButton class="bg-background-color-secondary text-black dark:text-white border border-gray-300 dark:border-neutral-700 rounded-full px-6 py-2 md:px-8" :to="`/${prefix}/explore/collectibles`">
-          {{ $t('collection.viewMore') }}
+        <UButton
+          variant="outline"
+          color="neutral"
+          :to="`/${prefix}/explore/collectibles`"
+          class="px-8 py-2 rounded-full"
+        >
+          Explore Collections
         </UButton>
       </div>
     </div>
