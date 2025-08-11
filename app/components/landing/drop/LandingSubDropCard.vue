@@ -32,7 +32,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
         <div class="flex flex-row justify-between flex-wrap items-center gap-2 md:gap-1 mb-1">
           <UserInfo :address="drop?.creator" :avatar-size="30" class="h-[40px]" />
           <FollowButton
-            :target="drop?.creator!" class="h-[40px] px-4 py-2"
+            :target="drop?.creator!"
           />
         </div>
         <div class="text-gray-500 dark:text-gray-300 max-w-full md:max-w-[300px] line-clamp-3 md:line-clamp-4">
