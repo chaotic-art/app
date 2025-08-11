@@ -64,10 +64,10 @@
     </section>
 
     <!-- Featured NFT Section -->
-    <FeaturedNFT />
+    <LazyFeaturedNFT />
 
     <!-- Latest Drops Section -->
-    <LatestDrops />
+    <LazyLatestDrops />
 
     <!-- Curated Artists Section -->
     <LazyCuratedArtists />
@@ -78,7 +78,7 @@
     </UContainer>
 
     <!-- Partners Section -->
-    <Partners />
+    <LazyPartners />
 
     <LazyDropMintModal />
   </div>
