@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { DropItem } from '@/types/drop'
 import DropCard from '@/components/drop/DropCard.vue'
 import { getEnrichedDrop } from '@/components/drop/utils'
 import { getDrops } from '@/services/fxart'
