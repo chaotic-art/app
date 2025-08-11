@@ -68,7 +68,7 @@ const footerLinks: Array<
                 </h3>
                 <ul v-if="col.type === 'links'" class="space-y-2 text-gray-500 dark:text-gray-400">
                   <li v-for="item in col.items" :key="item.label">
-                    <a :href="item.href" class="hover:text-primary-500 dark:hover:text-primary-400">{{ item.label }}</a>
+                    <a :href="item.href" class="hover:text-text-color">{{ item.label }}</a>
                   </li>
                 </ul>
                 <div v-else-if="col.type === 'buttons'" class="flex flex-col gap-2 items-center md:items-start">
@@ -79,7 +79,7 @@ const footerLinks: Array<
                     :href="item.href"
                     target="_blank"
                     variant="outline"
-                    class="rounded-full text-gray-500 dark:text-gray-400 w-fit"
+                    class="rounded-full text-gray-500 dark:text-gray-400 hover:text-text-color w-fit"
                   />
                 </div>
               </div>
