@@ -18,11 +18,46 @@ const {
   price,
   usdPrice,
   mediaIcon,
+  nativePrice,
 } = useToken(props)
+
+const actionCartStore = useActionCartStore()
+
+const id = computed(() => `${props.collectionId}-${props.tokenId}`)
+const isItemInActionCart = computed(() => actionCartStore.isItemInCart(id.value))
+
+function addToCart() {
+  if (!token.value || !owner.value) {
+    return
+  }
+
+  if (isItemInActionCart.value) {
+    actionCartStore.removeItem(id.value)
+  }
+  else {
+    actionCartStore.setItem({
+      id: id.value,
+      sn: props.tokenId,
+      collectionId: props.collectionId,
+      name: token.value.metadata?.name,
+      chain: props.chain,
+      price: Number(nativePrice.value),
+      currentOwner: owner.value,
+      metadata: token.value.metadata,
+      metadata_uri: token.value.metadata_uri,
+    })
+  }
+}
 </script>
 
 <template>
-  <div class="relative border rounded-xl border-gray-300 dark:border-neutral-700 overflow-hidden bg-white dark:bg-neutral-900 hover:shadow-lg transition-shadow hover-card-effect group">
+  <div
+    class="relative border rounded-xl overflow-hidden bg-white dark:bg-neutral-900 hover:shadow-lg transition-shadow hover-card-effect group"
+    :class="{
+      '!border-blue-500 dark:!border-blue-400': isItemInActionCart,
+      'border-gray-300 dark:border-neutral-700': !isItemInActionCart,
+    }"
+  >
     <!-- Loading State -->
     <template v-if="isLoading">
       <!-- Image Skeleton -->
@@ -98,6 +133,19 @@ const {
             class="absolute top-2 right-2 w-6 h-6 bg-black/70 rounded-full shadow-md flex items-center justify-center"
           >
             <UIcon :name="mediaIcon" class="w-3 h-3 text-white" />
+          </div>
+
+          <div class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
+            <UButton
+              :icon="isItemInActionCart ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
+              size="sm"
+              variant="solid"
+              color="primary"
+              class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-xl border border-white/30 text-gray-900 dark:text-white"
+              @click.prevent.stop="addToCart"
+            >
+              {{ isItemInActionCart ? 'Remove' : 'Select' }}
+            </UButton>
           </div>
         </div>
 

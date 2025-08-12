@@ -1,6 +1,8 @@
 import type { Interaction } from '@/types'
 import { isAfter, isBefore, isEqual, parseISO } from 'date-fns'
 
+export const sum = (array: number[]): number => array.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+
 export function getVolume(events: { meta: string }[]): bigint {
   return events
     .map(x => x.meta)

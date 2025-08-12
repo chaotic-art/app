@@ -71,4 +71,8 @@ export function formatAmountWithRound(value: string | number | bigint, tokenDeci
   )
 }
 
+export function calculateAmount(value: number, decimals: number): number {
+  return Math.trunc(value * 10 ** decimals)
+}
+
 export default format

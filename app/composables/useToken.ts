@@ -91,6 +91,7 @@ export function useToken(props: {
     error,
     mimeType,
     // Computed properties
+    nativePrice: queryPrice,
     price,
     usdPrice,
     mediaIcon,

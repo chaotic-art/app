@@ -127,5 +127,20 @@
     "waiting": "Awaiting Your Signature"
   },
   "confirmed": "Confirmed",
-  "finalazing": "Finalizing"
+  "finalazing": "Finalizing",
+  "actionCart": {
+    "listItem": "List Item | List Items",
+    "selectAll": "Select All",
+    "item": "Item | Items",
+    "clearAll": "Clear All"
+  },
+  "listingCart": {
+    "complete": "Complete Listing",
+    "inputPriceFirst": "Input Price First",
+    "listingFees": "Listing Fees",
+    "listingNft": "Listing NFT | Listing NFTs",
+    "missing1": "1 Item Is Missing Price",
+    "missingMultiple": "Items Are Missing Price",
+    "potentialEarnings": "Potential Earnings"
+  }
 }
