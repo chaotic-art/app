@@ -38,7 +38,7 @@ const title = computed(() => {
       : `${listingCartStore.count} ${$i18n.t('items')}`
 
   return showChangePriceModal.value
-    ? $i18n.t('transaction.price.change')
+    ? $i18n.t('listingCart.changePrice')
     : `List ${items}`
 })
 
@@ -50,7 +50,7 @@ const label = computed(() => {
   switch (listingCartStore.incompleteListPrices) {
     case 0:
       return showChangePriceModal.value
-        ? $i18n.t('transaction.price.change')
+        ? $i18n.t('listingCart.changePrice')
         : $i18n.t('listingCart.complete')
     case 1:
       return listingCartStore.count === 1
@@ -65,11 +65,12 @@ const label = computed(() => {
 
 useModalIsOpenTracker({
   isOpen: listingCartModalOpen,
-  onChange: () => {
-    if (listingCartModalOpen.value) {
-      actionCartTransfer.transferToListingCart()
-    }
+  onOpen: () => {
+    actionCartTransfer.transferToListingCart()
   },
+  onClose: () => {
+    listingCartStore.clearCartItems()
+  }
 })
 </script>
 
@@ -127,9 +128,14 @@ useModalIsOpenTracker({
               v-if="items.length === 1 && items[0]"
               :item="items[0]"
             />
+
+            <ListingCartMultipleItems
+              v-if="items.length > 1"
+              :items="items"
+            />
           </div>
 
-          <div class="pt-6 space-y-6">
+          <div class="space-y-6">
             <div class="bg-gray-50 dark:bg-neutral-800 rounded-lg p-4 space-y-4">
               <div class="flex justify-between items-center">
                 <span class="text-gray-900 dark:text-white font-medium">Potential Earnings</span>

@@ -141,6 +141,8 @@
     "listingNft": "Listing NFT | Listing NFTs",
     "missing1": "1 Item Is Missing Price",
     "missingMultiple": "Items Are Missing Price",
-    "potentialEarnings": "Potential Earnings"
+    "potentialEarnings": "Potential Earnings",
+    "fixedPrice": "Fixed Price",
+    "changePrice": "Change Price"
   }
 }

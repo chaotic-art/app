@@ -5,7 +5,7 @@ const actionCartStore = useActionCartStore()
 const preferencesStore = usePreferencesStore()
 const { prefix } = usePrefix()
 
-const listVisible = (prefix: string) => true // Allow listing for all chains for now
+const listVisible = (_prefix: string) => true // Allow listing for all chains for now
 
 const isListingDisabled = computed(() => !listVisible(prefix.value))
 

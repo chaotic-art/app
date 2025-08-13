@@ -2,7 +2,7 @@ export default function () {
   const actionCartStore = useActionCartStore()
   const listingCartStore = useListingCartStore()
 
-  async function transferToListingCart() {
+  function transferToListingCart() {
     try {
       listingCartStore.clearListedItems()
 
@@ -10,7 +10,8 @@ export default function () {
         listingCartStore.setItem({
           ...item,
           collection: {
-            floor: 1e8, //dev: remove
+            floor: 1e8, // dev: remove,
+            name: 'Collection Name', // dev: remove
           },
         })
       })

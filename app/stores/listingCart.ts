@@ -6,6 +6,7 @@ export type ListingCartItem = {
   listPrice?: number
   collection: {
     floor?: number
+    name: string
   }
 } & BaseActionCartItem
 
