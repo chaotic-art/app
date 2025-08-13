@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { calculateAmount } from '@/utils/format/balance'
+import { toNative } from '@/utils/format/balance'
+import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
 const { $i18n } = useNuxtApp()
 const { accountId } = useAuth()
+const { prefix } = usePrefix()
+const { listNfts } = useNftPallets()
 const listingCartStore = useListingCartStore()
 const { itemsInChain: items } = storeToRefs(listingCartStore)
 const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
 const actionCartTransfer = useActionCartTransfer()
 const { decimals, chainSymbol } = useChain()
 
+const listingFees = ref()
+
 const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
   computed(() =>
-    calculateAmount(
+    toNative(
       sum(listingCartStore.itemsInChain.map(nft => Number(nft.listPrice || 0))),
       decimals.value,
     )),
@@ -63,6 +68,31 @@ const label = computed(() => {
   }
 })
 
+const listParams = computed(() => ({
+  nfts: items.value.map(item => ({
+    sn: item.sn,
+    collectionId: item.collectionId,
+    price: toNative(item.listPrice || 0, decimals.value),
+  })),
+  chain: prefix.value,
+}))
+
+function list() {
+  listNfts({
+    ...listParams.value,
+    type: 'submit',
+  })
+}
+
+watchSyncEffect(async () => {
+  listingFees.value = Number(
+    await listNfts({
+      ...listParams.value,
+      type: 'estimate',
+    }),
+  )
+})
+
 useModalIsOpenTracker({
   isOpen: listingCartModalOpen,
   onOpen: () => {
@@ -70,7 +100,7 @@ useModalIsOpenTracker({
   },
   onClose: () => {
     listingCartStore.clearCartItems()
-  }
+  },
 })
 </script>
 
@@ -149,7 +179,7 @@ useModalIsOpenTracker({
 
               <div class="flex justify-between items-center">
                 <span class="text-gray-600 dark:text-gray-300">Listing Fees</span>
-                <span class="text-gray-600 dark:text-gray-300">0 DOT</span>
+                <Money class="text-gray-600 dark:text-gray-300" :value="listingFees" inline />
               </div>
             </div>
 
@@ -157,6 +187,7 @@ useModalIsOpenTracker({
               class="w-full py-4 inline-flex justify-center"
               :label="label"
               :disabled="confirmButtonDisabled"
+              @click="list"
             />
           </div>
         </div>
