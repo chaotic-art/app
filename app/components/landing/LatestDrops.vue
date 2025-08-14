@@ -9,7 +9,7 @@ const { prefix } = usePrefix()
 const { data: latestDrops } = await useLazyAsyncData(() => getDrops({
   active: [true],
   chain: [isProduction ? 'ahp' : prefix.value],
-  limit: 5,
+  limit: 10,
 }), {
   transform: async (data) => {
     return await Promise.all(data.map(getEnrichedDrop))
@@ -20,7 +20,7 @@ const { data: latestDrops } = await useLazyAsyncData(() => getDrops({
 const isLoading = computed(() => !latestDrops.value || latestDrops.value.length === 0)
 
 // Filter out undefined drops and skip the first one (already shown in FeaturedNFT)
-const filteredDrops = computed(() => latestDrops.value?.filter((drop): drop is NonNullable<typeof drop> => Boolean(drop)).slice(1, 5) || [])
+const filteredDrops = computed(() => latestDrops.value?.filter((drop): drop is NonNullable<typeof drop> => Boolean(drop)).slice(1, 9) || [])
 </script>
 
 <template>
