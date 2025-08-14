@@ -68,7 +68,7 @@ defineExpose({
         v-else-if="mimeType?.includes('audio') && (tokenData?.metadata?.animation_url || tokenData?.metadata?.image)"
         class="aspect-square w-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-700 dark:to-gray-900 relative p-4 md:p-6"
       >
-        <UIcon name="i-heroicons-musical-note" class="w-12 h-12 md:w-16 md:h-16 text-gray-700 dark:text-gray-200 mb-3 md:mb-4" />
+        <UIcon name="i-heroicons-musical-note" class="w-12 h-12 md:w-16 md:h-16 text-primary mb-3 md:mb-4" />
         <audio
           :src="sanitizeIpfsUrl(tokenData?.metadata?.animation_url || tokenData?.metadata?.image)"
           controls
@@ -98,21 +98,18 @@ defineExpose({
       <!-- Fallback -->
       <div
         v-else
-        class="aspect-square w-full flex items-center justify-center bg-gray-100 dark:bg-neutral-700"
+        class="aspect-square w-full flex items-center justify-center bg-muted"
       >
         <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
       </div>
 
       <!-- Fullscreen Back Button -->
-      <CommonButtonConfig
+      <UButton
         v-if="isFullscreen"
-        :button="{
-          label: 'Go Back',
-          icon: 'i-heroicons-chevron-left',
-          variant: 'ghost',
-          classes: 'z-20 fixed top-4 left-4 md:top-6 md:left-6',
-          onClick: toggleFullscreen,
-        }"
+        icon="i-heroicons-chevron-left"
+        variant="ghost"
+        class="z-20 fixed top-4 left-4 md:top-6 md:left-6"
+        @click="toggleFullscreen"
       />
 
       <!-- Media Toolbar -->

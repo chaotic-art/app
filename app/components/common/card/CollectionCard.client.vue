@@ -61,12 +61,12 @@ onMounted(async () => {
 
 <template>
   <article
-    class="group relative bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-200/60 dark:border-neutral-700 overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-gray-300/80 dark:hover:border-neutral-500/80"
+    class="group relative bg-background rounded-xl shadow-xs hover:shadow-sm border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1"
     :class="{ 'animate-pulse': isLoading }"
   >
     <NuxtLink
       :to="`/${prefix}/collection/${item.id}`"
-      class="block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-2xl"
+      class="block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-xl"
     >
       <!-- Hero Banner Section -->
       <div class="relative h-48 bg-gradient-to-br from-gray-100 dark:from-neutral-800 to-gray-200 dark:to-neutral-900 overflow-hidden">

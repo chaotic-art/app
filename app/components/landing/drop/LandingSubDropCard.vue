@@ -16,8 +16,8 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 rounded-xl h-auto md:h-[440px] overflow-hidden border border-gray-200 dark:border-neutral-700 bg-background-color-secondary">
-    <div class="h-full bg-gray-200 dark:bg-neutral-800 relative rounded-xl overflow-hidden border border-gray-200 dark:border-neutral-700 cursor-pointer" @click="emit('click', drop)">
+  <div class="flex rounded-xl h-auto md:h-[440px] overflow-hidden border border-border">
+    <div class="h-full relative rounded-xl overflow-hidden border border-border cursor-pointer aspect-square" @click="emit('click', drop)">
       <img
         :src="ipfsToCfImageUrl(drop?.banner)"
         :alt="drop?.name"
@@ -26,7 +26,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
     </div>
     <div class="p-4 md:p-6 flex flex-col justify-between flex-1">
       <div class="flex flex-col gap-3 md:gap-4">
-        <div class="font-serif italic line-clamp-1 font-medium text-xl md:text-[40px] text-center md:text-left text-gray-900 dark:text-white">
+        <div class="font-serif italic line-clamp-1 font-medium text-xl md:text-[40px] text-center md:text-left text-foreground">
           {{ drop?.name }}
         </div>
         <div class="flex flex-row justify-between flex-wrap items-center gap-2 md:gap-1 mb-1">
@@ -35,7 +35,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
             :target="drop?.creator!"
           />
         </div>
-        <div class="text-gray-500 dark:text-gray-300 max-w-full md:max-w-[300px] line-clamp-3 md:line-clamp-4">
+        <div class="text-muted-foreground max-w-full md:max-w-[300px] line-clamp-3 md:line-clamp-4">
           <MarkdownPreview :source="drop?.collectionDescription || ''" />
         </div>
       </div>
@@ -43,21 +43,21 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
       <div class="flex flex-col gap-4 md:gap-6 mt-4 md:mt-2">
         <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-0">
           <div class="flex items-center gap-2 justify-center md:justify-start">
-            <span class="text-gray-900 dark:text-white">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
-            <span class="font-bold text-gray-400 dark:text-gray-300">·</span>
-            <span class="text-gray-900 dark:text-white">{{ usdPrice }} USD</span>
+            <span class="text-foreground">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
+            <span class="font-bold text-muted-foreground">·</span>
+            <span class="text-foreground">{{ usdPrice }} USD</span>
           </div>
 
           <div class="flex items-center gap-2 justify-center md:justify-end">
             <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4" :alt="drop?.chain">
-            <div class="capitalize text-gray-700 dark:text-gray-300">
+            <div class="capitalize text-foreground">
               {{ drop?.chain }}
             </div>
           </div>
         </div>
 
         <div class="flex flex-col items-center md:flex-row gap-3 md:gap-1 md:justify-between">
-          <div class="text-gray-400 dark:text-gray-300 text-center md:text-left">
+          <div class="text-muted-foreground text-center md:text-left">
             {{ drop?.start_at ? formatToNow(parseCETDate(drop.start_at || '')) : 'N/A' }}
           </div>
           <DropMintButton class="w-fit md:w-auto" :drop="drop" size="sm" />

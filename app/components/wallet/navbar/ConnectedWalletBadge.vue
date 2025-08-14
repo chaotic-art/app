@@ -46,9 +46,9 @@ const displayName = computed(() => {
     :class="{ 'mr-1': account.vm === 'EVM' }"
   >
     <ProfileAvatar :address="selectedAccount?.address" :size="28" />
-    <div class="flex flex-col">
+    <div class="flex flex-col text-accent">
       <span class="text-xs font-medium">{{ displayName }}</span>
-      <span class="text-xs text-gray-500">{{ shortenAddress(selectedAccount?.address || '') }}</span>
+      <span class="text-xs">{{ shortenAddress(selectedAccount?.address || '') }}</span>
     </div>
   </div>
 </template>
