@@ -24,7 +24,7 @@ watchEffect(async () => {
 
     // Extract unique artists and get random selection
     const artists = [...new Set(drops.map(drop => drop.creator).filter(Boolean))]
-    const randomArtists = artists.slice().sort(() => Math.random() - 0.5).slice(0, 6)
+    const randomArtists = artists.slice().sort(() => Math.random() - 0.5).slice(0, 8)
 
     if (randomArtists.length > 0) {
       // Fetch individual profiles for each artist using Promise.all
@@ -51,10 +51,10 @@ watchEffect(async () => {
   <section class="py-16 lg:py-24">
     <UContainer>
       <div class="text-center mb-12">
-        <h2 class="text-3xl lg:text-4xl xl:text-5xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
-          Curated <span class="text-neutral-500 italic">Artists</span>
+        <h2 class="text-3xl lg:text-4xl xl:text-5xl text-foreground mb-6 leading-tight font-serif">
+          Curated <span class="text-muted-foreground italic">Artists</span>
         </h2>
-        <p class="text-lg text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto leading-relaxed">
+        <p class="text-lg text-primary max-w-3xl mx-auto leading-relaxed">
           Follow your favorite creators and discover new talent in our carefully selected artist community
         </p>
       </div>
@@ -77,23 +77,23 @@ watchEffect(async () => {
       </div>
 
       <!-- Artists Grid -->
-      <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <div v-else class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <NuxtLink
           v-for="artist in curatedArtists"
           :key="artist.address"
           :to="`/${prefix}/u/${artist.address}`"
-          class="block bg-white dark:bg-neutral-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
+          class="block bg-background rounded-xl shadow transition-all duration-300 overflow-hidden cursor-pointer relative hover:-translate-y-1"
         >
           <!-- Cover Image Section -->
           <div class="relative h-32 overflow-hidden">
             <div
               v-if="artist.image"
-              class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
+              class="w-full h-full bg-cover bg-center transition-transform duration-500"
               :style="{ backgroundImage: `url(${artist.image})` }"
             />
             <div
               v-else
-              class="w-full h-full bg-gradient-to-r from-neutral-600 to-neutral-800 group-hover:scale-105 transition-transform duration-500"
+              class="w-full h-full bg-gradient-to-r from-neutral-600 to-neutral-800 transition-transform duration-500"
             />
             <!-- Overlay for better text readability -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
@@ -105,14 +105,14 @@ watchEffect(async () => {
                   <ProfileAvatar
                     :address="artist.address"
                     :avatar-size="80"
-                    class="border-4 border-white shadow-lg rounded-full"
+                    class="rounded-full"
                   />
                 </div>
 
                 <FollowButton
                   v-if="artist.address"
                   :target="artist.address"
-                  class="bg-white hover:bg-neutral-50 dark:bg-neutral-700 dark:hover:bg-neutral-600 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-600 rounded-full transition-all duration-200 hover:scale-105"
+                  class="bg-background rounded-full"
                 />
               </div>
             </div>
@@ -123,18 +123,13 @@ watchEffect(async () => {
             <!-- Artist Info -->
             <div class="space-y-3">
               <div>
-                <h3 class="text-xl font-bold text-neutral-900 dark:text-white mb-1 group-hover:text-neutral-700 dark:group-hover:text-neutral-200 transition-colors">
+                <h3 class="text-xl font-bold text-foreground mb-1 transition-colors">
                   {{ artist.name || 'Unknown Artist' }}
                 </h3>
-                <p class="text-sm text-neutral-500 dark:text-neutral-400 font-medium">
+                <p class="text-sm text-muted-foreground font-medium">
                   @{{ artist.address ? shortenAddress(artist.address).toLowerCase().replace(/\s+/g, '_') : 'artist' }}
                 </p>
               </div>
-
-              <!-- Artist Description -->
-              <p v-if="artist.description" class="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed line-clamp-2">
-                {{ artist.description }}
-              </p>
             </div>
           </div>
         </NuxtLink>
@@ -145,7 +140,6 @@ watchEffect(async () => {
           variant="outline"
           color="neutral"
           to="/ahp/artists"
-          class="px-8 py-2 rounded-full"
         >
           Explore Artists
         </UButton>

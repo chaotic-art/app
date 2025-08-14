@@ -15,7 +15,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="py-16 md:pt-16 md:px-0 bg-background-color">
+  <section>
     <div class="text-center mb-12">
       <h2 class="text-3xl lg:text-4xl xl:text-5xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
         Top <span class="text-neutral-500 italic">Collections</span>

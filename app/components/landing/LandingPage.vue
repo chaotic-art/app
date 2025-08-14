@@ -2,11 +2,13 @@
 </script>
 
 <template>
-  <div class="bg-background-color">
+  <div>
     <!-- Hero Section -->
-    <section class="relative py-20 lg:py-32 overflow-hidden">
-      <!-- Background -->
-      <div class="absolute inset-0 bg-neutral-50 dark:bg-neutral-900" />
+    <section class="relative py-16 lg:py-32 overflow-hidden bg-muted">
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 opacity-10 dark:opacity-20">
+        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 24px 24px;" />
+      </div>
 
       <UContainer class="relative">
         <div class="text-center max-w-4xl mx-auto">
@@ -16,16 +18,16 @@
             target="_blank"
             variant="outline"
             size="sm"
-            class="mb-8 rounded-full"
+            class="mb-8"
           >
             <UIcon name="i-heroicons-sparkles" class="h-4 w-4" />
             <span class="text-sm font-medium">New: Chaotic NFT Marketplace Launch</span>
           </UButton>
 
           <!-- Main Heading -->
-          <h1 class="text-4xl sm:text-5xl lg:text-7xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
+          <h1 class="text-4xl sm:text-5xl lg:text-7xl text-foreground mb-6 leading-tight font-serif">
             Your
-            <span class="text-neutral-500 italic">
+            <span class="text-muted-foreground italic">
               Polkadot
             </span>
             NFT
@@ -34,7 +36,7 @@
           </h1>
 
           <!-- Description -->
-          <p class="text-xl text-neutral-600 dark:text-neutral-400 mb-10 max-w-3xl mx-auto leading-relaxed">
+          <p class="text-xl text-primary mb-10 max-w-3xl mx-auto leading-relaxed">
             Create, collect, and sell extraordinary NFTs on the most advanced blockchain. Join thousands of artists and
             collectors in the decentralized future.
           </p>
@@ -72,10 +74,12 @@
     <!-- Curated Artists Section -->
     <LazyCuratedArtists />
 
-    <UContainer>
-      <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '600px' }" />
+    <div class="bg-muted py-16">
+      <UContainer>
+        <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '600px' }" />
       <!-- <LazyArticles :hydrate-on-visible="{ rootMargin: '300px' }" /> -->
-    </UContainer>
+      </UContainer>
+    </div>
 
     <!-- Partners Section -->
     <LazyPartners />
