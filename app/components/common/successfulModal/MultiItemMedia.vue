@@ -32,14 +32,14 @@ const displayItems = computed(() =>
     <div
       v-for="item in displayItems"
       :key="item.id"
-      class="flex flex-row items-center gap-4"
+      class="flex w-full flex-row items-center gap-4"
     >
       <img
         class="border border-gray-200 dark:border-gray-700 aspect-square size-10! rounded shrink-0"
         :src="sanitizeIpfsUrl(item.image)"
       >
 
-      <div class="flex justify-between w-full">
+      <div class="flex flex-1 justify-between">
         <p>{{ item.name }}</p>
         <Money
           v-if="showPrice"
@@ -60,7 +60,7 @@ const displayItems = computed(() =>
       class="flex items-center gap-3"
     >
       <div
-        class="bg-k-grey-light px-1 py-1 text-center rounded-full text-gray-500 text-xs w-8"
+        class="px-1 py-1 text-center rounded-full text-gray-500 dark:text-gray-400 text-xs w-8"
       >
         +{{ moreItems }}
       </div>
@@ -77,9 +77,9 @@ const displayItems = computed(() =>
 
   <div
     v-if="header"
-    class="mt-5 border-b-k-shade"
+    class="mt-5"
   >
-    <p class="is-size-6 capitalize font-bold text-center">
+    <p class="capitalize font-bold text-center">
       {{ header }}
     </p>
   </div>

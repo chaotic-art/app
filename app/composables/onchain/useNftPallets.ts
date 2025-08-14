@@ -1,4 +1,5 @@
 import type { Prefix } from '@kodadot1/static'
+import type { NFTMetadata } from '~/services/oda'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 
@@ -35,6 +36,22 @@ interface CreateNftParams {
     image: string
     supply: number
   }
+}
+
+interface ListNftsParams {
+  chain: Prefix
+  type: TxType
+  nfts: {
+    id: string
+    sn: number
+    price: number
+    metadata: NFTMetadata
+    metadata_uri: string
+    collection: {
+      id: number
+      name: string
+    }
+  }[]
 }
 
 export function useNftPallets() {
@@ -206,15 +223,7 @@ export function useNftPallets() {
     properties,
     context: nftData,
   }: CreateNftParams) {
-    if (!getConnectedSubAccount.value?.address) {
-      throw new Error('No address found')
-    }
-
-    const signer = await getConnectedSubAccount.value.signer
-
-    if (!signer) {
-      throw new Error('No signer found')
-    }
+    const { signer, address } = await getAccountSigner()
 
     const api = $api(chain)
     await api.compatibilityToken
@@ -231,7 +240,7 @@ export function useNftPallets() {
       const _txMint = api.tx.Nfts.mint({
         collection: collectionId,
         item: nextItemId + i,
-        mint_to: MultiAddress.Id(getConnectedSubAccount.value.address),
+        mint_to: MultiAddress.Id(address),
         witness_data: undefined,
       })
 
@@ -276,7 +285,7 @@ export function useNftPallets() {
     const transaction = api.tx.Utility.batch_all({ calls })
 
     if (type === 'estimate') {
-      const estimatedFees = await transaction.getEstimatedFees(getConnectedSubAccount.value.address)
+      const estimatedFees = await transaction.getEstimatedFees(address)
       return estimatedFees
     }
 
@@ -307,9 +316,82 @@ export function useNftPallets() {
     })
   }
 
+  async function getAccountSigner() {
+    if (!getConnectedSubAccount.value?.address) {
+      throw new Error('No address found')
+    }
+
+    const signer = await getConnectedSubAccount.value.signer
+
+    if (!signer) {
+      throw new Error('No signer found')
+    }
+
+    return {
+      signer,
+      address: getConnectedSubAccount.value.address,
+    }
+  }
+
+  async function listNfts({
+    nfts,
+    chain,
+    type,
+  }: ListNftsParams) {
+    const { signer, address } = await getAccountSigner()
+    const api = $api(chain)
+
+    const txs = nfts.map(({ price, collection, sn }) => {
+      return api.tx.Nfts.set_price({
+        collection: Number(collection.id),
+        item: Number(sn),
+        price: BigInt(price),
+        whitelisted_buyer: undefined,
+      })
+    })
+
+    const transaction = api.tx.Utility.batch_all({
+      calls: txs.map(tx => tx.decodedCall),
+    })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+
+          result.value = {
+            type: 'listing',
+            items: nfts.map(nft => ({
+              id: nft.id,
+              sn: nft.sn,
+              price: nft.price,
+              collection: nft.collection,
+              metadata_uri: nft.metadata_uri,
+              metadata: nft.metadata,
+            })),
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
     mintNft,
+    listNfts,
     userCollection,
     userBalance,
   }

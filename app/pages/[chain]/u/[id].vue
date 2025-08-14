@@ -29,5 +29,8 @@ const route = useRoute()
 <template>
   <UContainer class="px-4 md:px-6">
     <ProfileDetail :address="String(route.params.id)" />
+
+    <ActionCart />
+    <ListingCartModal />
   </UContainer>
 </template>

@@ -112,6 +112,7 @@ export function useToken(props: {
     mimeType,
 
     // Computed properties
+    nativePrice: queryPrice,
     price,
     usdPrice,
     mediaIcon,
