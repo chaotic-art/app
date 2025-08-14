@@ -1,8 +1,19 @@
 <script lang="ts" setup>
-import type { ButtonConfig } from './CommonButtonConfig.vue'
+import type { ButtonProps } from '@nuxt/ui'
 import { useElementHover } from '@vueuse/core'
 import { follow, isFollowing, unfollow } from '@/services/profile'
 import { getss58AddressByPrefix } from '@/utils/account'
+
+export interface ButtonConfig {
+  label: string
+  icon?: string
+  onClick?: () => void
+  classes?: string
+  active?: boolean
+  disabled?: boolean
+  variant?: ButtonProps['variant']
+  color?: ButtonProps['color']
+}
 
 const props = withDefaults(defineProps<{
   target: string
@@ -64,11 +75,11 @@ const followConfig = computed<ButtonConfig>(() => ({
       },
     })
   },
-  classes: 'hover:bg-transparent! hover:border-black dark:hover:border-white',
 }))
 
 const unfollowConfig = computed<ButtonConfig>(() => ({
   label: $i18n.t('profile.unfollow'),
+  color: 'error',
   onClick: () => {
     doAfterLogin({
       onLoginSuccess: async () => {
@@ -100,7 +111,6 @@ const unfollowConfig = computed<ButtonConfig>(() => ({
       },
     })
   },
-  classes: 'hover:bg-transparent! hover:border-red-500 hover:text-red-500 hover:bg-red-500/10',
 }))
 
 const followingConfig: ButtonConfig = {
@@ -139,14 +149,17 @@ defineExpose({ refresh: refreshFollowingStatus })
 
 <template>
   <div ref="buttonRef">
-    <CommonButtonConfig
+    <UButton
       v-if="!accountId || getss58AddressByPrefix(accountId, prefix) !== getss58AddressByPrefix(target, prefix)"
       :loading="loading"
-      :button="{
-        ...buttonConfig,
-        classes: `px-6 py-2 rounded-full cursor-pointer border border-gray-300 dark:border-neutral-700 bg-background-color-secondary text-gray-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-neutral-700 h-[${height}px] ${buttonConfig.classes}`,
-      }"
+      variant="outline"
+      :icon="buttonConfig.icon"
+      :label="buttonConfig.label"
+      :active="buttonConfig.active"
+      :disabled="buttonConfig.disabled"
       test-id="profile-button-multi-action"
+      class="rounded-full w-[7rem]"
+      :color="buttonConfig.color"
       @click.stop
     />
   </div>

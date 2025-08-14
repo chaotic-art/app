@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ButtonConfig } from '~/components/common/button/CommonButtonConfig.vue'
+import type { ButtonConfig } from '@/components/common/button/FollowButton.client.vue'
 import { computed } from 'vue'
 import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
@@ -48,7 +48,6 @@ const editProfileConfig: ButtonConfig = {
   label: 'Edit Existing Profile',
   icon: 'i-heroicons-pencil-square',
   onClick: () => isEditProfileModalActive.value = true,
-  classes: 'rounded-full',
 }
 
 const createProfileConfig: ButtonConfig = {
@@ -56,7 +55,6 @@ const createProfileConfig: ButtonConfig = {
   icon: 'i-heroicons-sparkles',
   onClick: () => isEditProfileModalActive.value = true,
   variant: 'solid',
-  classes: 'rounded-full',
 }
 
 const profileButtonConfig = computed<ButtonConfig>(() =>
@@ -98,7 +96,7 @@ function onTotalCountChange(slot: string, totalCount: number) {
   <div>
     <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">
       <div
-        class="absolute inset-0 w-full h-full bg-gray-200 dark:bg-neutral-800"
+        class="absolute inset-0 w-full h-full bg-muted-foreground"
         :style="bannerUrl ? { backgroundImage: `url('${bannerUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
       />
 
@@ -109,7 +107,7 @@ function onTotalCountChange(slot: string, totalCount: number) {
       </div>
     </div>
 
-    <div class="w-full border-b border-gray-200 dark:border-gray-700">
+    <div class="w-full border-b border-border">
       <div class="flex justify-between flex-col md:flex-row gap-12 px-4">
         <div class="flex flex-col flex-1">
           <div class="my-4 flex flex-col md:flex-row justify-between items-start gap-2 w-full">
@@ -122,7 +120,7 @@ function onTotalCountChange(slot: string, totalCount: number) {
                   {{ shortenAddress(address) }}
                 </span>
               </div>
-              <div class="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+              <div class="flex items-center gap-1 text-sm text-muted-foreground">
                 {{ shortenAddress(address) }}
                 <UButton
                   icon="i-lucide-copy"
@@ -151,17 +149,17 @@ function onTotalCountChange(slot: string, totalCount: number) {
           </div>
 
           <div class="flex items-center gap-2">
-            <CommonButtonConfig
+            <UButton
               v-if="isCurrentAccount(address)"
-              :button="profileButtonConfig"
+              :label="profileButtonConfig.label"
+              :icon="profileButtonConfig.icon"
+              @click="profileButtonConfig.onClick"
             />
             <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
 
             <UButton
               icon="i-lucide-dollar-sign"
               variant="outline"
-              size="lg"
-              class="rounded-full"
             >
               Transfer
             </UButton>

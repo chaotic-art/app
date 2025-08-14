@@ -97,7 +97,6 @@ function handleMint() {
 
 <template>
   <UButton
-    class="bg-black text-white rounded-full hover:bg-gray-900 transition cursor-pointer truncate"
     :class="sizeClassMap[size]"
     :disabled="!enabled"
     @click.stop="handleMint"

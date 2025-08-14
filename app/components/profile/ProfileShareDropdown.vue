@@ -56,9 +56,8 @@ const shareItems = computed(() => [
   >
     <UButton
       variant="outline"
-      size="lg"
       icon="i-heroicons-share"
-      class="rounded-full"
+      class="size-9"
     />
   </UDropdownMenu>
 </template>
