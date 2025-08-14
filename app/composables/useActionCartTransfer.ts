@@ -19,7 +19,7 @@ export default function () {
         listingCartStore.setItem({
           ...item,
           collection: {
-            floor: 1e8, // dev: remove,
+            floor: undefined,
             name: String(metadatas[index]?.metadata?.name),
           },
         })
