@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+@import "./theme-new-york.css";
 
 /* docs for @nuxt/fonts: https://fonts.nuxt.com/advanced#how-it-works */
 /* docs for tailwindcss v4: https://tailwindcss.com/docs/theme#relationship-to-utility-classes */
@@ -10,24 +11,23 @@
 
 @theme static {
   --ui-container: 1680px;
-
-
-  --text-color: #000000;
   --ui-primary: #000000;
-  --background-color: #ffffff;
-  --background-color-secondary: #ffffff;
+
+  /* override nuxt-ui radius */
+  --ui-radius: var(--radius);
+  --radius-sm: calc(var(--ui-radius) - 4px);
+  --radius-md: calc(var(--ui-radius) - 2px);
+  --radius-lg: var(--ui-radius);
+  --radius-xl: calc(var(--ui-radius) + 4px);
 }
 
 .dark {
-  --text-color: #ffffff;
   --ui-primary: #ffffff;
-  --background-color: #18181b;
-  --background-color-secondary: #232329;
 }
 
 body {
   font-family: var(--font-sans);
-  color: var(--text-color);
+  color: var(--color-foreground);
 }
 
 .hover-card-effect {
