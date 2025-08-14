@@ -37,7 +37,7 @@ watchEffect(async () => {
 
 <template>
   <div
-    class="rounded-full h-[62px] md:w-auto bg-gray-100 dark:bg-neutral-800 inline-flex items-center justify-between py-1.5 px-3"
+    class="rounded-full h-[62px] md:w-auto bg-background inline-flex items-center justify-between py-1.5 px-3"
     :class="{ '!h-full !border-none !py-1 !px-2': size === 'small', 'bg-transparent': noBackground }"
   >
     <div class="flex items-center">
