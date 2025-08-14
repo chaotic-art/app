@@ -71,12 +71,12 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
 </script>
 
 <template>
-  <header class="border-b border-neutral-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50 w-full py-2">
+  <header class="border-b border-border bg-background backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full py-2">
     <UContainer>
-      <nav class="bg-background-color flex items-center gap-2 justify-between mx-auto overflow-hidden">
+      <nav class="flex items-center gap-2 justify-between mx-auto overflow-hidden">
         <div class="flex items-center gap-2">
           <Logo class="select-none w-6 h-6 md:w-8 md:h-8" :font-controlled="false" />
-          <NuxtLink to="/" class="text-lg md:text-xl font-bold font-serif italic text-gray-900 dark:text-white">
+          <NuxtLink to="/" class="text-lg md:text-xl font-bold font-serif italic text-foreground">
             Chaotic
           </NuxtLink>
         </div>
