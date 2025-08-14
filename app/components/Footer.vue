@@ -43,12 +43,7 @@ const footerLinks: Array<
 </script>
 
 <template>
-  <footer class="bg-gradient-to-br from-neutral-200 to-neutral-300 dark:from-neutral-700 dark:to-neutral-600 py-16 lg:py-24 relative overflow-hidden">
-    <!-- Background Pattern -->
-    <div class="absolute inset-0 opacity-10 dark:opacity-20">
-      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 24px 24px;" />
-    </div>
-
+  <footer class="bg-muted py-16 lg:py-24 relative overflow-hidden">
     <UContainer class="relative">
       <div class="px-6 md:px-[60px] py-6 md:py-[40px]">
         <!-- Main Footer Content -->
