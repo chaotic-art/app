@@ -12,7 +12,7 @@ const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
 const actionCartTransfer = useActionCartTransfer()
 const actionCartStore = useActionCartStore()
 const { decimals, chainSymbol } = useChain()
-const { open: isTransactionModalOpen, isSuccess } = useTransactionModal()
+const { open: isTransactionModalOpen } = useTransactionModal()
 
 const listingFees = ref()
 
@@ -92,13 +92,17 @@ function getListParams() {
 }
 
 function handleListNfts() {
+  const listParams = getListParams()
   // order matters
   isTransactionModalOpen.value = true
   listingCartModalOpen.value = false
 
+  listingCartStore.clearCartItems()
+  actionCartStore.clearCartItems()
+
   listNfts({
-    ...getListParams(),
     type: 'submit',
+    ...listParams,
   })
 }
 
@@ -120,16 +124,6 @@ useModalIsOpenTracker({
   onClose: () => {
     if (!isTransactionModalOpen.value) {
       listingCartStore.clearCartItems()
-    }
-  },
-})
-
-useModalIsOpenTracker({
-  isOpen: isTransactionModalOpen,
-  onClose: () => {
-    if (isSuccess.value) {
-      listingCartStore.clearCartItems()
-      actionCartStore.clearCartItems()
     }
   },
 })
