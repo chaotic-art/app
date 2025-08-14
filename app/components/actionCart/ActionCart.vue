@@ -23,7 +23,7 @@ onBeforeUnmount(actionCartStore.clear)
           <div class="inline-flex items-center">
             <div>
               <b>{{ actionCartStore.count }}</b>
-              {{ $t('actionCart.item', actionCartStore.count) }}
+              {{ $t('actionCart.item', { count: actionCartStore.count }) }}
             </div>
             <div class="mx-4" />
             <UButton
@@ -56,7 +56,7 @@ onBeforeUnmount(actionCartStore.clear)
                 :disabled="isListingDisabled"
                 @click="preferencesStore.listingCartModalOpen = true"
               >
-                {{ $t('actionCart.listItem', actionCartStore.count) }}
+                {{ $t('actionCart.listItem', { count: actionCartStore.count }) }}
               </UButton>
             </UTooltip>
           </div>
