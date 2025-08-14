@@ -1,4 +1,5 @@
 import type { Prefix } from '@kodadot1/static'
+import type { NFTMetadata } from '~/services/oda'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 
@@ -41,9 +42,15 @@ interface ListNftsParams {
   chain: Prefix
   type: TxType
   nfts: {
-    price: number
-    collectionId: number
+    id: string
     sn: number
+    price: number
+    metadata: NFTMetadata
+    metadata_uri: string
+    collection: {
+      id: number
+      name: string
+    }
   }[]
 }
 
@@ -322,7 +329,7 @@ export function useNftPallets() {
 
     return {
       signer,
-      address: getConnectedSubAccount.value.address
+      address: getConnectedSubAccount.value.address,
     }
   }
 
@@ -334,9 +341,9 @@ export function useNftPallets() {
     const { signer, address } = await getAccountSigner()
     const api = $api(chain)
 
-    const txs = nfts.map(({ price, collectionId, sn }) => {
+    const txs = nfts.map(({ price, collection, sn }) => {
       return api.tx.Nfts.set_price({
-        collection: Number(collectionId),
+        collection: Number(collection.id),
         item: Number(sn),
         price: BigInt(price),
         whitelisted_buyer: undefined,
@@ -353,8 +360,26 @@ export function useNftPallets() {
     }
 
     transaction.signSubmitAndWatch(signer).subscribe({
-      next: (_event) => {
-        // console.log(event)
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+
+          result.value = {
+            type: 'listing',
+            items: nfts.map(nft => ({
+              id: nft.id,
+              sn: nft.sn,
+              price: nft.price,
+              collection: nft.collection,
+              metadata_uri: nft.metadata_uri,
+              metadata: nft.metadata,
+            })),
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
       },
       error: (err) => {
         console.error('error', err)

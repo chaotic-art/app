@@ -10,7 +10,9 @@ const listingCartStore = useListingCartStore()
 const { itemsInChain: items } = storeToRefs(listingCartStore)
 const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
 const actionCartTransfer = useActionCartTransfer()
+const actionCartStore = useActionCartStore()
 const { decimals, chainSymbol } = useChain()
+const { open: isTransactionModalOpen, isSuccess } = useTransactionModal()
 
 const listingFees = ref()
 
@@ -37,6 +39,10 @@ const showChangePriceModal = computed(
 )
 
 const title = computed(() => {
+  if (isLoading.value) {
+    return ''
+  }
+
   const items
     = listingCartStore.count === 1
       ? 'NFT'
@@ -68,26 +74,39 @@ const label = computed(() => {
   }
 })
 
-const listParams = computed(() => ({
-  nfts: items.value.map(item => ({
-    sn: item.sn,
-    collectionId: item.collectionId,
-    price: toNative(item.listPrice || 0, decimals.value),
-  })),
-  chain: prefix.value,
-}))
+function getListParams() {
+  return {
+    nfts: items.value.map(item => ({
+      id: item.id,
+      sn: item.sn,
+      collection: {
+        id: item.collectionId,
+        name: item.collection.name,
+      },
+      price: toNative(item.listPrice || 0, decimals.value),
+      metadata_uri: item.metadata_uri,
+      metadata: item.metadata,
+    })),
+    chain: prefix.value,
+  }
+}
 
-function list() {
+function handleListNfts() {
+  // order matters
+  isTransactionModalOpen.value = true
+  listingCartModalOpen.value = false
+
   listNfts({
-    ...listParams.value,
+    ...getListParams(),
     type: 'submit',
   })
 }
 
 watchSyncEffect(async () => {
+  // TODO: debounce
   listingFees.value = Number(
     await listNfts({
-      ...listParams.value,
+      ...getListParams(),
       type: 'estimate',
     }),
   )
@@ -99,7 +118,19 @@ useModalIsOpenTracker({
     actionCartTransfer.transferToListingCart()
   },
   onClose: () => {
-    listingCartStore.clearCartItems()
+    if (!isTransactionModalOpen.value) {
+      listingCartStore.clearCartItems()
+    }
+  },
+})
+
+useModalIsOpenTracker({
+  isOpen: isTransactionModalOpen,
+  onClose: () => {
+    if (isSuccess.value) {
+      listingCartStore.clearCartItems()
+      actionCartStore.clearCartItems()
+    }
   },
 })
 </script>
@@ -187,7 +218,7 @@ useModalIsOpenTracker({
               class="w-full py-4 inline-flex justify-center"
               :label="label"
               :disabled="confirmButtonDisabled"
-              @click="list"
+              @click="handleListNfts"
             />
           </div>
         </div>

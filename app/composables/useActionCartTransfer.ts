@@ -1,17 +1,26 @@
+import { fetchOdaCollection } from '~/services/oda'
+
 export default function () {
+  const { prefix } = usePrefix()
   const actionCartStore = useActionCartStore()
   const listingCartStore = useListingCartStore()
 
-  function transferToListingCart() {
+  async function transferToListingCart() {
     try {
       listingCartStore.clearListedItems()
 
-      actionCartStore.itemsInChain.forEach((item) => {
+      const items = actionCartStore.itemsInChain
+
+      const metadatas = await Promise.all(
+        items.map(item => fetchOdaCollection(prefix.value, String(item.collectionId))),
+      )
+
+      items.forEach((item, index) => {
         listingCartStore.setItem({
           ...item,
           collection: {
             floor: 1e8, // dev: remove,
-            name: 'Collection Name', // dev: remove
+            name: String(metadatas[index]?.metadata?.name),
           },
         })
       })

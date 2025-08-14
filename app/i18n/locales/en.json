@@ -143,6 +143,14 @@
     "missingMultiple": "Items Are Missing Price",
     "potentialEarnings": "Potential Earnings",
     "fixedPrice": "Fixed Price",
-    "changePrice": "Change Price"
+    "changePrice": "Change Price",
+    "newListingPrice": "New Listing Price",
+    "bulkListingSuccessful": "Bulk Listing Successful"
+  },
+  "sharing": {
+    "dropNft": "I've minted {0} generative art piece on Chaotic!",
+    "dropNfts": "I've minted {0} generative art pieces on Chaotic!",
+    "listedNft": "Check out this awesome NFT I just listed on Chaotic!",
+    "listedNfts": "Check out these awesome NFTs I just listed on Chaotic:\n {0}"
   }
 }
