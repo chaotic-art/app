@@ -12,7 +12,7 @@ const { getIsEvmConnected, getIsSubstrateConnected } = storeToRefs(useWalletStor
       v-if="!getIsEvmConnected && !getIsSubstrateConnected"
       :label="$t('wallet.connect')"
       variant="solid"
-      class="h-10 text-white rounded-full px-6 text-base cursor-pointer dark:bg-gray-800"
+      class="h-10 px-6 text-base cursor-pointer"
       @click="$emit('openWallet')"
     />
 
