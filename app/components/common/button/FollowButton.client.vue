@@ -11,7 +11,6 @@ export interface ButtonConfig {
   classes?: string
   active?: boolean
   disabled?: boolean
-  variant?: ButtonProps['variant']
   color?: ButtonProps['color']
 }
 
@@ -160,7 +159,7 @@ defineExpose({ refresh: refreshFollowingStatus })
       test-id="profile-button-multi-action"
       class="rounded-full w-[7rem]"
       :color="buttonConfig.color"
-      @click.stop
+      @click="buttonConfig.onClick"
     />
   </div>
 </template>

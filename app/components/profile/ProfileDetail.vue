@@ -54,7 +54,6 @@ const createProfileConfig: ButtonConfig = {
   label: 'Create Profile',
   icon: 'i-heroicons-sparkles',
   onClick: () => isEditProfileModalActive.value = true,
-  variant: 'solid',
 }
 
 const profileButtonConfig = computed<ButtonConfig>(() =>
