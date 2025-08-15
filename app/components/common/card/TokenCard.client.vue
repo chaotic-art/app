@@ -39,12 +39,12 @@ function addToCart() {
       id: id.value,
       sn: props.tokenId,
       collectionId: props.collectionId,
-      name: token.value.metadata?.name,
+      name: token.value.metadata?.name || '',
       chain: props.chain,
       price: Number(nativePrice.value),
       currentOwner: owner.value,
-      metadata: token.value.metadata,
-      metadata_uri: token.value.metadata_uri,
+      metadata: token.value.metadata!,
+      metadata_uri: token.value.metadata_uri || '',
     })
   }
 }
