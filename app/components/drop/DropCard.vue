@@ -31,7 +31,7 @@ onBeforeMount(async () => {
   <NuxtLink v-if="shouldShowDrop" :to="`/${prefix}/drops/${drop.alias}`" class="relative border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group">
     <!-- Collectors on Hover -->
     <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-95">
-      <div v-if="formattedDrop?.minted" class="bg-white/90 dark:bg-gray-800 backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-2">
+      <div v-if="formattedDrop?.minted" class="bg-secondary backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-2">
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1">
             <UIcon name="mdi:account-group" class="text-gray-600 dark:text-gray-400 text-sm" />

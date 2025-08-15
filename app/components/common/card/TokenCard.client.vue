@@ -52,7 +52,7 @@ function addToCart() {
 
 <template>
   <div
-    class="relative border rounded-xl overflow-hidden bg-white dark:bg-neutral-900 hover:shadow-lg transition-shadow hover-card-effect group"
+    class="relative border rounded-xl overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group"
     :class="{
       '!border-blue-500 dark:!border-blue-400': isItemInActionCart,
       'border-gray-300 dark:border-neutral-700': !isItemInActionCart,

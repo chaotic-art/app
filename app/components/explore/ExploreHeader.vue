@@ -36,7 +36,7 @@ function handleTypeChange(type: string) {
     <!-- Controls Row -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <!-- Left Side - Type Toggle -->
-      <div class="flex bg-gray-100 dark:bg-gray-800 rounded-full p-1">
+      <div class="flex bg-accent rounded-full p-1">
         <UButton
           v-for="type in typeOptions"
           :key="type"

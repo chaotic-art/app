@@ -63,8 +63,8 @@ watchEffect(() => {
             size="sm"
             class="w-full"
             :ui="{
-              list: 'bg-gray-100 dark:bg-gray-800 rounded-lg p-1 gap-1',
-              trigger: 'flex-1 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700 data-[state=active]:text-gray-900 dark:data-[state=active]:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200',
+              list: 'rounded-lg p-1 gap-1',
+              trigger: 'flex-1 transition-colors duration-200',
             }"
           />
         </div>

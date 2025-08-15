@@ -42,7 +42,7 @@ const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.
         <div
           v-for="artist in allArtists"
           :key="artist"
-          class="flex flex-col gap-4 items-start md:gap-0 md:flex-row md:items-center justify-between bg-background rounded-xl px-4 py-3 md:px-6 md:py-4 border border-border hover-card-effect"
+          class="flex flex-col gap-4 items-start md:gap-0 md:flex-row md:items-center justify-between bg-card rounded-xl px-4 py-3 md:px-6 md:py-4 border border-border hover-card-effect"
         >
           <UserInfo :address="artist" :avatar-size="72" :custom-name="true" :transparent-background="true">
             <template #name="{ addressName, description }">
