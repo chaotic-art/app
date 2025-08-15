@@ -67,10 +67,4 @@ const networkName = chainNames[props.network as Prefix]
       </div>
     </div>
   </div>
-
-  <!-- <img
-    :src="KODA_LOGO_URL"
-    alt="logo"
-    class="absolute top-10 right-10 w-40"
-  > -->
 </template>
