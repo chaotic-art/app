@@ -13,8 +13,8 @@ const { accountId } = useAuth()
 const items = computed<ItemMedia[]>(() =>
   props.result.items.map(item => ({
     id: item.id,
-    image: item.metadata.image,
-    name: item.metadata.name,
+    image: item.metadata.image || '',
+    name: item.metadata.name || '',
     collection: String(item.collection.id),
     collectionName: item.collection.name,
     price: String(item.price),
