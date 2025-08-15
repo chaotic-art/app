@@ -16,7 +16,7 @@ async function signMessagePolkadot(address: string, message: string) {
   return u8aToHex(signedMessageU8a)
 }
 
-export const SIGNATURE_MESSAGE = 'Verify ownership of this account on Koda'
+export const SIGNATURE_MESSAGE = 'Verify ownership of this account on Chaotic'
 
 export default function useVerifyAccount() {
   const { accountId } = useAuth()
