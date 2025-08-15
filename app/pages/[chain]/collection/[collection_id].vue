@@ -128,7 +128,7 @@ defineOgImageComponent('Frame', {
           </div>
 
           <!-- Owner Info -->
-          <div v-if="owner" class="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+          <div v-if="owner" class="flex items-center gap-4 p-4 bg-secondary rounded-2xl border border-gray-200 dark:border-gray-700">
             <div class="shrink-0">
               <UserInfo :address="owner" />
             </div>
@@ -163,7 +163,7 @@ defineOgImageComponent('Frame', {
 
           <!-- Quick Stats -->
           <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+            <div class="text-center p-4 bg-secondary rounded-2xl border border-gray-200 dark:border-gray-700">
               <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                 {{ collection?.claimed || 0 }}
               </div>
@@ -172,7 +172,7 @@ defineOgImageComponent('Frame', {
               </div>
             </div>
 
-            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+            <div class="text-center p-4 bg-secondary rounded-2xl border border-gray-200 dark:border-gray-700">
               <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                 {{ unlimited(collection?.supply) ? '∞' : collection?.supply || 0 }}
               </div>
@@ -181,7 +181,7 @@ defineOgImageComponent('Frame', {
               </div>
             </div>
 
-            <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+            <div class="text-center p-4 bg-secondary rounded-2xl border border-gray-200 dark:border-gray-700">
               <div class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                 <UIcon v-if="isLoadingFloor" name="i-heroicons-arrow-path" class="w-5 h-5 animate-spin mx-auto" />
                 <Money v-else-if="floorPrice" inline :value="floorPrice" />

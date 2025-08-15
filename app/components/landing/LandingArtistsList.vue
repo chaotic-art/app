@@ -28,7 +28,7 @@ const randomSixArtist = computed(() => allArtists.value?.slice().sort(() => Math
         <div
           v-for="artist in randomSixArtist"
           :key="artist"
-          class="flex items-center justify-between rounded-xl px-4 py-3 md:px-6 md:py-4 border border-border hover-card-effect bg-background"
+          class="flex items-center justify-between rounded-xl px-4 py-3 md:px-6 md:py-4 border border-border hover-card-effect bg-card"
         >
           <UserInfo :address="artist" :avatar-size="56" :custom-name="true" :transparent-background="true" class="md:hidden">
             <template #name="{ addressName }">

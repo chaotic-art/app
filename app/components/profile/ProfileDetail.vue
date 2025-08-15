@@ -95,7 +95,7 @@ function onTotalCountChange(slot: string, totalCount: number) {
   <div>
     <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">
       <div
-        class="absolute inset-0 w-full h-full bg-muted-foreground"
+        class="absolute inset-0 w-full h-full bg-muted"
         :style="bannerUrl ? { backgroundImage: `url('${bannerUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
       />
 

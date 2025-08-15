@@ -20,10 +20,10 @@ const footerLinks: Array<
     ],
   },
   {
-    title: 'DotMint',
+    title: 'Chaotic',
     type: 'links',
     items: [
-      { label: 'Why Dotmint', href: '#' },
+      { label: 'Why Chaotic', href: '#' },
       { label: 'FAQ', href: '#' },
       { label: 'Tutorials', href: '#' },
       { label: 'Blog', href: '#' },

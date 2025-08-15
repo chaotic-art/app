@@ -61,7 +61,7 @@ onMounted(async () => {
 
 <template>
   <article
-    class="group relative bg-background rounded-xl shadow-xs hover:shadow-sm border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1"
+    class="group relative rounded-xl shadow-xs hover:shadow-sm border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1"
     :class="{ 'animate-pulse': isLoading }"
   >
     <NuxtLink
@@ -126,7 +126,7 @@ onMounted(async () => {
       </div>
 
       <!-- Stats Section -->
-      <div class="p-4 bg-gray-50/50 dark:bg-neutral-800/50">
+      <div class="p-4">
         <!-- Loading State -->
         <div v-if="isLoadingData" class="grid grid-cols-3 gap-4">
           <div v-for="i in 3" :key="i" class="text-center">

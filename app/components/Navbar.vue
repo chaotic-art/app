@@ -75,7 +75,9 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
     <nav class="rounded-full border border-border my-4 md:my-[26px] p-2 flex items-center gap-2 justify-between mx-auto overflow-hidden">
       <div class="flex items-center gap-2 ml-4">
         <Logo class="select-none w-6 h-6 md:w-8 md:h-8" :font-controlled="false" />
-        <NuxtLink to="/" class="text-lg md:text-xl font-bold font-serif italic text-foreground">
+        <NuxtLink
+          to="/" class="text-lg md:text-3xl font-medium font-serif italic text-foreground"
+        >
           Chaotic
         </NuxtLink>
       </div>
