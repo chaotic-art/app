@@ -67,7 +67,7 @@ const queryVariables = computed(() => ({
     </div>
 
     <!-- Grid Content -->
-    <div class="mt-8">
+    <div class="my-8">
       <CollectionsGrid
         :key="queryVariables.orderBy + queryVariables.search[0]?.name_containsInsensitive"
         :variables="queryVariables"
