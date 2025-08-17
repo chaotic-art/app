@@ -16,6 +16,12 @@ const sortOptions = [
   { label: 'Z-A', value: 'name_DESC' },
 ]
 
+const listedOptions = [
+  { label: 'All', value: '' },
+  { label: 'Listed', value: 'true' },
+  { label: 'Unlisted', value: 'false' },
+]
+
 // SEO Meta
 useSeoMeta({
   title: 'Explore NFTs - Discover Digital Collectibles',
@@ -29,8 +35,9 @@ const queryState = computed({
   get: () => ({
     sort: sortOptions.find(opt => opt.value === route.query.sort) || sortOptions[0],
     search: route.query.search as string || '',
+    listed: listedOptions.find(opt => opt.value === route.query.listed) || listedOptions[0],
   }),
-  set: ({ sort, search }: { sort?: typeof sortOptions[0], search?: string }) => {
+  set: ({ sort, search, listed }: { sort?: typeof sortOptions[0], search?: string, listed?: typeof listedOptions[0] }) => {
     const query = { ...route.query }
 
     // Clean up default values
@@ -43,6 +50,11 @@ const queryState = computed({
       delete query.search
     else query.search = search
 
+    if (listed?.value)
+      query.listed = listed.value
+    else
+      delete query.listed
+
     router.push({ query })
   },
 })
@@ -50,10 +62,17 @@ const queryState = computed({
 const queryVariables = computed(() => {
   const orderBy = queryState.value.sort?.value || 'blockNumber_DESC'
   const search = queryState.value.search
+  const listedVariables
+    = queryState.value.listed?.value === 'true'
+      ? { search: { price_gt: 0 } }
+      : queryState.value.listed?.value === 'false'
+        ? { search: { price_isNull: true } }
+        : {}
 
   return {
     orderBy: [orderBy],
     ...(search && { name: search }),
+    ...listedVariables,
   }
 })
 </script>
@@ -69,6 +88,7 @@ const queryVariables = computed(() => {
           icon="i-heroicons-magnifying-glass"
           @update:model-value="queryState = { ...queryState, search: $event }"
         />
+
         <USelectMenu
           :model-value="queryState.sort"
           :items="sortOptions"
@@ -76,13 +96,22 @@ const queryVariables = computed(() => {
           class="w-32"
           @update:model-value="queryState = { ...queryState, sort: $event }"
         />
+
+        <USelectMenu
+          :model-value="queryState.listed"
+          :items="listedOptions"
+          placeholder="Listed"
+          class="w-26"
+          :search-input="false"
+          @update:model-value="queryState = { ...queryState, listed: $event }"
+        />
       </template>
     </ExploreHeader>
 
     <!-- Grid Content for NFTs -->
     <div class="mt-8">
       <NftsGrid
-        :key="queryVariables.orderBy + (queryVariables.name || '')"
+        :key="JSON.stringify(queryVariables)"
         :search="queryState.search"
         :variables="queryVariables"
       />
