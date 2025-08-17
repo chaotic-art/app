@@ -76,7 +76,7 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
 
       totalCount.value = total
       currentOffset.value = offset + pageSize
-      hasMoreData.value = allItems.value.length < totalCount.value
+      hasMoreData.value = allItems.value.length < totalCount.value && newItems.length > 0
     }
     catch (error) {
       console.error('Error fetching data:', error)

@@ -49,7 +49,7 @@ function handleTypeChange(type: string) {
       </div>
 
       <!-- Right Side - Slot for page-specific controls -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
         <slot name="controls" />
       </div>
     </div>

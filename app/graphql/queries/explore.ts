@@ -38,6 +38,7 @@ export const exploreNfts = graphql(`
         $price_gte: Float
         $price_gt: Float
         $price_lte: Float
+        $price_isNull: Boolean
         $owner: String
         $issuer: String
         $denyList: [String!]
@@ -55,6 +56,7 @@ export const exploreNfts = graphql(`
                 currentOwner_eq: $owner
                 issuer_eq: $issuer
                 name_containsInsensitive: $name
+                price_isNull: $price_isNull
                 collection: {
                     id_in: $collections
                 }
