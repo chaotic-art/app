@@ -6,6 +6,13 @@ import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 import { getChainSpec } from '~/utils/api/substrate'
 
+// Blockchains for select
+export const blockchains: { label: string, value: AssetHubChain }[] = [
+  { label: 'Asset Hub Polkadot', value: 'ahp' },
+  { label: 'Asset Hub Kusama', value: 'ahk' },
+  { label: 'Asset Hub Paseo - (testnet)', value: 'ahpas' },
+]
+
 export function useCollectionForm() {
   const { createCollection, userBalance } = useNftPallets()
   const { open } = useTransactionModal()
@@ -27,13 +34,6 @@ export function useCollectionForm() {
     maxNfts: 'unlimited' as 'unlimited' | 'limited',
     maxNftsNumber: 1000,
   })
-
-  // Blockchains for select
-  const blockchains: { label: string, value: AssetHubChain }[] = [
-    { label: 'Asset Hub Polkadot', value: 'ahp' },
-    { label: 'Asset Hub Kusama', value: 'ahk' },
-    { label: 'Asset Hub Paseo - (testnet)', value: 'ahpas' },
-  ]
 
   // File upload states
   const logoFile = ref<File | null>(null)
@@ -134,7 +134,7 @@ export function useCollectionForm() {
     }
 
     const cidImages = await pinDirectory(filesToPin)
-    const image = `ipfs://${cidImages}`
+    const image = `ipfs://${cidImages}/${logoFile.value?.name}`
     const banner = bannerFile.value ? `ipfs://${cidImages}/${bannerFile.value.name}` : undefined
 
     const metadata: any = {

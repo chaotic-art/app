@@ -26,7 +26,7 @@ export function getSubscanExtrinsicUrl(hash: string, prefix: SupportedChain) {
 }
 
 export function getSubscanNftUrl(id: string, prefix: SupportedChain) {
-  return `https://${chainMapping[prefix]}.subscan.io/nft_collection/${id}?tab=tokens`
+  return `https://${chainMapping[prefix]}.subscan.io/nft_collection/${id}`
 }
 
 /**

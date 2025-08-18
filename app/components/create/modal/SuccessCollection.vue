@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CollectionCategory } from '~/composables/useTransactionModal'
+import { getSubscanNftUrl } from '~/utils/format/address'
 
 interface Props {
   result: CollectionCategory
@@ -25,7 +26,13 @@ const modalData = computed(() => {
         label: 'View Collection',
         onClick: () => {
           close()
-          router.push(`/${props.result?.prefix}/collection/${collectionId}`)
+
+          if (props.result.prefix === 'ahpas') {
+            window.open(getSubscanNftUrl(collectionId, props.result.prefix), '_blank')
+          }
+          else {
+            router.push(`/${props.result?.prefix}/collection/${collectionId}`)
+          }
         },
       },
     },

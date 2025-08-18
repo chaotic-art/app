@@ -5,6 +5,7 @@ import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 import { getChainSpec } from '~/utils/api/substrate'
+import { blockchains } from './useCollectionForm'
 
 interface Property {
   trait: string
@@ -35,13 +36,6 @@ export function useNftForm() {
     listDirectly: false,
     price: 0,
   })
-
-  // Blockchains for select
-  const blockchains: { label: string, value: AssetHubChain }[] = [
-    { label: 'Asset Hub Polkadot', value: 'ahp' },
-    { label: 'Asset Hub Kusama', value: 'ahk' },
-    { label: 'Asset Hub Paseo - (testnet)', value: 'ahpas' },
-  ]
 
   // Fetch user collections dynamically
   const collections = ref<Array<{ label: string, value: string, name: string, description: string, image: string }>>([])
