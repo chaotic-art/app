@@ -49,9 +49,12 @@ export function useNftForm() {
 
   const balance = reactive({
     userBalance: 0n,
+    userBalanceFormatted: '0',
     estimatedFee: 0n,
+    estimatedFeeFormatted: '0',
     symbol: 'DOT',
     decimals: 12,
+    name: '',
   })
   const isEstimatingFee = ref(false)
 
@@ -61,12 +64,17 @@ export function useNftForm() {
       return
 
     collectionsLoading.value = true
+    state.collection = ''
+
     try {
-      // fetch user balance
-      balance.userBalance = await userBalance(state.blockchain)
-      const { symbol, decimals } = await getChainSpec(state.blockchain)
+      const { symbol, decimals, name } = await getChainSpec(state.blockchain)
       balance.symbol = symbol
       balance.decimals = decimals
+      balance.name = name
+
+      // fetch user balance
+      balance.userBalance = await userBalance(state.blockchain)
+      balance.userBalanceFormatted = formatBalance(balance.userBalance, { decimals, symbol })
 
       // fetch user collections
       const userCollections = await userCollection(state.blockchain)
@@ -236,6 +244,7 @@ export function useNftForm() {
     if (!isWalletConnected.value || !mediaFile.value || !formData.collection || !formData.name || !formData.description) {
       if (type === 'estimate') {
         balance.estimatedFee = 0n
+        balance.estimatedFeeFormatted = '0'
       }
       return
     }
@@ -259,12 +268,14 @@ export function useNftForm() {
 
       if (type === 'estimate') {
         balance.estimatedFee = result || 0n
+        balance.estimatedFeeFormatted = formatBalance(result, { decimals: balance.decimals, symbol: balance.symbol })
       }
     }
     catch (error) {
       console.error(`Error ${type === 'estimate' ? 'estimating fee' : 'creating NFT'}:`, error)
       if (type === 'estimate') {
         balance.estimatedFee = 0n
+        balance.estimatedFeeFormatted = '0'
       }
     }
     finally {
@@ -289,16 +300,15 @@ export function useNftForm() {
     // Get actual wallet data
     const connectedAccount = getConnectedSubAccount.value
     const actualWalletAddress = connectedAccount?.address || ''
-    const selectedChain = event.data.blockchain === 'ahp' ? 'Asset Hub Polkadot' : 'Asset Hub Kusama'
-    const selectedCurrency = event.data.blockchain === 'ahp' ? 'DOT' : 'KSM'
 
     // Open modal programmatically
     try {
       const instance = modalConfirmation.open({
-        chain: selectedChain,
-        estimatedFee: formatBalance(balance.estimatedFee || 0, { decimals: 10, symbol: selectedCurrency }),
+        chain: balance.name,
+        estimatedFee: balance.estimatedFeeFormatted,
         walletAddress: actualWalletAddress,
-        walletBalance: formatBalance(balance.userBalance || 0, { decimals: 10, symbol: selectedCurrency }),
+        walletBalance: balance.userBalanceFormatted,
+        remainsBalance: formatBalance(balance.userBalance - balance.estimatedFee, { decimals: balance.decimals, symbol: balance.symbol }),
         title: 'Create NFT',
         items: Array.from({ length: event.data.supply }, () => ({
           name: event.data.name,

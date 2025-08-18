@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core'
-import { formatBalance } from 'dedot/utils'
 import { useNftForm } from '~/composables/create/useNftForm'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
@@ -385,7 +384,7 @@ watchDebounced(
                   <span class="w-18">Fee:</span>
                   <span v-if="isEstimatingFee" class="text-gray-500">Calculating...</span>
                   <span v-else-if="balance.estimatedFee !== 0n" class="font-medium text-gray-900 dark:text-white">
-                    {{ formatBalance(balance.estimatedFee, { decimals: balance.decimals, symbol: balance.symbol }) }}
+                    {{ balance.estimatedFeeFormatted }}
                   </span>
                   <span v-else class="text-gray-600 dark:text-gray-400">
                     ---
@@ -395,7 +394,7 @@ watchDebounced(
                 <span class="text-gray-600 dark:text-gray-400 flex">
                   <span class="w-18">Balance:</span>
                   <span class="font-medium text-gray-900 dark:text-white">
-                    {{ formatBalance(balance.userBalance, { decimals: balance.decimals, symbol: balance.symbol }) }}
+                    {{ balance.userBalanceFormatted }}
                   </span>
                 </span>
               </div>
