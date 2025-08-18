@@ -143,16 +143,13 @@ watchDebounced(
                   required
                   help="Choose the blockchain network for your NFT"
                 >
-                  <UTooltip text="Currently only Asset Hub Polkadot is supported">
-                    <USelectMenu
-                      v-model="state.blockchain"
-                      :items="blockchains"
-                      value-key="value"
-                      placeholder="Select a blockchain"
-                      :disabled="true"
-                      class="w-full"
-                    />
-                  </UTooltip>
+                  <USelectMenu
+                    v-model="state.blockchain"
+                    :items="blockchains"
+                    value-key="value"
+                    placeholder="Select a blockchain"
+                    class="w-full"
+                  />
                 </UFormField>
               </div>
             </div>

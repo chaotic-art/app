@@ -1,5 +1,5 @@
-import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
@@ -27,7 +27,7 @@ export function useNftForm() {
     name: '',
     description: '',
     collection: '',
-    blockchain: 'ahp', // Default to Asset Hub Polkadot
+    blockchain: 'ahp' as AssetHubChain, // Default to Asset Hub Polkadot
     supply: 1,
     autoNumbering: false,
     properties: [{ trait: '', value: '' }] as Property[],
@@ -36,9 +36,10 @@ export function useNftForm() {
   })
 
   // Blockchains for select
-  const blockchains = [
+  const blockchains: { label: string, value: AssetHubChain }[] = [
     { label: 'Asset Hub Polkadot', value: 'ahp' },
     { label: 'Asset Hub Kusama', value: 'ahk' },
+    { label: 'Asset Hub Paseo - (testnet)', value: 'ahpas' },
   ]
 
   // Fetch user collections dynamically
@@ -54,8 +55,8 @@ export function useNftForm() {
 
     collectionsLoading.value = true
     try {
-      balance.value = await userBalance(state.blockchain as Prefix)
-      const userCollections = await userCollection(state.blockchain as Prefix)
+      balance.value = await userBalance(state.blockchain)
+      const userCollections = await userCollection(state.blockchain)
       collections.value = userCollections
         .filter((collection): collection is NonNullable<typeof collection> => Boolean(collection && collection.id))
         .map(collection => ({
@@ -189,7 +190,7 @@ export function useNftForm() {
       name: formData.name,
       description: formData.description,
       image,
-      // external_url: 'https://example.com', TODO: add external url
+      external_url: 'https://chaotic.art',
     }
 
     // Add properties as attributes if they exist
@@ -249,7 +250,7 @@ export function useNftForm() {
       const { validProperties, metadataUris, context } = await prepareNftData(formData)
 
       const result = await mintNft({
-        chain: state.blockchain as Prefix,
+        chain: state.blockchain,
         type,
         collectionId: Number.parseInt(formData.collection),
         metadataUri: metadataUris,

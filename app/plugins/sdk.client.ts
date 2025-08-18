@@ -31,8 +31,10 @@ const config = {
   },
 }
 
-type SupportedChain = keyof typeof config
-type UnsupportedChain = 'base' | 'ahw'
+export type SupportedChain = keyof typeof config
+
+export type AssetHubChain = Extract<SupportedChain, 'ahp' | 'ahk' | 'ahpas'>
+export type UnsupportedChain = Extract<Prefix, 'base' | 'ahw'>
 export type Chain = SupportedChain | UnsupportedChain | Prefix
 
 // Mapped type for API return types

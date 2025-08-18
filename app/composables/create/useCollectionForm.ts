@@ -1,5 +1,5 @@
-import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
@@ -21,16 +21,17 @@ export function useCollectionForm() {
   const state = reactive({
     name: '',
     description: '',
-    blockchain: 'ahp', // Default to Asset Hub Polkadot
+    blockchain: 'ahp' as AssetHubChain, // Default to Asset Hub Polkadot
     royalties: 0,
     maxNfts: 'unlimited' as 'unlimited' | 'limited',
     maxNftsNumber: 1000,
   })
 
   // Blockchains for select
-  const blockchains = [
+  const blockchains: { label: string, value: AssetHubChain }[] = [
     { label: 'Asset Hub Polkadot', value: 'ahp' },
     { label: 'Asset Hub Kusama', value: 'ahk' },
+    { label: 'Asset Hub Paseo - (testnet)', value: 'ahpas' },
   ]
 
   // File upload states
@@ -59,7 +60,7 @@ export function useCollectionForm() {
       return
 
     try {
-      balance.value = await userBalance(state.blockchain as Prefix)
+      balance.value = await userBalance(state.blockchain)
     }
     catch (error) {
       console.error('Error fetching balance:', error)
@@ -137,7 +138,7 @@ export function useCollectionForm() {
       name: formData.name,
       description: formData.description,
       image,
-      // external_url: 'https://example.com', TODO: add external url
+      external_url: 'https://chaotic.art',
     }
 
     if (banner) {
@@ -175,7 +176,7 @@ export function useCollectionForm() {
       const { metadataUri, context } = await prepareCollectionData(formData)
 
       const result = await createCollection({
-        chain: formData.blockchain as Prefix,
+        chain: formData.blockchain,
         type,
         maxSupply: formData.maxNfts === 'unlimited' ? undefined : formData.maxNftsNumber,
         metadataUri,

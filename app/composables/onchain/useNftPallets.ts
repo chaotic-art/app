@@ -1,4 +1,4 @@
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
@@ -6,7 +6,7 @@ import { MultiAddress } from '~/descriptors/dist'
 type TxType = 'submit' | 'estimate'
 
 interface CreateCollectionParams {
-  chain: Prefix
+  chain: AssetHubChain
   type: TxType
   maxSupply?: number
   metadataUri: string
@@ -24,7 +24,7 @@ interface Property {
 }
 
 interface CreateNftParams {
-  chain: Prefix
+  chain: AssetHubChain
   type: TxType
   collectionId: number
   metadataUri: string | string[]
@@ -39,7 +39,7 @@ interface CreateNftParams {
 }
 
 interface ListNftsParams {
-  chain: Prefix
+  chain: AssetHubChain
   type: TxType
   nfts: {
     id: string
@@ -170,7 +170,7 @@ export function useNftPallets() {
     })
   }
 
-  async function userBalance(chain: Prefix) {
+  async function userBalance(chain: SupportedChain) {
     if (!getConnectedSubAccount.value?.address) {
       // throw new Error('No address found')
       return 0n
@@ -181,7 +181,7 @@ export function useNftPallets() {
     return query?.data.free ?? 0n
   }
 
-  async function userCollection(chain: Prefix) {
+  async function userCollection(chain: AssetHubChain) {
     if (!getConnectedSubAccount.value?.address) {
       // throw new Error('No address found')
       return []
