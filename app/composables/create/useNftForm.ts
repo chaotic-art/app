@@ -4,6 +4,7 @@ import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
+import { getChainSpec } from '~/utils/api/substrate'
 
 interface Property {
   trait: string
@@ -46,7 +47,13 @@ export function useNftForm() {
   const collections = ref<Array<{ label: string, value: string, name: string, description: string, image: string }>>([])
   const collectionsLoading = ref(false)
 
-  const balance = ref(0n)
+  const balance = reactive({
+    userBalance: 0n,
+    estimatedFee: 0n,
+    symbol: 'DOT',
+    decimals: 12,
+  })
+  const isEstimatingFee = ref(false)
 
   // Fetch collections and user balance on component mount
   watchEffect(async () => {
@@ -55,7 +62,13 @@ export function useNftForm() {
 
     collectionsLoading.value = true
     try {
-      balance.value = await userBalance(state.blockchain)
+      // fetch user balance
+      balance.userBalance = await userBalance(state.blockchain)
+      const { symbol, decimals } = await getChainSpec(state.blockchain)
+      balance.symbol = symbol
+      balance.decimals = decimals
+
+      // fetch user collections
       const userCollections = await userCollection(state.blockchain)
       collections.value = userCollections
         .filter((collection): collection is NonNullable<typeof collection> => Boolean(collection && collection.id))
@@ -84,23 +97,8 @@ export function useNftForm() {
     return collections.value.find(collection => collection.value === state.collection) || null
   })
 
-  // Currency mapping based on blockchain
-  const blockchainCurrencies: Record<string, string> = {
-    ahp: 'DOT',
-    ahk: 'KSM',
-  }
-
-  // Get currency based on selected blockchain
-  const selectedCurrency = computed(() => {
-    return blockchainCurrencies[state.blockchain] || 'DOT'
-  })
-
   // File upload state
   const mediaFile = ref<File | null>(null)
-
-  // Fee estimation state
-  const estimatedFee = ref<bigint | null>(null)
-  const isEstimatingFee = ref(false)
 
   // Property management
   function addProperty() {
@@ -237,7 +235,7 @@ export function useNftForm() {
   async function handleNftOperation(formData: typeof state, type: 'estimate' | 'submit') {
     if (!isWalletConnected.value || !mediaFile.value || !formData.collection || !formData.name || !formData.description) {
       if (type === 'estimate') {
-        estimatedFee.value = null
+        balance.estimatedFee = 0n
       }
       return
     }
@@ -260,13 +258,13 @@ export function useNftForm() {
       })
 
       if (type === 'estimate') {
-        estimatedFee.value = result || null
+        balance.estimatedFee = result || 0n
       }
     }
     catch (error) {
       console.error(`Error ${type === 'estimate' ? 'estimating fee' : 'creating NFT'}:`, error)
       if (type === 'estimate') {
-        estimatedFee.value = null
+        balance.estimatedFee = 0n
       }
     }
     finally {
@@ -284,7 +282,7 @@ export function useNftForm() {
     }
 
     // Check if user has insufficient funds
-    if (estimatedFee.value !== null && balance.value !== null && balance.value < estimatedFee.value) {
+    if (balance.estimatedFee !== 0n && balance.userBalance !== 0n && balance.userBalance < balance.estimatedFee) {
       return
     }
 
@@ -298,9 +296,9 @@ export function useNftForm() {
     try {
       const instance = modalConfirmation.open({
         chain: selectedChain,
-        estimatedFee: formatBalance(estimatedFee.value || 0, { decimals: 10, symbol: selectedCurrency }),
+        estimatedFee: formatBalance(balance.estimatedFee || 0, { decimals: 10, symbol: selectedCurrency }),
         walletAddress: actualWalletAddress,
-        walletBalance: formatBalance(balance.value || 0, { decimals: 10, symbol: selectedCurrency }),
+        walletBalance: formatBalance(balance.userBalance || 0, { decimals: 10, symbol: selectedCurrency }),
         title: 'Create NFT',
         items: Array.from({ length: event.data.supply }, () => ({
           name: event.data.name,
@@ -344,12 +342,10 @@ export function useNftForm() {
     blockchains,
     collections,
     collectionsLoading,
-    selectedCurrency,
     selectedCollection,
     isWalletConnected,
-    estimatedFee,
-    isEstimatingFee,
     balance,
+    isEstimatingFee,
 
     // Functions
     validate,
