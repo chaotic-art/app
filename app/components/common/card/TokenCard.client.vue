@@ -22,11 +22,17 @@ const {
 } = useToken(props)
 
 const actionCartStore = useActionCartStore()
+const route = useRoute()
+const { isCurrentAccount } = useAuth()
 
 const id = computed(() => `${props.collectionId}-${props.tokenId}`)
 const isItemInActionCart = computed(() => actionCartStore.isItemInCart(id.value))
+const isItemInCart = computed(() => isItemInActionCart.value)
 
-function addToCart() {
+const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
+const canAddToActionCart = computed(() => isProfileRoute.value && owner.value && isCurrentAccount(owner.value))
+
+function addToActionCart() {
   if (!token.value || !owner.value) {
     return
   }
@@ -54,8 +60,8 @@ function addToCart() {
   <div
     class="relative border rounded-xl overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group"
     :class="{
-      '!border-blue-500 dark:!border-blue-400': isItemInActionCart,
-      'border-gray-300 dark:border-neutral-700': !isItemInActionCart,
+      '!border-blue-500 dark:!border-blue-400': isItemInCart,
+      'border-gray-300 dark:border-neutral-700': !isItemInCart,
     }"
   >
     <!-- Loading State -->
@@ -135,14 +141,14 @@ function addToCart() {
             <UIcon :name="mediaIcon" class="w-3 h-3 text-white" />
           </div>
 
-          <div class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
+          <div v-if="canAddToActionCart" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
             <UButton
               :icon="isItemInActionCart ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
               size="sm"
               variant="solid"
               color="primary"
               class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-xl border border-white/30 text-gray-900 dark:text-white"
-              @click.prevent.stop="addToCart"
+              @click.prevent.stop="addToActionCart"
             >
               {{ isItemInActionCart ? 'Remove' : 'Select' }}
             </UButton>
