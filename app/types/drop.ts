@@ -1,5 +1,5 @@
-import type { Prefix } from '@kodadot1/static'
 import type { Abi } from 'viem'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 
 export interface Unit {
   name: string
@@ -20,7 +20,7 @@ type DropType = 'paid' | 'free' | 'holder'
 export interface DropItem {
   // offchain (database)
   id: string
-  chain: Prefix
+  chain: AssetHubChain
   alias: string
   collection: string // collection id
   type: DropType

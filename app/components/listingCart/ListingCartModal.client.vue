@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { toNative } from '@/utils/format/balance'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
 const { $i18n } = useNuxtApp()
 const { accountId } = useAuth()
-const { prefix } = usePrefix()
 const { listNfts } = useNftPallets()
 const listingCartStore = useListingCartStore()
 const { itemsInChain: items } = storeToRefs(listingCartStore)
@@ -87,7 +87,7 @@ function getListParams() {
       metadata_uri: item.metadata_uri,
       metadata: item.metadata,
     })),
-    chain: prefix.value,
+    chain: 'ahp' as AssetHubChain, // TODO: list for the other chains
   }
 }
 

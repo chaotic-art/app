@@ -4,7 +4,7 @@ export function useDropMinimumFunds() {
   const { itemDeposit } = useDeposit(prefix)
   const { amountToMint: amount } = storeToRefs(useDropStore())
 
-  const chainProperties = computed(() => chainPropListOf(drop.value.chain ?? 'ahp'))
+  const chainProperties = computed(() => chainPropListOf('ahp')) // TODO: handle another chains
 
   const { existentialDeposit } = useChain()
   const { transferableCurrentChainBalance } = useMultipleBalance()

@@ -1,8 +1,8 @@
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { t } from 'try'
 import { fetchOdaToken } from '~/services/oda'
 
-function getApi(prefix: Prefix) {
+function getApi(prefix: AssetHubChain) {
   const { $sdk } = useNuxtApp()
   return $sdk(prefix)
 }
@@ -16,11 +16,7 @@ function getApi(prefix: Prefix) {
  * @param params.excludeTokenId - The token ID to exclude from the results
  * @returns The entries for the collection
  */
-export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }: { prefix: Prefix, collectionId: number, max?: number, excludeTokenId?: number }) {
-  if (!isAssetHub(prefix)) {
-    throw new Error('This function is only available on Asset Hub chains')
-  }
-
+export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }: { prefix: AssetHubChain, collectionId: number, max?: number, excludeTokenId?: number }) {
   const api = getApi(prefix).api
   const query = await api.query.Nfts.Item.getEntries(collectionId)
 

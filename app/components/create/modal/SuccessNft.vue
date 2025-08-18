@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NftCategory } from '~/composables/useTransactionModal'
+import { getSubscanNftUrl } from '~/utils/format/address'
 
 interface Props {
   result: NftCategory
@@ -32,13 +33,19 @@ const modalData = computed(() => {
         label: 'View NFT',
         onClick: () => {
           close()
-          router.push(`/${props.result?.prefix}/gallery/${props.result.collectionId}-${items[0]?.id}`)
+
+          if (props.result.prefix === 'ahpas') {
+            window.open(getSubscanNftUrl(props.result.collectionId, props.result.prefix), '_blank')
+          }
+          else {
+            router.push(`/${props.result?.prefix}/gallery/${props.result.collectionId}-${items[0]?.id}`)
+          }
         },
       },
     },
     header: {
       single: 'You successfully created an NFT',
-      multiple: 'You successfully created an NFT',
+      multiple: `You successfully created ${props.result.itemIds.length} NFTs`,
     },
     items,
   }

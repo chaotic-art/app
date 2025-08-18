@@ -1,9 +1,17 @@
-import type { Prefix } from '@kodadot1/static'
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
+import { getChainSpec } from '~/utils/api/substrate'
+
+// Blockchains for select
+export const blockchains: { label: string, value: AssetHubChain }[] = [
+  { label: 'Asset Hub Polkadot', value: 'ahp' },
+  { label: 'Asset Hub Kusama', value: 'ahk' },
+  { label: 'Asset Hub Paseo - (testnet)', value: 'ahpas' },
+]
 
 export function useCollectionForm() {
   const { createCollection, userBalance } = useNftPallets()
@@ -21,37 +29,26 @@ export function useCollectionForm() {
   const state = reactive({
     name: '',
     description: '',
-    blockchain: 'ahp', // Default to Asset Hub Polkadot
+    blockchain: 'ahp' as AssetHubChain, // Default to Asset Hub Polkadot
     royalties: 0,
     maxNfts: 'unlimited' as 'unlimited' | 'limited',
     maxNftsNumber: 1000,
   })
 
-  // Blockchains for select
-  const blockchains = [
-    { label: 'Asset Hub Polkadot', value: 'ahp' },
-    { label: 'Asset Hub Kusama', value: 'ahk' },
-  ]
-
   // File upload states
   const logoFile = ref<File | null>(null)
   const bannerFile = ref<File | null>(null)
 
-  // Fee estimation state
-  const estimatedFee = ref<bigint | null>(null)
-  const isEstimatingFee = ref(false)
-  const balance = ref(0n)
-
-  // Currency mapping based on blockchain
-  const blockchainCurrencies: Record<string, string> = {
-    ahp: 'DOT',
-    ahk: 'KSM',
-  }
-
-  // Get currency based on selected blockchain
-  const selectedCurrency = computed(() => {
-    return blockchainCurrencies[state.blockchain] || 'DOT'
+  const balance = reactive({
+    userBalance: 0n,
+    userBalanceFormatted: '0',
+    estimatedFee: 0n,
+    estimatedFeeFormatted: '0',
+    symbol: 'DOT',
+    decimals: 12,
+    name: '',
   })
+  const isEstimatingFee = ref(false)
 
   // Fetch user balance on component mount
   watchEffect(async () => {
@@ -59,11 +56,18 @@ export function useCollectionForm() {
       return
 
     try {
-      balance.value = await userBalance(state.blockchain as Prefix)
+      const { symbol, decimals, name } = await getChainSpec(state.blockchain)
+      balance.symbol = symbol
+      balance.decimals = decimals
+      balance.name = name
+
+      balance.userBalance = await userBalance(state.blockchain)
+      balance.userBalanceFormatted = formatBalance(balance.userBalance, { decimals, symbol })
     }
     catch (error) {
       console.error('Error fetching balance:', error)
-      balance.value = 0n
+      balance.userBalance = 0n
+      balance.userBalanceFormatted = '0'
     }
   })
 
@@ -130,14 +134,14 @@ export function useCollectionForm() {
     }
 
     const cidImages = await pinDirectory(filesToPin)
-    const image = `ipfs://${cidImages}`
+    const image = `ipfs://${cidImages}/${logoFile.value?.name}`
     const banner = bannerFile.value ? `ipfs://${cidImages}/${bannerFile.value.name}` : undefined
 
     const metadata: any = {
       name: formData.name,
       description: formData.description,
       image,
-      // external_url: 'https://example.com', TODO: add external url
+      external_url: 'https://chaotic.art',
     }
 
     if (banner) {
@@ -162,7 +166,8 @@ export function useCollectionForm() {
   async function handleCollectionOperation(formData: typeof state, type: 'estimate' | 'submit') {
     if (!isWalletConnected.value || !logoFile.value || !formData.name || !formData.description) {
       if (type === 'estimate') {
-        estimatedFee.value = null
+        balance.estimatedFee = 0n
+        balance.estimatedFeeFormatted = '0'
       }
       return
     }
@@ -175,7 +180,7 @@ export function useCollectionForm() {
       const { metadataUri, context } = await prepareCollectionData(formData)
 
       const result = await createCollection({
-        chain: formData.blockchain as Prefix,
+        chain: formData.blockchain,
         type,
         maxSupply: formData.maxNfts === 'unlimited' ? undefined : formData.maxNftsNumber,
         metadataUri,
@@ -184,13 +189,15 @@ export function useCollectionForm() {
       })
 
       if (type === 'estimate') {
-        estimatedFee.value = result || null
+        balance.estimatedFee = result || 0n
+        balance.estimatedFeeFormatted = formatBalance(result, { decimals: balance.decimals, symbol: balance.symbol })
       }
     }
     catch (error) {
       console.error(`Error ${type === 'estimate' ? 'estimating fee' : 'creating collection'}:`, error)
       if (type === 'estimate') {
-        estimatedFee.value = null
+        balance.estimatedFee = 0n
+        balance.estimatedFeeFormatted = '0'
       }
     }
     finally {
@@ -208,24 +215,22 @@ export function useCollectionForm() {
     }
 
     // Check if user has insufficient funds
-    if (estimatedFee.value !== null && balance.value !== null && balance.value < estimatedFee.value) {
+    if (balance.estimatedFee !== 0n && balance.userBalance !== 0n && balance.userBalance < balance.estimatedFee) {
       return
     }
 
     // Get actual wallet data
     const connectedAccount = getConnectedSubAccount.value
     const actualWalletAddress = connectedAccount?.address || ''
-    // TODO: select chains
-    const selectedChain = event.data.blockchain === 'ahp' ? 'Asset Hub Polkadot' : 'Asset Hub Kusama'
-    const selectedCurrency = event.data.blockchain === 'ahp' ? 'DOT' : 'KSM'
 
     // Open modal programmatically
     try {
       const instance = modalConfirmation.open({
-        chain: selectedChain,
-        estimatedFee: formatBalance(estimatedFee.value || 0, { decimals: 10, symbol: selectedCurrency }),
+        chain: balance.name,
+        estimatedFee: balance.estimatedFeeFormatted,
         walletAddress: actualWalletAddress,
-        walletBalance: formatBalance(balance.value || 0, { decimals: 10, symbol: selectedCurrency }),
+        walletBalance: balance.userBalanceFormatted,
+        remainsBalance: formatBalance(balance.userBalance - balance.estimatedFee, { decimals: balance.decimals, symbol: balance.symbol }),
         title: 'Create Collection',
         items: [
           {
@@ -271,9 +276,7 @@ export function useCollectionForm() {
     logoFile,
     bannerFile,
     blockchains,
-    selectedCurrency,
     isWalletConnected,
-    estimatedFee,
     isEstimatingFee,
     balance,
 

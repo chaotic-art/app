@@ -1,8 +1,8 @@
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 
 export interface CartItem {
   id: string
-  chain: Prefix
+  chain: AssetHubChain
   discarded?: boolean
 }
 

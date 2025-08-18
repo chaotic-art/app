@@ -1,6 +1,6 @@
 import type { DropItem } from '@/types'
 import { getDropById } from '@/services/fxart'
-import { fetchOdaCollection, fetchOdaCollectionAbi } from '@/services/oda'
+import { fetchOdaCollection } from '@/services/oda'
 import { DropStatus } from '@/types'
 
 export function formatCETDate(date: string, time: string): Date {
@@ -66,7 +66,7 @@ export async function getEnrichedDrop(campaign: DropItem): Promise<DropItem | un
   // ----------------------
   const [{ supply, claimed: minted, metadata }, abi] = await Promise.all([
     fetchOdaCollection(campaign.chain, address),
-    isEvm(campaign.chain) ? fetchOdaCollectionAbi(campaign.chain, address) : Promise.resolve(null),
+    Promise.resolve(null), // TODO: handle evm
   ])
 
   const onChainData = {

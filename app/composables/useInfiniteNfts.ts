@@ -1,4 +1,5 @@
 import type { ExploreNftsData } from '~/graphql/queries/explore'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { exploreNfts } from '~/graphql/queries/explore'
 import { getDenyList } from '~/utils/prefix'
 
@@ -14,8 +15,6 @@ interface UseInfiniteNftsOptions {
 }
 
 export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
-  const { prefix } = usePrefix()
-
   const {
     pageSize = 40,
     distance = 300,
@@ -30,7 +29,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     pageSize,
     distance,
     variables: {
-      denyList: getDenyList(prefix.value) || [],
+      denyList: getDenyList('ahp') || [], // TODO: handle asset hub chains
       name: search || undefined,
       owner: owner || undefined,
       issuer: issuer || undefined,
@@ -51,7 +50,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
           name: item.name,
           tokenId: Math.floor(Math.random() * 1000) + 1,
           collectionId: Math.floor(Math.random() * 100) + 1,
-          chain: prefix.value,
+          chain: 'ahp' as AssetHubChain, // TODO: handle asset hub chains
           image: item.image,
           isPlaceholder: true,
         }
@@ -66,7 +65,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
         name: nft.name || 'Untitled NFT',
         tokenId: tokenId || 0,
         collectionId: collectionId || 0,
-        chain: prefix.value,
+        chain: 'ahp' as AssetHubChain, // TODO: handle asset hub chains
         image: nft.meta?.image || nft.image,
         isPlaceholder: false,
       }

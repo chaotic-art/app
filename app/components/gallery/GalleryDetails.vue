@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { refreshOdaTokenMetadata } from '~/services/oda'
 
 interface Props {
   tokenData: OdaToken | null
   collection: OnchainCollection | null
-  chain: Prefix
+  chain: AssetHubChain
   collectionId: string
   tokenId: string
   owner?: string

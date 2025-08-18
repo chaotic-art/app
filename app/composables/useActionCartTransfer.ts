@@ -1,7 +1,6 @@
 import { fetchOdaCollection } from '~/services/oda'
 
 export default function () {
-  const { prefix } = usePrefix()
   const actionCartStore = useActionCartStore()
   const listingCartStore = useListingCartStore()
 
@@ -12,7 +11,7 @@ export default function () {
       const items = actionCartStore.itemsInChain
 
       const metadatas = await Promise.all(
-        items.map(item => fetchOdaCollection(prefix.value, String(item.collectionId))),
+        items.map(item => fetchOdaCollection('ahp', String(item.collectionId))), // TODO: handle asset hub chains. get chain from item
       )
 
       items.forEach((item, index) => {
