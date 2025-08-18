@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
-import { tokenEntries } from '~/api/nft-pallets'
 import TokenCard from '~/components/common/card/TokenCard.client.vue'
 import TokenActivity from '~/components/gallery/TokenActivity.vue'
+import { tokenEntries } from '~/utils/api/substrate.nft-pallets'
 
 interface Props {
   tokenData: OdaToken | null
