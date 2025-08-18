@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Prefix } from '@kodadot1/static'
+import type { OdaToken } from '~/services/oda'
 
 const props = defineProps<{
   tokenId: number
@@ -32,6 +33,20 @@ const isItemInCart = computed(() => isItemInActionCart.value)
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
 const canAddToActionCart = computed(() => isProfileRoute.value && owner.value && isCurrentAccount(owner.value))
 
+function createActionCartItem({ token, owner }: { token: OdaToken, owner: string }): BaseActionCartItem {
+  return {
+    id: id.value,
+    sn: props.tokenId,
+    collectionId: props.collectionId,
+    name: token.metadata?.name || '',
+    chain: props.chain,
+    price: Number(nativePrice.value),
+    currentOwner: owner,
+    metadata: token.metadata!,
+    metadata_uri: token.metadata_uri || '',
+  }
+}
+
 function addToActionCart() {
   if (!token.value || !owner.value) {
     return
@@ -41,19 +56,15 @@ function addToActionCart() {
     actionCartStore.removeItem(id.value)
   }
   else {
-    actionCartStore.setItem({
-      id: id.value,
-      sn: props.tokenId,
-      collectionId: props.collectionId,
-      name: token.value.metadata?.name || '',
-      chain: props.chain,
-      price: Number(nativePrice.value),
-      currentOwner: owner.value,
-      metadata: token.value.metadata!,
-      metadata_uri: token.value.metadata_uri || '',
-    })
+    actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value }))
   }
 }
+
+watchEffect(() => {
+  if (token.value && owner.value && canAddToActionCart.value) {
+    actionCartStore.setOwnedItem(createActionCartItem({ token: token.value, owner: owner.value }))
+  }
+})
 </script>
 
 <template>

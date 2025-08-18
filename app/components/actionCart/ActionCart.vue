@@ -3,11 +3,8 @@ import { useActionCartStore } from '@/stores/actionCart'
 
 const actionCartStore = useActionCartStore()
 const preferencesStore = usePreferencesStore()
-const { prefix } = usePrefix()
 
-const listVisible = (_prefix: string) => true // Allow listing for all chains for now
-
-const isListingDisabled = computed(() => !listVisible(prefix.value))
+const isListingDisabled = ref(false) // Allow listing for all chains for now
 
 onBeforeUnmount(actionCartStore.clear)
 </script>
@@ -19,36 +16,35 @@ onBeforeUnmount(actionCartStore.clear)
       class="fixed right-24 bottom-9 z-998"
     >
       <div class="inline-flex items-center">
-        <div class="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 flex items-center py-[0.875rem]! px-6 gap-8 rounded-2xl">
-          <div class="inline-flex items-center">
-            <div>
+        <div class="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 flex items-center p-2 gap-8 rounded-2xl">
+          <div class="flex items-center gap-2">
+            <div class="px-4">
               <b>{{ actionCartStore.count }}</b>
               {{ $t('actionCart.item', { count: actionCartStore.count }) }}
             </div>
-            <div class="mx-4" />
-            <UButton
-              :disabled="!actionCartStore.count"
-              class="text-k-grey! hover:text-text-color! disabled:hover:text-k-grey!"
-              variant="ghost"
-              @click="actionCartStore.clear"
-            >
-              {{ $t('actionCart.clearAll') }}
-            </UButton>
-            <div class="mx-4 w-px h-4 bg-k-grey" />
-            <UButton
-              variant="ghost"
-              class="text-k-grey! hover:text-text-color!"
-              @click="actionCartStore.addAllToCart"
-            >
-              {{ $t('actionCart.selectAll') }}
-            </UButton>
+
+            <div class="flex items-center gap-2">
+              <UButton
+                :disabled="!actionCartStore.count"
+                variant="ghost"
+                @click="actionCartStore.clear"
+              >
+                {{ $t('actionCart.clearAll') }}
+              </UButton>
+              <UButton
+                variant="ghost"
+                @click="actionCartStore.addAllToCart"
+              >
+                {{ $t('actionCart.selectAll') }}
+              </UButton>
+            </div>
           </div>
 
           <div class="flex gap-4">
             <UTooltip
               class="cursor-pointer"
-              :text="$t('toast.unsupportedOperation')"
-              :prevent="!isListingDisabled"
+              text="Unsupported Operation"
+              :open="isListingDisabled"
             >
               <UButton
                 variant="solid"
