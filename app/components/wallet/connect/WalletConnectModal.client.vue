@@ -19,6 +19,8 @@ async function init() {
 
   await initWalletState()
 
+  console.log('wallets.value = extensions', extensions)
+
   wallets.value = extensions
 
   walletStore.setStage(WalletStageTypes.Wallet)
@@ -113,6 +115,10 @@ async function getWalletExtensions(): Promise<WalletExtension[]> {
     ...subExtensions,
     ...evmExtensions,
   ]
+
+  console.log('originalWallets', originalWallets)
+  console.log('currentWallets', wallets.value)
+
 
   return originalWallets.map((wallet) => {
     const savedWallet = wallets.value.find(w => w.id === wallet.id)
