@@ -55,7 +55,7 @@ interface ListNftsParams {
 }
 
 export function useNftPallets() {
-  const { $api } = useNuxtApp()
+  const { $sdk } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
   const { hash, error, status, result } = useTransactionModal()
@@ -72,7 +72,7 @@ export function useNftPallets() {
       throw new Error('No address found')
     }
 
-    const api = $api(chain)
+    const api = $sdk(chain).api
     await api.compatibilityToken
 
     // next collection id
@@ -176,7 +176,7 @@ export function useNftPallets() {
       return 0n
     }
 
-    const api = $api(chain)
+    const api = $sdk(chain).api
     const query = await api.query.System.Account.getValue(getConnectedSubAccount.value.address)
     return query?.data.free ?? 0n
   }
@@ -187,7 +187,7 @@ export function useNftPallets() {
       return []
     }
 
-    const api = $api(chain)
+    const api = $sdk(chain).api
     const query = await api.query.Nfts.CollectionAccount.getEntries(getConnectedSubAccount.value.address)
     const collections = query.map(item => item.keyArgs[1])
     const collectionsData = await Promise.all(collections.map(async (collection) => {
@@ -225,7 +225,7 @@ export function useNftPallets() {
   }: CreateNftParams) {
     const { signer, address } = await getAccountSigner()
 
-    const api = $api(chain)
+    const api = $sdk(chain).api
     await api.compatibilityToken
 
     // Get next item ID for the collection
@@ -339,7 +339,7 @@ export function useNftPallets() {
     type,
   }: ListNftsParams) {
     const { signer, address } = await getAccountSigner()
-    const api = $api(chain)
+    const api = $sdk(chain).api
 
     const txs = nfts.map(({ price, collection, sn }) => {
       return api.tx.Nfts.set_price({

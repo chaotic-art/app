@@ -29,7 +29,7 @@ const queryVariables = computed(() =>
 )
 
 // Floor price data
-const { $api } = useNuxtApp()
+const { $sdk } = useNuxtApp()
 const floorPrice = ref(0)
 const owner = ref('')
 const isLoadingFloor = ref(false)
@@ -41,7 +41,7 @@ onMounted(async () => {
 
   isLoadingFloor.value = true
   try {
-    const api = await $api(chain.value)
+    const api = $sdk(chain.value).api
     const [queryFloor, queryCollection] = await Promise.all([
       api.query.Nfts.ItemPriceOf.getEntries(Number(collection_id)),
       api.query.Nfts.Collection.getValue(Number(collection_id)),

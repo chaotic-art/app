@@ -7,7 +7,7 @@ const isModalOpen = ref(false)
 
 export default function useDropMint() {
   const { doAfterLogin } = useDoAfterlogin()
-  const { $i18n, $api } = useNuxtApp()
+  const { $i18n, $sdk } = useNuxtApp()
   const { accountId } = useAuth()
   const { prefix } = usePrefix()
 
@@ -53,7 +53,7 @@ export default function useDropMint() {
   }
 
   async function executeSubTransaction() {
-    const api = $api(prefix.value)
+    const api = $sdk(prefix.value).api
     const collectionId = drop.value?.collection
     const price = drop.value?.price || null
 

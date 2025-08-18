@@ -3,8 +3,8 @@ import { t } from 'try'
 import { fetchOdaToken } from '~/services/oda'
 
 function getApi(prefix: Prefix) {
-  const { $api } = useNuxtApp()
-  return $api(prefix)
+  const { $sdk } = useNuxtApp()
+  return $sdk(prefix)
 }
 
 /**
@@ -21,7 +21,7 @@ export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }
     throw new Error('This function is only available on Asset Hub chains')
   }
 
-  const api = getApi(prefix)
+  const api = getApi(prefix).api
   const query = await api.query.Nfts.Item.getEntries(collectionId)
 
   // Filter out excluded token ID if provided

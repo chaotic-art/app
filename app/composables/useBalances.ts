@@ -17,11 +17,11 @@ export type GetBalancesResult = (GetBalanceResult & { prefix: Prefix })[]
 
 export default function () {
   const getSubstrateBalance = async ({ address, prefix }: GetBalanceParams): Promise<GetBalanceResult> => {
-    const { $api } = useNuxtApp()
+    const { $sdk } = useNuxtApp()
 
     const formattedAddress = formatAddress({ address, prefix })
 
-    const balance = await $api(prefix).query.System.Account.getValue(formattedAddress)
+    const balance = await $sdk(prefix).api.query.System.Account.getValue(formattedAddress)
 
     return { address: formattedAddress, balance: balance.data.free, symbol: tokenSymbolOf(prefix) }
   }

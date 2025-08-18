@@ -3,7 +3,7 @@ import { Binary } from 'polkadot-api'
 
 type SupportedChain = 'ahp' | 'ahk' | 'dot' | 'ksm'
 
-const { $api } = useNuxtApp()
+const { $sdk } = useNuxtApp()
 const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
 const isLoading = ref(false)
@@ -29,7 +29,7 @@ async function submitRemark() {
   blockHash.value = ''
 
   try {
-    const api = $api(selectedChain.value)
+    const api = $sdk(selectedChain.value).api
     const signer = await getConnectedSubAccount.value?.signer
 
     if (!signer) {
