@@ -58,15 +58,15 @@ function getEffectiveChain(chain: Chain): SupportedChain {
 }
 
 // Generic function for supported chains
-function api<T extends SupportedChain>(chain: T): ApiMap[T]
+function sdk<T extends SupportedChain>(chain: T): { api: ApiMap[T], client: PolkadotClient }
 // Overload for unsupported chains and default case
-function api(chain?: UnsupportedChain | Prefix): ApiMap['ahp']
+function sdk(chain?: UnsupportedChain | Prefix): { api: ApiMap['ahp'], client: PolkadotClient }
 // Implementation
-function api(chain: Chain = DEFAULT_CHAIN) {
+function sdk(chain: Chain = DEFAULT_CHAIN) {
   const effectiveChain = getEffectiveChain(chain)
 
   // Get or create client state
-  const clients = useState<Partial<Record<SupportedChain, PolkadotClient>>>('api-clients', () => ({}))
+  const clients = useState<Partial<Record<SupportedChain, PolkadotClient>>>('sdk-clients', () => ({}))
 
   // Create client if it doesn't exist
   if (!clients.value[effectiveChain]) {
@@ -76,11 +76,14 @@ function api(chain: Chain = DEFAULT_CHAIN) {
     )
   }
 
-  return clients.value[effectiveChain]!.getTypedApi(config[effectiveChain].descriptor)
+  return {
+    api: clients.value[effectiveChain]!.getTypedApi(config[effectiveChain].descriptor),
+    client: clients.value[effectiveChain]!,
+  }
 }
 
 export default defineNuxtPlugin(() => {
   return {
-    provide: { api },
+    provide: { sdk },
   }
 })

@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
   volume: '',
 })
 
-const { $api } = useNuxtApp()
+const { $sdk } = useNuxtApp()
 
 const collectionData = reactive({
   items: 0,
@@ -32,7 +32,7 @@ onMounted(async () => {
 
   isLoadingData.value = true
   try {
-    const api = $api(props.prefix)
+    const api = $sdk(props.prefix).api
 
     const [queryItems, queryFloor] = await Promise.all([
       api.query.Nfts.Item.getEntries(Number(props.item.id)),

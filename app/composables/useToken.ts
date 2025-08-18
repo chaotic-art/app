@@ -19,7 +19,7 @@ export function useToken(props: {
   const error = ref<unknown | null>(null)
   const mimeType = ref<string | null>(null)
 
-  const { $api } = useNuxtApp()
+  const { $sdk } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()
 
   // Calculate USD price from DOT price
@@ -31,7 +31,7 @@ export function useToken(props: {
 
   // Fetch data on component mount
   onMounted(async () => {
-    const api = $api(props.chain)
+    const api = $sdk(props.chain).api
 
     try {
       // Fetch token metadata, price, and owner in parallel

@@ -18,7 +18,7 @@ export async function generateIdAssethub(collectionId: number, prefix?: Prefix) 
     const mapKey = `${prefix}-${collectionId}`
 
     // Always check the chain for the latest ID
-    const api = useNuxtApp().$api(prefix)
+    const api = useNuxtApp().$sdk(prefix).api
     const lastIdFromChain = await getLastIndexUsedOnChain(api, collectionId)
     const currentStoredId = latestIdsMap.get(mapKey) || 0
 
