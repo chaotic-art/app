@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
 import type { TokenActivityData } from '~/graphql/queries/token'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { formatBalance } from 'dedot/utils'
 import UserInfo from '~/components/common/UserInfo.vue'
 import { tokenActivity } from '~/graphql/queries/token'
 import { formatToNow } from '~/utils/format/time'
 
 interface Props {
-  chain: Prefix
+  chain: AssetHubChain
   collectionId: string
   tokenId: string
 }
@@ -112,8 +112,8 @@ watchEffect(async () => {
             cell: ({ row }) => {
               const meta = row.getValue('meta') as string
               const format = formatBalance(meta, {
-                decimals: decimalsOf(props.chain),
-                symbol: tokenSymbolOf(props.chain),
+                decimals: decimalsOf('ahp'), // TODO: handle asset hub chains
+                symbol: tokenSymbolOf('ahp'), // TODO: handle asset hub chains
               })
 
               return meta && meta !== '0' ? format : '-'

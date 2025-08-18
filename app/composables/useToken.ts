@@ -1,11 +1,11 @@
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { formatBalance } from '@polkadot/util'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
 export function useToken(props: {
   tokenId: number
   collectionId: number
-  chain: Prefix
+  chain: AssetHubChain
   image?: string | null
   name?: string | null
 }) {

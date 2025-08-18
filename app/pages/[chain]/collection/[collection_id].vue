@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 import { useSortOptions } from '~/composables/useSortOptions'
 import { fetchOdaCollection } from '~/services/oda'
-import { copyAddress, getSubscanUrl, shortenAddress } from '~/utils/format/address'
+import { copyAddress, getSubscanAccountUrl, shortenAddress } from '~/utils/format/address'
 
 const route = useRoute()
 const { chain: chainPrefix, collection_id } = route.params
 
-const chain = computed(() => chainPrefix as Prefix)
+const chain = computed(() => chainPrefix as AssetHubChain)
 
 const { data: collection, refresh } = await useLazyAsyncData(
   `collection:${chain.value}:${collection_id}`,
@@ -150,7 +150,7 @@ defineOgImageComponent('Frame', {
                 Copy
               </UButton>
               <UButton
-                :to="getSubscanUrl(owner, chain)"
+                :to="getSubscanAccountUrl(owner, chain)"
                 target="_blank"
                 size="sm"
                 variant="outline"

@@ -5,12 +5,11 @@ import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
 import useFetchProfile from '@/composables/useFetchProfile'
 import { fetchFollowersOf, fetchFollowing } from '@/services/profile'
-import { copyAddress, getSubscanUrl, shortenAddress } from '@/utils/format/address'
+import { copyAddress, getSubscanAccountUrl, shortenAddress } from '@/utils/format/address'
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
 
 const props = defineProps<{ address: string }>()
 const { isCurrentAccount } = useAuth()
-const { prefix } = usePrefix()
 const { profile } = useFetchProfile(computed(() => props.address))
 const bannerUrl = computed(() => sanitizeIpfsUrl(profile?.value?.banner || ''))
 const followButton = ref()
@@ -131,7 +130,7 @@ function onTotalCountChange(slot: string, totalCount: number) {
                 />
 
                 <UButton
-                  :to="getSubscanUrl(address, prefix)"
+                  :to="getSubscanAccountUrl(address, 'ahp')"
                   target="_blank"
                   size="sm"
                   variant="ghost"

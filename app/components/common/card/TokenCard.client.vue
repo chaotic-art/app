@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken } from '~/services/oda'
 
 const props = defineProps<{
   tokenId: number
   collectionId: number
-  chain: Prefix
+  chain: AssetHubChain
   image?: string | null
   name?: string | null
 }>()

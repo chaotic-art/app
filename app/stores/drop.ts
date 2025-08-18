@@ -31,9 +31,7 @@ const DEFAULT_MINTING_SESSION: MintingSession = {
 }
 
 export const useDropStore = defineStore('drop', () => {
-  const { prefix } = usePrefix()
-
-  const drop = ref<DropItem>({ ...DEFAULT_DROP, chain: prefix.value })
+  const drop = ref<DropItem>({ ...DEFAULT_DROP, chain: 'ahp' }) // TODO: handle asset hub chains
   const loading = ref(false)
   const isCapturingImage = ref(false)
   const previewItem = ref<GenerativePreviewItem>()
@@ -55,7 +53,7 @@ export const useDropStore = defineStore('drop', () => {
   const reset = () => {
     isCapturingImage.value = false
     previewItem.value = undefined
-    drop.value = { ...DEFAULT_DROP, chain: prefix.value }
+    drop.value = { ...DEFAULT_DROP, chain: 'ahp' } // TODO: handle asset hub chains
     amountToMint.value = 1
     loading.value = false
     toMintNFTs.value = []

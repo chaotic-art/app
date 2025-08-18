@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 
 const CONTAINER_ID = 'nft-img-container'
 
 const { token, chain } = useRoute().params
-const chainPrefix = computed(() => chain?.toString() as Prefix)
+const chainPrefix = computed(() => chain?.toString() as AssetHubChain)
 const [collectionId, tokenId] = token?.toString().split('-') ?? []
 
 const safeCollectionId = computed(() => collectionId?.toString() ?? '')
