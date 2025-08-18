@@ -19,7 +19,7 @@ const listPrice = computed({
 </script>
 
 <template>
-  <div class="bg-secondary">
+  <div>
     <CartItemDetails
       class="mb-5"
       :name="item.name"
