@@ -108,12 +108,14 @@ function handleListNfts() {
 
 watchSyncEffect(async () => {
   // TODO: debounce
-  listingFees.value = Number(
-    await listNfts({
-      ...getListParams(),
-      type: 'estimate',
-    }),
-  )
+  if (accountId.value) {
+    listingFees.value = Number(
+      await listNfts({
+        ...getListParams(),
+        type: 'estimate',
+      }),
+    )
+  }
 })
 
 useModalIsOpenTracker({
