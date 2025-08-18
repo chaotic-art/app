@@ -1,5 +1,5 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import { formatBalance } from '@polkadot/util'
+import { formatBalance } from 'dedot/utils'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
 export function useToken(props: {
@@ -78,11 +78,7 @@ export function useToken(props: {
     if (!queryPrice.value)
       return ''
 
-    const pricesString = formatBalance(queryPrice.value, { decimals: 10, withSi: false })
-    let float = Number.parseFloat(pricesString)
-    float = float > 1 ? Number(float.toFixed(0)) : Number(float.toFixed(4))
-
-    return `${float} DOT`
+    return formatBalance(queryPrice.value, { decimals: decimals.value, symbol: chainSymbol.value })
   })
 
   const mediaIcon = computed(() => {
