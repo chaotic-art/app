@@ -32,7 +32,7 @@ onMounted(async () => {
 
   isLoadingData.value = true
   try {
-    const api = await $api(props.prefix)
+    const api = $api(props.prefix)
 
     const [queryItems, queryFloor] = await Promise.all([
       api.query.Nfts.Item.getEntries(Number(props.item.id)),
