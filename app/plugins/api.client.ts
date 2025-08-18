@@ -62,7 +62,7 @@ function api<T extends SupportedChain>(chain: T): ApiMap[T]
 // Overload for unsupported chains and default case
 function api(chain?: UnsupportedChain | Prefix): ApiMap['ahp']
 // Implementation
-function api(chain: Chain = DEFAULT_CHAIN): any {
+function api(chain: Chain = DEFAULT_CHAIN) {
   const effectiveChain = getEffectiveChain(chain)
 
   // Get or create client state
