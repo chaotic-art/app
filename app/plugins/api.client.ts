@@ -3,7 +3,7 @@ import type { PolkadotClient, TypedApi } from 'polkadot-api'
 import { createClient } from 'polkadot-api'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
 import { getWsProvider } from 'polkadot-api/ws-provider/web'
-import { ahk, ahp, dot, ksm } from '~/descriptors'
+import { ahk, ahp, ahpas, dot, ksm } from '~/descriptors'
 
 // TODO: provide more providers
 const config = {
@@ -23,56 +23,60 @@ const config = {
     descriptor: ksm,
     providers: ['wss://kusama-rpc.polkadot.io'],
   },
+
+  // testnet. faucet: https://faucet.polkadot.io/?parachain=1000
+  ahpas: {
+    descriptor: ahpas,
+    providers: ['wss://pas-rpc.stakeworld.io/assethub'],
+  },
 }
 
-// Type definitions for each chain's API
-type AhpApi = TypedApi<typeof ahp>
-type AhkApi = TypedApi<typeof ahk>
-type DotApi = TypedApi<typeof dot>
-type KsmApi = TypedApi<typeof ksm>
+type SupportedChain = keyof typeof config
+type UnsupportedChain = 'base' | 'ahw'
+export type Chain = SupportedChain | UnsupportedChain | Prefix
 
-// Function overloads for proper type inference
-function api(chain: 'ahp'): AhpApi
-function api(chain: 'ahk'): AhkApi
-function api(chain: 'dot'): DotApi
-function api(chain: 'ksm'): KsmApi
-function api(chain: 'base' | 'ahw'): AhpApi // These fallback to ahp
-function api(chain?: Prefix): AhpApi // Default case
-function api(chain: Prefix | 'base' | 'ahw' = 'ahp'): AhpApi | AhkApi | DotApi | KsmApi {
-  // Handle explicitly unsupported chains
-  if (chain === 'base' || chain === 'ahw') {
-    console.warn(`Unsupported chain: ${chain}. Using ahp as fallback.`)
-    const client = createClient(withPolkadotSdkCompat(getWsProvider(config.ahp.providers)))
-    return client.getTypedApi(config.ahp.descriptor)
+// Mapped type for API return types
+type ApiMap = {
+  [K in SupportedChain]: TypedApi<typeof config[K]['descriptor']>
+}
+
+const DEFAULT_CHAIN = 'ahp' as const
+const UNSUPPORTED_CHAINS: UnsupportedChain[] = ['base', 'ahw']
+
+function getEffectiveChain(chain: Chain): SupportedChain {
+  if (UNSUPPORTED_CHAINS.includes(chain as UnsupportedChain)) {
+    console.warn(`Unsupported chain: ${chain}. Using ${DEFAULT_CHAIN} as fallback.`)
+    return DEFAULT_CHAIN
   }
 
-  // Check if the chain exists in config
   if (!(chain in config)) {
-    console.warn(`Chain ${chain} not found in config. Using ahp as fallback.`)
-    const client = createClient(withPolkadotSdkCompat(getWsProvider(config.ahp.providers)))
-    return client.getTypedApi(config.ahp.descriptor)
+    console.warn(`Chain ${chain} not found in config. Using ${DEFAULT_CHAIN} as fallback.`)
+    return DEFAULT_CHAIN
   }
 
-  // store client in the state
-  const client = useState<Record<Prefix, PolkadotClient | undefined>>('api-client', () => ({
-    ahp: undefined,
-    ahk: undefined,
-    dot: undefined,
-    ksm: undefined,
-    base: undefined,
-    ahw: undefined,
-  }))
+  return chain as SupportedChain
+}
 
-  // create client if it doesn't exist
-  if (!client.value[chain]) {
-    client.value[chain] = createClient(
-      withPolkadotSdkCompat(getWsProvider(config[chain].providers)),
+// Generic function for supported chains
+function api<T extends SupportedChain>(chain: T): ApiMap[T]
+// Overload for unsupported chains and default case
+function api(chain?: UnsupportedChain | Prefix): ApiMap['ahp']
+// Implementation
+function api(chain: Chain = DEFAULT_CHAIN): any {
+  const effectiveChain = getEffectiveChain(chain)
+
+  // Get or create client state
+  const clients = useState<Partial<Record<SupportedChain, PolkadotClient>>>('api-clients', () => ({}))
+
+  // Create client if it doesn't exist
+  if (!clients.value[effectiveChain]) {
+    const chainConfig = config[effectiveChain]
+    clients.value[effectiveChain] = createClient(
+      withPolkadotSdkCompat(getWsProvider(chainConfig.providers)),
     )
   }
 
-  // Return the proper descriptor for the supported chain
-  const chainConfig = config[chain as keyof typeof config]
-  return client.value[chain]?.getTypedApi(chainConfig.descriptor)
+  return clients.value[effectiveChain]!.getTypedApi(config[effectiveChain].descriptor)
 }
 
 export default defineNuxtPlugin(() => {

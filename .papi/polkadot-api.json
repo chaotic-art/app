@@ -21,6 +21,12 @@
       "chain": "ksmcc3",
       "metadata": ".papi/metadata/ksm.scale",
       "genesis": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+    },
+    "ahpas": {
+      "chain": "paseo_asset_hub",
+      "metadata": ".papi/metadata/ahpas.scale",
+      "genesis": "0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2",
+      "codeHash": "0xb7f52ff9b4fb5124568a5b8cbfcebba2bc9318bcb5916b69457c10bc6a2d0ac5"
     }
   },
   "options": {
