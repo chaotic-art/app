@@ -106,7 +106,7 @@ function handleListNfts() {
   })
 }
 
-watchSyncEffect(async () => {
+watchEffect(async () => {
   // TODO: debounce
   if (accountId.value) {
     listingFees.value = Number(

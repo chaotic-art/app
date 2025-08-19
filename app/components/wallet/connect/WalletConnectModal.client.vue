@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SubstrateWallet, SubstrateWalletSource } from '@/utils/wallet/substrate/types'
+import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
 import { formatEvmAccounts, formatSubAccounts } from '@/utils/wallet'
 import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
 
@@ -15,7 +15,7 @@ const { stage, wallets } = storeToRefs(walletStore)
 async function init() {
   walletStore.setStage(WalletStageTypes.Loading)
 
-  const extensions = await getWalletExtensions()
+  const extensions = getWalletExtensions()
 
   await initWalletState()
 
@@ -26,28 +26,28 @@ async function init() {
 
 async function initWalletState() {
   // sub
-  subWalletStore.$subscribe((mutation, state) => {
-    const events = Array.isArray(mutation.events) ? mutation.events : [mutation.events]
+  watch(
+    () => subWalletStore.wallets.map(wallet => ({ id: wallet.id, accounts: wallet.accounts })),
+    (newWallets, oldWallets) => {
+      newWallets.forEach((newWallet, index) => {
+        const oldWallet = oldWallets?.[index]
 
-    for (const event of events) {
-      if (event.key === 'accounts') {
-        const targetId = (event.target as SubstrateWallet).id
-        const extension = wallets.value.find(wallet => wallet.id === targetId)
-        const accounts = state.wallets.find(wallet => wallet.id === targetId)?.accounts || []
+        if (!oldWallet || JSON.stringify(newWallet.accounts) !== JSON.stringify(oldWallet.accounts)) {
+          const extension = wallets.value.find(wallet => wallet.id === newWallet.id)
 
-        if (!extension) {
-          return
+          if (extension) {
+            walletStore.updateWallet(extension.id, {
+              accounts: formatSubAccounts({
+                accounts: newWallet.accounts,
+                extension,
+              }),
+            })
+          }
         }
-
-        walletStore.updateWallet(extension.id, {
-          accounts: formatSubAccounts({
-            accounts,
-            extension,
-          }),
-        })
-      }
-    }
-  })
+      })
+    },
+    { deep: true },
+  )
 
   // evm
   const { accounts, wallet } = useReown()
@@ -79,7 +79,7 @@ async function initWalletState() {
   })
 }
 
-async function getSubWalletExtensions(): Promise<WalletExtension[]> {
+function getSubWalletExtensions(): WalletExtension[] {
   const wallets = subWalletStore.init()
 
   return wallets.map(extension => ({
@@ -105,30 +105,31 @@ function getEvmWalletExtensions(): WalletExtension[] {
   ]
 }
 
-async function getWalletExtensions(): Promise<WalletExtension[]> {
-  const subExtensions = await getSubWalletExtensions()
+function getWalletExtensions(): WalletExtension[] {
+  const subExtensions = getSubWalletExtensions()
   const evmExtensions = getEvmWalletExtensions()
 
-  const originalWallets = [
+  const freshWallets = [
     ...subExtensions,
     ...evmExtensions,
   ]
 
-  return originalWallets.map((wallet) => {
-    const savedWallet = wallets.value.find(w => w.id === wallet.id)
+  return freshWallets.map((wallet) => {
+    const prevWallet = wallets.value.find(w => w.id === wallet.id)
 
-    if (!savedWallet) {
+    if (!prevWallet) {
       return wallet
     }
 
     let state: WalletState = WalletStates.Idle
 
-    if (savedWallet.state === WalletStates.Connected) {
+    if (prevWallet.state === WalletStates.Connected || walletStore.selectedAccounts[wallet.vm]?.includes(wallet.id)) {
       state = WalletStates.Authorized
     }
 
     return {
-      ...savedWallet,
+      ...wallet,
+      accounts: prevWallet.accounts, // start with old accounts
       state,
     }
   })
