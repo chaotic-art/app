@@ -10,10 +10,6 @@ export function vmOf(prefix: Prefix): ChainVM {
   return chainPropListOf(prefix).vm
 }
 
-export function blockExplorerOf(prefix: Prefix): string {
-  return chainPropListOf(prefix).blockExplorer || ''
-}
-
 // this is static config. for onchain data use getChainSpec() from utils/api/substrate.ts
 export const chainSpec: Record<SupportedChain, { name: string, tokenDecimals: number, tokenSymbol: string, ss58Format: number }> = {
   ahp: {

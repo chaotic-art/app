@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { SupportedChain } from '~/plugins/sdk.client'
 import { useClipboard } from '@vueuse/core'
 import { TransactionStatus } from '@/composables/useTransactionStatus'
+import { getSubscanExtrinsicUrl } from '~/utils/format/address'
 
 const props = defineProps<{
   txHash?: string
@@ -8,11 +10,10 @@ const props = defineProps<{
 }>()
 
 const { add: toast } = useToast()
-const { getTransactionUrl } = useExplorer()
 const { prefix } = usePrefix()
 
 const txUrl = computed(() =>
-  getTransactionUrl(props.txHash || '', prefix.value),
+  getSubscanExtrinsicUrl(props.txHash || '', prefix.value as SupportedChain),
 )
 const { copy } = useClipboard({ source: txUrl })
 
