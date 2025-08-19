@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SubstrateWallet, SubstrateWalletSource } from '@/utils/wallet/substrate/types'
+import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
 import { formatEvmAccounts, formatSubAccounts } from '@/utils/wallet'
 import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
 
@@ -26,28 +26,28 @@ async function init() {
 
 async function initWalletState() {
   // sub
-  subWalletStore.$subscribe((mutation, state) => {
-    const events = Array.isArray(mutation.events) ? mutation.events : [mutation.events]
+  watch(
+    () => subWalletStore.wallets.map(wallet => ({ id: wallet.id, accounts: wallet.accounts })),
+    (newWallets, oldWallets) => {
+      newWallets.forEach((newWallet, index) => {
+        const oldWallet = oldWallets?.[index]
 
-    for (const event of events) {
-      if (event.key === 'accounts') {
-        const targetId = (event.target as SubstrateWallet).id
-        const extension = wallets.value.find(wallet => wallet.id === targetId)
-        const accounts = state.wallets.find(wallet => wallet.id === targetId)?.accounts || []
+        if (!oldWallet || JSON.stringify(newWallet.accounts) !== JSON.stringify(oldWallet.accounts)) {
+          const extension = wallets.value.find(wallet => wallet.id === newWallet.id)
 
-        if (!extension) {
-          return
+          if (extension) {
+            walletStore.updateWallet(extension.id, {
+              accounts: formatSubAccounts({
+                accounts: newWallet.accounts,
+                extension,
+              }),
+            })
+          }
         }
-
-        walletStore.updateWallet(extension.id, {
-          accounts: formatSubAccounts({
-            accounts,
-            extension,
-          }),
-        })
-      }
-    }
-  })
+      })
+    },
+    { deep: true },
+  )
 
   // evm
   const { accounts, wallet } = useReown()
