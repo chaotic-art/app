@@ -123,7 +123,7 @@ function getWalletExtensions(): WalletExtension[] {
 
     let state: WalletState = WalletStates.Idle
 
-    if (prevWallet.state === WalletStates.Connected) {
+    if (prevWallet.state === WalletStates.Connected || walletStore.selectedAccounts[wallet.vm]?.includes(wallet.id)) {
       state = WalletStates.Authorized
     }
 
