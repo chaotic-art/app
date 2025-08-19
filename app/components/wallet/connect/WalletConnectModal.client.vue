@@ -27,7 +27,7 @@ async function init() {
 async function initWalletState() {
   // sub
   subWalletStore.$subscribe((mutation, state) => {
-    console.log(mutation.events)
+    console.log(mutation)
     const events = Array.isArray(mutation.events) ? mutation.events : [mutation.events]
 
     for (const event of events) {
