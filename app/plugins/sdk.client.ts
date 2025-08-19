@@ -3,31 +3,31 @@ import type { PolkadotClient, TypedApi } from 'polkadot-api'
 import { createClient } from 'polkadot-api'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
 import { getWsProvider } from 'polkadot-api/ws-provider/web'
+import { PROVIDERS } from '~/config/providers'
 import { ahk, ahp, ahpas, dot, ksm } from '~/descriptors'
 
-// TODO: provide more providers
 const config = {
   ahp: {
     descriptor: ahp,
-    providers: ['wss://polkadot-asset-hub-rpc.polkadot.io'],
+    providers: PROVIDERS.ahp,
   },
   ahk: {
     descriptor: ahk,
-    providers: ['wss://kusama-asset-hub-rpc.polkadot.io'],
+    providers: PROVIDERS.ahk,
   },
   dot: {
     descriptor: dot,
-    providers: ['wss://rpc.dotters.network/polkadot'],
+    providers: PROVIDERS.dot,
   },
   ksm: {
     descriptor: ksm,
-    providers: ['wss://kusama-rpc.polkadot.io'],
+    providers: PROVIDERS.ksm,
   },
 
   // testnet. faucet: https://faucet.polkadot.io/?parachain=1000
   ahpas: {
     descriptor: ahpas,
-    providers: ['wss://pas-rpc.stakeworld.io/assethub'],
+    providers: PROVIDERS.ahpas,
   },
 }
 
@@ -74,7 +74,7 @@ function sdk(chain: Chain = DEFAULT_CHAIN) {
   if (!clients.value[effectiveChain]) {
     const chainConfig = config[effectiveChain]
     clients.value[effectiveChain] = createClient(
-      withPolkadotSdkCompat(getWsProvider(chainConfig.providers)),
+      withPolkadotSdkCompat(getWsProvider({ endpoints: [...chainConfig.providers] })),
     )
   }
 
