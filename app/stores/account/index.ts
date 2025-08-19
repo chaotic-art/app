@@ -1,6 +1,7 @@
 import type { ChainVM, Prefix } from '@kodadot1/static'
 import type { AccountVm, ChainData, TokenDetail, TokenKey } from './types'
 import type { Chain } from '@/types/chain'
+import type { SupportedChain } from '~/plugins/sdk.client'
 import format from '@/utils/format/balance'
 import { getDefaultAccount, getVMSupportedAssets, vmChains } from './utils'
 
@@ -52,9 +53,9 @@ export const useAccountStore = defineStore('account', () => {
     return accounts.value[vm]?.authSignature
   }
 
-  const getTokenDetailFromBalance = ({ prefix, balance }: { prefix: Prefix, balance: bigint | string }): TokenDetail => {
+  const getTokenDetailFromBalance = ({ prefix, balance }: { prefix: SupportedChain, balance: bigint | string }): TokenDetail => {
     const nativeBalance = String(balance || '0')
-    const formattedBalance = format(nativeBalance, decimalsOf(prefix), false)
+    const formattedBalance = format(nativeBalance, chainSpec[prefix].tokenDecimals, false)
 
     return {
       balance: formattedBalance,
@@ -62,7 +63,7 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
-  const updateChainDataWithBalance = ({ vm, address, balance, prefix }: { vm: ChainVM, address: string, balance: bigint, prefix: Prefix }): ChainData => {
+  const updateChainDataWithBalance = ({ vm, address, balance, prefix }: { vm: ChainVM, address: string, balance: bigint, prefix: SupportedChain }): ChainData => {
     const supportedTokens = getVMSupportedAssets(vm).filter(({ prefix: tokenPrefix }) => tokenPrefix === prefix)
 
     const assets = Object.fromEntries(
@@ -112,7 +113,7 @@ export const useAccountStore = defineStore('account', () => {
                 vm,
                 address,
                 balance,
-                prefix,
+                prefix: prefix as SupportedChain,
               }),
             },
           },

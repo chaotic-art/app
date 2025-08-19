@@ -1,5 +1,4 @@
 import type { ChainProperties, ChainVM, Prefix } from '@kodadot1/static'
-import type { Chain } from '@/types/chain'
 import type { SupportedChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 
@@ -22,12 +21,6 @@ export function ss58Of(prefix: Prefix): number {
 export function tokenSymbolOf<T = string>(prefix: Prefix): T {
   return chainPropListOf(prefix).tokenSymbol as T
 }
-
-export function decimalsOf(prefix: Prefix): number {
-  return chainPropListOf(prefix).tokenDecimals
-}
-
-export const vmOfChain = (chain: Chain): ChainVM => vmOf(getPrefixOfChain(chain)!)
 
 export const chainSpec: Record<SupportedChain, { name: string, tokenDecimals: number, tokenSymbol: string }> = {
   ahp: {
