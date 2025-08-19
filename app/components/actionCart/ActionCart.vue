@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { useActionCartStore } from '@/stores/actionCart'
 
-const { onDisconnect } = useWalletManager()
 const actionCartStore = useActionCartStore()
 const preferencesStore = usePreferencesStore()
 
 const isListingDisabled = ref(false) // Allow listing for all chains for now
 
-onDisconnect(actionCartStore.clear)
 onBeforeUnmount(actionCartStore.clear)
 </script>
 
@@ -18,7 +16,7 @@ onBeforeUnmount(actionCartStore.clear)
       class="fixed right-24 bottom-9 z-998"
     >
       <div class="inline-flex items-center">
-        <div class="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 flex items-center p-2 gap-5 rounded-2xl">
+        <div class="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 flex items-center p-2 gap-8 rounded-2xl">
           <div class="flex items-center gap-2">
             <div class="px-4">
               <b>{{ actionCartStore.count }}</b>

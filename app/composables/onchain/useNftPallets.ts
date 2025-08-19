@@ -317,13 +317,11 @@ export function useNftPallets() {
   }
 
   async function getAccountSigner() {
-    const account = getConnectedSubAccount.value
-
-    if (!account?.address) {
+    if (!getConnectedSubAccount.value?.address) {
       throw new Error('No address found')
     }
 
-    const signer = await account.signer
+    const signer = await getConnectedSubAccount.value.signer
 
     if (!signer) {
       throw new Error('No signer found')
@@ -331,7 +329,7 @@ export function useNftPallets() {
 
     return {
       signer,
-      address: account.address,
+      address: getConnectedSubAccount.value.address,
     }
   }
 

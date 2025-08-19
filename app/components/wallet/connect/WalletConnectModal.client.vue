@@ -15,7 +15,7 @@ const { stage, wallets } = storeToRefs(walletStore)
 async function init() {
   walletStore.setStage(WalletStageTypes.Loading)
 
-  const extensions = getWalletExtensions()
+  const extensions = await getWalletExtensions()
 
   await initWalletState()
 
@@ -79,7 +79,7 @@ async function initWalletState() {
   })
 }
 
-function getSubWalletExtensions(): WalletExtension[] {
+async function getSubWalletExtensions(): Promise<WalletExtension[]> {
   const wallets = subWalletStore.init()
 
   return wallets.map(extension => ({
@@ -105,31 +105,30 @@ function getEvmWalletExtensions(): WalletExtension[] {
   ]
 }
 
-function getWalletExtensions(): WalletExtension[] {
-  const subExtensions = getSubWalletExtensions()
+async function getWalletExtensions(): Promise<WalletExtension[]> {
+  const subExtensions = await getSubWalletExtensions()
   const evmExtensions = getEvmWalletExtensions()
 
-  const freshWallets = [
+  const originalWallets = [
     ...subExtensions,
     ...evmExtensions,
   ]
 
-  return freshWallets.map((wallet) => {
-    const prevWallet = wallets.value.find(w => w.id === wallet.id)
+  return originalWallets.map((wallet) => {
+    const savedWallet = wallets.value.find(w => w.id === wallet.id)
 
-    if (!prevWallet) {
+    if (!savedWallet) {
       return wallet
     }
 
     let state: WalletState = WalletStates.Idle
 
-    if (prevWallet.state === WalletStates.Connected || walletStore.selectedAccounts[wallet.vm]?.includes(wallet.id)) {
+    if (savedWallet.state === WalletStates.Connected) {
       state = WalletStates.Authorized
     }
 
     return {
-      ...wallet,
-      accounts: prevWallet.accounts, // start with old accounts
+      ...savedWallet,
       state,
     }
   })
