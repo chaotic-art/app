@@ -51,10 +51,7 @@ onMounted(async () => {
 
 const nftPath = computed(
   () => mintedNft.value
-    ? pickByVm({
-        SUB: `/${mintedNft.value.chain}/gallery/${mintedNft.value.collection.id}-${mintedNft.value.id}`,
-        EVM: `/${mintedNft.value.chain}/gallery/${mintedNft.value.id}`,
-      }, { prefix: mintedNft.value.chain as Prefix })
+    ? `/${mintedNft.value.chain}/gallery/${mintedNft.value.collection.id}-${mintedNft.value.id}`
     : '',
 )
 const nftFullUrl = computed(() => `${window.location.origin}${nftPath.value}`)
