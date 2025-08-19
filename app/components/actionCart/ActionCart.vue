@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useActionCartStore } from '@/stores/actionCart'
 
+const { onDisconnect } = useWalletManager()
 const actionCartStore = useActionCartStore()
 const preferencesStore = usePreferencesStore()
 
 const isListingDisabled = ref(false) // Allow listing for all chains for now
 
+onDisconnect(actionCartStore.clear)
 onBeforeUnmount(actionCartStore.clear)
 </script>
 

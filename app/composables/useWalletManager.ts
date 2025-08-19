@@ -1,7 +1,11 @@
+import { createEventHook, whenever } from '@vueuse/core'
+
 export default function useWalletManager() {
   const walletStore = useWalletStore()
+  const { accountId } = useAuth()
   const { selectedAccounts } = storeToRefs(walletStore)
   const accountStore = useAccountStore()
+  const disconnectEvent = createEventHook<void>()
 
   async function disconnectWallet(wallet: WalletExtension) {
     const vm = wallet.vm
@@ -29,7 +33,14 @@ export default function useWalletManager() {
     }
   }
 
+  whenever(
+    () => !accountId.value,
+    () => disconnectEvent.trigger(),
+    { flush: 'sync' },
+  )
+
   return {
     disconnectWallet,
+    onDisconnect: disconnectEvent.on,
   }
 }
