@@ -2,15 +2,21 @@
 import type { SupportedChain } from '~/plugins/sdk.client'
 import { getBalance } from '~/utils/api/substrate'
 
+const { getConnectedSubAccount } = storeToRefs(useWalletStore())
+
 const mainNet: Exclude<SupportedChain, 'ahpas'>[] = ['dot', 'ksm', 'ahp', 'ahk']
 const balances = ref<Awaited<ReturnType<typeof getBalance>>[]>([])
 const isLoading = ref(true)
 
-onMounted(async () => {
+watchEffect(async () => {
+  if (!getConnectedSubAccount?.value?.address) {
+    return
+  }
+
   // Load balances gradually as they resolve
   const promises = mainNet.map(async (chain, index) => {
     try {
-      const balance = await getBalance(chain, '1xjvRADwdJcnmUCLWerEHR4iGCT5EBTm4D4fzLLg4LcAC9p')
+      const balance = await getBalance(chain, getConnectedSubAccount.value?.address ?? '')
       // Add balance to the array as soon as it resolves
       balances.value[index] = balance
     }

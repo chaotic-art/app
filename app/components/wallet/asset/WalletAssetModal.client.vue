@@ -20,9 +20,6 @@ const value = defineModel<boolean>({ required: true })
           <USeparator class="my-4" />
 
           <!-- Balances -->
-          <!-- <WalletAssetBalances /> -->
-
-          <!-- Asset Balances -->
           <AssetBalances />
         </div>
       </template>
