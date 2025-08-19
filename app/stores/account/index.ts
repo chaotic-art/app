@@ -32,7 +32,7 @@ export const useAccountStore = defineStore('account', () => {
     for (const account of Object.values(accounts.value)) {
       for (const [chain, chainData] of Object.entries(account.chains)) {
         const prefix = getPrefixOfChain(chain as Chain)
-        const nativeToken = tokenSymbolOf<TokenKey>(prefix)
+        const nativeToken = chainSpec[prefix as SupportedChain].tokenSymbol as TokenKey
 
         if (chainData.assets[nativeToken]) {
           result[prefix] = chainData.assets[nativeToken].nativeBalance

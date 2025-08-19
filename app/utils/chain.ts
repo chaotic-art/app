@@ -18,10 +18,6 @@ export function ss58Of(prefix: Prefix): number {
   return chainPropListOf(prefix).ss58Format
 }
 
-export function tokenSymbolOf<T = string>(prefix: Prefix): T {
-  return chainPropListOf(prefix).tokenSymbol as T
-}
-
 export const chainSpec: Record<SupportedChain, { name: string, tokenDecimals: number, tokenSymbol: string }> = {
   ahp: {
     name: 'Asset Hub Polkadot',
