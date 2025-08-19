@@ -28,6 +28,8 @@ async function initWalletState() {
   // sub
   subWalletStore.$subscribe((mutation, state) => {
     const events = Array.isArray(mutation.events) ? mutation.events : [mutation.events]
+    // eslint-disable-next-line no-console
+    console.log('events', { mutation, events })
 
     for (const event of events) {
       if (event.key === 'accounts') {
