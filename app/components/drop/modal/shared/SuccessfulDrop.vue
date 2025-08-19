@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
 import type { ItemMedia } from '@/components/common/successfulModal/SuccessfulItemsMedia.vue'
 import type { ShareProp } from '@/components/common/successfulModal/SuccessfulModalBody.vue'
 import type { MintedNFT, MintingSession } from '@/components/drop/types'
