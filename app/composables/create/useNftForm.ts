@@ -4,7 +4,6 @@ import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
-import { getChainSpec } from '~/utils/api/substrate'
 import { blockchains } from './useCollectionForm'
 
 interface Property {
@@ -61,14 +60,14 @@ export function useNftForm() {
     state.collection = ''
 
     try {
-      const { symbol, decimals, name } = await getChainSpec(state.blockchain)
-      balance.symbol = symbol
-      balance.decimals = decimals
+      const { name, tokenDecimals, tokenSymbol } = chainSpec[state.blockchain]
+      balance.symbol = tokenSymbol
+      balance.decimals = tokenDecimals
       balance.name = name
 
       // fetch user balance
       balance.userBalance = await userBalance(state.blockchain)
-      balance.userBalanceFormatted = formatBalance(balance.userBalance, { decimals, symbol })
+      balance.userBalanceFormatted = formatBalance(balance.userBalance, { decimals: tokenDecimals, symbol: tokenSymbol })
 
       // fetch user collections
       const userCollections = await userCollection(state.blockchain)

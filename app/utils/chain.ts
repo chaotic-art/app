@@ -14,34 +14,36 @@ export function blockExplorerOf(prefix: Prefix): string {
   return chainPropListOf(prefix).blockExplorer || ''
 }
 
-export function ss58Of(prefix: Prefix): number {
-  return chainPropListOf(prefix).ss58Format
-}
-
-export const chainSpec: Record<SupportedChain, { name: string, tokenDecimals: number, tokenSymbol: string }> = {
+// this is static config. for onchain data use getChainSpec() from utils/api/substrate.ts
+export const chainSpec: Record<SupportedChain, { name: string, tokenDecimals: number, tokenSymbol: string, ss58Format: number }> = {
   ahp: {
-    name: 'Asset Hub Polkadot',
+    name: 'Polkadot Asset Hub',
     tokenDecimals: 10,
     tokenSymbol: 'DOT',
+    ss58Format: 0,
   },
   ahk: {
-    name: 'Asset Hub Kusama',
+    name: 'Kusama Asset Hub',
     tokenDecimals: 12,
     tokenSymbol: 'KSM',
+    ss58Format: 2,
   },
   ahpas: {
-    name: 'Asset Hub Paseo',
+    name: 'Paseo Asset Hub',
     tokenDecimals: 10,
     tokenSymbol: 'PAS',
+    ss58Format: 0,
   },
   dot: {
     name: 'Polkadot',
     tokenDecimals: 10,
     tokenSymbol: 'DOT',
+    ss58Format: 0,
   },
   ksm: {
     name: 'Kusama',
     tokenDecimals: 12,
     tokenSymbol: 'KSM',
+    ss58Format: 2,
   },
 }

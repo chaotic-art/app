@@ -12,6 +12,7 @@ export async function getChainSpec(chainPrefix: SupportedChain) {
     decimals: tokenDecimals,
     symbol: tokenSymbol,
     name: chainSpec.name,
+    ss58Format: chainSpec.properties.ss58Format,
   }
 }
 
