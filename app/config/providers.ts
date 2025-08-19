@@ -1,7 +1,7 @@
 /**
  * Network providers configuration
  * Generated from @polkadot/apps-config endpoints
- *
+ * 
  * This file is auto-generated. Do not edit manually.
  * Run 'node scripts/generate-providers.mjs' to regenerate.
  */
