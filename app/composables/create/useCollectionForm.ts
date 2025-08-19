@@ -4,7 +4,6 @@ import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
-import { getChainSpec } from '~/utils/api/substrate'
 
 // Blockchains for select
 export const blockchains: { label: string, value: AssetHubChain }[] = [
@@ -56,13 +55,13 @@ export function useCollectionForm() {
       return
 
     try {
-      const { symbol, decimals, name } = await getChainSpec(state.blockchain)
-      balance.symbol = symbol
-      balance.decimals = decimals
+      const { name, tokenDecimals, tokenSymbol } = chainSpec[state.blockchain]
+      balance.symbol = tokenSymbol
+      balance.decimals = tokenDecimals
       balance.name = name
 
       balance.userBalance = await userBalance(state.blockchain)
-      balance.userBalanceFormatted = formatBalance(balance.userBalance, { decimals, symbol })
+      balance.userBalanceFormatted = formatBalance(balance.userBalance, { decimals: tokenDecimals, symbol: tokenSymbol })
     }
     catch (error) {
       console.error('Error fetching balance:', error)

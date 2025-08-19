@@ -22,7 +22,6 @@ interface FilterOption {
 
 const props = defineProps<Props>()
 const { $apolloClient } = useNuxtApp()
-const { decimalsOf } = useChain()
 const selectedFilters = ref<ActivityFilter[]>(['MINT', 'LIST', 'BUY'])
 const tokenActivityData = ref<TokenActivityData['events']>([])
 
@@ -112,8 +111,8 @@ watchEffect(async () => {
             cell: ({ row }) => {
               const meta = row.getValue('meta') as string
               const format = formatBalance(meta, {
-                decimals: decimalsOf('ahp'), // TODO: handle asset hub chains
-                symbol: tokenSymbolOf('ahp'), // TODO: handle asset hub chains
+                decimals: chainSpec[chain].tokenDecimals,
+                symbol: chainSpec[chain].tokenSymbol,
               })
 
               return meta && meta !== '0' ? format : '-'

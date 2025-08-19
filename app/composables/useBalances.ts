@@ -1,5 +1,6 @@
 import type { Prefix } from '@kodadot1/static'
 import type { Address } from 'viem'
+import type { SupportedChain } from '~/plugins/sdk.client'
 import { getBalance as accountBalance } from '@wagmi/core'
 
 interface GetBalanceParams {
@@ -23,7 +24,7 @@ export default function () {
 
     const balance = await $sdk(prefix).api.query.System.Account.getValue(formattedAddress)
 
-    return { address: formattedAddress, balance: balance.data.free, symbol: tokenSymbolOf(prefix) }
+    return { address: formattedAddress, balance: balance.data.free, symbol: chainSpec[prefix as SupportedChain].tokenSymbol }
   }
 
   const getEvmBalance = async ({ address, prefix }: GetBalanceParams): Promise<GetBalanceResult> => {
