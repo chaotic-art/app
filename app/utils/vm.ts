@@ -16,7 +16,7 @@ export function pickByVm<T>(map: CompleteVmMap<T>, options?: PickByVmOptions): T
 export function pickByVm<T>(map: Partial<Record<ChainVM, T>>, options?: PickByVmOptions): T | undefined
 
 export function pickByVm<T>(map: Partial<Record<ChainVM, T>>, { key, vm, prefix }: PickByVmOptions = {}): T | undefined {
-  const { vm: currentVm } = useChain()
+  const { vm: currentVm } = useVm()
   const targetVm = prefix ? vmOf(prefix) : (vm ?? currentVm.value)
 
   const isComplete = isCompleteVmMap(map)

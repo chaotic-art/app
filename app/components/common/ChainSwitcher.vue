@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import { chainSpec, isAssetHubChain } from '~/utils/chain'
+import { chainSpec } from '~/utils/chain'
 
 interface Props {
   /**
@@ -13,6 +13,7 @@ const { showLabel = true } = defineProps<Props>()
 
 const route = useRoute()
 const router = useRouter()
+const { currentChain } = useChain()
 
 // Chain options for Asset Hub chains
 const chainOptions = [
@@ -35,12 +36,6 @@ const chainOptions = [
     tokenSymbol: chainSpec.ahk.tokenSymbol,
   },
 ]
-
-// Get current chain from route params
-const currentChain = computed(() => {
-  const { chain } = route.params
-  return typeof chain === 'string' && isAssetHubChain(chain) ? chain : 'ahp'
-})
 
 // Get current selected chain option (for display purposes if needed later)
 const selectedChain = computed(() => {

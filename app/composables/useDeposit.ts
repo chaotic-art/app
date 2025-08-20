@@ -1,6 +1,6 @@
 import type { Prefix } from '@kodadot1/static'
 import { CHAINS } from '@kodadot1/static'
-import { chainPropListOf } from '@/utils/chain'
+import { chainPropListOf } from '@/composables/useVm'
 import format from '@/utils/format/balance'
 
 export default function (prefix: Ref<Prefix>) {
