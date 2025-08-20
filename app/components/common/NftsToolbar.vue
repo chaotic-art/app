@@ -93,6 +93,9 @@ watch(() => queryState.value, (newValue) => {
 
 <template>
   <div class="flex items-center gap-2 flex-wrap">
+    <!-- Chain Switcher -->
+    <ChainSwitcher />
+
     <UInput
       :model-value="queryState.search"
       placeholder="Search NFTs..."

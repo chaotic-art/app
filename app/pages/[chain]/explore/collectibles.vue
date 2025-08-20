@@ -64,6 +64,9 @@ const queryVariables = computed(() => ({
   <UContainer class="px-4 md:px-6">
     <ExploreHeader>
       <template #controls>
+        <!-- Chain Switcher -->
+        <ChainSwitcher />
+
         <UInput
           :model-value="queryState.search"
           placeholder="Search collections..."
