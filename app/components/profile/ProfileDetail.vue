@@ -155,12 +155,12 @@ function onTotalCountChange(slot: string, totalCount: number) {
             />
             <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
 
-            <UButton
+            <!-- <UButton
               icon="i-lucide-dollar-sign"
               variant="outline"
             >
               Transfer
-            </UButton>
+            </UButton> -->
 
             <ProfileShareDropdown />
           </div>
