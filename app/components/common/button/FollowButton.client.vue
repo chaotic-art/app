@@ -144,6 +144,10 @@ watch(isHovered, (newHover, oldHover) => {
 })
 
 defineExpose({ refresh: refreshFollowingStatus })
+
+watch(accountId, () => {
+  refreshFollowingStatus()
+})
 </script>
 
 <template>
