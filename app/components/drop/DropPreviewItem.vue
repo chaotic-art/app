@@ -67,9 +67,9 @@ watch([accountId], () => {
       <UButton class="rounded-full bg-accent text-xs md:text-sm cursor-pointer" variant="soft" trailing-icon="i-lucide-refresh-cw" :loading="isCapturingImage" @click="generateNft">
         Preview Variation
       </UButton>
-      <UButton class="rounded-full bg-accent text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
+      <!-- <UButton class="rounded-full bg-accent text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
         Controls
-      </UButton>
+      </UButton> -->
     </div>
   </div>
 </template>
