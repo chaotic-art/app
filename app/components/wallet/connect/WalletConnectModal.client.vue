@@ -143,22 +143,20 @@ const walletStates = computed<Record<string, WalletState>>(() => {
 })
 
 // watch for unsyncedExtensions
-watch(walletStates, (_, prevState) => {
+watch(walletStates, async (_, prevState) => {
   for (const wallet of wallets.value) {
     if (wallet.state === WalletStates.Authorized && prevState[wallet.id] !== WalletStates.Authorized) {
-      execByVm({
-        SUB: async () => {
-          walletStore.updateWallet(wallet.id, { state: WalletStates.Connecting })
+      if (wallet.vm === 'SUB') {
+        walletStore.updateWallet(wallet.id, { state: WalletStates.Connecting })
 
-          if (!subWalletStore.isWalletInitialized(wallet.id)) {
-            await subWalletStore.connectWallet(wallet.source as SubstrateWalletSource)
-          }
+        if (!subWalletStore.isWalletInitialized(wallet.id)) {
+          await subWalletStore.connectWallet(wallet.source as SubstrateWalletSource)
+        }
 
-          subWalletStore.subscribeAccounts(wallet.id)
+        subWalletStore.subscribeAccounts(wallet.id)
 
-          walletStore.updateWallet(wallet.id, { state: WalletStates.Connected })
-        },
-      }, { vm: wallet.vm })
+        walletStore.updateWallet(wallet.id, { state: WalletStates.Connected })
+      }
     }
   }
 })
