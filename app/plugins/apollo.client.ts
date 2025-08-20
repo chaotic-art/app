@@ -1,12 +1,16 @@
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from './sdk.client'
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
-import { INDEXERS as GRAPHQL_ENDPOINTS } from '@kodadot1/static'
+
+export const GRAPHQL_ENDPOINTS: Record<Exclude<AssetHubChain, 'ahpas'>, string> = {
+  ahk: 'https://ahk.gql.api.kodadot.xyz/',
+  ahp: 'https://ahp.gql.api.kodadot.xyz/',
+}
 
 export default defineNuxtPlugin(() => {
   const customUri = new HttpLink({
     uri: ({ getContext }) => {
       const { endpoint } = getContext()
-      return GRAPHQL_ENDPOINTS[endpoint as Prefix || 'ahp']
+      return GRAPHQL_ENDPOINTS[endpoint as Exclude<AssetHubChain, 'ahpas'> || 'ahp']
     },
   })
 

@@ -12,6 +12,7 @@ interface UseInfiniteNftsOptions {
   owner?: string
   issuer?: string
   variables?: Record<string, any> // Allow any additional GraphQL variables
+  endpoint?: AssetHubChain
 }
 
 export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
@@ -22,6 +23,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     owner,
     issuer,
     variables = {},
+    endpoint = 'ahp',
   } = options
 
   const infiniteQuery = useInfiniteQuery<ExploreNftsData, NftEntity>({
@@ -29,7 +31,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     pageSize,
     distance,
     variables: {
-      denyList: getDenyList('ahp') || [], // TODO: handle asset hub chains
+      denyList: getDenyList(endpoint) || [], // TODO: handle asset hub chains
       name: search || undefined,
       owner: owner || undefined,
       issuer: issuer || undefined,
@@ -38,6 +40,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     extractData: data => data.tokenEntities,
     extractTotal: data => data.tokenEntityCount.totalCount,
     placeholderCount: 18,
+    endpoint,
   })
 
   // Transform display items for the template with proper typing
@@ -50,7 +53,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
           name: item.name,
           tokenId: Math.floor(Math.random() * 1000) + 1,
           collectionId: Math.floor(Math.random() * 100) + 1,
-          chain: 'ahp' as AssetHubChain, // TODO: handle asset hub chains
+          chain: endpoint,
           image: item.image,
           isPlaceholder: true,
         }
@@ -65,7 +68,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
         name: nft.name || 'Untitled NFT',
         tokenId: tokenId || 0,
         collectionId: collectionId || 0,
-        chain: 'ahp' as AssetHubChain, // TODO: handle asset hub chains
+        chain: endpoint,
         image: nft.meta?.image || nft.image,
         isPlaceholder: false,
       }

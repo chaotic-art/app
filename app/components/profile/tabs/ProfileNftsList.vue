@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/plugins/sdk.client'
+
 const props = defineProps<{
   extraVariables?: Partial<Record<'owner' | 'issuer', string>>
 }>()
@@ -6,6 +8,9 @@ const props = defineProps<{
 defineEmits(['totalCountChange'])
 
 const queryVariables = ref<Record<string, any>>({})
+
+const { chain } = useRoute().params as { chain: AssetHubChain }
+const currentChain = computed(() => chain || 'ahp')
 </script>
 
 <template>
@@ -22,6 +27,7 @@ const queryVariables = ref<Record<string, any>>({})
         :owner="queryVariables.owner"
         :issuer="queryVariables.issuer"
         :variables="queryVariables"
+        :prefix="currentChain"
         @total-count-change="$emit('totalCountChange', $event)"
       />
     </div>

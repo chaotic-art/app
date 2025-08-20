@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 interface Props {
   item: ReturnType<typeof useInfiniteCollections>['collections']['value'][number]
-  prefix?: Prefix
+  prefix?: AssetHubChain
   isLoading?: boolean
   volume?: string
 }
