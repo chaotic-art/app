@@ -32,7 +32,7 @@ interface OdaCollectionOwners {
   owners: Record<string, number>
 }
 
-export function fetchOdaCollectionOwners(chain: Prefix, address: string) {
+export function fetchOdaCollectionOwners(chain: AssetHubChain, address: string) {
   return api<OdaCollectionOwners>(`/v1/${chain}/collection/${address}/owners`)
 }
 

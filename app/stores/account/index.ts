@@ -7,7 +7,7 @@ import { getDefaultAccount, getVMSupportedAssets, vmChains } from './utils'
 
 export const useAccountStore = defineStore('account', () => {
   const { prefix } = usePrefix()
-  const { vm } = useChain()
+  const { vm } = useVm()
 
   const loading = ref(false)
   const accounts = ref<Record<ChainVM, AccountVm>>({

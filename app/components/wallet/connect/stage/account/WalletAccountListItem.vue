@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
-import { chainPropListOf } from '@/utils/chain'
 import { shortenAddress } from '@/utils/format/address'
 
 const props = defineProps<{
@@ -14,25 +13,15 @@ const emit = defineEmits<{
 }>()
 
 const toast = useToast()
-const { prefix: currentPrefix } = usePrefix()
-const { vm: currentVm } = useChain()
 const { getBalance } = useBalances()
 const { selectedAccounts } = useWalletStore()
 
-const accountPrefix = computed(() => {
-  const isCurrentAccountVm = currentVm.value === props.account.vm
-
-  return isCurrentAccountVm ? currentPrefix.value : DEFAULT_PREFIX_MAP[props.account.vm]
-})
-
-const chainProps = computed(() => chainPropListOf(accountPrefix.value))
-
 const { data: balanceData, isPending: isBalanceLoading } = useQuery({
-  queryKey: ['wallet-balance', props.account.address, currentPrefix],
+  queryKey: ['wallet-balance', props.account.address],
   queryFn: () => {
     return getBalance({
       address: props.account.address,
-      prefix: accountPrefix.value,
+      prefix: 'ahp',
     })
   },
   staleTime: 30000,
@@ -40,7 +29,7 @@ const { data: balanceData, isPending: isBalanceLoading } = useQuery({
 })
 
 const balance = computed(() => balanceData.value?.balance?.toString() || '0')
-const { usd: usdBalance } = useAmount(balance, computed(() => chainProps.value.tokenDecimals), computed(() => chainProps.value.tokenSymbol))
+const usdBalance = computed(() => tokenToUsd(Number(balance.value), chainSpec.ahp.tokenDecimals, chainSpec.ahp.tokenSymbol))
 
 function selectAccount(account: WalletAccount) {
   emit('select', account.id)
@@ -109,7 +98,7 @@ onMounted(async () => {
               class="h-3 w-12"
             />
             <span
-              v-else
+              v-else-if="account.vm === 'SUB'"
               class="text-xs text-gray-600 dark:text-gray-400"
             >
               {{ usdBalance }}

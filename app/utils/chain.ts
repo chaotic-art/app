@@ -1,14 +1,4 @@
-import type { ChainProperties, ChainVM, Prefix } from '@kodadot1/static'
 import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
-import { CHAINS } from '@kodadot1/static'
-
-export function chainPropListOf(prefix: Prefix): ChainProperties {
-  return CHAINS[prefix]
-}
-
-export function vmOf(prefix: Prefix): ChainVM {
-  return chainPropListOf(prefix).vm
-}
 
 // this is static config. for onchain data use getChainSpec() from utils/api/substrate.ts
 export const chainSpec: Record<SupportedChain, { name: string, tokenDecimals: number, tokenSymbol: string, ss58Format: number }> = {

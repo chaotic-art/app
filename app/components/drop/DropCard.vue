@@ -8,15 +8,14 @@ const props = defineProps<{
   showMinted?: boolean
 }>()
 
-const { prefix } = usePrefix()
 const formattedDrop = ref<DropItem>()
-const { decimals, chainSymbol } = useChain()
+const { decimals, chainSymbol, currentChain } = useChain()
 
 const shouldShowDrop = computed(() =>
   props.showMinted || (formattedDrop.value && !formattedDrop.value.isMintedOut),
 )
 const isUnlimited = computed(() => formattedDrop.value?.max && formattedDrop.value.max >= Number.MAX_SAFE_INTEGER)
-const { usd: usdPrice } = useAmount(computed(() => formattedDrop.value?.price), decimals, chainSymbol)
+const usdPrice = computed(() => tokenToUsd(Number(formattedDrop.value?.price), decimals.value, chainSymbol.value))
 
 onBeforeMount(async () => {
   formattedDrop.value = await getDropAttributes(props.drop.alias)
@@ -28,7 +27,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <NuxtLink v-if="shouldShowDrop" :to="`/${prefix}/drops/${drop.alias}`" class="relative border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group">
+  <NuxtLink v-if="shouldShowDrop" :to="`/${currentChain}/drops/${drop.alias}`" class="relative border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group">
     <!-- Collectors on Hover -->
     <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-95">
       <div v-if="formattedDrop?.minted" class="bg-secondary backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-2">
@@ -37,7 +36,7 @@ onBeforeMount(async () => {
             <UIcon name="mdi:account-group" class="text-gray-600 dark:text-gray-400 text-sm" />
             <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Collected by</span>
           </div>
-          <DropCollectedBy :chain="prefix" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
+          <DropCollectedBy :chain="currentChain" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
         </div>
       </div>
     </div>
