@@ -66,13 +66,13 @@
     </section>
 
     <!-- Featured NFT Section -->
-    <LazyFeaturedNFT />
+    <LazyFeaturedNFT :hydrate-on-visible="{ rootMargin: '600px' }" />
 
     <!-- Latest Drops Section -->
-    <LazyLatestDrops />
+    <LazyLatestDrops :hydrate-on-visible="{ rootMargin: '600px' }" />
 
     <!-- Curated Artists Section -->
-    <LazyCuratedArtists />
+    <LazyCuratedArtists :hydrate-on-visible="{ rootMargin: '600px' }" />
 
     <div class="bg-muted py-16">
       <UContainer>
@@ -82,7 +82,7 @@
     </div>
 
     <!-- Partners Section -->
-    <LazyPartners />
+    <LazyPartners :hydrate-on-visible="{ rootMargin: '600px' }" />
 
     <LazyDropMintModal />
   </div>
