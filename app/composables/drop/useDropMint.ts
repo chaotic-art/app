@@ -1,7 +1,7 @@
 import type { TxInBestBlocksFound } from 'polkadot-api'
 import { Binary } from 'polkadot-api'
 import useDropMassmint from '@/composables/drop/massmint/useDropMassmint'
-import { useUpdateMetadata } from '@/composables/drop/useGenerativeDropMint'
+import { updateGenartMetadata } from '@/composables/drop/useGenerativeDropMint'
 
 const isModalOpen = ref(false)
 
@@ -127,14 +127,12 @@ export default function useDropMint() {
   }
 
   function executeTransaction() {
-    execByVm({
-      SUB: executeSubTransaction,
-    })
+    executeSubTransaction()
   }
 
   async function submitMints() {
     try {
-      await useUpdateMetadata({ blockNumber })
+      updateGenartMetadata()
 
       loading.value = false
     }

@@ -75,18 +75,18 @@ async function initExtensionAuthorization(extension: WalletExtension) {
   try {
     walletStore.updateWalletState(extension.id, WalletStates.Authorizing)
 
-    execByVm({
-      SUB: async () => {
-        try {
-          const walletAccounts = await initSubAuthorization(extension)
-          setWalletAuthorized(extension, walletAccounts)
-        }
-        catch {
-          walletStore.updateWalletState(extension.id, WalletStates.AuthorizationFailed)
-        }
-      },
-      EVM: async () => await initEvmAuth(),
-    }, { vm: extension.vm })
+    if (extension.vm === 'SUB') {
+      try {
+        const walletAccounts = await initSubAuthorization(extension)
+        setWalletAuthorized(extension, walletAccounts)
+      }
+      catch {
+        walletStore.updateWalletState(extension.id, WalletStates.AuthorizationFailed)
+      }
+    }
+    else {
+      await initEvmAuth()
+    }
   }
   catch {
     walletStore.updateWalletState(extension.id, WalletStates.AuthorizationFailed)
