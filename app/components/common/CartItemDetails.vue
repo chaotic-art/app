@@ -27,7 +27,7 @@ defineProps<{
     </div>
 
     <!-- NFT Details -->
-    <div class="flex flex-1 justify-between items-end">
+    <div class="flex flex-1 justify-between">
       <div class="flex-1 min-w-0">
         <h2 class="font-bold text-gray-900 dark:text-white truncate">
           {{ name || '--' }}
@@ -37,7 +37,9 @@ defineProps<{
         </p>
       </div>
 
-      <Money :value="price" inline />
+      <slot name="right">
+        <Money :value="price" inline class="mt-auto" />
+      </slot>
     </div>
   </div>
 </template>

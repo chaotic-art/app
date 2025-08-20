@@ -7,6 +7,7 @@ const { accountId } = useAuth()
 const { prefix } = usePrefix()
 const route = useRoute()
 const router = useRouter()
+const preferencesStore = usePreferencesStore()
 
 // Modal state
 const isCreateModalOpen = ref(false)
@@ -88,6 +89,13 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
             :items="navItems"
           />
           <ThemeSwitcher v-if="!accountId" />
+          <UButton
+            v-if="accountId"
+            icon="lucide:shopping-cart"
+            color="neutral"
+            variant="ghost"
+            @click="preferencesStore.shoppingCartModalOpen = true"
+          />
         </div>
 
         <!-- Desktop Wallet -->

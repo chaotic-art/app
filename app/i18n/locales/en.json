@@ -152,5 +152,8 @@
     "dropNfts": "I've minted {0} generative art pieces on Chaotic!",
     "listedNft": "Check out this awesome NFT I just listed on Chaotic!",
     "listedNfts": "Check out these awesome NFTs I just listed on Chaotic:\n {0}"
+  },
+  "shoppingCart": {
+    "completePurchase": "Complete Purchase"
   }
 }
