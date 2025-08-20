@@ -1,5 +1,5 @@
 import type { ChainProperties, ChainVM, Prefix } from '@kodadot1/static'
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 
 export function chainPropListOf(prefix: Prefix): ChainProperties {
@@ -42,4 +42,13 @@ export const chainSpec: Record<SupportedChain, { name: string, tokenDecimals: nu
     tokenSymbol: 'KSM',
     ss58Format: 2,
   },
+}
+
+// Type guard functions
+export function isAssetHubChain(chain: string): chain is AssetHubChain {
+  return ['ahp', 'ahk', 'ahpas'].includes(chain as AssetHubChain)
+}
+
+export function isSupportedChain(chain: string): chain is SupportedChain {
+  return chain in chainSpec
 }

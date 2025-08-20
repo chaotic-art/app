@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { CHAINS } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
+import { isAssetHubChain } from '~/utils/chain'
 
 // Validate chain parameter
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && chain in CHAINS
+    return typeof chain === 'string' && isAssetHubChain(chain)
   },
 })
 
@@ -14,6 +15,9 @@ useSeoMeta({
   title: 'Explore NFTs - Discover Digital Collectibles',
   description: 'Browse and discover NFTs across different categories and collections.',
 })
+
+const route = useRoute()
+const { chain } = route.params as { chain: AssetHubChain }
 
 const queryVariables = ref<Record<string, any>>({})
 </script>
@@ -34,6 +38,7 @@ const queryVariables = ref<Record<string, any>>({})
         :key="JSON.stringify(queryVariables)"
         :search="queryVariables.name || ''"
         :variables="queryVariables"
+        :prefix="chain"
       />
     </div>
   </UContainer>

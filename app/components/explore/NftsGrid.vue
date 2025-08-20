@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/plugins/sdk.client'
+
 interface Props {
   search?: string
   variables?: Record<string, any>
   noItemsFoundMessage?: string
   gridClass?: string
+  prefix?: AssetHubChain
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,6 +31,7 @@ const {
   distance: 300,
   search: props.search,
   variables: props.variables,
+  endpoint: props.prefix,
 })
 
 onMounted(async () => {

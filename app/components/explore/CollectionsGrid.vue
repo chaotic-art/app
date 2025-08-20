@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 
 interface Props {
   variables?: Record<string, any>
-  prefix?: Prefix
+  prefix?: AssetHubChain
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -25,6 +25,7 @@ const {
   pageSize: 40,
   distance: 300,
   variables: props.variables,
+  endpoint: props.prefix,
 })
 
 onMounted(async () => {
