@@ -1,10 +1,12 @@
 import type { ChainProperties, Prefix } from '@kodadot1/static'
-import type { Chain } from '~/types'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { existentialDeposit as chainsExistentialDeposit } from '@kodadot1/static'
 import { chainPropListOf } from '@/utils/chain'
-import { prefixToChainMap } from '~/types'
 
 export function useChain() {
+  const route = useRoute()
+  const { chain } = route.params as { chain: AssetHubChain }
+
   const { prefix } = usePrefix()
 
   const vm = computed(() => vmOf(prefix.value))
@@ -37,7 +39,7 @@ export function useChain() {
     () => chainsExistentialDeposit[prefix.value],
   )
 
-  const currentChain = computed(() => prefixToChainMap[prefix.value] as Chain)
+  const currentChain = computed(() => chain || 'ahp')
 
   return {
     vm,
