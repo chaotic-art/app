@@ -1,4 +1,4 @@
-import type { ChainProperties, Prefix } from '@kodadot1/static'
+import type { ChainProperties } from '@kodadot1/static'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { existentialDeposit as chainsExistentialDeposit } from '@kodadot1/static'
 import { chainPropListOf } from '@/utils/chain'
@@ -21,20 +21,6 @@ export function useChain() {
     return chainProperties.value.tokenDecimals
   })
 
-  const decimalsOf = (prefix: Prefix) => {
-    return chainPropListOf(prefix).tokenDecimals
-  }
-
-  const withDecimals = (value: number, chainPrefix: Prefix = prefix.value) => {
-    const decimals = chainPropListOf(chainPrefix).tokenDecimals
-    // if already with decimals
-    if (value.toString().length === decimals) {
-      return value
-    }
-
-    return Math.trunc(value * 10 ** decimals)
-  }
-
   const existentialDeposit = computed<number>(
     () => chainsExistentialDeposit[prefix.value],
   )
@@ -45,8 +31,6 @@ export function useChain() {
     vm,
     chainProperties,
     decimals,
-    decimalsOf,
-    withDecimals,
     chainSymbol,
     existentialDeposit,
     currentChain,

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import { shortenAddress } from '@/utils/format/address'
 
 const props = withDefaults(
@@ -17,14 +16,13 @@ const props = withDefaults(
   },
 )
 
+const { currentChain } = useChain()
+
 const { profile: profileFromAddress } = useFetchProfile(
   computed(() => props.address),
 )
 
 const name = computed(() => profileFromAddress.value?.name || shortenAddress(props.address))
-
-const { chain } = useRoute().params as { chain: AssetHubChain }
-const currentChain = computed(() => chain || 'ahp')
 </script>
 
 <template>

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
-
 const props = defineProps<{
   extraVariables?: Partial<Record<'owner' | 'issuer', string>>
 }>()
@@ -9,8 +7,7 @@ defineEmits(['totalCountChange'])
 
 const queryVariables = ref<Record<string, any>>({})
 
-const { chain } = useRoute().params as { chain: AssetHubChain }
-const currentChain = computed(() => chain || 'ahp')
+const { currentChain } = useChain()
 </script>
 
 <template>
