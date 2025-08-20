@@ -127,5 +127,30 @@
     "waiting": "Awaiting Your Signature"
   },
   "confirmed": "Confirmed",
-  "finalazing": "Finalizing"
+  "finalazing": "Finalizing",
+  "actionCart": {
+    "listItem": "List Item | List Items",
+    "selectAll": "Select All",
+    "item": "Item | Items",
+    "clearAll": "Clear All"
+  },
+  "listingCart": {
+    "complete": "Complete Listing",
+    "inputPriceFirst": "Input Price First",
+    "listingFees": "Listing Fees",
+    "listingNft": "Listing NFT | Listing NFTs",
+    "missing1": "1 Item Is Missing Price",
+    "missingMultiple": "Items Are Missing Price",
+    "potentialEarnings": "Potential Earnings",
+    "fixedPrice": "Fixed Price",
+    "changePrice": "Change Price",
+    "newListingPrice": "New Listing Price",
+    "bulkListingSuccessful": "Bulk Listing Successful"
+  },
+  "sharing": {
+    "dropNft": "I've minted {0} generative art piece on Chaotic!",
+    "dropNfts": "I've minted {0} generative art pieces on Chaotic!",
+    "listedNft": "Check out this awesome NFT I just listed on Chaotic!",
+    "listedNfts": "Check out these awesome NFTs I just listed on Chaotic:\n {0}"
+  }
 }

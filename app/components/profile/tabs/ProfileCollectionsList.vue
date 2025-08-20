@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/plugins/sdk.client'
+
 const props = defineProps<{
   issuer: string
 }>()
@@ -10,9 +12,11 @@ const sortOptions = [
   { label: 'A-Z', value: 'name_ASC' },
   { label: 'Z-A', value: 'name_DESC' },
 ]
-const { prefix } = usePrefix()
+
 const route = useRoute()
 const router = useRouter()
+
+const { chain } = route.params as { chain: AssetHubChain }
 
 const queryState = computed({
   get: () => ({
@@ -67,11 +71,11 @@ const queryVariables = computed(() => ({
     </div>
 
     <!-- Grid Content -->
-    <div class="mt-8">
+    <div class="my-8">
       <CollectionsGrid
         :key="queryVariables.orderBy + queryVariables.search[0]?.name_containsInsensitive"
         :variables="queryVariables"
-        :prefix="prefix"
+        :prefix="chain"
         @total-count-change="$emit('totalCountChange', $event)"
       />
     </div>

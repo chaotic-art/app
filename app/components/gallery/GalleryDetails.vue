@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { refreshOdaTokenMetadata } from '~/services/oda'
 
 interface Props {
   tokenData: OdaToken | null
   collection: OnchainCollection | null
-  chain: Prefix
+  chain: AssetHubChain
   collectionId: string
   tokenId: string
   owner?: string
@@ -100,25 +100,24 @@ const actionItems = computed(() => [
       </div>
 
       <!-- Title with Action Dropdown -->
-      <div class="flex items-start justify-between gap-3 md:gap-4">
+      <div class="flex items-center justify-between gap-3 md:gap-4">
         <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight flex-1 min-w-0">
           {{ tokenData?.metadata?.name || 'Untitled NFT' }}
         </h1>
 
         <!-- Action Dropdown Menu -->
-        <div class="flex-shrink-0 mt-1 md:mt-2">
-          <UDropdownMenu
-            :items="actionItems"
-            :content="{ align: 'end', side: 'bottom', sideOffset: 8 }"
-            :ui="{ content: 'w-48' }"
-          >
-            <UButton
-              color="neutral"
-              size="sm"
-              icon="i-heroicons-ellipsis-horizontal"
-            />
-          </UDropdownMenu>
-        </div>
+        <UDropdownMenu
+          :items="actionItems"
+          :content="{ align: 'end', side: 'bottom', sideOffset: 8 }"
+          :ui="{ content: 'w-48' }"
+        >
+          <UButton
+            color="neutral"
+            size="sm"
+            class="h-7 w-7"
+            icon="i-heroicons-ellipsis-horizontal"
+          />
+        </UDropdownMenu>
       </div>
     </div>
 
@@ -130,7 +129,7 @@ const actionItems = computed(() => [
     <!-- Creator and Owner Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <!-- Creator Card -->
-      <div class="p-6 bg-neutral-50 rounded-md space-y-2">
+      <div class="p-6 bg-secondary rounded-md space-y-2">
         <p class="font-bold">
           Collection Creator
         </p>
@@ -147,7 +146,7 @@ const actionItems = computed(() => [
       </div>
 
       <!-- Owner Card -->
-      <div class="p-6 bg-neutral-50 rounded-md space-y-2">
+      <div class="p-6 bg-secondary rounded-md space-y-2">
         <p class="font-bold">
           Owner
         </p>
@@ -164,7 +163,7 @@ const actionItems = computed(() => [
       </div>
     </div>
 
-    <div class="space-y-3 bg-neutral-50 rounded-md p-6">
+    <div class="space-y-3 bg-secondary rounded-md p-6">
       <!-- Current Price Section -->
       <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
         Current Price

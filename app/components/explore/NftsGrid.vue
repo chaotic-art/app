@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/plugins/sdk.client'
+
 interface Props {
   search?: string
   variables?: Record<string, any>
   noItemsFoundMessage?: string
   gridClass?: string
+  prefix?: AssetHubChain
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,6 +31,7 @@ const {
   distance: 300,
   search: props.search,
   variables: props.variables,
+  endpoint: props.prefix,
 })
 
 onMounted(async () => {
@@ -64,7 +68,7 @@ watch(totalCount, (newCount) => {
     </div>
 
     <!-- End of Results -->
-    <div v-else-if="!hasMoreData && nfts.length > 0" class="text-center py-8">
+    <div v-else-if="!hasMoreData && nfts.length > 0 && nfts.length === totalCount" class="text-center py-8">
       <div class="text-gray-500">
         Showing all {{ totalCount }} NFTs
       </div>

@@ -1,4 +1,5 @@
 import type { Prefix } from '@kodadot1/static'
+import type { SupportedChain } from '~/plugins/sdk.client'
 import { decodeAddress, encodeAddress, isEvmAddress } from 'dedot/utils'
 
 export function formatAddress({
@@ -8,9 +9,7 @@ export function formatAddress({
   address: string
   prefix: Prefix
 }) {
-  return execByVm({
-    SUB: () => encodeAddress(address, ss58Of(prefix)),
-  }, { prefix }) || ''
+  return encodeAddress(address, chainSpec[prefix as SupportedChain].ss58Format)
 }
 
 export function isValidSubstrateAddress(address: string): boolean {
@@ -28,7 +27,7 @@ export function getss58AddressByPrefix(address: string, prefix: Prefix) {
     if (isEvmAddress(address)) {
       return address
     }
-    const ss58Format = ss58Of(prefix)
+    const ss58Format = chainSpec[prefix as SupportedChain].ss58Format
     const decodedAddress = decodeAddress(address)
     return encodeAddress(decodedAddress, ss58Format)
   }

@@ -15,11 +15,12 @@ const selectedType = computed(() => {
 })
 
 function handleTypeChange(type: string) {
+  const { chain } = route.params
   if (type === 'Collections') {
-    router.push(`/${route.params.chain}/explore/collectibles`)
+    router.push(`/${chain}/explore/collectibles`)
   }
   else if (type === 'NFTs') {
-    router.push(`/${route.params.chain}/explore/nfts`)
+    router.push(`/${chain}/explore/nfts`)
   }
 }
 </script>
@@ -34,22 +35,25 @@ function handleTypeChange(type: string) {
     </div>
 
     <!-- Controls Row -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <!-- Left Side - Type Toggle -->
-      <div class="flex bg-gray-100 dark:bg-gray-800 rounded-full p-1">
-        <UButton
-          v-for="type in typeOptions"
-          :key="type"
-          :variant="selectedType === type ? 'solid' : 'ghost'"
-          class="rounded-full px-4 py-2 text-sm font-medium"
-          @click="handleTypeChange(type)"
-        >
-          {{ type }}
-        </UButton>
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+      <!-- Left Side - Chain and Type Controls -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <!-- Type Toggle -->
+        <div class="flex bg-accent rounded-full p-1">
+          <UButton
+            v-for="type in typeOptions"
+            :key="type"
+            :variant="selectedType === type ? 'solid' : 'ghost'"
+            class="rounded-full px-4 py-2 text-sm font-medium"
+            @click="handleTypeChange(type)"
+          >
+            {{ type }}
+          </UButton>
+        </div>
       </div>
 
       <!-- Right Side - Slot for page-specific controls -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 flex-wrap">
         <slot name="controls" />
       </div>
     </div>

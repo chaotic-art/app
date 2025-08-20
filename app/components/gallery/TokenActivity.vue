@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
 import type { TokenActivityData } from '~/graphql/queries/token'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { formatBalance } from 'dedot/utils'
 import UserInfo from '~/components/common/UserInfo.vue'
 import { tokenActivity } from '~/graphql/queries/token'
 import { formatToNow } from '~/utils/format/time'
 
 interface Props {
-  chain: Prefix
+  chain: AssetHubChain
   collectionId: string
   tokenId: string
 }
@@ -22,7 +22,6 @@ interface FilterOption {
 
 const props = defineProps<Props>()
 const { $apolloClient } = useNuxtApp()
-const { decimalsOf } = useChain()
 const selectedFilters = ref<ActivityFilter[]>(['MINT', 'LIST', 'BUY'])
 const tokenActivityData = ref<TokenActivityData['events']>([])
 
@@ -112,8 +111,8 @@ watchEffect(async () => {
             cell: ({ row }) => {
               const meta = row.getValue('meta') as string
               const format = formatBalance(meta, {
-                decimals: decimalsOf(props.chain),
-                symbol: tokenSymbolOf(props.chain),
+                decimals: chainSpec[chain].tokenDecimals,
+                symbol: chainSpec[chain].tokenSymbol,
               })
 
               return meta && meta !== '0' ? format : '-'

@@ -1,22 +1,24 @@
+import { createEventHook, whenever } from '@vueuse/core'
+
 export default function useWalletManager() {
   const walletStore = useWalletStore()
+  const { accountId } = useAuth()
   const { selectedAccounts } = storeToRefs(walletStore)
   const accountStore = useAccountStore()
+  const disconnectEvent = createEventHook<void>()
 
   async function disconnectWallet(wallet: WalletExtension) {
     const vm = wallet.vm
 
-    await execByVm({
-      EVM: () => {
-        if (import.meta.client) {
-          const { disconnect: disconnectReown } = useReown()
+    if (vm === 'EVM') {
+      if (import.meta.client) {
+        const { disconnect: disconnectReown } = useReown()
 
-          return disconnectReown()
-        }
+        return disconnectReown()
+      }
 
-        return Promise.resolve()
-      },
-    }, { vm })
+      return Promise.resolve()
+    }
 
     walletStore.updateWallet(wallet.id, {
       accounts: [],
@@ -29,7 +31,14 @@ export default function useWalletManager() {
     }
   }
 
+  whenever(
+    () => !accountId.value,
+    () => disconnectEvent.trigger(),
+    { flush: 'sync' },
+  )
+
   return {
     disconnectWallet,
+    onDisconnect: disconnectEvent.on,
   }
 }

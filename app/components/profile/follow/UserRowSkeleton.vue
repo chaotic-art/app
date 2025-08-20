@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+  <div class="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-neutral-700 bg-secondary">
     <div class="flex items-center flex-1 min-w-0">
       <!-- Avatar skeleton -->
       <USkeleton class="w-12 h-12 rounded-full mr-4 flex-shrink-0" />

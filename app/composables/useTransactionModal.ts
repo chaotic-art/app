@@ -1,5 +1,6 @@
-import type { Prefix } from '@kodadot1/static'
 import type { TxEvent } from 'polkadot-api'
+import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { NFTMetadata } from '~/services/oda'
 
 export interface CollectionCategory {
   type: 'collection'
@@ -8,7 +9,7 @@ export interface CollectionCategory {
   description: string
   image: string
   hash: string
-  prefix: Prefix
+  prefix: AssetHubChain
 }
 
 export interface NftCategory {
@@ -20,10 +21,27 @@ export interface NftCategory {
   image: string
   supply: number
   hash: string
-  prefix: Prefix
+  prefix: AssetHubChain
 }
 
-type TransactionResult = CollectionCategory | NftCategory
+export interface ListingTransactionResult {
+  type: 'listing'
+  items: {
+    id: string
+    sn: number
+    price: number
+    metadata: NFTMetadata
+    metadata_uri: string
+    collection: {
+      id: number
+      name: string
+    }
+  }[]
+  hash: string
+  prefix: AssetHubChain
+}
+
+type TransactionResult = CollectionCategory | NftCategory | ListingTransactionResult
 
 // Transaction status progression:
 // 1. status.value = 'signed'

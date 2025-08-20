@@ -1,9 +1,9 @@
-import type { Prefix } from '@kodadot1/static'
+import type { Chain } from '~/plugins/sdk.client'
 
 export function useIcon() {
   const { isDarkMode } = useTheme()
 
-  const getChainIcon = (prefix: Prefix | null): string | null => {
+  const getChainIcon = (prefix: Chain | null): string | null => {
     switch (prefix) {
       case 'ahp':
         return isDarkMode.value ? '/chain/ahp_dark.svg' : '/chain/ahp.svg'

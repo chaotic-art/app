@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { OdaToken } from '~/services/oda'
 
 const props = defineProps<{
   tokenId: number
   collectionId: number
-  chain: Prefix
+  chain: AssetHubChain
   image?: string | null
   name?: string | null
 }>()
@@ -18,11 +19,62 @@ const {
   price,
   usdPrice,
   mediaIcon,
+  nativePrice,
 } = useToken(props)
+
+const actionCartStore = useActionCartStore()
+const route = useRoute()
+const { isCurrentAccount } = useAuth()
+
+const id = computed(() => `${props.collectionId}-${props.tokenId}`)
+const isItemInActionCart = computed(() => actionCartStore.isItemInCart(id.value))
+const isItemInCart = computed(() => isItemInActionCart.value)
+
+const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
+const canAddToActionCart = computed(() => isProfileRoute.value && owner.value && isCurrentAccount(owner.value))
+
+function createActionCartItem({ token, owner }: { token: OdaToken, owner: string }): BaseActionCartItem {
+  return {
+    id: id.value,
+    sn: props.tokenId,
+    collectionId: props.collectionId,
+    name: token.metadata?.name || '',
+    chain: props.chain,
+    price: Number(nativePrice.value),
+    currentOwner: owner,
+    metadata: token.metadata!,
+    metadata_uri: token.metadata_uri || '',
+  }
+}
+
+function addToActionCart() {
+  if (!token.value || !owner.value) {
+    return
+  }
+
+  if (isItemInActionCart.value) {
+    actionCartStore.removeItem(id.value)
+  }
+  else {
+    actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value }))
+  }
+}
+
+watchEffect(() => {
+  if (token.value && owner.value && canAddToActionCart.value) {
+    actionCartStore.setOwnedItem(createActionCartItem({ token: token.value, owner: owner.value }))
+  }
+})
 </script>
 
 <template>
-  <div class="relative border rounded-xl border-gray-300 dark:border-neutral-700 overflow-hidden bg-white dark:bg-neutral-900 hover:shadow-lg transition-shadow hover-card-effect group">
+  <div
+    class="relative border rounded-xl overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group"
+    :class="{
+      '!border-blue-500 dark:!border-blue-400': isItemInCart,
+      'border-gray-300 dark:border-neutral-700': !isItemInCart,
+    }"
+  >
     <!-- Loading State -->
     <template v-if="isLoading">
       <!-- Image Skeleton -->
@@ -98,6 +150,19 @@ const {
             class="absolute top-2 right-2 w-6 h-6 bg-black/70 rounded-full shadow-md flex items-center justify-center"
           >
             <UIcon :name="mediaIcon" class="w-3 h-3 text-white" />
+          </div>
+
+          <div v-if="canAddToActionCart" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
+            <UButton
+              :icon="isItemInActionCart ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
+              size="sm"
+              variant="solid"
+              color="primary"
+              class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-xl border border-white/30 text-gray-900 dark:text-white"
+              @click.prevent.stop="addToActionCart"
+            >
+              {{ isItemInActionCart ? 'Remove' : 'Select' }}
+            </UButton>
           </div>
         </div>
 

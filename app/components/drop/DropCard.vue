@@ -2,7 +2,7 @@
 import type { DropItem } from '@/types'
 import { formatBalance } from 'dedot/utils'
 import { useMintedDropsStore } from '@/stores/dropsMinted'
-import { calculateTokenUSD } from '@/utils/coinPrice'
+import { tokenToUsd } from '@/utils/calculation'
 import { getDropAttributes, isTBA } from './utils'
 
 const props = defineProps<{
@@ -10,7 +10,7 @@ const props = defineProps<{
   showMinted?: boolean
 }>()
 
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 const formattedDrop = ref<DropItem>()
 
 const shouldShowDrop = computed(() =>
@@ -27,8 +27,8 @@ const formattedPrice = computed(() => {
     return 'Free'
 
   return formatBalance(formattedDrop.value.price, {
-    decimals: decimalsOf(formattedDrop.value.chain || prefix.value),
-    symbol: tokenSymbolOf(formattedDrop.value.chain || prefix.value),
+    decimals: chainSpec[formattedDrop.value.chain].tokenDecimals,
+    symbol: chainSpec[formattedDrop.value.chain].tokenSymbol,
   })
 })
 
@@ -37,7 +37,7 @@ const formattedPriceUSD = computed(() => {
   if (!formattedDrop.value?.price || isTBA(formattedDrop.value.price) || Number(formattedDrop.value.price) === 0)
     return ''
 
-  return calculateTokenUSD(formattedDrop.value.price, formattedDrop.value.chain || prefix.value)
+  return tokenToUsd(Number(formattedDrop.value.price), chainSpec[formattedDrop.value.chain].tokenDecimals, chainSpec[formattedDrop.value.chain].tokenSymbol)
 })
 
 // Badge text based on drop status
@@ -67,7 +67,7 @@ const minted = computed(() => formattedDrop.value?.minted || 0)
 </script>
 
 <template>
-  <NuxtLink v-if="shouldShowDrop" :to="`/${prefix}/drops/${drop.alias}`" class="relative shadow-xs border border-border rounded-xl overflow-hidden bg-background transition-all duration-300 hover:-translate-y-1 group">
+  <NuxtLink v-if="shouldShowDrop" :to="`/${currentChain}/drops/${drop.alias}`" class="relative shadow-xs border border-border rounded-xl overflow-hidden bg-background transition-all duration-300 hover:-translate-y-1 group">
     <!-- Badge -->
     <div class="absolute top-3 left-3 z-10">
       <UBadge>
@@ -83,7 +83,7 @@ const minted = computed(() => formattedDrop.value?.minted || 0)
       <div class="absolute bottom-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-95">
         <UButton v-if="formattedDrop?.minted" icon="mdi:account-group" size="sm">
           <span>Collected by</span>
-          <DropCollectedBy :chain="prefix" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
+          <DropCollectedBy :chain="currentChain" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
         </UButton>
       </div>
     </div>

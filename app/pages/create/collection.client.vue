@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { watchDebounced } from '@vueuse/core'
-import { formatBalance } from 'dedot/utils'
 import { useCollectionForm } from '~/composables/create/useCollectionForm'
 
 definePageMeta({
@@ -17,7 +16,6 @@ const {
   validate,
   onSubmit,
   isWalletConnected,
-  estimatedFee,
   isEstimatingFee,
   handleCollectionOperation,
   balance,
@@ -25,9 +23,9 @@ const {
 
 // Computed properties for cleaner logic
 const hasInsufficientFunds = computed(() => {
-  return estimatedFee.value !== null
-    && balance.value !== null
-    && balance.value < estimatedFee.value
+  return balance.estimatedFee !== 0n
+    && balance.userBalance !== 0n
+    && balance.userBalance < balance.estimatedFee
 })
 
 const isSubmitDisabled = computed(() => {
@@ -152,16 +150,13 @@ watchDebounced(
                 required
                 help="Choose the blockchain network for your collection"
               >
-                <UTooltip text="Currently only Asset Hub Polkadot is supported">
-                  <USelectMenu
-                    v-model="state.blockchain"
-                    :items="blockchains"
-                    value-key="value"
-                    placeholder="Select a blockchain"
-                    :disabled="true"
-                    class="w-full"
-                  />
-                </UTooltip>
+                <USelectMenu
+                  v-model="state.blockchain"
+                  :items="blockchains"
+                  value-key="value"
+                  placeholder="Select a blockchain"
+                  class="w-full"
+                />
               </UFormField>
             </div>
           </div>
@@ -254,8 +249,8 @@ watchDebounced(
               <span class="text-gray-600 dark:text-gray-400 flex">
                 <span class="w-18">Fee:</span>
                 <span v-if="isEstimatingFee" class="text-gray-500">Calculating...</span>
-                <span v-else-if="estimatedFee !== null" class="font-medium text-gray-900 dark:text-white">
-                  {{ formatBalance(estimatedFee, { decimals: 10, symbol: 'DOT' }) }}
+                <span v-else-if="balance.estimatedFee !== 0n" class="font-medium text-gray-900 dark:text-white">
+                  {{ balance.estimatedFeeFormatted }}
                 </span>
                 <span v-else class="text-gray-600 dark:text-gray-400">
                   ---
@@ -265,7 +260,7 @@ watchDebounced(
               <span class="text-gray-600 dark:text-gray-400 flex">
                 <span class="w-18">Balance:</span>
                 <span class="font-medium text-gray-900 dark:text-white">
-                  {{ formatBalance(balance, { decimals: 10, symbol: 'DOT' }) }}
+                  {{ balance.userBalanceFormatted }}
                 </span>
               </span>
             </div>
@@ -274,7 +269,7 @@ watchDebounced(
               <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
               <span class="text-xs font-medium">Insufficient</span>
             </div>
-            <div v-else-if="estimatedFee !== null && balance" class="flex items-center gap-1 text-green-600 dark:text-green-400">
+            <div v-else-if="balance.estimatedFee !== 0n && balance.userBalance !== 0n" class="flex items-center gap-1 text-green-600 dark:text-green-400">
               <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
               <span class="text-xs font-medium">Ready</span>
             </div>

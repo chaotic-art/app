@@ -1,4 +1,5 @@
 import type { DocumentNode } from 'graphql'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { useInfiniteScroll } from '@vueuse/core'
 
 interface UseInfiniteQueryOptions<TData, TItem> {
@@ -9,6 +10,7 @@ interface UseInfiniteQueryOptions<TData, TItem> {
   extractData: (data: TData) => TItem[]
   extractTotal: (data: TData) => number
   placeholderCount?: number
+  endpoint?: AssetHubChain
 }
 
 export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQueryOptions<TData, TItem>) {
@@ -20,6 +22,7 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
     extractData,
     extractTotal,
     placeholderCount = 8,
+    endpoint = 'ahp',
   } = options
 
   const { $apolloClient } = useNuxtApp()
@@ -62,6 +65,9 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
           first: pageSize,
           offset,
         },
+        context: {
+          endpoint,
+        },
       })
 
       const newItems = extractData(data)
@@ -76,7 +82,7 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
 
       totalCount.value = total
       currentOffset.value = offset + pageSize
-      hasMoreData.value = allItems.value.length < totalCount.value
+      hasMoreData.value = allItems.value.length < totalCount.value && newItems.length > 0
     }
     catch (error) {
       console.error('Error fetching data:', error)

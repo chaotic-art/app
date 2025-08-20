@@ -5,12 +5,11 @@ import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
 import useFetchProfile from '@/composables/useFetchProfile'
 import { fetchFollowersOf, fetchFollowing } from '@/services/profile'
-import { copyAddress, getSubscanUrl, shortenAddress } from '@/utils/format/address'
+import { copyAddress, getSubscanAccountUrl, shortenAddress } from '@/utils/format/address'
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
 
 const props = defineProps<{ address: string }>()
 const { isCurrentAccount } = useAuth()
-const { prefix } = usePrefix()
 const { profile } = useFetchProfile(computed(() => props.address))
 const bannerUrl = computed(() => sanitizeIpfsUrl(profile?.value?.banner || ''))
 const followButton = ref()
@@ -54,7 +53,6 @@ const createProfileConfig: ButtonConfig = {
   label: 'Create Profile',
   icon: 'i-heroicons-sparkles',
   onClick: () => isEditProfileModalActive.value = true,
-  variant: 'solid',
 }
 
 const profileButtonConfig = computed<ButtonConfig>(() =>
@@ -96,7 +94,7 @@ function onTotalCountChange(slot: string, totalCount: number) {
   <div>
     <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">
       <div
-        class="absolute inset-0 w-full h-full bg-muted-foreground"
+        class="absolute inset-0 w-full h-full bg-muted"
         :style="bannerUrl ? { backgroundImage: `url('${bannerUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}"
       />
 
@@ -132,7 +130,7 @@ function onTotalCountChange(slot: string, totalCount: number) {
                 />
 
                 <UButton
-                  :to="getSubscanUrl(address, prefix)"
+                  :to="getSubscanAccountUrl(address, 'ahp')"
                   target="_blank"
                   size="sm"
                   variant="ghost"

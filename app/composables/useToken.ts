@@ -1,11 +1,11 @@
-import type { Prefix } from '@kodadot1/static'
-import { formatBalance } from '@polkadot/util'
+import type { AssetHubChain } from '~/plugins/sdk.client'
+import { formatBalance } from 'dedot/utils'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
 export function useToken(props: {
   tokenId: number
   collectionId: number
-  chain: Prefix
+  chain: AssetHubChain
   image?: string | null
   name?: string | null
 }) {
@@ -19,7 +19,7 @@ export function useToken(props: {
   const error = ref<unknown | null>(null)
   const mimeType = ref<string | null>(null)
 
-  const { $api } = useNuxtApp()
+  const { $sdk } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()
 
   // Calculate USD price from DOT price
@@ -31,7 +31,7 @@ export function useToken(props: {
 
   // Fetch data on component mount
   onMounted(async () => {
-    const api = $api(props.chain)
+    const api = $sdk(props.chain).api
 
     try {
       // Fetch token metadata, price, and owner in parallel
@@ -78,11 +78,7 @@ export function useToken(props: {
     if (!queryPrice.value)
       return ''
 
-    const pricesString = formatBalance(queryPrice.value, { decimals: 10, withSi: false })
-    let float = Number.parseFloat(pricesString)
-    float = float > 1 ? Number(float.toFixed(0)) : Number(float.toFixed(4))
-
-    return `${float} DOT`
+    return formatBalance(queryPrice.value, { decimals: decimals.value, symbol: chainSymbol.value })
   })
 
   const mediaIcon = computed(() => {
@@ -112,6 +108,7 @@ export function useToken(props: {
     mimeType,
 
     // Computed properties
+    nativePrice: queryPrice,
     price,
     usdPrice,
     mediaIcon,

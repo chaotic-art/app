@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { CHAINS } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
+import { isAssetHubChain } from '~/utils/chain'
 
 // Validate chain parameter
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && chain in CHAINS
+    return typeof chain === 'string' && isAssetHubChain(chain)
   },
 })
 
@@ -22,9 +23,10 @@ useSeoMeta({
   description: 'Browse and discover collections and NFTs across different categories.',
 })
 
-const { prefix } = usePrefix()
 const route = useRoute()
 const router = useRouter()
+
+const { chain } = route.params as { chain: AssetHubChain }
 
 const queryState = computed({
   get: () => ({
@@ -62,6 +64,9 @@ const queryVariables = computed(() => ({
   <UContainer class="px-4 md:px-6">
     <ExploreHeader>
       <template #controls>
+        <!-- Chain Switcher -->
+        <ChainSwitcher />
+
         <UInput
           :model-value="queryState.search"
           placeholder="Search collections..."
@@ -80,11 +85,11 @@ const queryVariables = computed(() => ({
     </ExploreHeader>
 
     <!-- Grid Content -->
-    <div class="mt-8">
+    <div class="my-8">
       <CollectionsGrid
         :key="queryVariables.orderBy + queryVariables.search[0]?.name_containsInsensitive"
         :variables="queryVariables"
-        :prefix="prefix"
+        :prefix="chain"
       />
     </div>
   </UContainer>

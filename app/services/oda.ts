@@ -1,5 +1,6 @@
 import type { Prefix } from '@kodadot1/static'
 import type { Abi } from 'viem'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 
 const BASE_URL = isProduction ? 'https://oda.koda.art' : 'https://oda-beta.koda.art'
 const api = $fetch.create({ baseURL: BASE_URL, retry: 3 })
@@ -17,11 +18,11 @@ export interface OnchainCollection {
   owner?: string
 }
 
-export function fetchOdaCollection(chain: Prefix, address: string) {
+export function fetchOdaCollection(chain: AssetHubChain, address: string) {
   return api<OnchainCollection>(`/v1/${chain}/collection/${address}`)
 }
 
-export function refreshOdaCollection(chain: Prefix, address: string) {
+export function refreshOdaCollection(chain: AssetHubChain, address: string) {
   return api(`/v1/${chain}/collection/${address}`, { method: 'DELETE' })
 }
 
@@ -31,7 +32,7 @@ interface OdaCollectionOwners {
   owners: Record<string, number>
 }
 
-export function fetchOdaCollectionOwners(chain: Prefix, address: string) {
+export function fetchOdaCollectionOwners(chain: AssetHubChain, address: string) {
   return api<OdaCollectionOwners>(`/v1/${chain}/collection/${address}/owners`)
 }
 
@@ -50,11 +51,11 @@ export interface OdaToken {
   metadata_uri?: string
 }
 
-export function fetchOdaToken(chain: Prefix, address: string, tokenId: string) {
+export function fetchOdaToken(chain: AssetHubChain, address: string, tokenId: string) {
   return api<OdaToken>(`/v1/${chain}/collection/${address}/token/${tokenId}`)
 }
 
-export function refreshOdaTokenMetadata(chain: Prefix, address: string, tokenId: string) {
+export function refreshOdaTokenMetadata(chain: AssetHubChain, address: string, tokenId: string) {
   return api<OdaToken>(`/v1/${chain}/collection/${address}/token/${tokenId}`, {
     method: 'DELETE',
   })

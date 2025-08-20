@@ -2,7 +2,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
     <!-- Media Skeleton -->
     <div class="order-2 lg:order-1">
-      <div class="relative border border-gray-200 dark:border-neutral-700 rounded-2xl overflow-hidden bg-white dark:bg-neutral-900 p-4">
+      <div class="relative border border-gray-200 dark:border-neutral-700 rounded-2xl overflow-hidden bg-secondary p-4">
         <div class="aspect-square bg-gray-200 dark:bg-neutral-800 rounded-xl animate-pulse flex items-center justify-center">
           <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
         </div>
@@ -23,7 +23,7 @@
       <USkeleton class="h-16 w-full" />
 
       <!-- Owner section skeleton -->
-      <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 bg-white dark:bg-neutral-900">
+      <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 bg-secondary">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <USkeleton class="w-12 h-12 rounded-full" />
@@ -44,7 +44,7 @@
       </div>
 
       <!-- Price section skeleton -->
-      <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 bg-white dark:bg-neutral-900">
+      <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 bg-secondary">
         <div class="flex items-center justify-between mb-4">
           <div class="space-y-2">
             <USkeleton class="h-8 w-32" />
@@ -62,7 +62,7 @@
       </div>
 
       <!-- Token info skeleton -->
-      <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 bg-white dark:bg-neutral-900 space-y-3">
+      <div class="border border-gray-200 dark:border-neutral-700 rounded-2xl p-4 bg-secondary space-y-3">
         <div class="flex justify-between items-center">
           <USkeleton class="h-4 w-24" />
           <USkeleton class="h-4 w-16" />

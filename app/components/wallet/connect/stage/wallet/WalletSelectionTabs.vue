@@ -29,7 +29,7 @@ const tabItems = computed(() => [
       :ui="{
         list: 'bg-transparent gap-2',
         indicator: 'hidden',
-        trigger: 'min-w-[100px] bg-gray-100 dark:bg-gray-800 data-[state=active]:bg-primary dark:data-[state=active]:bg-gray-700 data-[state=active]:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200',
+        trigger: 'min-w-[100px] bg-secondary hover:bg-accent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-colors duration-200',
       }"
     />
   </div>

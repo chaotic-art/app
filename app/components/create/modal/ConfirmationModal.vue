@@ -4,6 +4,7 @@ interface Props {
   estimatedFee: string
   walletAddress: string
   walletBalance: string
+  remainsBalance: string
   title: string
   items: {
     name: string
@@ -140,16 +141,41 @@ function handleCancel() {
           </div>
         </div>
 
-        <!-- Estimated Fee -->
         <div class="bg-gray-50 rounded-lg p-4">
+          <!-- Estimated Fee -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-currency-dollar" class="w-4 h-4 text-gray-500" />
-              <span class="text-sm text-gray-600">Estimated Fee</span>
+              <span class="text-sm text-gray-600">Fee</span>
             </div>
             <div class="text-right">
-              <div class="text-sm font-medium text-gray-900">
+              <div class="text-sm font-medium text-gray-900 font-mono">
                 {{ estimatedFee }}
+              </div>
+            </div>
+          </div>
+
+          <!-- wallet balance -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-600">Balance</span>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-medium text-gray-900 font-mono">
+                {{ walletBalance }}
+              </div>
+            </div>
+          </div>
+
+          <USeparator class="my-2" />
+
+          <!-- remains balance -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-600">Remains Balance</span>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-medium text-gray-900 font-mono">
+                {{ remainsBalance }}
               </div>
             </div>
           </div>

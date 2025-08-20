@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 interface Props {
   item: ReturnType<typeof useInfiniteCollections>['collections']['value'][number]
-  prefix?: Prefix
+  prefix?: AssetHubChain
   isLoading?: boolean
   volume?: string
 }
@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<Props>(), {
   volume: '',
 })
 
-const { $api } = useNuxtApp()
+const { $sdk } = useNuxtApp()
 
 const collectionData = reactive({
   items: 0,
@@ -32,7 +32,7 @@ onMounted(async () => {
 
   isLoadingData.value = true
   try {
-    const api = await $api(props.prefix)
+    const api = $sdk(props.prefix).api
 
     const [queryItems, queryFloor] = await Promise.all([
       api.query.Nfts.Item.getEntries(Number(props.item.id)),
@@ -126,7 +126,7 @@ onMounted(async () => {
       </div>
 
       <!-- Stats Section -->
-      <div class="p-4 bg-gray-50/50 dark:bg-neutral-800/50">
+      <div class="p-4">
         <!-- Loading State -->
         <div v-if="isLoadingData" class="grid grid-cols-3 gap-4">
           <div v-for="i in 3" :key="i" class="text-center">

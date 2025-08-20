@@ -1,10 +1,10 @@
 import type { Prefix } from '@kodadot1/static'
 import { CHAINS } from '@kodadot1/static'
-import { chainPropListOf } from '@/utils/chain'
+import { chainPropListOf } from '@/composables/useVm'
 import format from '@/utils/format/balance'
 
 export default function (prefix: Ref<Prefix>) {
-  const { $api } = useNuxtApp()
+  const { $sdk } = useNuxtApp()
   const { isAssetHub } = useIsChain(prefix)
 
   const collectionDeposit = ref(0)
@@ -26,7 +26,7 @@ export default function (prefix: Ref<Prefix>) {
 
   watchEffect(async () => {
     if (isEnabled.value) {
-      const api = $api(prefix.value)
+      const api = $sdk(prefix.value).api
       const chain = CHAINS[prefix.value]
 
       if (isAssetHub.value) {

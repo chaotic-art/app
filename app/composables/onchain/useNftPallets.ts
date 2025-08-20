@@ -1,11 +1,12 @@
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
+import type { NFTMetadata } from '~/services/oda'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 
 type TxType = 'submit' | 'estimate'
 
 interface CreateCollectionParams {
-  chain: Prefix
+  chain: AssetHubChain
   type: TxType
   maxSupply?: number
   metadataUri: string
@@ -23,7 +24,7 @@ interface Property {
 }
 
 interface CreateNftParams {
-  chain: Prefix
+  chain: AssetHubChain
   type: TxType
   collectionId: number
   metadataUri: string | string[]
@@ -37,8 +38,24 @@ interface CreateNftParams {
   }
 }
 
+interface ListNftsParams {
+  chain: AssetHubChain
+  type: TxType
+  nfts: {
+    id: string
+    sn: number
+    price: number
+    metadata: NFTMetadata
+    metadata_uri: string
+    collection: {
+      id: number
+      name: string
+    }
+  }[]
+}
+
 export function useNftPallets() {
-  const { $api } = useNuxtApp()
+  const { $sdk } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
   const { hash, error, status, result } = useTransactionModal()
@@ -55,7 +72,7 @@ export function useNftPallets() {
       throw new Error('No address found')
     }
 
-    const api = $api(chain)
+    const api = $sdk(chain).api
     await api.compatibilityToken
 
     // next collection id
@@ -153,24 +170,24 @@ export function useNftPallets() {
     })
   }
 
-  async function userBalance(chain: Prefix) {
+  async function userBalance(chain: SupportedChain) {
     if (!getConnectedSubAccount.value?.address) {
       // throw new Error('No address found')
       return 0n
     }
 
-    const api = $api(chain)
+    const api = $sdk(chain).api
     const query = await api.query.System.Account.getValue(getConnectedSubAccount.value.address)
     return query?.data.free ?? 0n
   }
 
-  async function userCollection(chain: Prefix) {
+  async function userCollection(chain: AssetHubChain) {
     if (!getConnectedSubAccount.value?.address) {
       // throw new Error('No address found')
       return []
     }
 
-    const api = $api(chain)
+    const api = $sdk(chain).api
     const query = await api.query.Nfts.CollectionAccount.getEntries(getConnectedSubAccount.value.address)
     const collections = query.map(item => item.keyArgs[1])
     const collectionsData = await Promise.all(collections.map(async (collection) => {
@@ -206,17 +223,9 @@ export function useNftPallets() {
     properties,
     context: nftData,
   }: CreateNftParams) {
-    if (!getConnectedSubAccount.value?.address) {
-      throw new Error('No address found')
-    }
+    const { signer, address } = await getAccountSigner()
 
-    const signer = await getConnectedSubAccount.value.signer
-
-    if (!signer) {
-      throw new Error('No signer found')
-    }
-
-    const api = $api(chain)
+    const api = $sdk(chain).api
     await api.compatibilityToken
 
     // Get next item ID for the collection
@@ -231,7 +240,7 @@ export function useNftPallets() {
       const _txMint = api.tx.Nfts.mint({
         collection: collectionId,
         item: nextItemId + i,
-        mint_to: MultiAddress.Id(getConnectedSubAccount.value.address),
+        mint_to: MultiAddress.Id(address),
         witness_data: undefined,
       })
 
@@ -276,7 +285,7 @@ export function useNftPallets() {
     const transaction = api.tx.Utility.batch_all({ calls })
 
     if (type === 'estimate') {
-      const estimatedFees = await transaction.getEstimatedFees(getConnectedSubAccount.value.address)
+      const estimatedFees = await transaction.getEstimatedFees(address)
       return estimatedFees
     }
 
@@ -307,9 +316,84 @@ export function useNftPallets() {
     })
   }
 
+  async function getAccountSigner() {
+    const account = getConnectedSubAccount.value
+
+    if (!account?.address) {
+      throw new Error('No address found')
+    }
+
+    const signer = await account.signer
+
+    if (!signer) {
+      throw new Error('No signer found')
+    }
+
+    return {
+      signer,
+      address: account.address,
+    }
+  }
+
+  async function listNfts({
+    nfts,
+    chain,
+    type,
+  }: ListNftsParams) {
+    const { signer, address } = await getAccountSigner()
+    const api = $sdk(chain).api
+
+    const txs = nfts.map(({ price, collection, sn }) => {
+      return api.tx.Nfts.set_price({
+        collection: Number(collection.id),
+        item: Number(sn),
+        price: BigInt(price),
+        whitelisted_buyer: undefined,
+      })
+    })
+
+    const transaction = api.tx.Utility.batch_all({
+      calls: txs.map(tx => tx.decodedCall),
+    })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+
+          result.value = {
+            type: 'listing',
+            items: nfts.map(nft => ({
+              id: nft.id,
+              sn: nft.sn,
+              price: nft.price,
+              collection: nft.collection,
+              metadata_uri: nft.metadata_uri,
+              metadata: nft.metadata,
+            })),
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
     mintNft,
+    listNfts,
     userCollection,
     userBalance,
   }

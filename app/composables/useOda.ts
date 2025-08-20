@@ -1,10 +1,10 @@
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { refreshOdaCollection } from '~/services/oda'
 
 export function useOda() {
   const isRefreshing = ref(false)
 
-  const clearCache = async (chain: Prefix, collectionId: string, refresh?: () => Promise<void>) => {
+  const clearCache = async (chain: AssetHubChain, collectionId: string, refresh?: () => Promise<void>) => {
     if (isRefreshing.value)
       return
 

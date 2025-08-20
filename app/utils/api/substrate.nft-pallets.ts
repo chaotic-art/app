@@ -1,10 +1,10 @@
-import type { Prefix } from '@kodadot1/static'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { t } from 'try'
 import { fetchOdaToken } from '~/services/oda'
 
-function getApi(prefix: Prefix) {
-  const { $api } = useNuxtApp()
-  return $api(prefix)
+function getApi(prefix: AssetHubChain) {
+  const { $sdk } = useNuxtApp()
+  return $sdk(prefix)
 }
 
 /**
@@ -16,12 +16,8 @@ function getApi(prefix: Prefix) {
  * @param params.excludeTokenId - The token ID to exclude from the results
  * @returns The entries for the collection
  */
-export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }: { prefix: Prefix, collectionId: number, max?: number, excludeTokenId?: number }) {
-  if (!isAssetHub(prefix)) {
-    throw new Error('This function is only available on Asset Hub chains')
-  }
-
-  const api = getApi(prefix)
+export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }: { prefix: AssetHubChain, collectionId: number, max?: number, excludeTokenId?: number }) {
+  const api = getApi(prefix).api
   const query = await api.query.Nfts.Item.getEntries(collectionId)
 
   // Filter out excluded token ID if provided
@@ -46,4 +42,19 @@ export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }
   }))
 
   return items
+}
+
+/**
+ * Get the last item ID used on a collection
+ * @param params - The parameters object
+ * @param params.prefix - The prefix of the chain
+ * @param params.collectionId - The ID of the collection
+ * @returns The last item ID used on the collection
+ */
+export async function lastItemId({ prefix, collectionId }: { prefix: AssetHubChain, collectionId: number }) {
+  const api = getApi(prefix).api
+  const collectionItems = await api.query.Nfts.Item.getEntries(collectionId)
+  const itemIds = collectionItems.map(item => item.keyArgs[1])
+
+  return Math.max(...itemIds)
 }
