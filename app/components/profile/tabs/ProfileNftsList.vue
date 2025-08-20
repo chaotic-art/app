@@ -11,7 +11,7 @@ const { currentChain } = useChain()
 </script>
 
 <template>
-  <div>
+  <div class="mt-4">
     <NftsToolbar
       :extra-variables="props.extraVariables"
       @update:query-variables="queryVariables = $event"
