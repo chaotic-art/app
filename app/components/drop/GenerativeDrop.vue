@@ -68,7 +68,9 @@ const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() 
       <!-- right side -->
       <div class="order-1 lg:order-2">
         <!-- preview section -->
-        <DropPreviewItem />
+        <ClientOnly>
+          <DropPreviewItem />
+        </ClientOnly>
 
         <!-- stats section -->
         <div class="border p-3 md:p-4 rounded-2xl border-gray-100 mt-4">
