@@ -2,7 +2,7 @@
 import { formatBalance } from 'dedot/utils'
 import { getEnrichedDrop } from '@/components/drop/utils'
 import { getDrops } from '@/services/fxart'
-import { calculateTokenUSD } from '@/utils/coinPrice'
+import { tokenToUsd } from '@/utils/calculation'
 import { ipfsToCfImageUrl } from '@/utils/ipfs'
 
 const { prefix } = usePrefix()
@@ -27,8 +27,8 @@ const formattedPrice = computed(() => {
     return 'Free'
 
   return formatBalance(featuredDrop.value.price, {
-    decimals: decimalsOf(featuredDrop.value.chain),
-    symbol: tokenSymbolOf(featuredDrop.value.chain),
+    decimals: chainSpec[featuredDrop.value.chain].tokenDecimals,
+    symbol: chainSpec[featuredDrop.value.chain].tokenSymbol,
   })
 })
 
@@ -37,7 +37,7 @@ const formattedPriceUSD = computed(() => {
   if (!featuredDrop.value?.price)
     return 'Free'
 
-  return calculateTokenUSD(featuredDrop.value.price, featuredDrop.value.chain)
+  return tokenToUsd(Number(featuredDrop.value.price), chainSpec[featuredDrop.value.chain].tokenDecimals, chainSpec[featuredDrop.value.chain].tokenSymbol)
 })
 
 // Loading state

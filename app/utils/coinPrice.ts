@@ -1,7 +1,4 @@
-import type { Prefix } from '@kodadot1/static'
 import { $fetch } from 'ofetch'
-import { useFiatStore } from '@/stores/fiat'
-import { decimalsOf, tokenSymbolOf } from '@/utils/chain'
 import { URLS } from '@/utils/constants'
 
 export const COINGECKO_BASE_URL = URLS.providers.coingecko
@@ -86,21 +83,3 @@ export async function getApproximatePriceOf(id: string): Promise<number> {
 }
 
 export default kodapriceApi
-
-/**
- * Calculate USD value from token amount and chain
- * @param tokenAmount - Raw token amount (string or number)
- * @param chain - Chain prefix (e.g., 'ahp', 'ahk')
- * @returns Formatted USD string or '--' if no value
- */
-export function calculateTokenUSD(tokenAmount: string | number | undefined, chain: Prefix): string {
-  if (!tokenAmount)
-    return '--'
-
-  const fiatStore = useFiatStore()
-  const tokenValue = Number(tokenAmount) * 10 ** -decimalsOf(chain)
-  const currentTokenValue = fiatStore.getCurrentTokenValue(tokenSymbolOf(chain))
-  const usdValue = tokenValue * Number(currentTokenValue)
-
-  return usdValue > 0 ? `$${usdValue.toFixed(2)}` : '--'
-}
