@@ -4,7 +4,7 @@ import { CHAINS } from '@kodadot1/static'
 import { useSortOptions } from '~/composables/useSortOptions'
 import { getDrops } from '~/services/fxart'
 import { fetchOdaCollection } from '~/services/oda'
-import { copyAddress, getSubscanAccountUrl, shortenAddress } from '~/utils/format/address'
+import { getSubscanAccountUrl } from '~/utils/format/address'
 
 const route = useRoute()
 const { chain: chainPrefix, collection_id } = route.params
