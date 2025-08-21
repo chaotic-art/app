@@ -66,10 +66,10 @@
     </section>
 
     <!-- Featured NFT Section -->
-    <LazyFeaturedNFT :hydrate-on-visible="{ rootMargin: '600px' }" />
+    <!-- <LazyFeaturedNFT :hydrate-on-visible="{ rootMargin: '600px' }" /> -->
 
     <!-- Latest Drops Section -->
-    <LazyLatestDrops :hydrate-on-visible="{ rootMargin: '600px' }" />
+    <!-- <LazyLatestDrops :hydrate-on-visible="{ rootMargin: '600px' }" /> -->
 
     <!-- Curated Artists Section -->
     <LazyCuratedArtists :hydrate-on-visible="{ rootMargin: '600px' }" />

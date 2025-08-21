@@ -10,8 +10,8 @@ const { prefix } = usePrefix()
 const curatedArtists = ref<Profile[]>([])
 const isLoading = ref(true)
 
-// Fetch data using watchEffect
-watchEffect(async () => {
+// Fetch data using onMounted
+onMounted(async () => {
   try {
     isLoading.value = true
 
