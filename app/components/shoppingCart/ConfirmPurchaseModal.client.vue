@@ -44,7 +44,7 @@ function buy() {
       sn: item.sn,
       collection: {
         id: item.collectionId,
-        name: item.collection?.name || '',
+        name: item.collectionName,
       },
       price: Number(item.price),
       metadata_uri: item.metadata_uri,
@@ -88,7 +88,7 @@ function buy() {
             :key="item.id"
             :name="item.name"
             :image="item.metadata?.image"
-            :collection-name="item.collection?.name"
+            :collection-name="item.collectionName"
             :price="item.price"
           />
         </div>

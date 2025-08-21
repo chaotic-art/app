@@ -15,6 +15,7 @@ const props = defineProps<{
 const {
   token,
   owner,
+  collection,
   isLoading,
   error,
   mimeType,
@@ -73,6 +74,7 @@ function createShoppingCartItem({ token, owner }: { token: OdaToken, owner: stri
     sn: props.tokenId,
     name: token.metadata?.name || '',
     collectionId: props.collectionId,
+    collectionName: collection.value?.metadata?.name || '',
     price: Number(nativePrice.value),
     currentOwner: owner,
     metadata: token.metadata!,
