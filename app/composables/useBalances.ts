@@ -38,10 +38,11 @@ export default function () {
   }
 
   const getBalance = async ({ address, prefix }: GetBalanceParams): Promise<GetBalanceResult> => {
-    return execByVm({
-      SUB: () => getSubstrateBalance({ address, prefix }),
-      EVM: () => getEvmBalance({ address, prefix }),
-    }, { prefix })
+    if (prefix === 'ahp' || prefix === 'ahk' || prefix === 'dot' || prefix === 'ksm') {
+      return getSubstrateBalance({ address, prefix })
+    }
+
+    return getEvmBalance({ address, prefix })
   }
 
   const getBalances = async (accounts: GetBalanceParams[]): Promise<GetBalancesResult> => {

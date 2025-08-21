@@ -3,10 +3,12 @@ interface QueryState {
   sort: { label: string, value: string }
   search: string
   listed: { label: string, value: string }
+  owned: boolean
 }
 
 const props = withDefaults(defineProps<{
   extraVariables?: Record<string, any>
+  hasOwnedFilter?: boolean
 }>(), {
   extraVariables: () => ({}),
 })
@@ -17,6 +19,7 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const router = useRouter()
+const { accountId } = useAuth()
 
 const sortOptions = [
   { label: 'Recent', value: 'blockNumber_DESC' },
@@ -36,8 +39,9 @@ const queryState = computed({
     sort: sortOptions.find(opt => opt.value === route.query.sort) || sortOptions[0] as QueryState['sort'],
     search: route.query.search as string || '',
     listed: listedOptions.find(opt => opt.value === route.query.listed) || listedOptions[0] as QueryState['listed'],
+    owned: route.query.owned === 'true',
   }),
-  set: ({ sort, search, listed }: { sort?: QueryState['sort'], search?: string, listed?: QueryState['listed'] }) => {
+  set: ({ sort, search, listed, owned }: { sort?: QueryState['sort'], search?: string, listed?: QueryState['listed'], owned?: boolean }) => {
     const query = { ...route.query }
 
     // Clean up default values
@@ -54,6 +58,11 @@ const queryState = computed({
       query.listed = listed.value
     else
       delete query.listed
+
+    if (owned)
+      query.owned = owned.toString()
+    else
+      delete query.owned
 
     router.push({ query })
   },
@@ -76,11 +85,16 @@ function computeQueryVariables(queryState: QueryState) {
         ? { price_isNull: true }
         : {}
 
+  const ownedVariables = props.hasOwnedFilter && queryState.owned && accountId.value
+    ? { owner: accountId.value }
+    : {}
+
   return {
     ...props.extraVariables,
     orderBy: [orderBy],
     ...(search && { name: search }),
     ...listedVariables,
+    ...ownedVariables,
   }
 }
 
@@ -93,6 +107,9 @@ watch(() => queryState.value, (newValue) => {
 
 <template>
   <div class="flex items-center gap-2 flex-wrap">
+    <!-- Chain Switcher -->
+    <ChainSwitcher />
+
     <UInput
       :model-value="queryState.search"
       placeholder="Search NFTs..."
@@ -117,5 +134,18 @@ watch(() => queryState.value, (newValue) => {
       :search-input="false"
       @update:model-value="updateQueryState({ listed: $event })"
     />
+
+    <UButton
+      v-if="hasOwnedFilter"
+      :variant="queryState.owned ? 'solid' : 'outline'"
+      :color="queryState.owned ? 'primary' : 'neutral'"
+      class="px-4 h-8"
+      @click="updateQueryState({ owned: !queryState.owned })"
+    >
+      Owned
+      <template #trailing>
+        <UIcon v-if="queryState.owned" name="i-heroicons-check" />
+      </template>
+    </UButton>
   </div>
 </template>

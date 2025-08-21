@@ -1,4 +1,5 @@
 import type { ExploreCollectionsData } from '~/graphql/queries/explore'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { exploreCollections } from '~/graphql/queries/explore'
 import { getDenyList } from '~/utils/prefix'
 
@@ -9,16 +10,16 @@ interface UseInfiniteCollectionsOptions {
   distance?: number
   search?: any[]
   variables?: Record<string, any> // Allow any additional GraphQL variables
+  endpoint?: AssetHubChain
 }
 
 export function useInfiniteCollections(options: UseInfiniteCollectionsOptions = {}) {
-  const { prefix } = usePrefix()
-
   const {
     pageSize = 40,
     distance = 300,
     search = [],
     variables = {},
+    endpoint = 'ahp',
   } = options
 
   const infiniteQuery = useInfiniteQuery<ExploreCollectionsData, CollectionEntity>({
@@ -26,13 +27,14 @@ export function useInfiniteCollections(options: UseInfiniteCollectionsOptions = 
     pageSize,
     distance,
     variables: {
-      denyList: getDenyList(prefix.value) || [],
+      denyList: getDenyList(endpoint) || [],
       search,
       ...variables,
     },
     extractData: data => data.collectionEntities,
     extractTotal: data => data.stats.totalCount,
     placeholderCount: 8,
+    endpoint,
   })
 
   // Transform display items for the template with proper typing

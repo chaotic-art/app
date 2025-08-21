@@ -1,4 +1,5 @@
 import type { DocumentNode } from 'graphql'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { useInfiniteScroll } from '@vueuse/core'
 
 interface UseInfiniteQueryOptions<TData, TItem> {
@@ -9,6 +10,7 @@ interface UseInfiniteQueryOptions<TData, TItem> {
   extractData: (data: TData) => TItem[]
   extractTotal: (data: TData) => number
   placeholderCount?: number
+  endpoint?: AssetHubChain
 }
 
 export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQueryOptions<TData, TItem>) {
@@ -20,6 +22,7 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
     extractData,
     extractTotal,
     placeholderCount = 8,
+    endpoint = 'ahp',
   } = options
 
   const { $apolloClient } = useNuxtApp()
@@ -61,6 +64,9 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
           ...variables,
           first: pageSize,
           offset,
+        },
+        context: {
+          endpoint,
         },
       })
 

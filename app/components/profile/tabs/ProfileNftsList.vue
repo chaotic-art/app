@@ -6,10 +6,12 @@ const props = defineProps<{
 defineEmits(['totalCountChange'])
 
 const queryVariables = ref<Record<string, any>>({})
+
+const { currentChain } = useChain()
 </script>
 
 <template>
-  <div>
+  <div class="mt-4">
     <NftsToolbar
       :extra-variables="props.extraVariables"
       @update:query-variables="queryVariables = $event"
@@ -22,6 +24,7 @@ const queryVariables = ref<Record<string, any>>({})
         :owner="queryVariables.owner"
         :issuer="queryVariables.issuer"
         :variables="queryVariables"
+        :prefix="currentChain"
         @total-count-change="$emit('totalCountChange', $event)"
       />
     </div>

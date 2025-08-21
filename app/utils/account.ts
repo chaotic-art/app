@@ -9,9 +9,7 @@ export function formatAddress({
   address: string
   prefix: Prefix
 }) {
-  return execByVm({
-    SUB: () => encodeAddress(address, chainSpec[prefix as SupportedChain].ss58Format),
-  }, { prefix }) || ''
+  return encodeAddress(address, chainSpec[prefix as SupportedChain].ss58Format)
 }
 
 export function isValidSubstrateAddress(address: string): boolean {

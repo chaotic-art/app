@@ -1,12 +1,7 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
-
-const { chain } = useRoute().params
-const chainPrefix = computed(() => chain?.toString() as Prefix)
-
 const { drop, amountToMint } = storeToRefs(useDropStore())
 
-const { decimals, chainSymbol } = useChain()
+const { decimals, chainSymbol, currentChain } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
 </script>
 
@@ -51,7 +46,7 @@ const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() 
             </p>
 
             <DropCollectedBy
-              :chain="chainPrefix"
+              :chain="currentChain"
               :collection-id="drop?.collection ?? ''"
               :max-address-count="5"
               size="medium"
@@ -68,7 +63,9 @@ const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() 
       <!-- right side -->
       <div class="order-1 lg:order-2">
         <!-- preview section -->
-        <DropPreviewItem />
+        <ClientOnly>
+          <DropPreviewItem />
+        </ClientOnly>
 
         <!-- stats section -->
         <div class="border p-3 md:p-4 rounded-2xl border-gray-100 mt-4">

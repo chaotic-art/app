@@ -43,3 +43,18 @@ export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }
 
   return items
 }
+
+/**
+ * Get the last item ID used on a collection
+ * @param params - The parameters object
+ * @param params.prefix - The prefix of the chain
+ * @param params.collectionId - The ID of the collection
+ * @returns The last item ID used on the collection
+ */
+export async function lastItemId({ prefix, collectionId }: { prefix: AssetHubChain, collectionId: number }) {
+  const api = getApi(prefix).api
+  const collectionItems = await api.query.Nfts.Item.getEntries(collectionId)
+  const itemIds = collectionItems.map(item => item.keyArgs[1])
+
+  return Math.max(...itemIds)
+}

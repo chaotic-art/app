@@ -1,14 +1,4 @@
-import type { ChainProperties, ChainVM, Prefix } from '@kodadot1/static'
-import type { SupportedChain } from '~/plugins/sdk.client'
-import { CHAINS } from '@kodadot1/static'
-
-export function chainPropListOf(prefix: Prefix): ChainProperties {
-  return CHAINS[prefix]
-}
-
-export function vmOf(prefix: Prefix): ChainVM {
-  return chainPropListOf(prefix).vm
-}
+import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 
 // this is static config. for onchain data use getChainSpec() from utils/api/substrate.ts
 export const chainSpec: Record<SupportedChain, { name: string, tokenDecimals: number, tokenSymbol: string, ss58Format: number }> = {
@@ -42,4 +32,13 @@ export const chainSpec: Record<SupportedChain, { name: string, tokenDecimals: nu
     tokenSymbol: 'KSM',
     ss58Format: 2,
   },
+}
+
+// Type guard functions
+export function isAssetHubChain(chain: string): chain is AssetHubChain {
+  return ['ahp', 'ahk', 'ahpas'].includes(chain as AssetHubChain)
+}
+
+export function isSupportedChain(chain: string): chain is SupportedChain {
+  return chain in chainSpec
 }

@@ -10,8 +10,7 @@ const props = defineProps<{
   showPrice?: boolean
 }>()
 
-const { decimals, chainSymbol } = useChain()
-const { prefix } = usePrefix()
+const { decimals, chainSymbol, currentChain } = useChain()
 
 const { usd, formatted } = useAmount(
   computed(() => props.price),
@@ -43,7 +42,7 @@ const { usd, formatted } = useAmount(
       >
         {{ $t('drop.artBy', [nftName]) }}
         <nuxt-link
-          :to="`/${prefix}/collection/${collectionId}`"
+          :to="`/${currentChain}/collection/${collectionId}`"
           class="has-text-link"
           target="_blank"
           rel="nofollow noopener noreferrer"
