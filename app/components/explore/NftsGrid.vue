@@ -49,13 +49,15 @@ watch(totalCount, (newCount) => {
     <div :class="props.gridClass">
       <TokenCard
         v-for="nft in nfts"
-        :key="nft.id"
+        :key="`${prefix}-${nft.collectionId}-${nft.tokenId}`"
         :token-id="nft.tokenId"
         :collection-id="nft.collectionId"
         :chain="nft.chain"
         :class="{ 'animate-pulse': nft.isPlaceholder }"
         :image="nft.image"
         :name="nft.name"
+        :price="nft.price"
+        :current-owner="nft.currentOwner"
       />
     </div>
 

@@ -46,24 +46,12 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
   // Transform display items for the template with proper typing
   const nfts = computed(() => {
     return infiniteQuery.displayItems.value.map((item) => {
-      // Type guard for placeholder items
-      if (item.isPlaceholder) {
-        return {
-          id: item.id,
-          name: item.name,
-          tokenId: Math.floor(Math.random() * 1000) + 1,
-          collectionId: Math.floor(Math.random() * 100) + 1,
-          chain: endpoint,
-          image: item.image,
-          isPlaceholder: true,
-        }
-      }
-
       // Real NFT data
       const nft = item as NftEntity & { isPlaceholder: false }
       const [collectionId, tokenId] = String(nft.id).split('-').map(Number)
 
       return {
+        ...nft,
         id: nft.id,
         name: nft.name || 'Untitled NFT',
         tokenId: tokenId || 0,

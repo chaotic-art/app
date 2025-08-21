@@ -70,6 +70,8 @@ export const exploreNfts = graphql(`
             image
             media
             metadata
+            price
+            currentOwner
             meta {
                 id
                 image
