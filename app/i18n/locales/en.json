@@ -154,6 +154,7 @@
     "listedNfts": "Check out these awesome NFTs I just listed on Chaotic:\n {0}"
   },
   "shoppingCart": {
-    "completePurchase": "Complete Purchase"
+    "completePurchase": "Complete Purchase",
+    "buyNow": "Buy Now"
   }
 }

@@ -28,6 +28,7 @@ const actionCartStore = useActionCartStore()
 const route = useRoute()
 const { isCurrentAccount } = useAuth()
 const shoppingCartStore = useShoppingCartStore()
+const { completePurchaseModal } = storeToRefs(usePreferencesStore())
 const { itemToBuy } = storeToRefs(shoppingCartStore)
 
 const id = computed(() => `${props.collectionId}-${props.tokenId}`)
@@ -37,7 +38,7 @@ const isItemInCart = computed(() => isItemInActionCart.value || isItemInShopping
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
 const canAddToActionCart = computed(() => isProfileRoute.value && owner.value && isCurrentAccount(owner.value))
-const canBuy = computed(() => Boolean(nativePrice.value))
+const canBuy = computed(() => Boolean(nativePrice.value) && owner.value && !isCurrentAccount(owner.value))
 
 function createActionCartItem({ token, owner }: { token: OdaToken, owner: string }): BaseActionCartItem {
   return {
@@ -99,6 +100,7 @@ function handleBuyNow() {
   }
 
   itemToBuy.value = createShoppingCartItem({ token: token.value, owner: owner.value })
+  completePurchaseModal.value = { open: true, mode: 'buy-now' }
 }
 
 watchEffect(() => {
@@ -208,10 +210,9 @@ watchEffect(() => {
               <UButton
                 class="rounded-r-none"
                 color="primary"
+                :label="$t('shoppingCart.buyNow')"
                 @click.prevent.stop="handleBuyNow"
-              >
-                Buy Now
-              </UButton>
+              />
               <UButton
                 class="rounded-l-none pr-3"
                 :icon="isItemInShoppingCart ? 'ic:outline-remove-shopping-cart' : 'ic:outline-shopping-cart'"

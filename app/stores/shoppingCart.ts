@@ -15,9 +15,7 @@ export const useShoppingCartStore = defineStore('shoppingCart', () => {
     existInItemIndex,
     isItemInCart,
     setItem,
-    setItemDiscardedState,
     removeItem,
-    clearDiscardedItems,
     clear: clearItems,
     updateItem,
   } = useCart<ShoppingCartItem>({ items: localStorage })
@@ -30,6 +28,7 @@ export const useShoppingCartStore = defineStore('shoppingCart', () => {
 
   function clear() {
     clearCartItems()
+    itemToBuy.value = undefined
   }
 
   return {
@@ -44,8 +43,6 @@ export const useShoppingCartStore = defineStore('shoppingCart', () => {
     isItemInCart,
     setItem,
     removeItem,
-    setItemDiscardedState,
-    clearDiscardedItems,
     clearCartItems,
     updateItem,
 

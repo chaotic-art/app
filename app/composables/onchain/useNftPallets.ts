@@ -54,6 +54,22 @@ interface ListNftsParams {
   }[]
 }
 
+interface BuyNftsParams {
+  chain: AssetHubChain
+  type?: TxType
+  nfts: {
+    id: string
+    sn: number
+    price: number
+    metadata: NFTMetadata
+    metadata_uri: string
+    collection: {
+      id: number
+      name: string
+    }
+  }[]
+}
+
 export function useNftPallets() {
   const { $sdk } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
@@ -390,11 +406,61 @@ export function useNftPallets() {
     })
   }
 
+  async function buyNfts({
+    nfts,
+    chain,
+    type = 'submit',
+  }: BuyNftsParams) {
+    const { signer, address } = await getAccountSigner()
+    const api = $sdk(chain).api
+
+    const totalPrice = sum(nfts.map(nft => Number(nft.price)))
+
+    const buyTxs = nfts.map(({ price, collection, sn }) => {
+      return api.tx.Nfts.buy_item({
+        collection: Number(collection.id),
+        item: Number(sn),
+        bid_price: BigInt(price),
+      })
+    })
+
+    const supportTx = api.tx.Balances.transfer_keep_alive({
+      dest: MultiAddress.Id(SUPPORT_ADDRESS),
+      value: BigInt(getPercentSupportFee(totalPrice)),
+    })
+
+    const txs = [...buyTxs, supportTx]
+
+    const transaction = api.tx.Utility.batch_all({
+      calls: txs.map(tx => tx.decodedCall),
+    })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
     mintNft,
     listNfts,
     userCollection,
     userBalance,
+    buyNfts,
   }
 }

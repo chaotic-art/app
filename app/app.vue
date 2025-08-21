@@ -16,5 +16,6 @@ onMounted(async () => {
 
     <LazyTransactionModal />
     <LazyShoppingCartModal />
+    <LazyConfirmPurchaseModal />
   </UApp>
 </template>

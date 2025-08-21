@@ -1,7 +1,8 @@
 <script setup lang="ts">
-const { shoppingCartModalOpen: value } = storeToRefs(usePreferencesStore())
+const { shoppingCartModalOpen: isModalOpen } = storeToRefs(usePreferencesStore())
 const shoppingCartStore = useShoppingCartStore()
 const { itemsInChain: items, count } = storeToRefs(shoppingCartStore)
+const { completePurchaseModal } = storeToRefs(usePreferencesStore())
 
 const { decimals, chainSymbol } = useChain()
 
@@ -11,13 +12,17 @@ const { usd, formatted } = useAmount(
   chainSymbol,
 )
 
+function completePurchase() {
+  isModalOpen.value = false
+  completePurchaseModal.value = { open: true, mode: 'shopping-cart' }
+}
 onBeforeUnmount(shoppingCartStore.clear)
 </script>
 
 <template>
   <div>
     <USlideover
-      v-model:open="value"
+      v-model:open="isModalOpen"
       title="Cart"
       side="right"
       :ui="{
@@ -57,6 +62,7 @@ onBeforeUnmount(shoppingCartStore.clear)
             class="mt-4"
             size="lg"
             :label="$t('shoppingCart.completePurchase')"
+            @click="completePurchase"
           />
         </div>
       </template>
