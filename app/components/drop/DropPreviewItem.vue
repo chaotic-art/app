@@ -11,6 +11,13 @@ const { accountId } = useAuth()
 
 const generativeImageUrl = ref()
 
+// Calculate minting percentage
+const mintingPercentage = computed(() => {
+  if (!drop.value?.max || !drop.value?.minted)
+    return 0
+  return Math.round((Number(drop.value.minted) / Number(drop.value.max)) * 100)
+})
+
 const { start: startTimer } = useTimeoutFn(() => {
   // quick fix: ensure that even if the completed event is not received, the loading state of the drop can be cleared
   // only applicable if the drop is missing`kodahash/render/completed` event
@@ -54,7 +61,7 @@ watch([accountId], () => {
 </script>
 
 <template>
-  <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
+  <div class="rounded-xl border border-border overflow-hidden relative group">
     <iframe
       class="aspect-square w-full"
       :src="sanitizeIpfsUrl(generativeImageUrl)"
@@ -63,13 +70,25 @@ watch([accountId], () => {
       allow="accelerometer *; camera *; gyroscope *; microphone *; xr-spatial-tracking *;"
     />
 
-    <div class="flex flex-col sm:flex-row gap-2 mt-4 justify-center">
-      <UButton class="rounded-full bg-accent text-xs md:text-sm cursor-pointer" variant="soft" trailing-icon="i-lucide-refresh-cw" :loading="isCapturingImage" @click="generateNft">
+    <!-- Preview Variation Button - shows on hover -->
+    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+      <UButton class="bg-accent text-xs md:text-sm cursor-pointer" variant="soft" trailing-icon="i-lucide-refresh-cw" :loading="isCapturingImage" @click="generateNft">
         Preview Variation
       </UButton>
-      <!-- <UButton class="rounded-full bg-accent text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
-        Controls
-      </UButton> -->
+    </div>
+  </div>
+
+  <!-- Minting Progress -->
+  <div class="mt-6 bg-card border border-border rounded-xl p-4">
+    <div class="flex items-center justify-between text-sm mb-3 text-card-foreground">
+      <span>{{ drop?.minted || 0 }} / {{ drop?.max || 10000 }} minted</span>
+      <span>{{ mintingPercentage }}%</span>
+    </div>
+    <div class="w-full bg-secondary rounded-full h-2">
+      <div
+        class="bg-primary rounded-full h-2 transition-all duration-300"
+        :style="{ width: `${mintingPercentage}%` }"
+      />
     </div>
   </div>
 </template>
