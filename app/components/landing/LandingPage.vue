@@ -1,4 +1,19 @@
 <script lang="ts" setup>
+import type { DropItem } from '~/types'
+import { getDrops } from '~/services/fxart'
+import { getEnrichedDrop } from '../drop/utils'
+
+const dropItems = ref<DropItem[]>([])
+
+onMounted(async () => {
+  const drops = await getDrops({
+    active: [true],
+    chain: ['ahp'],
+    limit: 9,
+  })
+
+  dropItems.value = (await Promise.all(drops.map(getEnrichedDrop))).filter((item): item is DropItem => item !== undefined)
+})
 </script>
 
 <template>
@@ -66,10 +81,10 @@
     </section>
 
     <!-- Featured NFT Section -->
-    <!-- <LazyFeaturedNFT :hydrate-on-visible="{ rootMargin: '600px' }" /> -->
+    <FeaturedNFT :drop="dropItems[0]" />
 
     <!-- Latest Drops Section -->
-    <!-- <LazyLatestDrops :hydrate-on-visible="{ rootMargin: '600px' }" /> -->
+    <LatestDrops :drops="dropItems.slice(0, 9)" :hydrate-on-visible="{ rootMargin: '600px' }" />
 
     <!-- Curated Artists Section -->
     <LazyCuratedArtists :hydrate-on-visible="{ rootMargin: '600px' }" />

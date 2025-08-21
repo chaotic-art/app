@@ -1,26 +1,18 @@
 <script lang="ts" setup>
+import type { DropItem } from '~/types'
 import DropCard from '@/components/drop/DropCard.vue'
-import { getEnrichedDrop } from '@/components/drop/utils'
-import { getDrops } from '@/services/fxart'
+
+const props = defineProps<{
+  drops: DropItem[]
+}>()
 
 const { prefix } = usePrefix()
 
-// Fetch latest drops
-const { data: latestDrops } = await useLazyAsyncData(() => getDrops({
-  active: [true],
-  chain: [isProduction ? 'ahp' : prefix.value],
-  limit: 10,
-}), {
-  transform: async (data) => {
-    return await Promise.all(data.map(getEnrichedDrop))
-  },
-})
-
 // Loading state
-const isLoading = computed(() => !latestDrops.value || latestDrops.value.length === 0)
+const isLoading = computed(() => !props.drops || props.drops.length === 0)
 
 // Filter out undefined drops and skip the first one (already shown in FeaturedNFT)
-const filteredDrops = computed(() => latestDrops.value?.filter((drop): drop is NonNullable<typeof drop> => Boolean(drop)).slice(1, 9) || [])
+const filteredDrops = computed(() => props.drops?.filter((drop): drop is NonNullable<typeof drop> => Boolean(drop)).slice(1, 9) || [])
 </script>
 
 <template>

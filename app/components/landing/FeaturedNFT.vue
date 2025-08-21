@@ -1,55 +1,42 @@
 <script lang="ts" setup>
+import type { DropItem } from '~/types'
 import { formatBalance } from 'dedot/utils'
-import { getEnrichedDrop } from '@/components/drop/utils'
-import { getDrops } from '@/services/fxart'
 import { tokenToUsd } from '@/utils/calculation'
 import { ipfsToCfImageUrl } from '@/utils/ipfs'
 
-const { prefix } = usePrefix()
-
-// Fetch the most recent active drop to feature
-const { data: featuredDrop } = await useLazyAsyncData(() => getDrops({
-  active: [true],
-  chain: [isProduction ? 'ahp' : prefix.value],
-  limit: 1,
-}), {
-  transform: async (data) => {
-    if (data.length > 0) {
-      return await getEnrichedDrop(data[0]!)
-    }
-    return null
-  },
-})
+const props = defineProps<{
+  drop?: DropItem
+}>()
 
 // Format price for display
 const formattedPrice = computed(() => {
-  if (!featuredDrop.value?.price)
+  if (!props.drop?.price)
     return 'Free'
 
-  return formatBalance(featuredDrop.value.price, {
-    decimals: chainSpec[featuredDrop.value.chain].tokenDecimals,
-    symbol: chainSpec[featuredDrop.value.chain].tokenSymbol,
+  return formatBalance(props.drop.price, {
+    decimals: chainSpec[props.drop.chain].tokenDecimals,
+    symbol: chainSpec[props.drop.chain].tokenSymbol,
   })
 })
 
 // Format USD equivalent using the utility function
 const formattedPriceUSD = computed(() => {
-  if (!featuredDrop.value?.price)
+  if (!props.drop?.price)
     return 'Free'
 
-  return tokenToUsd(Number(featuredDrop.value.price), chainSpec[featuredDrop.value.chain].tokenDecimals, chainSpec[featuredDrop.value.chain].tokenSymbol)
+  return tokenToUsd(Number(props.drop.price), chainSpec[props.drop.chain].tokenDecimals, chainSpec[props.drop.chain].tokenSymbol)
 })
 
 // Loading state
-const isLoading = computed(() => !featuredDrop.value)
+const isLoading = computed(() => !props.drop)
 
 // Badge text based on drop status
 const badgeText = computed(() => {
-  if (!featuredDrop.value)
+  if (!props.drop)
     return ''
 
-  const status = featuredDrop.value.status
-  const isMintedOut = featuredDrop.value.isMintedOut
+  const status = props.drop.status
+  const isMintedOut = props.drop.isMintedOut
 
   if (status === 'minting_live')
     return 'Live Now'
@@ -60,14 +47,14 @@ const badgeText = computed(() => {
 
 // Function to share the drop
 function shareDrop() {
-  if (!featuredDrop.value)
+  if (!props.drop)
     return
 
-  const url = `${window.location.origin}/${featuredDrop.value.chain}/drops/${featuredDrop.value.alias}`
+  const url = `${window.location.origin}/${props.drop.chain}/drops/${props.drop.alias}`
   if (navigator.share) {
     navigator.share({
-      title: featuredDrop.value.name || 'Untitled Collection',
-      text: featuredDrop.value.collectionDescription || 'Check out this amazing collection!',
+      title: props.drop.name || 'Untitled Collection',
+      text: props.drop.collectionDescription || 'Check out this amazing collection!',
       url,
     }).catch((error) => {
       console.error('Error sharing drop:', error)
@@ -100,9 +87,9 @@ function shareDrop() {
 
       <div class="max-w-6xl mx-auto">
         <!-- Loading State -->
-        <div v-if="isLoading" class="bg-background rounded-3xl shadow-2xl overflow-hidden border border-border">
+        <div v-if="isLoading" class="bg-background rounded-xl shadow-xl overflow-hidden border border-border">
           <div class="grid lg:grid-cols-2 gap-0">
-            <div class="relative aspect-square lg:aspect-auto bg-muted animate-pulse" />
+            <div class="relative aspect-square bg-muted animate-pulse" />
             <div class="p-8 lg:p-12 flex flex-col justify-center">
               <div class="space-y-4">
                 <div class="h-8 bg-muted rounded animate-pulse" />
@@ -115,13 +102,13 @@ function shareDrop() {
         </div>
 
         <!-- Featured Drop Content -->
-        <div v-else-if="featuredDrop" class="bg-background rounded-xl shadow-xl overflow-hidden border border-border group">
+        <div v-else-if="drop" class="bg-background rounded-xl shadow-xl overflow-hidden border border-border group">
           <div class="grid lg:grid-cols-2 gap-0">
             <!-- Image Section -->
             <div class="relative aspect-square">
               <img
-                :src="ipfsToCfImageUrl(featuredDrop.image || featuredDrop.banner, 'detail')"
-                :alt="featuredDrop.name"
+                :src="ipfsToCfImageUrl(drop.image || drop.banner, 'detail')"
+                :alt="drop.name"
                 class="w-full h-full object-contain"
               >
               <div class="absolute top-4 left-4">
@@ -144,12 +131,12 @@ function shareDrop() {
             <div class="p-8 lg:p-12 flex flex-col justify-between">
               <div class="mb-6">
                 <h3 class="text-3xl lg:text-4xl font-bold text-foreground mb-2">
-                  {{ featuredDrop.name || 'Untitled Collection' }}
+                  {{ drop.name || 'Untitled Collection' }}
                 </h3>
                 <div class="flex items-center space-x-3 mb-4">
                   <div>
                     <UserInfo
-                      :address="featuredDrop.creator || featuredDrop.collection"
+                      :address="drop.creator || drop.collection"
                       :avatar-size="42"
                       :transparent-background="true"
                       :custom-name="true"
@@ -166,7 +153,7 @@ function shareDrop() {
                   </div>
                 </div>
                 <p class="text-muted-foreground leading-relaxed mb-6 line-clamp-3">
-                  {{ featuredDrop.collectionDescription || 'No description available for this collection.' }}
+                  {{ drop.collectionDescription || 'No description available for this collection.' }}
                 </p>
               </div>
 
@@ -188,7 +175,7 @@ function shareDrop() {
                     Supply
                   </p>
                   <p class="text-2xl font-bold text-foreground">
-                    {{ featuredDrop.max || 'Unknown' }}
+                    {{ drop.max || 'Unknown' }}
                   </p>
                   <p class="text-sm text-neutral-500 dark:text-neutral-500">
                     Total Items
@@ -199,23 +186,23 @@ function shareDrop() {
               <!-- Minting Progress -->
               <div class="mb-6">
                 <div class="flex justify-between text-sm text-muted-foreground mb-2">
-                  <span>Minted: {{ featuredDrop.minted || 0 }}</span>
-                  <span>{{ featuredDrop.max ? Math.round((featuredDrop.minted / featuredDrop.max) * 100) : 0 }}%</span>
+                  <span>Minted: {{ drop.minted || 0 }}</span>
+                  <span>{{ drop.max ? Math.round((drop.minted / drop.max) * 100) : 0 }}%</span>
                 </div>
-                <UProgress v-model="featuredDrop.minted" :max="featuredDrop.max" />
+                <UProgress :model-value="drop.minted" :max="drop.max" />
               </div>
 
               <!-- Action Buttons -->
               <div class="flex space-x-3">
                 <!-- Primary Button - Mint Now or View Details -->
                 <UButton
-                  v-if="!featuredDrop.isMintedOut"
+                  v-if="!drop.isMintedOut"
                   class="flex-1 text-lg"
                   size="lg"
                   block
-                  :to="`/${featuredDrop.chain}/drops/${featuredDrop.alias}`"
+                  :to="`/${drop.chain}/drops/${drop.alias}`"
                 >
-                  {{ featuredDrop.status === 'minting_live' ? 'Mint Now' : 'View Details' }}
+                  {{ drop.status === 'minting_live' ? 'Mint Now' : 'View Details' }}
                 </UButton>
 
                 <!-- Secondary Button - Always show View Collection -->
@@ -224,7 +211,7 @@ function shareDrop() {
                   class="flex-1 text-lg"
                   size="lg"
                   block
-                  :to="`/${featuredDrop.chain}/collection/${featuredDrop.collection}`"
+                  :to="`/${drop.chain}/collection/${drop.collection}`"
                 >
                   View Collection
                 </UButton>
