@@ -90,7 +90,7 @@ defineOgImageComponent('Frame', {
 </script>
 
 <template>
-  <UContainer class="px-4 md:px-6">
+  <UContainer class="px-4 md:px-6 pb-6">
     <div>
       <!-- Banner Section -->
       <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">

@@ -8,6 +8,8 @@ const props = defineProps<{
   chain: AssetHubChain
   image?: string | null
   name?: string | null
+  price?: string | null
+  currentOwner?: string | null
 }>()
 
 const {
@@ -26,12 +28,14 @@ const actionCartStore = useActionCartStore()
 const route = useRoute()
 const { isCurrentAccount } = useAuth()
 
+const dataOwner = computed(() => owner.value || props.currentOwner)
+
 const id = computed(() => `${props.collectionId}-${props.tokenId}`)
 const isItemInActionCart = computed(() => actionCartStore.isItemInCart(id.value))
 const isItemInCart = computed(() => isItemInActionCart.value)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
-const canAddToActionCart = computed(() => isProfileRoute.value && owner.value && isCurrentAccount(owner.value))
+const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value))
 
 function createActionCartItem({ token, owner }: { token: OdaToken, owner: string }): BaseActionCartItem {
   return {
@@ -48,7 +52,7 @@ function createActionCartItem({ token, owner }: { token: OdaToken, owner: string
 }
 
 function addToActionCart() {
-  if (!token.value || !owner.value) {
+  if (!token.value || !dataOwner.value) {
     return
   }
 
@@ -56,13 +60,13 @@ function addToActionCart() {
     actionCartStore.removeItem(id.value)
   }
   else {
-    actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value }))
+    actionCartStore.setItem(createActionCartItem({ token: token.value, owner: dataOwner.value }))
   }
 }
 
 watchEffect(() => {
-  if (token.value && owner.value && canAddToActionCart.value) {
-    actionCartStore.setOwnedItem(createActionCartItem({ token: token.value, owner: owner.value }))
+  if (token.value && dataOwner.value && canAddToActionCart.value) {
+    actionCartStore.setOwnedItem(createActionCartItem({ token: token.value, owner: dataOwner.value }))
   }
 })
 </script>
@@ -75,27 +79,8 @@ watchEffect(() => {
       'border-gray-300 dark:border-neutral-700': !isItemInCart,
     }"
   >
-    <!-- Loading State -->
-    <template v-if="isLoading">
-      <!-- Image Skeleton -->
-      <div class="aspect-square bg-gray-200 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
-        <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
-      </div>
-
-      <!-- Content Skeleton -->
-      <div class="p-3 md:p-4 space-y-3">
-        <!-- Title Skeleton -->
-        <div class="h-4 bg-gray-200 dark:bg-neutral-800 rounded animate-pulse w-3/4" />
-
-        <!-- Price Skeleton -->
-        <div class="flex items-center justify-between">
-          <div class="h-3 bg-gray-100 dark:bg-neutral-700 rounded animate-pulse w-1/3" />
-        </div>
-      </div>
-    </template>
-
     <!-- Error State -->
-    <template v-else-if="error">
+    <template v-if="error">
       <div class="aspect-square bg-red-50 dark:bg-red-900 flex items-center justify-center">
         <UIcon name="i-heroicons-exclamation-triangle" class="w-16 h-16 text-red-400 dark:text-red-300" />
       </div>
@@ -179,7 +164,10 @@ watchEffect(() => {
                 Price
               </div>
               <div class="text-right">
-                <div v-if="price" class="flex items-baseline gap-1">
+                <div v-if="isLoading" class="flex items-baseline gap-1">
+                  <USkeleton class="h-4 w-16" />
+                </div>
+                <div v-else-if="price" class="flex items-baseline gap-1">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ price }}</span>
                 </div>
                 <div v-else>
@@ -194,7 +182,10 @@ watchEffect(() => {
                 USD
               </div>
               <div class="text-right">
-                <div v-if="price" class="flex items-baseline gap-1">
+                <div v-if="isLoading" class="flex items-baseline gap-1">
+                  <USkeleton class="h-4 w-12" />
+                </div>
+                <div v-else-if="price" class="flex items-baseline gap-1">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ usdPrice || '$0.00' }}</span>
                 </div>
                 <div v-else>
@@ -209,8 +200,8 @@ watchEffect(() => {
             <div class="flex items-center gap-2">
               <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Owner</span>
               <UserInfo
-                v-if="owner"
-                :address="owner"
+                v-if="dataOwner"
+                :address="dataOwner || ''"
                 :avatar-size="20"
                 :transparent-background="true"
                 class="!p-0"
