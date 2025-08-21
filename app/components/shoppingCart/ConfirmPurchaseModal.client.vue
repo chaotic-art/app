@@ -67,7 +67,7 @@ function buy() {
 <template>
   <UModal
     v-model:open="isModalOpen"
-    title="Confirm Purchase"
+    :title="$t('shoppingCart.confirmPurchase')"
     :ui="{
       content: 'max-w-md w-full',
     }"
@@ -97,16 +97,16 @@ function buy() {
 
         <div class="space-y-2">
           <div class="flex justify-between items-center">
-            <span>Price for NFT(s)</span>
+            <span>{{ $t('shoppingCart.priceForNfts') }}</span>
             <Money :value="nftPrice" inline />
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-gray-500 dark:text-gray-400 text-sm">Service Commission (3%)</span>
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ $t('shoppingCart.serviceCommission') }}</span>
             <Money class="text-gray-500 dark:text-gray-400 text-sm" :value="serviceFee" inline />
           </div>
 
           <div class="flex justify-between items-center">
-            <span class="text-gray-500 dark:text-gray-400 text-sm">Royalties</span>
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ $t('shoppingCart.royalties') }}</span>
             <span class="text-gray-500 dark:text-gray-400 text-sm">0 DOT</span>
           </div>
         </div>
@@ -114,7 +114,7 @@ function buy() {
         <USeparator class="my-4" />
 
         <div class="flex justify-between items-center">
-          <span class="text-gray-900 dark:text-white font-medium">You Will Pay</span>
+          <span class="text-gray-900 dark:text-white font-medium">{{ $t('shoppingCart.youWillPay') }}</span>
           <div class="flex">
             <div class="text-gray-900 dark:text-white font-medium">
               {{ usd }}
