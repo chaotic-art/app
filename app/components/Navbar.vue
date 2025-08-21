@@ -12,9 +12,6 @@ const router = useRouter()
 const isCreateModalOpen = ref(false)
 const isBottomSheetOpen = ref(false)
 
-// Provide for mobile shopping cart
-provide('isBottomSheetOpen', isBottomSheetOpen)
-
 const routePrefix = computed(() => isProduction ? 'ahp' : prefix.value)
 
 const navItems = computed<NavigationMenuItem[][]>(() => [
