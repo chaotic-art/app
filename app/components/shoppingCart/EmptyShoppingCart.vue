@@ -6,7 +6,7 @@ const { currentMode } = useTheme()
 
 <template>
   <div class="flex items-center flex-col gap-5 pt-8">
-    <img :src="currentMode.value === 'dark' ? '/cart/empty-cart-dark.svg' : '/cart/empty-cart.svg'" alt="Empty Cart" class="w-36 h-36">
+    <img :src="currentMode?.value === 'dark' ? '/cart/empty-cart-dark.svg' : '/cart/empty-cart.svg'" alt="Empty Cart" class="w-36 h-36">
 
     <div class="flex flex-col gap-2 items-center">
       <h1 class="font-bold">
