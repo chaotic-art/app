@@ -29,7 +29,7 @@ const filteredDrops = computed(() => props.drops?.filter((drop): drop is NonNull
 
       <!-- Loading State -->
       <div v-if="isLoading" class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div v-for="i in 4" :key="i" class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden">
+        <div v-for="i in 8" :key="i" class="bg-white dark:bg-neutral-800 rounded-xl shadow overflow-hidden">
           <div class="relative aspect-square bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
           <div class="p-6 space-y-4">
             <div class="h-6 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse" />
