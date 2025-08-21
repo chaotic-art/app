@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Profile } from '@/services/profile'
-import { getDrops } from '@/services/fxart'
+// import { getDrops } from '@/services/fxart'
 import { fetchProfileByAddress } from '@/services/profile'
 import { shortenAddress } from '~/utils/format/address'
 
@@ -10,32 +10,41 @@ const { prefix } = usePrefix()
 const curatedArtists = ref<Profile[]>([])
 const isLoading = ref(true)
 
+const topCreators = [
+  '16dBfC3PW1KsDwXTEQzN66EPccPRMEwPJPoAvTyCYx3ubZkL',
+  '16iMazd1dask2PQfWbJbeMTTStvSj81bpgtFUWVUVLbQ5yYg',
+  '16GASGn5QofWzBEvfdi9bfD755n9PStDByWj6XLcyVfrwvwZ',
+  '1VshyWpZUt8mgtWKgv9pgj8Gin99Wg5PCaDL3iCABixQbUP',
+  '165s3SRHPoEC5Bv8zTeJshcMFjDdVVUXKrJZEW1Vr3xR8VBM',
+  '13uXPnWg9fnL5vcn8i4Pq4A7gwLEdgYSzztDgg8QYtsyWhLa',
+  '15GcteQcQbLtWQA1zEJyUpGk3Ehjqod4R9zwLJvxbLgLo7wm',
+  '12smhjMXzgf9PBQwnxhJ555K7ETSWZ1QoTyTxAQ7yShsUZSa',
+]
+
+// async function fetchTopCreators() {
+//   const drops = await getDrops({
+//     active: [true],
+//     chain: [prefix.value],
+//     limit: 100,
+//   })
+
+//   const countCreators: Record<string, number> = {}
+//   drops.forEach((drop) => {
+//     if (drop.creator) {
+//       countCreators[drop.creator] = (countCreators[drop.creator] || 0) + 1
+//     }
+//   })
+//   const sortedCreators = Object.entries(countCreators).sort((a, b) => b[1] - a[1])
+//   return sortedCreators.slice(0, 8)
+// }
+
 // Fetch data using onMounted
 onMounted(async () => {
   try {
     isLoading.value = true
 
-    // Fetch drops
-    const drops = await getDrops({
-      active: [true],
-      chain: [prefix.value],
-      limit: 50,
-    })
-
-    // Extract unique artists and get random selection
-    const artists = [...new Set(drops.map(drop => drop.creator).filter(Boolean))]
-    const randomArtists = artists.slice().sort(() => Math.random() - 0.5).slice(0, 8)
-
-    if (randomArtists.length > 0) {
-      // Fetch individual profiles for each artist using Promise.all
-      const profilePromises = randomArtists
-        .filter((artist): artist is string => Boolean(artist))
-        .map(address => fetchProfileByAddress(address))
-      curatedArtists.value = await Promise.all(profilePromises)
-    }
-    else {
-      curatedArtists.value = []
-    }
+    const profilePromises = topCreators.map(address => fetchProfileByAddress(address))
+    curatedArtists.value = await Promise.all(profilePromises)
   }
   catch (error) {
     console.error('Failed to fetch data:', error)
@@ -60,8 +69,8 @@ onMounted(async () => {
       </div>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        <div v-for="i in 6" :key="i" class="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden">
+      <div v-if="isLoading" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div v-for="i in 8" :key="i" class="bg-white dark:bg-neutral-800 rounded-xl overflow-hidden">
           <div class="h-24 bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
           <div class="px-6 pb-6 -mt-8 relative">
             <div class="flex items-start sm:items-center justify-between mb-4 flex-col sm:flex-row">
