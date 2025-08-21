@@ -10,6 +10,8 @@ const { usd, formatted } = useAmount(
   decimals,
   chainSymbol,
 )
+
+onBeforeUnmount(shoppingCartStore.clear)
 </script>
 
 <template>

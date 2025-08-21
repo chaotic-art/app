@@ -7,11 +7,13 @@ const { accountId } = useAuth()
 const { prefix } = usePrefix()
 const route = useRoute()
 const router = useRouter()
-const preferencesStore = usePreferencesStore()
 
 // Modal state
 const isCreateModalOpen = ref(false)
 const isBottomSheetOpen = ref(false)
+
+// Provide for mobile shopping cart
+provide('isBottomSheetOpen', isBottomSheetOpen)
 
 const routePrefix = computed(() => isProduction ? 'ahp' : prefix.value)
 
@@ -89,13 +91,7 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
             :items="navItems"
           />
           <ThemeSwitcher v-if="!accountId" />
-          <UButton
-            v-if="accountId"
-            icon="lucide:shopping-cart"
-            color="neutral"
-            variant="ghost"
-            @click="preferencesStore.shoppingCartModalOpen = true"
-          />
+          <NavbarShoppingCart />
         </div>
 
         <!-- Desktop Wallet -->
@@ -146,6 +142,12 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
             </div>
           </UButton>
         </div>
+
+        <!-- Mobile Shopping Cart -->
+        <NavbarShoppingCart
+          mobile
+          @click="isBottomSheetOpen = false"
+        />
 
         <USeparator />
 
