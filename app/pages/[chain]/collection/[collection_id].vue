@@ -166,7 +166,7 @@ defineOgImageComponent('Frame', {
           <!-- Quick Stats -->
           <div class="pt-4 w-auto md:w-60 space-y-3">
             <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-500 dark:text-gray-400">Claimed</span>
+              <span class="text-sm text-gray-500 dark:text-gray-400">Minted</span>
               <span class="font-medium text-gray-900 dark:text-white">{{ data?.collection?.claimed || 0 }}</span>
             </div>
 
@@ -210,6 +210,7 @@ defineOgImageComponent('Frame', {
           :variables="queryVariables"
           grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
           no-items-found-message="This collection doesn't have any items yet."
+          :prefix="chain"
         />
       </div>
     </div>
