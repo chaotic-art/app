@@ -10,16 +10,20 @@ const { data: dropItems, isPending } = useQuery({
     limit: 200,
   }),
 })
-const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.creator).filter(Boolean))])
+const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.creator).filter(Boolean))] as string[])
 </script>
 
 <template>
   <UContainer>
-    <h1 class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 px-4 text-center md:text-left text-foreground">
-      {{ $t('artist.curated') }} <span class="text-ring">&lt;</span>{{ $t('artist.all') }}<span class="text-ring">&gt;</span>
-    </h1>
+    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4 md:mb-8 px-4 md:px-0">
+      <h1 class="text-2xl md:text-[50px] font-serif italic font-medium text-center md:text-left text-foreground">
+        {{ $t('artist.curated') }} <span class="text-ring">&lt;</span>{{ $t('artist.all') }}<span class="text-ring">&gt;</span>
+      </h1>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
+      <FollowAllButton :artists="allArtists" />
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0 pb-6">
       <template v-if="isPending">
         <div
           v-for="i in 12"
@@ -56,7 +60,7 @@ const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.
               </div>
             </template>
           </UserInfo>
-          <FollowButton :target="artist!" class="text-sm md:text-base" />
+          <FollowButton :target="artist" class="text-sm md:text-base" />
         </div>
       </template>
     </div>

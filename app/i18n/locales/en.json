@@ -75,7 +75,8 @@
     "follow": "Follow",
     "unfollow": "Unfollow",
     "following": "Following",
-    "unfollowing": "Unfollowing"
+    "unfollowing": "Unfollowing",
+    "followAll": "Follow all"
   },
   "profiles": {
     "created": "Profile Created",
