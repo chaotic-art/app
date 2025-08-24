@@ -11,6 +11,8 @@ const { data: dropItems, isPending } = useQuery({
   }),
 })
 const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.creator).filter(Boolean))] as string[])
+
+const refreshKey = ref(0)
 </script>
 
 <template>
@@ -20,10 +22,10 @@ const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.
         {{ $t('artist.curated') }} <span class="text-ring">&lt;</span>{{ $t('artist.all') }}<span class="text-ring">&gt;</span>
       </h1>
 
-      <FollowAllButton :artists="allArtists" />
+      <FollowAllButton :artists="allArtists" @success="refreshKey++" />
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0 pb-6">
+    <div :key="refreshKey" class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0 pb-6">
       <template v-if="isPending">
         <div
           v-for="i in 12"

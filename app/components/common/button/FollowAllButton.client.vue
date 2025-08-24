@@ -7,12 +7,13 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const emit = defineEmits(['success'])
+
 const { doAfterLogin } = useDoAfterlogin()
 const { accountId } = useAuth()
 const { getSignaturePair } = useVerifyAccount()
 const toast = useToast()
 const loading = ref(false)
-
 function followAllArtists() {
   if (!props.artists?.length || !accountId.value)
     return
@@ -54,6 +55,7 @@ function followAllArtists() {
         ).length
 
         if (successful > 0) {
+          emit('success')
           toast.add({
             title: `Successfully followed ${successful} artists`,
             color: 'success',
