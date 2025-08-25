@@ -168,7 +168,7 @@ watchEffect(() => {
                   <USkeleton class="h-4 w-16" />
                 </div>
                 <div v-else-if="price" class="flex items-baseline gap-1">
-                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ price }}</span>
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ price }}</span>
                 </div>
                 <div v-else>
                   <span class="text-xs font-medium text-gray-600 dark:text-gray-300">No price set</span>
