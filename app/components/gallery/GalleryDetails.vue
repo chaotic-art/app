@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import { t } from 'try'
+import { getDrops } from '~/services/fxart'
 import { refreshOdaTokenMetadata } from '~/services/oda'
 
 interface Props {
@@ -18,6 +20,16 @@ interface Props {
 const props = defineProps<Props>()
 
 const toast = useToast()
+
+// collection owner for genart
+const genartCreator = ref('')
+const creator = computed(() => genartCreator.value || props.collectionCreator)
+onMounted(async () => {
+  const [ok, _, drop] = await t(getDrops({ collection: props.collectionId }))
+  if (ok && drop[0]?.creator) {
+    genartCreator.value = drop[0].creator
+  }
+})
 
 // Action methods
 function shareToken() {
@@ -133,7 +145,7 @@ const actionItems = computed(() => [
         <p class="font-bold">
           Collection Creator
         </p>
-        <UserInfo :size="40" :address="collectionCreator || undefined" transparent-background custom-name>
+        <UserInfo :size="40" :address="creator || undefined" transparent-background custom-name>
           <template #name="{ addressName }">
             <div>
               <p class="font-bold">
