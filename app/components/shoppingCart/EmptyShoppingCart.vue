@@ -2,6 +2,9 @@
 import useTheme from '@/composables/useTheme'
 
 const { currentMode } = useTheme()
+const { prefix } = usePrefix()
+
+const NuxtLink = resolveComponent('NuxtLink')
 </script>
 
 <template>
@@ -21,6 +24,8 @@ const { currentMode } = useTheme()
       icon="ic:twotone-search"
       :label="$t('shoppingCart.exploreNfts')"
       variant="outline"
+      :as="NuxtLink"
+      :to="`/${prefix}/explore/nfts?listed=true`"
     />
   </div>
 </template>
