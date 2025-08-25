@@ -1,8 +1,6 @@
 import { useLocalStorage } from '@vueuse/core'
 
-export type ShoppingCartItem = {
-  collectionName: string
-} & BaseActionCartItem
+export type ShoppingCartItem = {} & BaseActionCartItem
 
 export const useShoppingCartStore = defineStore('shoppingCart', () => {
   const localStorage = useLocalStorage<ShoppingCartItem[]>('shoppingCart', [])

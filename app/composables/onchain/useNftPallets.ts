@@ -447,6 +447,20 @@ export function useNftPallets() {
         if (event.type === 'txBestBlocksState' && event.found) {
           hash.value = event.txHash.toString()
         }
+
+        result.value = {
+          type: 'buy',
+          hash: hash.value,
+          prefix: chain,
+          items: nfts.map(nft => ({
+            id: nft.id,
+            sn: nft.sn,
+            price: nft.price,
+            collection: nft.collection,
+            metadata_uri: nft.metadata_uri,
+            metadata: nft.metadata,
+          })),
+        }
       },
       error: (err) => {
         console.error('error', err)

@@ -11,13 +11,24 @@ interface Props {
   tokenId: string
   owner?: string
   collectionCreator?: string
+  price: bigint | null
   formattedPrice?: string
   usdPrice?: string
+  canBuy: boolean
 }
 
 const props = defineProps<Props>()
 
+const { isCurrentAccount } = useAuth()
+const shoppingCartStore = useShoppingCartStore()
+const preferencesStore = usePreferencesStore()
+const listingCartStore = useListingCartStore()
+const { completePurchaseModal, listingCartModalOpen } = storeToRefs(preferencesStore)
+const { itemToBuy } = storeToRefs(shoppingCartStore)
+
 const toast = useToast()
+
+const id = computed(() => `${props.collectionId}-${props.tokenId}`)
 
 // Action methods
 function shareToken() {
@@ -58,6 +69,73 @@ async function handleRefreshMetadata() {
       color: 'error',
     })
   }
+}
+
+function createShoppingCartItem({ token, owner }: { token: OdaToken, owner: string }): ShoppingCartItem {
+  return {
+    id: id.value,
+    sn: Number(props.tokenId),
+    name: token.metadata?.name || '',
+    collection: {
+      id: Number(props.collectionId),
+      name: props.collection?.metadata?.name || '',
+    },
+    price: Number(props.price),
+    currentOwner: owner,
+    metadata: token.metadata!,
+    metadata_uri: token.metadata_uri || '',
+    chain: props.chain,
+  }
+}
+
+const isItemInShoppingCart = computed(() => shoppingCartStore.isItemInCart(id.value))
+
+function handleAddToShoppingCart() {
+  if (!props.tokenData || !props.owner) {
+    return
+  }
+
+  if (isItemInShoppingCart.value) {
+    shoppingCartStore.removeItem(id.value)
+  }
+  else {
+    shoppingCartStore.setItem(createShoppingCartItem({ token: props.tokenData, owner: props.owner }))
+  }
+}
+
+function handleBuyNow() {
+  if (!props.tokenData || !props.owner) {
+    return
+  }
+
+  itemToBuy.value = createShoppingCartItem({ token: props.tokenData, owner: props.owner })
+  completePurchaseModal.value = { open: true, mode: 'buy-now' }
+}
+
+function createListingCartItem({ token, owner }: { token: OdaToken, owner: string }): ListingCartItem {
+  return {
+    id: id.value,
+    sn: Number(props.tokenId),
+    name: token.metadata?.name || '',
+    collection: {
+      id: Number(props.collectionId),
+      name: props.collection?.metadata?.name || '',
+    },
+    price: Number(props.price),
+    currentOwner: owner,
+    metadata: token.metadata!,
+    metadata_uri: token.metadata_uri || '',
+    chain: props.chain,
+  }
+}
+
+function handleList() {
+  if (!props.tokenData || !props.owner) {
+    return
+  }
+
+  listingCartStore.setItem(createListingCartItem({ token: props.tokenData, owner: props.owner }))
+  listingCartModalOpen.value = true
 }
 
 // Action items for dropdown menu
@@ -176,6 +254,33 @@ const actionItems = computed(() => [
           ({{ usdPrice }})
         </p>
       </div>
+    </div>
+
+    <!-- Item Actions -->
+    <div v-if="canBuy" class="flex gap-3">
+      <UButton
+        color="primary"
+        size="lg"
+        class="flex-1"
+        @click="handleBuyNow"
+      >
+        Buy Now
+      </UButton>
+      <UButton
+        size="lg"
+        :icon="shoppingCartStore.isItemInCart(id) ? 'ic:outline-remove-shopping-cart' : 'ic:outline-shopping-cart'"
+        @click="handleAddToShoppingCart"
+      />
+    </div>
+    <div v-else-if="isCurrentAccount(owner)" class="flex">
+      <UButton
+        color="primary"
+        size="lg"
+        class="flex-1"
+        @click="handleList"
+      >
+        {{ !price ? 'List' : 'Change Price' }}
+      </UButton>
     </div>
   </div>
 </template>

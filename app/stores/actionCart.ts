@@ -4,7 +4,10 @@ import { useLocalStorage } from '@vueuse/core'
 export type BaseActionCartItem = {
   sn: number
   name: string
-  collectionId: number
+  collection: {
+    id: number
+    name: string
+  }
   price?: number
   currentOwner: string
   metadata: NFTMetadata

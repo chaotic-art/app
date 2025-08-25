@@ -21,6 +21,7 @@ export function useToken(props: {
 
   const { $sdk } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()
+  const { isCurrentAccount } = useAuth()
 
   // Calculate USD price from DOT price
   const { usd: usdPrice } = useAmount(computed(() => {
@@ -97,6 +98,8 @@ export function useToken(props: {
     return 'i-heroicons-document'
   })
 
+  const canBuy = computed(() => Boolean(queryPrice.value) && Boolean(owner.value && !isCurrentAccount(owner.value)))
+
   return {
     // Reactive data
     token,
@@ -112,5 +115,8 @@ export function useToken(props: {
     price,
     usdPrice,
     mediaIcon,
+
+    // Actions
+    canBuy,
   }
 }

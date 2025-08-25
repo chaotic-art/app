@@ -30,7 +30,6 @@ const route = useRoute()
   <UContainer class="px-4 md:px-6">
     <ProfileDetail :address="String(route.params.id)" />
 
-    <ActionCart />
-    <ListingCartModal />
+    <LazyActionCart />
   </UContainer>
 </template>

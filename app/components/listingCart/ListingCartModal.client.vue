@@ -9,7 +9,6 @@ const { listNfts } = useNftPallets()
 const listingCartStore = useListingCartStore()
 const { itemsInChain: items } = storeToRefs(listingCartStore)
 const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
-const actionCartTransfer = useActionCartTransfer()
 const actionCartStore = useActionCartStore()
 const { decimals, chainSymbol } = useChain()
 const { open: isTransactionModalOpen } = useTransactionModal()
@@ -79,10 +78,7 @@ function getListParams() {
     nfts: items.value.map(item => ({
       id: item.id,
       sn: item.sn,
-      collection: {
-        id: item.collectionId,
-        name: item.collection.name,
-      },
+      collection: item.collection,
       price: toNative(item.listPrice || 0, decimals.value),
       metadata_uri: item.metadata_uri,
       metadata: item.metadata,
@@ -120,9 +116,6 @@ watchEffect(async () => {
 
 useModalIsOpenTracker({
   isOpen: listingCartModalOpen,
-  onOpen: () => {
-    actionCartTransfer.transferToListingCart()
-  },
   onClose: () => {
     if (!isTransactionModalOpen.value) {
       listingCartStore.clearCartItems()

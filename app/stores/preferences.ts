@@ -1,6 +1,8 @@
+type ShoppingCartMode = 'shopping-cart' | 'buy-now'
+
 interface ConfirmPurchaseModal {
   open: boolean
-  mode: 'shopping-cart' | 'buy-now'
+  mode: ShoppingCartMode
 }
 
 export const usePreferencesStore = defineStore('preferences', () => {

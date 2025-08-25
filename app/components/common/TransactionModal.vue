@@ -25,7 +25,7 @@ const resolvedStatus = computed(() => {
 <template>
   <UModal
     v-model:open="open"
-    title="Sign Transaction"
+    :title="isSuccess ? 'Success' : 'Sign Transaction'"
     :dismissible="!open"
     :close="isSuccess || !!error"
     :ui="{
@@ -50,6 +50,13 @@ const resolvedStatus = computed(() => {
       <!-- Listing success preview -->
       <LazySuccessfulListing
         v-else-if="isSuccess && result?.type === 'listing'"
+        :result="result"
+        :status="resolvedStatus"
+      />
+
+      <!-- Shopping success preview -->
+      <LazySuccessfulBuy
+        v-else-if="isSuccess && result?.type === 'buy'"
         :result="result"
         :status="resolvedStatus"
       />

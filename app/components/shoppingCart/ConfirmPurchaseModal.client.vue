@@ -42,10 +42,7 @@ function buy() {
     nfts: items.value.map(item => ({
       id: item.id,
       sn: item.sn,
-      collection: {
-        id: item.collectionId,
-        name: item.collectionName,
-      },
+      collection: item.collection,
       price: Number(item.price),
       metadata_uri: item.metadata_uri,
       metadata: item.metadata,
@@ -88,7 +85,7 @@ function buy() {
             :key="item.id"
             :name="item.name"
             :image="item.metadata?.image"
-            :collection-name="item.collectionName"
+            :collection-name="item.collection.name"
             :price="item.price"
           />
         </div>

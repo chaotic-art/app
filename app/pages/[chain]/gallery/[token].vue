@@ -16,11 +16,13 @@ const {
   isLoading,
   error,
   mimeType,
+  nativePrice: price,
   price: formattedPrice,
   usdPrice,
   mediaIcon,
   token: tokenData,
   collection,
+  canBuy,
 } = useToken({
   tokenId: Number(tokenId),
   collectionId: Number(collectionId),
@@ -67,6 +69,8 @@ useSeoMeta({
               :collection-creator="collectionCreator || undefined"
               :formatted-price="formattedPrice || undefined"
               :usd-price="usdPrice"
+              :price="price"
+              :can-buy="canBuy"
             />
           </div>
         </div>

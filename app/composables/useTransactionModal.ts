@@ -41,7 +41,24 @@ export interface ListingTransactionResult {
   prefix: AssetHubChain
 }
 
-type TransactionResult = CollectionCategory | NftCategory | ListingTransactionResult
+export interface BuyTransactionResult {
+  type: 'buy'
+  items: {
+    id: string
+    sn: number
+    price: number
+    metadata: NFTMetadata
+    metadata_uri: string
+    collection: {
+      id: number
+      name: string
+    }
+  }[]
+  hash: string
+  prefix: AssetHubChain
+}
+
+type TransactionResult = CollectionCategory | NftCategory | ListingTransactionResult | BuyTransactionResult
 
 // Transaction status progression:
 // 1. status.value = 'signed'

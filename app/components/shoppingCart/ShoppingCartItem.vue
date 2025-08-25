@@ -17,7 +17,7 @@ const isHovered = useElementHover(cart)
     <CartItemDetails
       :name="item.name"
       :image="item.metadata?.image"
-      :collection-name="item.collectionName"
+      :collection-name="item.collection.name"
       :price="item.price"
     >
       <template v-if="isHovered" #right>

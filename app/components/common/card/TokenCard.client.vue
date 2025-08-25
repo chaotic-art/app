@@ -23,6 +23,7 @@ const {
   usdPrice,
   mediaIcon,
   nativePrice,
+  canBuy,
 } = useToken(props)
 
 const actionCartStore = useActionCartStore()
@@ -39,19 +40,21 @@ const isItemInCart = computed(() => isItemInActionCart.value || isItemInShopping
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
 const canAddToActionCart = computed(() => isProfileRoute.value && owner.value && isCurrentAccount(owner.value))
-const canBuy = computed(() => Boolean(nativePrice.value) && owner.value && !isCurrentAccount(owner.value))
 
 function createActionCartItem({ token, owner }: { token: OdaToken, owner: string }): BaseActionCartItem {
   return {
     id: id.value,
     sn: props.tokenId,
-    collectionId: props.collectionId,
     name: token.metadata?.name || '',
     chain: props.chain,
     price: Number(nativePrice.value),
     currentOwner: owner,
     metadata: token.metadata!,
     metadata_uri: token.metadata_uri || '',
+    collection: {
+      id: props.collectionId,
+      name: collection.value?.metadata?.name || '',
+    },
   }
 }
 
@@ -73,13 +76,15 @@ function createShoppingCartItem({ token, owner }: { token: OdaToken, owner: stri
     id: id.value,
     sn: props.tokenId,
     name: token.metadata?.name || '',
-    collectionId: props.collectionId,
-    collectionName: collection.value?.metadata?.name || '',
     price: Number(nativePrice.value),
     currentOwner: owner,
     metadata: token.metadata!,
     metadata_uri: token.metadata_uri || '',
     chain: props.chain,
+    collection: {
+      id: props.collectionId,
+      name: collection.value?.metadata?.name || '',
+    },
   }
 }
 
