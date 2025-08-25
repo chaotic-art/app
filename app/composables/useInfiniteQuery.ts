@@ -39,8 +39,8 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
   // Mock data for placeholder cards
   const placeholderItems = Array.from({ length: placeholderCount }, (_, i) => ({
     id: i + 1,
-    name: `Item ${i + 1}`,
-    image: '',
+    name: '---',
+    image: '', // TODO: add placeholder image
     isPlaceholder: true as const,
   }))
 
