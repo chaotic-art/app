@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { useQuery } from '@tanstack/vue-query'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
 const { completePurchaseModal } = storeToRefs(usePreferencesStore())
@@ -8,7 +9,7 @@ const { itemsInChain, itemToBuy } = storeToRefs(shoppingCartStore)
 const { accountId } = useAuth()
 const { decimals, chainSymbol } = useChain()
 const { open: isTransactionModalOpen } = useTransactionModal()
-const { buyNfts } = useNftPallets()
+const { buyNfts, collectionRoyalties } = useNftPallets()
 const { prefix } = usePrefix()
 
 const isModalOpen = computed({
@@ -30,7 +31,28 @@ const { usd, formatted } = useAmount(
   chainSymbol,
 )
 
+const { data: royaltiesData, isPending: isRoyaltiesLoading } = useQuery({
+  queryKey: ['royalties', items.value.map(item => item.id)],
+  queryFn: () => Promise.all(items.value.map(item => collectionRoyalties(item.chain, item.collection.id))),
+  enabled: isModalOpen,
+})
+
+const totalRoyalties = computed(() => {
+  let total = 0
+
+  for (const [index, item] of items.value.entries()) {
+    total += Math.floor(Number(item.price) * ((royaltiesData.value?.[index]?.amount || 0) / 100))
+  }
+
+  return total
+})
+
+const loading = computed(() => isRoyaltiesLoading.value)
+
 const label = computed(() => {
+  if (loading.value)
+    return 'Loading...'
+
   return 'Confirm'
 })
 
@@ -50,15 +72,6 @@ function buy() {
     chain: prefix.value as AssetHubChain,
   })
 }
-
-// useModalIsOpenTracker({
-//   isOpen: isModalOpen,
-//   onClose: () => {
-//     if (!isTransactionModalOpen.value) {
-//       shoppingCartStore.clear()
-//     }
-//   },
-// })
 </script>
 
 <template>
@@ -104,7 +117,7 @@ function buy() {
 
           <div class="flex justify-between items-center">
             <span class="text-gray-500 dark:text-gray-400 text-sm">{{ $t('shoppingCart.royalties') }}</span>
-            <span class="text-gray-500 dark:text-gray-400 text-sm">0 DOT</span>
+            <Money class="text-gray-500 dark:text-gray-400 text-sm" :value="totalRoyalties" inline />
           </div>
         </div>
 
@@ -122,6 +135,7 @@ function buy() {
 
         <UButton
           class="w-full mt-7 inline-flex justify-center"
+          :disabled="loading"
           :label="label"
           @click="buy"
         />

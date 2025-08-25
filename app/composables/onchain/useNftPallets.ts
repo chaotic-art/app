@@ -1,9 +1,15 @@
 import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
+import { encodeAddress } from 'dedot/utils'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 
 type TxType = 'submit' | 'estimate'
+
+interface CollectionRoyalty {
+  amount: number
+  recipient: string
+}
 
 interface CreateCollectionParams {
   chain: AssetHubChain
@@ -406,6 +412,34 @@ export function useNftPallets() {
     })
   }
 
+  async function collectionAttributes(chain: AssetHubChain, collectionId: number) {
+    const attributes = await $sdk(chain).api.query.Nfts.Attribute.getEntries(collectionId)
+
+    return attributes.map((item) => {
+      return {
+        key: item.keyArgs[3].asText(),
+        value: item.value[0],
+      }
+    })
+  }
+
+  async function collectionRoyalties(chain: AssetHubChain, collectionId: number): Promise<CollectionRoyalty | null> {
+    const attributes = await collectionAttributes(chain, collectionId)
+
+    const recipient = attributes.find(attr => attr.key === 'recipient')
+    const royalty = attributes.find(attr => attr.key === 'royalty')
+
+    // if !recipient should default to the collection owner?
+    if (!(royalty && recipient)) {
+      return null
+    }
+
+    return {
+      recipient: encodeAddress(recipient.value.asBytes()),
+      amount: Number(royalty.value.asText()),
+    }
+  }
+
   async function buyNfts({
     nfts,
     chain,
@@ -429,7 +463,26 @@ export function useNftPallets() {
       value: BigInt(getPercentSupportFee(totalPrice)),
     })
 
-    const txs = [...buyTxs, supportTx]
+    const royalties = await Promise.all(nfts.map(async (item) => {
+      const royalty = await collectionRoyalties(chain, item.collection.id)
+      return {
+        royalty,
+        item,
+      }
+    }))
+
+    const royaltiesTx = api.tx.Nfts.pay_tips({
+      tips: royalties
+        .filter(i => Boolean(i.royalty))
+        .map(({ item, royalty }) => ({
+          collection: Number(item.collection.id),
+          item: Number(item.sn),
+          receiver: royalty!.recipient || '',
+          amount: BigInt(item.price * (Number(royalty!.amount) / 100)),
+        })),
+    })
+
+    const txs = [...buyTxs, royaltiesTx, supportTx]
 
     const transaction = api.tx.Utility.batch_all({
       calls: txs.map(tx => tx.decodedCall),
@@ -476,5 +529,6 @@ export function useNftPallets() {
     userCollection,
     userBalance,
     buyNfts,
+    collectionRoyalties,
   }
 }
