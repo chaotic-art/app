@@ -1,5 +1,6 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { formatBalance } from 'dedot/utils'
+import { t } from 'try'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
 export function useToken(props: {
@@ -61,8 +62,10 @@ export function useToken(props: {
 
       const media = token.value?.metadata?.animation_url || token.value?.metadata?.image || props.image
       if (media) {
-        const mimeTypeData = await fetchMimeType(media)
-        mimeType.value = mimeTypeData.mime_type
+        const [ok, _, mimeTypeData] = await t(fetchMimeType(media))
+        if (ok) {
+          mimeType.value = mimeTypeData.mime_type
+        }
       }
     }
     catch (err) {
@@ -100,7 +103,7 @@ export function useToken(props: {
   return {
     // Reactive data
     token,
-    collection,
+    collection: computed(() => collection.value),
     owner,
     collectionCreator,
     isLoading,
