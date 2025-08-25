@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import type { ActionButton } from './ActionButtons.vue'
-import type { SocialMediaProps } from './ShareSocialsSection.vue'
 import type { TransactionStatus } from '@/composables/useTransactionStatus'
 
 export interface ShareProp {
   text: string
   url: string
   withCopy?: boolean
-  social?: SocialMediaProps
 }
 type ActionButtonWithHandler = ActionButton & { onClick: () => void }
 
@@ -48,7 +46,6 @@ function handleSecondaryActionClick() {
       :text="share.text"
       :url="share.url"
       :with-copy="share.withCopy"
-      :social="share.social"
     />
 
     <slot name="actions">

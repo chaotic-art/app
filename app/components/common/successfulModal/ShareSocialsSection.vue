@@ -6,22 +6,14 @@ const props = withDefaults(
     text: string
     url: string
     withCopy?: boolean
-    showFarcaster?: boolean
-    social?: SocialMediaProps
   }>(),
   {
     withCopy: true,
-    showFarcaster: true,
-    social: undefined,
   },
 )
 
-export interface SocialMediaProps {
-  farcaster?: { embeds: string[] }
-}
-
 const toast = useToast()
-const { shareOnX, shareOnTelegram, shareOnFarcaster } = useSocialShare()
+const { shareOnX, shareOnTelegram } = useSocialShare()
 const { copy } = useClipboard()
 
 function handleShareOnX() {
@@ -30,9 +22,6 @@ function handleShareOnX() {
 
 function handleShareOnTelegram() {
   shareOnTelegram(props.text, props.url)
-}
-function handleShareOnFarcaster() {
-  shareOnFarcaster(props.text, props.social?.farcaster?.embeds ?? [props.url])
 }
 </script>
 
@@ -51,21 +40,6 @@ function handleShareOnFarcaster() {
         >
           <UIcon
             name="i-simple-icons:x"
-            class="text-gray-500"
-          />
-        </UButton>
-      </UTooltip>
-      <UTooltip
-        v-if="showFarcaster"
-        text="Farcaster"
-      >
-        <UButton
-          variant="ghost"
-          size="lg"
-          @click="handleShareOnFarcaster"
-        >
-          <UIcon
-            name="simple-icons:farcaster"
             class="text-gray-500"
           />
         </UButton>
