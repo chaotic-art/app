@@ -29,6 +29,7 @@ const actionCartStore = useActionCartStore()
 const route = useRoute()
 const { isCurrentAccount } = useAuth()
 
+const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const id = computed(() => `${props.collectionId}-${props.tokenId}`)
@@ -70,20 +71,6 @@ watchEffect(() => {
     actionCartStore.setOwnedItem(createActionCartItem({ token: token.value, owner: dataOwner.value }))
   }
 })
-
-const allowFallback = ref(true)
-async function handleImageError(event: Event) {
-  if (allowFallback.value && collection.value?.metadata?.image) {
-    const target = event.target as HTMLImageElement
-    target.src = sanitizeIpfsUrl(collection.value?.metadata?.image || '')
-    allowFallback.value = false
-  }
-
-  if (!collection.value?.metadata?.image) {
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    handleImageError(event)
-  }
-}
 </script>
 
 <template>
@@ -131,11 +118,17 @@ async function handleImageError(event: Event) {
             />
           </div>
           <img
-            v-else-if="image || token?.metadata?.image"
+            v-else-if="imageStatus === 'normal' && (image || token?.metadata?.image)"
             :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
             :alt="token?.metadata?.name || 'NFT'"
             class="w-full h-full object-contain"
-            @error="handleImageError"
+            @error="imageStatus = 'fallback'"
+          >
+          <img
+            v-else-if="imageStatus === 'fallback' && collection?.metadata?.image"
+            :src="sanitizeIpfsUrl(collection?.metadata?.image)"
+            :alt="token?.metadata?.name || 'NFT'"
+            class="w-full h-full object-contain"
           >
           <div
             v-else

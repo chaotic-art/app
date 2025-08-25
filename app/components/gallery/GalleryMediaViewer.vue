@@ -13,6 +13,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const imageStatus = ref<'normal' | 'fallback'>('normal')
 const fullScreenDisabled = ref(false)
 const mediaItemRef = ref<HTMLDivElement & { toggleFullscreen: () => void } | null>(null)
 const { toggle, isFullscreen, isSupported } = useFullscreen(mediaItemRef)
@@ -38,15 +39,6 @@ function toggleFullscreen() {
   }
   else {
     toggleMediaFullscreen()
-  }
-}
-
-const allowFallback = ref(true)
-function handleImageError(event: Event) {
-  if (allowFallback.value) {
-    const target = event.target as HTMLImageElement
-    target.src = sanitizeIpfsUrl(props.collectionData?.metadata?.image || '')
-    allowFallback.value = false
   }
 }
 
@@ -98,13 +90,18 @@ defineExpose({
 
       <!-- Image Media -->
       <img
-        v-else-if="tokenData?.metadata?.image"
+        v-else-if="imageStatus === 'normal' && tokenData?.metadata?.image"
         :src="sanitizeIpfsUrl(tokenData?.metadata?.image)"
         :alt="tokenData?.metadata?.name || 'NFT'"
         class="aspect-square w-full object-contain"
-        @error="handleImageError"
+        @error="imageStatus = 'fallback'"
       >
-
+      <img
+        v-else-if="imageStatus === 'fallback' && collectionData?.metadata?.image"
+        :src="sanitizeIpfsUrl(collectionData?.metadata?.image)"
+        :alt="tokenData?.metadata?.name || 'NFT'"
+        class="aspect-square w-full object-contain"
+      >
       <!-- Fallback -->
       <div
         v-else
