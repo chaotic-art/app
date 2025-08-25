@@ -41,14 +41,14 @@ function toggleFullscreen() {
   }
 }
 
-const fallbackImage = ref('')
-const imageStatus = ref<'normal' | 'error'>('normal')
-watchEffect(() => {
-  if (imageStatus.value === 'error' && props.collectionData?.metadata?.image) {
-    fallbackImage.value = sanitizeIpfsUrl(props.collectionData.metadata.image)
-    imageStatus.value = 'normal'
+const allowFallback = ref(true)
+function handleImageError(event: Event) {
+  if (allowFallback.value) {
+    const target = event.target as HTMLImageElement
+    target.src = sanitizeIpfsUrl(props.collectionData?.metadata?.image || '')
+    allowFallback.value = false
   }
-})
+}
 
 defineExpose({
   toggleFullscreen,
@@ -98,11 +98,11 @@ defineExpose({
 
       <!-- Image Media -->
       <img
-        v-else-if="fallbackImage || tokenData?.metadata?.image"
-        :src="sanitizeIpfsUrl(fallbackImage || tokenData?.metadata?.image)"
+        v-else-if="tokenData?.metadata?.image"
+        :src="sanitizeIpfsUrl(tokenData?.metadata?.image)"
         :alt="tokenData?.metadata?.name || 'NFT'"
         class="aspect-square w-full object-contain"
-        @error="imageStatus = 'error'"
+        @error="handleImageError"
       >
 
       <!-- Fallback -->

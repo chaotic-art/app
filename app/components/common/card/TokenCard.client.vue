@@ -71,14 +71,19 @@ watchEffect(() => {
   }
 })
 
-const fallbackImage = ref('')
-const imageStatus = ref<'normal' | 'error'>('normal')
-watchEffect(() => {
-  if (imageStatus.value === 'error' && collection.value?.metadata?.image) {
-    fallbackImage.value = sanitizeIpfsUrl(collection.value.metadata.image)
-    imageStatus.value = 'normal'
+const allowFallback = ref(true)
+async function handleImageError(event: Event) {
+  if (allowFallback.value && collection.value?.metadata?.image) {
+    const target = event.target as HTMLImageElement
+    target.src = sanitizeIpfsUrl(collection.value?.metadata?.image || '')
+    allowFallback.value = false
   }
-})
+
+  if (!collection.value?.metadata?.image) {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    handleImageError(event)
+  }
+}
 </script>
 
 <template>
@@ -126,11 +131,11 @@ watchEffect(() => {
             />
           </div>
           <img
-            v-else-if="fallbackImage || image || token?.metadata?.image"
-            :src="sanitizeIpfsUrl(fallbackImage || image || token?.metadata?.image)"
+            v-else-if="image || token?.metadata?.image"
+            :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
             :alt="token?.metadata?.name || 'NFT'"
             class="w-full h-full object-contain"
-            @error="imageStatus = 'error'"
+            @error="handleImageError"
           >
           <div
             v-else
