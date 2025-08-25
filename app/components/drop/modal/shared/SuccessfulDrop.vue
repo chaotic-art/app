@@ -11,7 +11,6 @@ const { $i18n } = useNuxtApp()
 const { add: toast } = useToast()
 const { prefix } = usePrefix()
 const { accountId } = useAuth()
-const { getCollectionFrameUrl } = useSocialShare()
 const { toMintNFTs } = storeToRefs(useDropStore())
 
 const txHash = computed(() => props.mintingSession.txHash ?? '')
@@ -68,16 +67,6 @@ const share = computed<ShareProp>(() => ({
   text: sharingTxt.value,
   url: nftFullUrl.value,
   withCopy: singleMint.value,
-  social: {
-    farcaster: {
-      embeds: [
-        getCollectionFrameUrl(
-          prefix.value,
-          mintedNft.value?.collection.id as string,
-        ),
-      ],
-    },
-  },
 }))
 
 const viewButton = computed(() => ({
