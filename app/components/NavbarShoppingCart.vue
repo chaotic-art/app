@@ -19,14 +19,15 @@ function handleClick() {
     v-if="accountId"
     color="neutral"
     variant="ghost"
+    size="sm"
     :class="mobile ? 'w-full justify-start' : ''"
     @click="handleClick"
   >
-    <div class="relative">
-      <UIcon name="lucide:shopping-cart" class="w-5 h-5" />
+    <div class="relative flex">
+      <UIcon name="lucide:shopping-cart" class="w-4 h-4" />
       <span
         v-if="shoppingCartStore.count > 0"
-        class="absolute -top-2 -right-2 bg-red-500 dark:bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center opacity-90"
+        class="absolute -top-2 -right-2 bg-red-500 dark:bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center opacity-90"
       >
         {{ shoppingCartStore.count }}
       </span>
