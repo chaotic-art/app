@@ -6,6 +6,7 @@ const props = withDefaults(
     text: string
     url: string
     withCopy?: boolean
+    disabled?: boolean
   }>(),
   {
     withCopy: true,
@@ -36,6 +37,7 @@ function handleShareOnTelegram() {
         <UButton
           variant="ghost"
           size="lg"
+          :disabled="disabled"
           @click="handleShareOnX"
         >
           <UIcon
@@ -49,6 +51,7 @@ function handleShareOnTelegram() {
         <UButton
           variant="ghost"
           size="lg"
+          :disabled="disabled"
           @click="handleShareOnTelegram"
         >
           <UIcon
@@ -64,6 +67,7 @@ function handleShareOnTelegram() {
         <UButton
           variant="ghost"
           size="lg"
+          :disabled="disabled"
           @click="() => {
             copy(url)
             toast.add({ title: $t('general.copyToClipboard') })

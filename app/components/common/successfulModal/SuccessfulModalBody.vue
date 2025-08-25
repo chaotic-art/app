@@ -3,6 +3,7 @@ import type { ActionButton } from './ActionButtons.vue'
 import type { TransactionStatus } from '@/composables/useTransactionStatus'
 
 export interface ShareProp {
+  disabled?: boolean
   text: string
   url: string
   withCopy?: boolean
@@ -43,6 +44,7 @@ function handleSecondaryActionClick() {
     <USeparator class="my-5" />
 
     <ShareSocialsSection
+      :disabled="share.disabled"
       :text="share.text"
       :url="share.url"
       :with-copy="share.withCopy"

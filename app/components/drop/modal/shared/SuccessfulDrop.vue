@@ -29,6 +29,7 @@ const itemMedias = props.mintingSession.items.map(item => ({
   metadata: item.metadata,
 }))
 const items = ref<ItemMedia[]>(itemMedias)
+const isLoading = ref(true)
 
 onMounted(async () => {
   toast({ title: 'Successfully minted token. There is a 1 minute indexer and worker delay for this action to appear in the website.', duration: 15000 })
@@ -45,6 +46,7 @@ onMounted(async () => {
       toMintNFTs.value[index].name = metadata.name
     }
   })
+  isLoading.value = false
 })
 
 const nftPath = computed(
@@ -59,11 +61,12 @@ const getItemSn = (name: string) => `#${name.split('#')[1]}`
 
 const sharingTxt = computed(() =>
   singleMint.value
-    ? $i18n.t('sharing.dropNft', [getItemSn(items.value[0]?.name || '')])
-    : $i18n.t('sharing.dropNfts', [items.value.map(item => getItemSn(item.name)).join(', ')]),
+    ? $i18n.t('sharing.dropNft', [items.value[0]?.collectionName, getItemSn(items.value[0]?.name || '')])
+    : $i18n.t('sharing.dropNfts', [items.value[0]?.collectionName, items.value.map(item => getItemSn(item.name)).join(', ')]),
 )
 
 const share = computed<ShareProp>(() => ({
+  disabled: isLoading.value,
   text: sharingTxt.value,
   url: nftFullUrl.value,
   withCopy: singleMint.value,
