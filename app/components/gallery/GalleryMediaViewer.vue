@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { OdaToken } from '~/services/oda'
+import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { useFullscreen } from '@vueuse/core'
 import { MediaType, resolveMedia } from '@/utils/gallery/media'
 
 interface Props {
   tokenData: OdaToken | null
+  collectionData: OnchainCollection | null
   mimeType?: string
   mediaIcon: string
   containerId: string
@@ -39,6 +40,15 @@ function toggleFullscreen() {
     toggleMediaFullscreen()
   }
 }
+
+const fallbackImage = ref('')
+const imageStatus = ref<'normal' | 'error'>('normal')
+watchEffect(() => {
+  if (imageStatus.value === 'error' && props.collectionData?.metadata?.image) {
+    fallbackImage.value = sanitizeIpfsUrl(props.collectionData.metadata.image)
+    imageStatus.value = 'normal'
+  }
+})
 
 defineExpose({
   toggleFullscreen,
@@ -88,11 +98,11 @@ defineExpose({
 
       <!-- Image Media -->
       <img
-        v-else-if="tokenData?.metadata?.image"
-        :src="sanitizeIpfsUrl(tokenData?.metadata?.image)"
+        v-else-if="fallbackImage || tokenData?.metadata?.image"
+        :src="sanitizeIpfsUrl(fallbackImage || tokenData?.metadata?.image)"
         :alt="tokenData?.metadata?.name || 'NFT'"
         class="aspect-square w-full object-contain"
-        @error="($event.target as HTMLImageElement).style.display = 'none'"
+        @error="imageStatus = 'error'"
       >
 
       <!-- Fallback -->

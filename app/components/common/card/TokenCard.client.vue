@@ -22,6 +22,7 @@ const {
   usdPrice,
   mediaIcon,
   nativePrice,
+  collection,
 } = useToken(props)
 
 const actionCartStore = useActionCartStore()
@@ -67,6 +68,15 @@ function addToActionCart() {
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
     actionCartStore.setOwnedItem(createActionCartItem({ token: token.value, owner: dataOwner.value }))
+  }
+})
+
+const fallbackImage = ref('')
+const imageStatus = ref<'normal' | 'error'>('normal')
+watchEffect(() => {
+  if (imageStatus.value === 'error' && collection.value?.metadata?.image) {
+    fallbackImage.value = sanitizeIpfsUrl(collection.value.metadata.image)
+    imageStatus.value = 'normal'
   }
 })
 </script>
@@ -116,11 +126,11 @@ watchEffect(() => {
             />
           </div>
           <img
-            v-else-if="image || token?.metadata?.image"
-            :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
+            v-else-if="fallbackImage || image || token?.metadata?.image"
+            :src="sanitizeIpfsUrl(fallbackImage || image || token?.metadata?.image)"
             :alt="token?.metadata?.name || 'NFT'"
             class="w-full h-full object-contain"
-            @error="($event.target as HTMLImageElement).style.display = 'none'"
+            @error="imageStatus = 'error'"
           >
           <div
             v-else
