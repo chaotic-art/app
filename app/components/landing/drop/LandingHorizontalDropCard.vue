@@ -7,9 +7,11 @@ const props = defineProps<{
 
 const emit = defineEmits(['click'])
 const { decimals, chainSymbol } = useChain()
+const { getChainIcon } = useIcon()
 const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals, chainSymbol)
 
 const isLoading = computed(() => !props.drop)
+const chainIcon = computed(() => getChainIcon(props.drop?.chain || null))
 
 useHead({
   link: [
@@ -84,6 +86,12 @@ useHead({
               <span class="font-medium text-foreground">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
               <span class="font-bold text-muted-foreground">·</span>
               <span class="font-medium text-foreground">{{ usdPrice }} USD</span>
+
+              <span class="font-bold text-muted-foreground">·</span>
+              <div v-if="drop?.chain" class="flex items-center gap-1">
+                <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4" :alt="drop.chain">
+                <span class="font-medium text-foreground">{{ chainSpec[drop.chain].tokenSymbol }}</span>
+              </div>
             </template>
           </div>
 
