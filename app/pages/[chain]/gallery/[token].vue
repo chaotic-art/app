@@ -51,13 +51,7 @@ const { data: item } = useLazyAsyncData(
 useSeoMeta({
   title: () => item.value?.metadata?.name,
   description: () => item.value?.metadata?.description?.slice(0, 150),
-})
-
-defineOgImageComponent('Gallery', {
-  title: item.value?.metadata?.name,
-  imageSrc: item.value?.metadata?.image,
-  symbol: chainSpec[chainPrefix.value].tokenSymbol,
-  network: chainSpec[chainPrefix.value].name,
+  ogImage: () => `https://ogi.koda.art/__og-image__/image/${chainPrefix.value}/gallery/${collectionId}-${tokenId}/og.png`, // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
 })
 </script>
 

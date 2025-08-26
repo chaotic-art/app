@@ -4,6 +4,11 @@ const { drop, amountToMint } = storeToRefs(useDropStore())
 const { decimals, chainSymbol, currentChain } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
 
+useSeoMeta({
+  title: () => drop.value.name,
+  description: () => drop.value.collectionDescription?.slice(0, 150),
+})
+
 defineOgImageComponent('Drops', {
   title: drop.value.name,
   image: drop.value.image,
