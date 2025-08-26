@@ -41,7 +41,7 @@ const { data: item } = useLazyAsyncData(
         ...data,
         metadata: {
           ...data.metadata,
-          image: sanitizeIpfsUrl(data?.metadata?.image ?? ''),
+          image: ipfsToCfImageUrl(data?.metadata?.image ?? '', 'small'),
         },
       }
     },
@@ -54,8 +54,8 @@ useSeoMeta({
 })
 
 defineOgImageComponent('Gallery', {
-  title: item.value?.metadata?.name ?? '',
-  image: item.value?.metadata?.image ?? '',
+  title: item.value?.metadata?.name,
+  imageSrc: item.value?.metadata?.image,
   symbol: chainSpec[chainPrefix.value].tokenSymbol,
   network: chainSpec[chainPrefix.value].name,
 })

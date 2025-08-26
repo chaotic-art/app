@@ -9,7 +9,7 @@ defineOptions({
 
 const props = defineProps<{
   title: string
-  image: string
+  image?: string
   usd?: string
   price?: string
   symbol?: string
@@ -31,17 +31,26 @@ const parsePrice = computed(() =>
 </script>
 
 <template>
-  <img :src="image" :alt="title" :style="cover" class="h-full w-full">
+  <img v-if="image" :src="image" :alt="title" :style="cover" class="h-full w-full">
 
   <div
     class="flex flex-col justify-end h-full w-full bg-slate-900/85 text-white p-20 text-2xl font-bold absolute inset-0"
   >
-    <img :src="image" :alt="title" class="w-30 rounded-md border border-white">
+    <img v-if="image" :src="image" :alt="title" class="w-30 rounded-md border border-white">
     <h1 class="mb-6 font-bold">
       {{ title }}
     </h1>
     <div class="flex flex-row">
       <div>
+        <div class="text-2xl font-bold m-0">
+          {{ network }}
+        </div>
+        <div class="text-gray-400 m-0">
+          network
+        </div>
+      </div>
+
+      <div v-if="usd" class="ml-20">
         <div class="text-2xl font-bold m-0">
           {{ parseUsd }}
         </div>
@@ -50,21 +59,12 @@ const parsePrice = computed(() =>
         </div>
       </div>
 
-      <div class="ml-20">
+      <div v-if="price" class="ml-20">
         <div class="text-2xl font-bold m-0">
           {{ parsePrice }}
         </div>
         <div class="text-gray-400 m-0">
           price
-        </div>
-      </div>
-
-      <div class="ml-20">
-        <div class="text-2xl font-bold m-0">
-          {{ network }}
-        </div>
-        <div class="text-gray-400 m-0">
-          network
         </div>
       </div>
     </div>
