@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { fetchOdaToken } from '~/services/oda'
 
 const CONTAINER_ID = 'nft-img-container'
 
@@ -27,16 +28,23 @@ const {
   chain: chainPrefix.value,
 })
 
+// for opengraph purposes
+const { data: item } = useLazyAsyncData(
+  `token:${chainPrefix.value}:${tokenId}`,
+  async () => {
+    const item = await fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value)
+    return item
+  },
+)
+
 useSeoMeta({
-  title: () => tokenData.value?.metadata?.name,
-  description: () => tokenData.value?.metadata?.description?.slice(0, 150),
+  title: () => item.value?.metadata?.name,
+  description: () => item.value?.metadata?.description?.slice(0, 150),
 })
 
 defineOgImageComponent('Gallery', {
-  title: tokenData.value?.metadata?.name,
-  image: sanitizeIpfsUrl(tokenData.value?.metadata?.image),
-  usd: usdPrice.value,
-  price: formattedPrice.value,
+  title: item.value?.metadata?.name ?? '',
+  image: sanitizeIpfsUrl(item.value?.metadata?.image ?? ''),
   symbol: chainSpec[chainPrefix.value].tokenSymbol,
   network: chainSpec[chainPrefix.value].name,
 })
