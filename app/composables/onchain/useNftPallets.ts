@@ -459,7 +459,7 @@ export function useNftPallets() {
     })
 
     const supportTx = api.tx.Balances.transfer_keep_alive({
-      dest: MultiAddress.Id(SUPPORT_ADDRESS),
+      dest: MultiAddress.Id(CHAOTIC_MINTER),
       value: BigInt(getPercentSupportFee(totalPrice)),
     })
 
