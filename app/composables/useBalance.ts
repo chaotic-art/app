@@ -16,8 +16,8 @@ export default function ({ enabled = ref(true) }: { enabled?: Ref<boolean> } = {
         : Promise.resolve(null)
     },
     enabled: computed(() => Boolean(getConnectedSubAccount.value) && enabled.value),
-    staleTime: 30000,
-    refetchInterval: 60000,
+    staleTime: 10000,
+    refetchInterval: 20000,
   })
 
   return {
