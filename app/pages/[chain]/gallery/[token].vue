@@ -31,6 +31,15 @@ useSeoMeta({
   title: () => tokenData.value?.metadata?.name,
   description: () => tokenData.value?.metadata?.description?.slice(0, 150),
 })
+
+defineOgImageComponent('Gallery', {
+  title: () => tokenData.value?.metadata?.name,
+  image: () => sanitizeIpfsUrl(tokenData.value?.metadata?.image),
+  usd: () => usdPrice.value,
+  price: () => formattedPrice.value,
+  symbol: () => chainSpec[chainPrefix.value].tokenSymbol,
+  network: () => chainSpec[chainPrefix.value].name,
+})
 </script>
 
 <template>
