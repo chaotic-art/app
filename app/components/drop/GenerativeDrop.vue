@@ -7,12 +7,7 @@ const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() 
 useSeoMeta({
   title: () => drop.value.name,
   description: () => drop.value.collectionDescription?.slice(0, 150),
-})
-
-defineOgImageComponent('Drops', {
-  title: drop.value.name,
-  image: drop.value.image,
-  items: drop.value.max,
+  ogImage: () => `https://ogi.koda.art/__og-image__/image/${drop.value.chain}/drops/${drop.value.alias}/og.png`, // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
 })
 </script>
 
