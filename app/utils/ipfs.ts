@@ -67,10 +67,10 @@ export function toOriginalContentUrl(baseurl: string) {
   return url.toString()
 }
 
-export function ipfsToCfImageUrl(ipfsUrl?: string) {
+export function ipfsToCfImageUrl(ipfsUrl?: string, variant = 'public') {
   if (!ipfsUrl) {
     return ''
   }
 
-  return `${CF_IMAGE_URL}${fastExtract(ipfsUrl)}/public`
+  return `${CF_IMAGE_URL}${fastExtract(ipfsUrl)}/${variant}`
 }

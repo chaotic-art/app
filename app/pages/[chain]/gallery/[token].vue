@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { fetchOdaToken } from '~/services/oda'
 
 const CONTAINER_ID = 'nft-img-container'
 
@@ -27,9 +28,30 @@ const {
   chain: chainPrefix.value,
 })
 
+// for opengraph purposes
+const { data: item } = useLazyAsyncData(
+  `token:${chainPrefix.value}:${tokenId}`,
+  async () => {
+    const item = await fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value)
+    return item
+  },
+  {
+    transform: (data) => {
+      return {
+        ...data,
+        metadata: {
+          ...data.metadata,
+          image: ipfsToCfImageUrl(data?.metadata?.image ?? '', 'small'),
+        },
+      }
+    },
+  },
+)
+
 useSeoMeta({
-  title: () => tokenData.value?.metadata?.name,
-  description: () => tokenData.value?.metadata?.description?.slice(0, 150),
+  title: () => item.value?.metadata?.name,
+  description: () => item.value?.metadata?.description?.slice(0, 150),
+  ogImage: () => `https://ogi.koda.art/__og-image__/image/${chainPrefix.value}/gallery/${collectionId}-${tokenId}/og.png`, // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
 })
 </script>
 
