@@ -35,6 +35,17 @@ const { data: item } = useLazyAsyncData(
     const item = await fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value)
     return item
   },
+  {
+    transform: (data) => {
+      return {
+        ...data,
+        metadata: {
+          ...data.metadata,
+          image: sanitizeIpfsUrl(data?.metadata?.image ?? ''),
+        },
+      }
+    },
+  },
 )
 
 useSeoMeta({
@@ -44,7 +55,7 @@ useSeoMeta({
 
 defineOgImageComponent('Gallery', {
   title: item.value?.metadata?.name ?? '',
-  image: sanitizeIpfsUrl(item.value?.metadata?.image ?? ''),
+  image: item.value?.metadata?.image ?? '',
   symbol: chainSpec[chainPrefix.value].tokenSymbol,
   network: chainSpec[chainPrefix.value].name,
 })
