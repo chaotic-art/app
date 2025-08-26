@@ -5,7 +5,7 @@ const props = defineProps<{
   loading: boolean
   toMintNfts: ToMassmintNFT[]
   minimumFunds: number
-  mintButton: { label: string, disabled: boolean, loading?: boolean }
+  mintButton: { label: string, disabled: boolean, loading?: boolean, alert?: string }
 }>()
 
 const emits = defineEmits(['confirm'])
@@ -63,5 +63,9 @@ function onSubmit() {
       :label="mintButton.label"
       @click="onSubmit"
     />
+
+    <div v-if="mintButton.alert" class="mt-2 text-center text-xs text-error-500 dark:text-error-400">
+      {{ mintButton.alert }}
+    </div>
   </div>
 </template>
