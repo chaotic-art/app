@@ -435,7 +435,7 @@ export function useNftPallets() {
     }
 
     return {
-      recipient: encodeAddress(recipient.value.asBytes()),
+      recipient: encodeAddress(recipient.value.asBytes(), chainSpec[chain].ss58Format),
       amount: Number(royalty.value.asText()),
     }
   }
@@ -471,21 +471,25 @@ export function useNftPallets() {
       }
     }))
 
-    const royaltiesTx = api.tx.Nfts.pay_tips({
-      tips: royalties
-        .filter(i => Boolean(i.royalty))
-        .map(({ item, royalty }) => ({
-          collection: Number(item.collection.id),
-          item: Number(item.sn),
-          receiver: royalty!.recipient || '',
-          amount: BigInt(item.price * (Number(royalty!.amount) / 100)),
-        })),
-    })
+    const itemsWithRoyalties = royalties.filter(i => Boolean(i.royalty))
 
-    const txs = [...buyTxs, royaltiesTx, supportTx]
+    const txs = [
+      ...buyTxs,
+      supportTx,
+      itemsWithRoyalties.length
+        ? api.tx.Nfts.pay_tips({
+            tips: itemsWithRoyalties.map(({ item, royalty }) => ({
+              collection: Number(item.collection.id),
+              item: Number(item.sn),
+              receiver: royalty!.recipient,
+              amount: BigInt(item.price * (Number(royalty!.amount) / 100)),
+            })),
+          })
+        : undefined,
+    ].filter(Boolean)
 
     const transaction = api.tx.Utility.batch_all({
-      calls: txs.map(tx => tx.decodedCall),
+      calls: txs.map(tx => tx!.decodedCall),
     })
 
     if (type === 'estimate') {
