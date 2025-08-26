@@ -104,7 +104,19 @@ export default function useDropMint() {
         next: (event) => {
           resolveStatus(event)
 
-          if (event.type === 'txBestBlocksState') {
+          if (isError.value) {
+            return
+          }
+
+          if (event.type === 'txBestBlocksState' && event.found && !event.ok) {
+            const errorType = event.events.find(e => e.type === 'System' && e.value.type === 'ExtrinsicFailed')?.value.value.dispatch_error.type
+            errorMessage($i18n.t('drop.mintDropError', [errorType || 'Something went wrong']))
+            isError.value = true
+            stopMint()
+            return
+          }
+
+          if (event.type === 'txBestBlocksState' && event.found) {
             txHash.value = event.txHash.toString()
             blockNumber.value = (event as TxInBestBlocksFound).block.number
             submitMints()
