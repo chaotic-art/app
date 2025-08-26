@@ -23,16 +23,16 @@ const items = computed<ItemMedia[]>(() =>
 )
 
 const txHash = computed(() => props.result.hash)
-const singlePurhcase = computed(() => props.result.items.length === 1)
+const singleListing = computed(() => props.result.items.length === 1)
 
 const shareText = computed(() => {
-  if (singlePurhcase.value) {
-    return $i18n.t('sharing.boughtNft')
+  if (singleListing.value) {
+    return $i18n.t('sharing.listedNft')
   }
 
   const someNfts = items.value.map(item => item.name)
 
-  return $i18n.t('sharing.boughtNft', [someNfts.join(', ')])
+  return $i18n.t('sharing.listedNfts', [someNfts.join(', ')])
 })
 
 const url = computed(() => window.location.origin)
@@ -40,14 +40,14 @@ const userProfilePath = computed(() => `/${prefix.value}/u/${accountId.value}`)
 const nftPath = computed(() => `/${prefix.value}/gallery/${items.value[0]?.id}`)
 
 const shareUrl = computed(() =>
-  singlePurhcase.value
+  singleListing.value
     ? `${url.value}${nftPath.value}`
     : `${url.value}${userProfilePath.value}`,
 )
 
 const share = computed(() => ({
   text: shareText.value,
-  withCopy: singlePurhcase.value,
+  withCopy: singleListing.value,
   url: shareUrl.value,
 }))
 
@@ -72,9 +72,10 @@ const actionButtons = computed(() => ({
   >
     <SuccessfulItemsMedia
       :items="items"
+      show-price
       :header="{
-        single: $t('buyModal.purchaseSuccessful'),
-        multiple: $t('buyModal.amountPurchaseSuccessfully'),
+        single: $t('listingCart.newListingPrice'),
+        multiple: $t('listingCart.bulkListingSuccessful'),
       }"
     />
   </SuccessfulModalBody>

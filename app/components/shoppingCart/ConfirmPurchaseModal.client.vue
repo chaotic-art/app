@@ -22,7 +22,7 @@ const isModalOpen = computed({
 })
 
 const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: isModalOpen })
-const items = computed(() => completePurchaseModal.value.mode === 'shopping-cart' ? itemsInChain.value : [itemToBuy.value].filter(Boolean) as [])
+const items = computed(() => completePurchaseModal.value.mode === 'shopping-cart' ? itemsInChain.value : [itemToBuy.value].filter(Boolean) as ShoppingCartItem[])
 
 const nftPrice = computed(() => sum(items.value.map(nft => Number(nft.price || 0))))
 const serviceFee = computed(() => getPercentSupportFee(nftPrice.value))
