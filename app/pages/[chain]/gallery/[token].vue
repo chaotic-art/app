@@ -51,6 +51,7 @@ useSeoMeta({
           <div class="order-2 lg:order-1">
             <GalleryMediaViewer
               :token-data="tokenData"
+              :collection-data="collection"
               :mime-type="mimeType || undefined"
               :media-icon="mediaIcon"
               :container-id="CONTAINER_ID"

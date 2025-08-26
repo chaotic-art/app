@@ -149,8 +149,8 @@
     "bulkListingSuccessful": "Bulk Listing Successful"
   },
   "sharing": {
-    "dropNft": "I've minted {0} generative art piece on Chaotic!",
-    "dropNfts": "I've minted {0} generative art pieces on Chaotic!",
+    "dropNft": "I've minted {0} {1} generative art piece on Chaotic!",
+    "dropNfts": "I've minted {0} {1} generative art pieces on Chaotic!",
     "listedNft": "Check out this awesome NFT I just listed on Chaotic!",
     "listedNfts": "Check out these awesome NFTs I just listed on Chaotic:\n {0}",
     "boughtNft": "Check out this awesome NFT I bought on Chaotic! | Check out these awesome NFTs I bought on Chaotic:\n {0}"

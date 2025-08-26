@@ -48,10 +48,10 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
             <span class="text-foreground">{{ usdPrice }} USD</span>
           </div>
 
-          <div class="flex items-center gap-2 justify-center md:justify-end">
-            <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4" :alt="drop?.chain">
+          <div v-if="drop?.chain" class="flex items-center gap-1 justify-center md:justify-end">
+            <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4" :alt="drop.chain">
             <div class="capitalize text-foreground">
-              {{ drop?.chain }}
+              {{ chainSpec[drop.chain].tokenSymbol }}
             </div>
           </div>
         </div>

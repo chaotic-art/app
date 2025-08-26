@@ -154,7 +154,7 @@ onMounted(async () => {
               Floor
             </div>
             <div class="text-sm font-bold text-gray-900 dark:text-white">
-              <Money v-if="collectionData.floor" :value="collectionData.floor" :round="2" inline />
+              <Money v-if="collectionData.floor" :value="collectionData.floor" :round="2" inline class="truncate" />
               <span v-else class="text-gray-400 dark:text-gray-500">–</span>
             </div>
           </div>

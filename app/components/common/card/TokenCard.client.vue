@@ -35,6 +35,7 @@ const shoppingCartStore = useShoppingCartStore()
 const { completePurchaseModal } = storeToRefs(usePreferencesStore())
 const { itemToBuy } = storeToRefs(shoppingCartStore)
 
+const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const id = computed(() => `${props.collectionId}-${props.tokenId}`)
@@ -166,11 +167,17 @@ watchEffect(() => {
             />
           </div>
           <img
-            v-else-if="image || token?.metadata?.image"
+            v-else-if="imageStatus === 'normal' && (image || token?.metadata?.image)"
             :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
             :alt="token?.metadata?.name || 'NFT'"
             class="w-full h-full object-contain"
-            @error="($event.target as HTMLImageElement).style.display = 'none'"
+            @error="imageStatus = 'fallback'"
+          >
+          <img
+            v-else-if="imageStatus === 'fallback' && collection?.metadata?.image"
+            :src="sanitizeIpfsUrl(collection?.metadata?.image)"
+            :alt="token?.metadata?.name || 'NFT'"
+            class="w-full h-full object-contain"
           >
           <div
             v-else
@@ -231,7 +238,7 @@ watchEffect(() => {
                   <USkeleton class="h-4 w-16" />
                 </div>
                 <div v-else-if="price" class="flex items-baseline gap-1">
-                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ price }}</span>
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ price }}</span>
                 </div>
                 <div v-else>
                   <span class="text-xs font-medium text-gray-600 dark:text-gray-300">No price set</span>
