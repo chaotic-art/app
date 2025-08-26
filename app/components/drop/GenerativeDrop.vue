@@ -3,6 +3,12 @@ const { drop, amountToMint } = storeToRefs(useDropStore())
 
 const { decimals, chainSymbol, currentChain } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
+
+defineOgImageComponent('Drops', {
+  title: drop.value.name,
+  image: drop.value.image,
+  items: drop.value.max,
+})
 </script>
 
 <template>
