@@ -11,8 +11,10 @@ const { itemsInChain: items } = storeToRefs(listingCartStore)
 const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
 const actionCartStore = useActionCartStore()
 const { decimals, chainSymbol } = useChain()
+const { prefix } = usePrefix()
 const { open: isTransactionModalOpen } = useTransactionModal()
-
+const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: listingCartModalOpen })
+const { existentialDeposit } = useDeposit(prefix)
 const listingFees = ref()
 
 const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
@@ -28,6 +30,7 @@ const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
 const isLoading = computed(() => (
   listingCartModalOpen.value
   && !items.value.length
+  && !isBalanceLoading.value
 ))
 
 const cartHasNFTsWithPrice = computed(() =>
@@ -56,7 +59,13 @@ const confirmButtonDisabled = computed(
   () => Boolean(listingCartStore.incompleteListPrices),
 )
 
+const hasEnoughFunds = computed(() => (balance.value - existentialDeposit.value) > listingFees.value)
+
 const label = computed(() => {
+  if (!hasEnoughFunds.value) {
+    return $i18n.t('balance.insufficient')
+  }
+
   switch (listingCartStore.incompleteListPrices) {
     case 0:
       return showChangePriceModal.value

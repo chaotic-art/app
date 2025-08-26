@@ -170,5 +170,8 @@
   "buyModal": {
     "amountPurchaseSuccessfully": "{0} NFTs purchased successfully",
     "purchaseSuccessful": "Purchase successful"
+  },
+  "balance": {
+    "insufficient": "Insufficient Balance"
   }
 }

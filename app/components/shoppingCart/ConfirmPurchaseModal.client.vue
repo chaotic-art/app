@@ -7,10 +7,12 @@ const { completePurchaseModal } = storeToRefs(usePreferencesStore())
 const shoppingCartStore = useShoppingCartStore()
 const { itemsInChain, itemToBuy } = storeToRefs(shoppingCartStore)
 const { accountId } = useAuth()
+const { $i18n } = useNuxtApp()
 const { decimals, chainSymbol } = useChain()
 const { open: isTransactionModalOpen } = useTransactionModal()
 const { buyNfts, collectionRoyalties } = useNftPallets()
 const { prefix } = usePrefix()
+const { existentialDeposit } = useDeposit(prefix)
 
 const isModalOpen = computed({
   get: () => completePurchaseModal.value.open,
@@ -19,6 +21,7 @@ const isModalOpen = computed({
   },
 })
 
+const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: isModalOpen })
 const items = computed(() => completePurchaseModal.value.mode === 'shopping-cart' ? itemsInChain.value : [itemToBuy.value].filter(Boolean) as [])
 
 const nftPrice = computed(() => sum(items.value.map(nft => Number(nft.price || 0))))
@@ -47,14 +50,22 @@ const totalRoyalties = computed(() => {
   return total
 })
 
-const loading = computed(() => isRoyaltiesLoading.value)
+const loading = computed(() => isRoyaltiesLoading.value || isBalanceLoading.value)
+const hasEnoughFunds = computed(() => (balance.value - existentialDeposit.value) > total.value)
 
 const label = computed(() => {
-  if (loading.value)
+  if (loading.value) {
     return 'Loading...'
+  }
+
+  if (!hasEnoughFunds.value) {
+    return $i18n.t('balance.insufficient')
+  }
 
   return 'Confirm'
 })
+
+const isDisabled = computed(() => loading.value || !hasEnoughFunds.value)
 
 function buy() {
   isTransactionModalOpen.value = true
@@ -115,7 +126,7 @@ function buy() {
             <Money class="text-gray-500 dark:text-gray-400 text-sm" :value="serviceFee" inline />
           </div>
 
-          <div class="flex justify-between items-center">
+          <div v-if="totalRoyalties" class="flex justify-between items-center">
             <span class="text-gray-500 dark:text-gray-400 text-sm">{{ $t('shoppingCart.royalties') }}</span>
             <Money class="text-gray-500 dark:text-gray-400 text-sm" :value="totalRoyalties" inline />
           </div>
@@ -135,7 +146,7 @@ function buy() {
 
         <UButton
           class="w-full mt-7 inline-flex justify-center"
-          :disabled="loading"
+          :disabled="isDisabled"
           :label="label"
           @click="buy"
         />
