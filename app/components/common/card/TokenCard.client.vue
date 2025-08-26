@@ -194,7 +194,7 @@ watchEffect(() => {
             <UIcon :name="mediaIcon" class="w-3 h-3 text-white" />
           </div>
 
-          <div v-if="canAddToActionCart || canBuy" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
+          <div v-if="token && (canAddToActionCart || canBuy)" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
             <UButton
               v-if="canAddToActionCart"
               :icon="isItemInActionCart ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
