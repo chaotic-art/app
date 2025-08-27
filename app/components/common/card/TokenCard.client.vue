@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import type { OdaToken } from '~/services/oda'
-import type { ShoppingCartItem } from '~/stores/shoppingCart'
-import { useShoppingCartStore } from '~/stores/shoppingCart'
 
 const props = defineProps<{
   tokenId: number
@@ -25,95 +22,36 @@ const {
   usdPrice,
   mediaIcon,
   nativePrice,
-  canBuy,
 } = useToken(props)
+
+const {
+  addToActionCart,
+  addToShoppingCart,
+  buyNow,
+  createActionCartItem,
+  isItemInActionCart,
+  isItemInShoppingCart,
+  isItemInCart,
+  canBuy,
+} = useCartActions({
+  tokenId: props.tokenId,
+  collectionId: props.collectionId,
+  chain: props.chain,
+  token,
+  collection,
+  owner,
+  price: nativePrice,
+})
 
 const actionCartStore = useActionCartStore()
 const route = useRoute()
 const { isCurrentAccount } = useAuth()
-const shoppingCartStore = useShoppingCartStore()
-const { completePurchaseModal } = storeToRefs(usePreferencesStore())
-const { itemToBuy } = storeToRefs(shoppingCartStore)
 
 const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
-const id = computed(() => `${props.collectionId}-${props.tokenId}`)
-const isItemInActionCart = computed(() => actionCartStore.isItemInCart(id.value))
-const isItemInShoppingCart = computed(() => shoppingCartStore.isItemInCart(id.value))
-const isItemInCart = computed(() => isItemInActionCart.value || isItemInShoppingCart.value)
-
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
 const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value))
-
-function createActionCartItem({ token, owner }: { token: OdaToken, owner: string }): BaseActionCartItem {
-  return {
-    id: id.value,
-    sn: props.tokenId,
-    name: token.metadata?.name || '',
-    chain: props.chain,
-    price: Number(nativePrice.value),
-    currentOwner: owner,
-    metadata: token.metadata!,
-    metadata_uri: token.metadata_uri || '',
-    collection: {
-      id: props.collectionId,
-      name: collection.value?.metadata?.name || '',
-    },
-  }
-}
-
-function addToActionCart() {
-  if (!token.value || !dataOwner.value) {
-    return
-  }
-
-  if (isItemInActionCart.value) {
-    actionCartStore.removeItem(id.value)
-  }
-  else {
-    actionCartStore.setItem(createActionCartItem({ token: token.value, owner: dataOwner.value }))
-  }
-}
-
-function createShoppingCartItem({ token, owner }: { token: OdaToken, owner: string }): ShoppingCartItem {
-  return {
-    id: id.value,
-    sn: props.tokenId,
-    name: token.metadata?.name || '',
-    price: Number(nativePrice.value),
-    currentOwner: owner,
-    metadata: token.metadata!,
-    metadata_uri: token.metadata_uri || '',
-    chain: props.chain,
-    collection: {
-      id: props.collectionId,
-      name: collection.value?.metadata?.name || '',
-    },
-  }
-}
-
-function handleAddToShoppingCart() {
-  if (!token.value || !owner.value) {
-    return
-  }
-
-  if (isItemInShoppingCart.value) {
-    shoppingCartStore.removeItem(id.value)
-  }
-  else {
-    shoppingCartStore.setItem(createShoppingCartItem({ token: token.value, owner: owner.value }))
-  }
-}
-
-function handleBuyNow() {
-  if (!token.value || !owner.value) {
-    return
-  }
-
-  itemToBuy.value = createShoppingCartItem({ token: token.value, owner: owner.value })
-  completePurchaseModal.value = { open: true, mode: 'buy-now' }
-}
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
@@ -210,12 +148,12 @@ watchEffect(() => {
                 class="rounded-r-none"
                 color="primary"
                 :label="$t('shoppingCart.buyNow')"
-                @click.prevent.stop="handleBuyNow"
+                @click.prevent.stop="buyNow"
               />
               <UButton
                 class="rounded-l-none pr-3"
                 :icon="isItemInShoppingCart ? 'ic:outline-remove-shopping-cart' : 'ic:outline-shopping-cart'"
-                @click.prevent.stop="handleAddToShoppingCart"
+                @click.prevent.stop="addToShoppingCart"
               />
             </div>
           </div>

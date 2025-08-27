@@ -22,7 +22,6 @@ const {
   mediaIcon,
   token: tokenData,
   collection,
-  canBuy,
 } = useToken({
   tokenId: Number(tokenId),
   collectionId: Number(collectionId),
@@ -71,7 +70,16 @@ useSeoMeta({
               :formatted-price="formattedPrice || undefined"
               :usd-price="usdPrice"
               :price="price"
-              :can-buy="canBuy"
+            />
+            <GalleryItemActions
+              class="mt-6"
+              :token-data="tokenData"
+              :collection="collection"
+              :chain="chainPrefix"
+              :collection-id="Number(safeCollectionId)"
+              :token-id="Number(safeTokenId)"
+              :owner="owner"
+              :price="price"
             />
           </div>
         </div>
