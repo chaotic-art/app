@@ -60,20 +60,22 @@ interface ListNftsParams {
   }[]
 }
 
+interface BuyNftItem {
+  id: string
+  sn: number
+  price: number
+  metadata: NFTMetadata
+  metadata_uri: string
+  collection: {
+    id: number
+    name: string
+  }
+}
+
 interface BuyNftsParams {
   chain: AssetHubChain
   type?: TxType
-  nfts: {
-    id: string
-    sn: number
-    price: number
-    metadata: NFTMetadata
-    metadata_uri: string
-    collection: {
-      id: number
-      name: string
-    }
-  }[]
+  nfts: BuyNftItem[]
 }
 
 export function useNftPallets() {
@@ -471,7 +473,7 @@ export function useNftPallets() {
       }
     }))
 
-    const itemsWithRoyalties = royalties.filter(i => Boolean(i.royalty))
+    const itemsWithRoyalties = royalties.filter((i): i is { item: BuyNftItem, royalty: CollectionRoyalty } => i.royalty !== null)
 
     const txs = [
       ...buyTxs,
@@ -481,8 +483,8 @@ export function useNftPallets() {
             tips: itemsWithRoyalties.map(({ item, royalty }) => ({
               collection: Number(item.collection.id),
               item: Number(item.sn),
-              receiver: royalty!.recipient,
-              amount: BigInt(item.price * (Number(royalty!.amount) / 100)),
+              receiver: royalty.recipient,
+              amount: BigInt(item.price * (Number(royalty.amount) / 100)),
             })),
           })
         : undefined,
