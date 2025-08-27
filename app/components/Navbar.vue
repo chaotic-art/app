@@ -88,6 +88,7 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
             :items="navItems"
           />
           <ThemeSwitcher v-if="!accountId" />
+          <NavbarShoppingCart />
         </div>
 
         <!-- Desktop Wallet -->
@@ -138,6 +139,12 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
             </div>
           </UButton>
         </div>
+
+        <!-- Mobile Shopping Cart -->
+        <NavbarShoppingCart
+          mobile
+          @click="isBottomSheetOpen = false"
+        />
 
         <USeparator />
 

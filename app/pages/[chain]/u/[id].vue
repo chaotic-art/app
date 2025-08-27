@@ -32,7 +32,6 @@ const { currentChain } = useChain()
   <UContainer class="px-4 md:px-6">
     <ProfileDetail :address="getss58AddressByPrefix(String(route.params.id), currentChain as Prefix)" />
 
-    <ActionCart />
-    <ListingCartModal />
+    <LazyActionCart />
   </UContainer>
 </template>

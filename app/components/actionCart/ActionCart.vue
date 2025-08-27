@@ -3,12 +3,36 @@ import { useActionCartStore } from '@/stores/actionCart'
 
 const { onDisconnect } = useWalletManager()
 const actionCartStore = useActionCartStore()
+const listingCartStore = useListingCartStore()
 const preferencesStore = usePreferencesStore()
 
 const isListingDisabled = ref(false) // Allow listing for all chains for now
 
+function transferToListingCart() {
+  try {
+    listingCartStore.clearListedItems()
+
+    const items = actionCartStore.itemsInChain
+
+    items.forEach((item) => {
+      listingCartStore.setItem({
+        ...item,
+        collection: {
+          ...item.collection,
+          floor: undefined,
+        },
+      })
+    })
+  }
+  catch { }
+}
+
 onDisconnect(actionCartStore.clear)
 onBeforeUnmount(actionCartStore.clear)
+useModalIsOpenTracker({
+  isOpen: computed(() => preferencesStore.listingCartModalOpen),
+  onOpen: transferToListingCart,
+})
 </script>
 
 <template>

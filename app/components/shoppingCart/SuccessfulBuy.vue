@@ -2,7 +2,7 @@
 import type { ItemMedia } from '@/components/common/successfulModal/SuccessfulItemsMedia.vue'
 
 const props = defineProps<{
-  result: ListingTransactionResult
+  result: BuyTransactionResult
   status: TransactionStatus
 }>()
 
@@ -26,13 +26,10 @@ const txHash = computed(() => props.result.hash)
 const singleListing = computed(() => props.result.items.length === 1)
 
 const shareText = computed(() => {
-  if (singleListing.value) {
-    return $i18n.t('sharing.listedNft')
-  }
-
   const someNfts = items.value.map(item => item.name)
 
-  return $i18n.t('sharing.listedNfts', [someNfts.join(', ')])
+  // @ts-expect-error transaltion count
+  return $i18n.t('sharing.boughtNft', items.value.length, [someNfts.join(', ')])
 })
 
 const url = computed(() => window.location.origin)
@@ -72,10 +69,9 @@ const actionButtons = computed(() => ({
   >
     <SuccessfulItemsMedia
       :items="items"
-      show-price
       :header="{
-        single: $t('listingCart.newListingPrice'),
-        multiple: $t('listingCart.bulkListingSuccessful'),
+        single: $t('buyModal.purchaseSuccessful'),
+        multiple: $t('buyModal.amountPurchaseSuccessfully'),
       }"
     />
   </SuccessfulModalBody>

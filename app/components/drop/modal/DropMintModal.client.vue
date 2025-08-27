@@ -22,7 +22,7 @@ const { existentialDeposit } = useDeposit(prefix)
 const { toMintNFTs, mintingSession } = storeToRefs(useDropStore())
 const { executeTransaction, isModalOpen, transaction } = useDropMint()
 const { decimals: tokenDecimals, chainSymbol: tokenSymbol } = useChain()
-const { balance, isLoading: isBalanceLoading } = useBalance()
+const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: isModalOpen })
 
 const status = computed(() => mintingSession.value.status)
 
@@ -52,7 +52,7 @@ const mintButton = computed(() => {
   // TODO add tx calculation
   if (deosntHaveEnoughBalance || isEdSlash) {
     return {
-      label: 'Insufficient Balance',
+      label: $i18n.t('balance.insufficient'),
       alert: isEdSlash ? `You need to keep a minimum balance of ${formatBalance(existentialDeposit.value, { decimals: tokenDecimals.value, symbol: tokenSymbol.value })} in your account` : undefined,
       disabled: true,
     }

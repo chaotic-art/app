@@ -13,6 +13,7 @@ interface Props {
   tokenId: string
   owner?: string
   collectionCreator?: string
+  price: bigint | null
   formattedPrice?: string
   usdPrice?: string
 }

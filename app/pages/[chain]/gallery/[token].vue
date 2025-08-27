@@ -17,6 +17,7 @@ const {
   isLoading,
   error,
   mimeType,
+  nativePrice: price,
   price: formattedPrice,
   usdPrice,
   mediaIcon,
@@ -90,6 +91,17 @@ useSeoMeta({
               :collection-creator="collectionCreator || undefined"
               :formatted-price="formattedPrice || undefined"
               :usd-price="usdPrice"
+              :price="price"
+            />
+            <GalleryItemActions
+              class="mt-6"
+              :token-data="tokenData"
+              :collection="collection"
+              :chain="chainPrefix"
+              :collection-id="Number(safeCollectionId)"
+              :token-id="Number(safeTokenId)"
+              :owner="owner"
+              :price="price"
             />
           </div>
         </div>

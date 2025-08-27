@@ -76,6 +76,12 @@
           <USkeleton class="h-4 w-20" />
         </div>
       </div>
+
+      <!-- Token Actions  -->
+      <div class="flex gap-3">
+        <USkeleton class="h-10 w-full rounded-full" />
+        <USkeleton class="h-10 aspect-square rounded-full" />
+      </div>
     </div>
   </div>
 </template>

@@ -40,7 +40,7 @@ watch([() => props.title, () => props.subtitle], calculateTextContainerWidth, {
 
 <template>
   <div class="w-full h-full relative">
-    <div v-if="solid" class="w-full h-full bg-gray-100 dark:bg-gray-800 rounded-2xl p-4" />
+    <div v-if="solid" class="w-full h-full bg-muted rounded-2xl p-4" />
     <USkeleton
       v-else
       id="skeleton-backdrop"

@@ -9,11 +9,12 @@ const { listNfts } = useNftPallets()
 const listingCartStore = useListingCartStore()
 const { itemsInChain: items } = storeToRefs(listingCartStore)
 const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
-const actionCartTransfer = useActionCartTransfer()
 const actionCartStore = useActionCartStore()
 const { decimals, chainSymbol } = useChain()
+const { prefix } = usePrefix()
 const { open: isTransactionModalOpen } = useTransactionModal()
-
+const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: listingCartModalOpen })
+const { existentialDeposit } = useDeposit(prefix)
 const listingFees = ref()
 
 const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
@@ -29,6 +30,7 @@ const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
 const isLoading = computed(() => (
   listingCartModalOpen.value
   && !items.value.length
+  && !isBalanceLoading.value
 ))
 
 const cartHasNFTsWithPrice = computed(() =>
@@ -57,7 +59,13 @@ const confirmButtonDisabled = computed(
   () => Boolean(listingCartStore.incompleteListPrices),
 )
 
+const hasEnoughFunds = computed(() => (balance.value - existentialDeposit.value) > listingFees.value)
+
 const label = computed(() => {
+  if (!hasEnoughFunds.value) {
+    return $i18n.t('balance.insufficient')
+  }
+
   switch (listingCartStore.incompleteListPrices) {
     case 0:
       return showChangePriceModal.value
@@ -79,10 +87,7 @@ function getListParams() {
     nfts: items.value.map(item => ({
       id: item.id,
       sn: item.sn,
-      collection: {
-        id: item.collectionId,
-        name: item.collection.name,
-      },
+      collection: item.collection,
       price: toNative(item.listPrice || 0, decimals.value),
       metadata_uri: item.metadata_uri,
       metadata: item.metadata,
@@ -120,9 +125,6 @@ watchEffect(async () => {
 
 useModalIsOpenTracker({
   isOpen: listingCartModalOpen,
-  onOpen: () => {
-    actionCartTransfer.transferToListingCart()
-  },
   onClose: () => {
     if (!isTransactionModalOpen.value) {
       listingCartStore.clearCartItems()

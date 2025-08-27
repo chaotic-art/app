@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import type { OdaToken } from '~/services/oda'
 
 const props = defineProps<{
   tokenId: number
@@ -15,6 +14,7 @@ const props = defineProps<{
 const {
   token,
   owner,
+  collection,
   isLoading,
   error,
   mimeType,
@@ -22,8 +22,26 @@ const {
   usdPrice,
   mediaIcon,
   nativePrice,
-  collection,
 } = useToken(props)
+
+const {
+  addToActionCart,
+  addToShoppingCart,
+  buyNow,
+  createActionCartItem,
+  isItemInActionCart,
+  isItemInShoppingCart,
+  isItemInCart,
+  canBuy,
+} = useCartActions({
+  tokenId: props.tokenId,
+  collectionId: props.collectionId,
+  chain: props.chain,
+  token,
+  collection,
+  owner,
+  price: nativePrice,
+})
 
 const actionCartStore = useActionCartStore()
 const route = useRoute()
@@ -32,39 +50,8 @@ const { isCurrentAccount } = useAuth()
 const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
-const id = computed(() => `${props.collectionId}-${props.tokenId}`)
-const isItemInActionCart = computed(() => actionCartStore.isItemInCart(id.value))
-const isItemInCart = computed(() => isItemInActionCart.value)
-
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
 const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value))
-
-function createActionCartItem({ token, owner }: { token: OdaToken, owner: string }): BaseActionCartItem {
-  return {
-    id: id.value,
-    sn: props.tokenId,
-    collectionId: props.collectionId,
-    name: token.metadata?.name || '',
-    chain: props.chain,
-    price: Number(nativePrice.value),
-    currentOwner: owner,
-    metadata: token.metadata!,
-    metadata_uri: token.metadata_uri || '',
-  }
-}
-
-function addToActionCart() {
-  if (!token.value || !dataOwner.value) {
-    return
-  }
-
-  if (isItemInActionCart.value) {
-    actionCartStore.removeItem(id.value)
-  }
-  else {
-    actionCartStore.setItem(createActionCartItem({ token: token.value, owner: dataOwner.value }))
-  }
-}
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
@@ -145,10 +132,10 @@ watchEffect(() => {
             <UIcon :name="mediaIcon" class="w-3 h-3 text-white" />
           </div>
 
-          <div v-if="canAddToActionCart" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
+          <div v-if="token && (canAddToActionCart || canBuy)" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
             <UButton
+              v-if="canAddToActionCart"
               :icon="isItemInActionCart ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
-              size="sm"
               variant="solid"
               color="primary"
               class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-xl border border-white/30 text-gray-900 dark:text-white"
@@ -156,6 +143,19 @@ watchEffect(() => {
             >
               {{ isItemInActionCart ? 'Remove' : 'Select' }}
             </UButton>
+            <div v-else-if="canBuy" class="flex">
+              <UButton
+                class="rounded-r-none"
+                color="primary"
+                :label="$t('shoppingCart.buyNow')"
+                @click.prevent.stop="buyNow"
+              />
+              <UButton
+                class="rounded-l-none pr-3"
+                :icon="isItemInShoppingCart ? 'ic:outline-remove-shopping-cart' : 'ic:outline-shopping-cart'"
+                @click.prevent.stop="addToShoppingCart"
+              />
+            </div>
           </div>
         </div>
 

@@ -30,6 +30,7 @@ function setFixedPrice() {
       <div class="flex gap-2">
         <ListingCartPriceInput v-model="fixedPrice" class="!w-40" />
         <UButton
+          class="aspect-square"
           icon="i-heroicons-check"
           variant="outline"
           color="primary"
