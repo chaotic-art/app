@@ -4,7 +4,7 @@ import { encodeAddress } from 'dedot/utils'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 
-type TxType = 'submit' | 'estimate'
+export type TxType = 'submit' | 'estimate'
 
 interface CollectionRoyalty {
   amount: number
@@ -536,5 +536,8 @@ export function useNftPallets() {
     userBalance,
     buyNfts,
     collectionRoyalties,
+
+    // TODO move else where
+    getAccountSigner,
   }
 }
