@@ -11,6 +11,9 @@ export default defineNuxtPlugin((nuxtApp) => {
         resolve(true)
         return
       }
+      else {
+        console.log('waitForInjection not found immediatedly', window.injectedWeb3)
+      }
 
       const startTime = Date.now()
       const checkInterval = setInterval(() => {

@@ -44,9 +44,13 @@ export const useWalletStore = defineStore('wallet', () => {
     if (account.vm === 'EVM')
       return account
 
-     console.log('getWalletAccount ->getSigner', account)
+    console.log('getWalletAccount ->getSigner', account)
 
-    const { getSigner } = useSubWalletStore()
+    const { getSigner, injected } = useSubWalletStore()
+
+    if (!injected) {
+      return account
+    }
 
     return {
       ...account,

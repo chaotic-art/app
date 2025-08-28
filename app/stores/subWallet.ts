@@ -27,6 +27,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
   const isLoading = ref(false)
   const error = ref<Error | null>(null)
   const initialized = ref(false)
+  const injected = ref(false)
 
   const enabledWallets = computed(() => wallets.value.filter(wallet => wallet.enabled))
 
@@ -201,6 +202,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     isLoading,
     error,
     initialized,
+    injected,
 
     init,
     connectWallet,
