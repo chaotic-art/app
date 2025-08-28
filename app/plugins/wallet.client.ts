@@ -33,8 +33,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     console.log('app:mounted')
     waitForInjection()
       .then(subWalletStore.init)
-      .catch(() => {
+      .catch((error) => {
         console.error('Failed to initialize sub wallet')
+        console.error(error)
       })
   })
 })
