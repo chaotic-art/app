@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import { computedAsync } from '@vueuse/core'
 import { toNative } from '@/utils/format/balance'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
+import { getExistentialDeposit } from '~/utils/api/substrate'
 
 const { $i18n } = useNuxtApp()
 const { accountId } = useAuth()
@@ -10,11 +11,9 @@ const listingCartStore = useListingCartStore()
 const { itemsInChain: items } = storeToRefs(listingCartStore)
 const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
 const actionCartStore = useActionCartStore()
-const { decimals, chainSymbol } = useChain()
-const { prefix } = usePrefix()
+const { decimals, chainSymbol, currentChain } = useChain()
 const { open: isTransactionModalOpen } = useTransactionModal()
 const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: listingCartModalOpen })
-const { existentialDeposit } = useDeposit(prefix)
 const listingFees = ref()
 
 const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
@@ -59,7 +58,10 @@ const confirmButtonDisabled = computed(
   () => Boolean(listingCartStore.incompleteListPrices),
 )
 
-const hasEnoughFunds = computed(() => (balance.value - existentialDeposit.value) > listingFees.value)
+const hasEnoughFunds = computedAsync(async () => {
+  const existentialDeposit = await getExistentialDeposit(currentChain.value)
+  return (Number(balance.value) - Number(existentialDeposit)) > listingFees.value
+})
 
 const label = computed(() => {
   if (!hasEnoughFunds.value) {
@@ -92,7 +94,7 @@ function getListParams() {
       metadata_uri: item.metadata_uri,
       metadata: item.metadata,
     })),
-    chain: 'ahp' as AssetHubChain, // TODO: list for the other chains
+    chain: currentChain.value,
   }
 }
 
