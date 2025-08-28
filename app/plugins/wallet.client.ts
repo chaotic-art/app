@@ -28,7 +28,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   nuxtApp.hook('app:mounted', () => {
-    console.log('app:beforeMount')
+    console.log('app:mounted')
     waitForInjection()
       .then(subWalletStore.init)
       .catch(() => {
