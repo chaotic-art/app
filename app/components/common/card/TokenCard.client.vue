@@ -41,6 +41,7 @@ const {
   collection,
   owner,
   price: nativePrice,
+  mimeType: computed(() => mimeType.value || ''),
 })
 
 const actionCartStore = useActionCartStore()
@@ -51,7 +52,7 @@ const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
-const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value))
+const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {

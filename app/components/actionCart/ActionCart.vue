@@ -46,20 +46,20 @@ function openBurnModal() {
 <template>
   <transition name="slide">
     <div
-      v-if="actionCartStore.count"
+      v-if="actionCartStore.items.length"
       class="fixed right-24 bottom-9 z-998"
     >
       <div class="inline-flex items-center">
         <div class="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 flex items-center p-2 gap-5 rounded-2xl">
           <div class="flex items-center gap-2">
             <div class="px-4">
-              <b>{{ actionCartStore.count }}</b>
-              {{ $t('actionCart.item', { count: actionCartStore.count }) }}
+              <b>{{ actionCartStore.items.length }}</b>
+              {{ $t('actionCart.item', { count: actionCartStore.items.length }) }}
             </div>
 
             <div class="flex items-center gap-2">
               <UButton
-                :disabled="!actionCartStore.count"
+                :disabled="!actionCartStore.items.length"
                 variant="ghost"
                 @click="actionCartStore.clear"
               >

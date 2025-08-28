@@ -4,6 +4,7 @@ defineProps<{
   image?: string
   collectionName: string
   price?: number
+  notEligible?: boolean
 }>()
 </script>
 
@@ -29,9 +30,19 @@ defineProps<{
     <!-- NFT Details -->
     <div class="flex flex-1 justify-between">
       <div class="flex-1 min-w-0">
-        <h2 class="font-bold text-gray-900 dark:text-white truncate">
-          {{ name || '--' }}
-        </h2>
+        <div class="flex items-center gap-2">
+          <h2 class="font-bold text-gray-900 dark:text-white truncate">
+            {{ name || '--' }}
+          </h2>
+          <div
+            v-if="notEligible"
+            class="flex items-center gap-1 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-medium rounded-full flex-shrink-0"
+            title="This token is not eligible for burning"
+          >
+            <UIcon name="i-heroicons-exclamation-triangle" class="w-3 h-3" />
+            <span>Not Eligible</span>
+          </div>
+        </div>
         <p class="text-gray-600 dark:text-gray-400 truncate">
           {{ collectionName }}
         </p>

@@ -541,7 +541,10 @@ export function useNftPallets() {
         collection: item.collection.id,
         item: item.sn,
       })
-      calls.push(_txBurn.decodedCall)
+
+      if (!item.mimeType?.includes('html')) {
+        calls.push(_txBurn.decodedCall)
+      }
     }
 
     const transaction = api.tx.Utility.batch_all({ calls })

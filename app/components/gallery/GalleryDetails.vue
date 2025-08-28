@@ -83,7 +83,7 @@ const { canBurn, burnNow } = useCartActions({
   collection: computed(() => props.collection),
   owner: computed(() => props.owner || null),
   price: computed(() => props.price || null),
-  mimeType: props.mimeType,
+  mimeType: computed(() => props.mimeType),
 })
 
 // Action items for dropdown menu

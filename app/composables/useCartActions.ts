@@ -10,7 +10,7 @@ interface UseCartActionsParams {
   owner: Ref<string | null>
   price: Ref<bigint | null>
   chain: AssetHubChain
-  mimeType?: string
+  mimeType?: ComputedRef<string>
 }
 
 export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId, mimeType }: UseCartActionsParams) {
@@ -30,7 +30,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
 
   const canBuy = computed(() => Boolean(price.value) && Boolean(owner.value && !isCurrentAccount(owner.value)))
   const canList = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)))
-  const canBurn = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)) && !mimeType?.includes('html'))
+  const canBurn = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)) && !mimeType?.value?.includes('html'))
 
   const overlay = useOverlay()
   const burnModal = overlay.create(LazyBurnModal)
@@ -62,7 +62,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
       actionCartStore.removeItem(id.value)
     }
     else {
-      actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value }))
+      actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value, mimeType: mimeType?.value || '' }))
     }
   }
 
@@ -118,7 +118,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     }
 
     if (canBurn.value) {
-      actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value, mimeType }))
+      actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value, mimeType: mimeType?.value || '' }))
       burnModal.open()
     }
   }

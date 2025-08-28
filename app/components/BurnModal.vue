@@ -42,6 +42,7 @@ function burn() {
             :image="item.metadata?.image"
             :collection-name="item.collection.name"
             :price="item.price"
+            :not-eligible="item.mimeType?.includes('html')"
           />
         </div>
 
