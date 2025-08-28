@@ -7,6 +7,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const waitForInjection = async (timeout = 10000) => {
     console.log('waitForInjection started')
     return new Promise((resolve, reject) => {
+      console.log('im in waitForInjection', window.injectedWeb3)
       if (window.injectedWeb3) {
         console.log('waitForInjection found immediatedly', window.injectedWeb3)
         resolve(true)
