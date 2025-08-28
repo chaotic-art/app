@@ -114,6 +114,7 @@ function handleListNfts() {
 watchEffect(async () => {
   // TODO: debounce
   if (accountId.value) {
+    console.log('listNfts -> tx fees')
     listingFees.value = Number(
       await listNfts({
         ...getListParams(),
