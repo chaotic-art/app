@@ -58,7 +58,13 @@ export interface BuyTransactionResult {
   prefix: AssetHubChain
 }
 
-type TransactionResult = CollectionCategory | NftCategory | ListingTransactionResult | BuyTransactionResult
+export interface AirdropTransactionResult {
+  type: 'airdrop'
+  hash: string
+  prefix: AssetHubChain
+}
+
+type TransactionResult = CollectionCategory | NftCategory | ListingTransactionResult | BuyTransactionResult | AirdropTransactionResult
 
 // Transaction status progression:
 // 1. status.value = 'signed'
