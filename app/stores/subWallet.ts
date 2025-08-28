@@ -108,6 +108,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     try {
       isLoading.value = true
 
+      console.log('connectWallet -> connectInjectedExtension')
       const rawExtension = await connectInjectedExtension(walletSource, DAPP_NAME)
 
       const accounts = rawExtension.getAccounts()
@@ -157,6 +158,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
   }
 
   async function getSigner(source: SubstrateWalletSource, address: string) {
+    console.log('getSigner -> connectInjectedExtension')
     const selectedExtension = await connectInjectedExtension(source)
     const account = selectedExtension.getAccounts().find(account => account.address === address)
 
