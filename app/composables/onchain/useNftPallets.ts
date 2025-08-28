@@ -166,6 +166,7 @@ export function useNftPallets() {
     const signer = await getConnectedSubAccount.value.signer
 
     if (!signer) {
+      console.log('error:1')
       throw new Error('No signer found')
     }
 
