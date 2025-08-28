@@ -350,6 +350,8 @@ export function useNftPallets() {
     const signer = await account.signer
 
     if (!signer) {
+      console.log('error:getAccountSigner')
+      debugger
       throw new Error('No signer found')
     }
 
