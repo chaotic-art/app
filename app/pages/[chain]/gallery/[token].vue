@@ -82,6 +82,7 @@ useSeoMeta({
           <!-- Details Section -->
           <div class="order-1 lg:order-2">
             <GalleryDetails
+              v-if="mimeType"
               :token-data="tokenData"
               :collection="collection"
               :chain="chainPrefix"
@@ -92,6 +93,7 @@ useSeoMeta({
               :formatted-price="formattedPrice || undefined"
               :usd-price="usdPrice"
               :price="price"
+              :mime-type="mimeType"
             />
             <GalleryItemActions
               class="mt-6"

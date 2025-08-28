@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { LazyBurnModal } from '#components'
 import { useActionCartStore } from '@/stores/actionCart'
 
 const { onDisconnect } = useWalletManager()
@@ -33,6 +34,13 @@ useModalIsOpenTracker({
   isOpen: computed(() => preferencesStore.listingCartModalOpen),
   onOpen: transferToListingCart,
 })
+
+const overlay = useOverlay()
+const burnModal = overlay.create(LazyBurnModal)
+
+function openBurnModal() {
+  burnModal.open()
+}
 </script>
 
 <template>
@@ -67,6 +75,13 @@ useModalIsOpenTracker({
           </div>
 
           <div class="flex gap-4">
+            <UButton
+              variant="destructive"
+              @click="openBurnModal"
+            >
+              Burn
+            </UButton>
+
             <UTooltip
               class="cursor-pointer"
               text="Unsupported Operation"

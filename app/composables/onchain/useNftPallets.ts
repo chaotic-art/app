@@ -82,7 +82,7 @@ export function useNftPallets() {
   const { $sdk } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
-  const { hash, error, status, result } = useTransactionModal()
+  const { hash, error, status, result, open } = useTransactionModal()
 
   async function createCollection({
     chain,
@@ -528,6 +528,60 @@ export function useNftPallets() {
     })
   }
 
+  async function burnNfts({ items, chain, type = 'submit' }: { items: BaseActionCartItem[], chain: AssetHubChain, type: TxType }) {
+    const { signer, address } = await getAccountSigner()
+
+    const api = $sdk(chain).api
+    await api.compatibilityToken
+
+    const calls = []
+
+    for (const item of items) {
+      const _txBurn = api.tx.Nfts.burn({
+        collection: item.collection.id,
+        item: item.sn,
+      })
+      calls.push(_txBurn.decodedCall)
+    }
+
+    const transaction = api.tx.Utility.batch_all({ calls })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    open.value = true
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+
+          result.value = {
+            type: 'burn',
+            hash: hash.value,
+            prefix: chain,
+            items: items.map(nft => ({
+              id: nft.id,
+              sn: nft.sn,
+              price: 0,
+              collection: nft.collection,
+              metadata_uri: nft.metadata_uri,
+              metadata: nft.metadata,
+            })),
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
     mintNft,
@@ -535,6 +589,7 @@ export function useNftPallets() {
     userCollection,
     userBalance,
     buyNfts,
+    burnNfts,
     collectionRoyalties,
   }
 }

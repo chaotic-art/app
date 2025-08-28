@@ -16,6 +16,7 @@ interface Props {
   price: bigint | null
   formattedPrice?: string
   usdPrice?: string
+  mimeType: string
 }
 
 const props = defineProps<Props>()
@@ -73,6 +74,18 @@ async function handleRefreshMetadata() {
   }
 }
 
+// burn action
+const { canBurn, burnNow } = useCartActions({
+  tokenId: Number(props.tokenId),
+  collectionId: Number(props.collectionId),
+  chain: props.chain,
+  token: computed(() => props.tokenData),
+  collection: computed(() => props.collection),
+  owner: computed(() => props.owner || null),
+  price: computed(() => props.price || null),
+  mimeType: props.mimeType,
+})
+
 // Action items for dropdown menu
 const actionItems = computed(() => [
   [
@@ -80,6 +93,12 @@ const actionItems = computed(() => [
       label: 'Share',
       icon: 'i-heroicons-share',
       onSelect: shareToken,
+    },
+    {
+      label: 'Burn',
+      icon: 'i-heroicons-fire',
+      onSelect: burnNow,
+      disabled: !canBurn,
     },
   ],
   [
