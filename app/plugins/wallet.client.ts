@@ -4,7 +4,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   console.log('wallet.client.ts')
 
   const waitForInjection = async (timeout = 10000) => {
-    consoe.log('waitForInjection started')
+    console.log('waitForInjection started')
     return new Promise((resolve, reject) => {
       if (window.injectedWeb3) {
         console.log('waitForInjection found immediatedly', window.injectedWeb3)
@@ -14,6 +14,8 @@ export default defineNuxtPlugin((nuxtApp) => {
 
       const startTime = Date.now()
       const checkInterval = setInterval(() => {
+        console.log('waitForInjection interval', window.injectedWeb3)
+
         if (window.injectedWeb3) {
           console.log('waitForInjection found interval', window.injectedWeb3)
           clearInterval(checkInterval)
