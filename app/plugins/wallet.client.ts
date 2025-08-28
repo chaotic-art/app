@@ -1,6 +1,8 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const subWalletStore = useSubWalletStore()
 
+  console.log('wallet.client.ts')
+
   const waitForInjection = async (timeout = 10000) => {
     return new Promise((resolve, reject) => {
       if (window.injectedWeb3) {
@@ -22,7 +24,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
   }
 
-  nuxtApp.hook('app:mounted', () => {
+  nuxtApp.hook('app:beforeMount', () => {
+    console.log('app:beforeMount')
     waitForInjection()
       .then(subWalletStore.init)
       .catch(() => {
