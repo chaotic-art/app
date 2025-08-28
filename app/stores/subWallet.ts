@@ -109,6 +109,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
       isLoading.value = true
 
       console.log('connectWallet -> connectInjectedExtension')
+
       const rawExtension = await connectInjectedExtension(walletSource, DAPP_NAME)
 
       const accounts = rawExtension.getAccounts()
@@ -158,7 +159,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
   }
 
   async function getSigner(source: SubstrateWalletSource, address: string) {
-    console.log('getSigner -> connectInjectedExtension', window.injectedWeb3)
+    console.log('getSigner -> connectInjectedExtension', JSON.stringify(window.injectedWeb3))
     console.log('window.injectedWeb3', window.injectedWeb3, window.injectedWeb3 === undefined)
     const selectedExtension = await connectInjectedExtension(source)
     const account = selectedExtension.getAccounts().find(account => account.address === address)
