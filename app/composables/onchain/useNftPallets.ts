@@ -1,7 +1,9 @@
+import type { ActionAirdrop } from '~/components/airdrop/types'
 import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
 import { encodeAddress } from 'dedot/utils'
 import { Binary } from 'polkadot-api'
+import { generateAirdropTxs } from '@/components/airdrop/utils'
 import { MultiAddress } from '~/descriptors/dist'
 
 type TxType = 'submit' | 'estimate'
@@ -76,6 +78,12 @@ interface BuyNftsParams {
   chain: AssetHubChain
   type?: TxType
   nfts: BuyNftItem[]
+}
+interface AirdropNftsParams {
+  chain: AssetHubChain
+  items: ActionAirdrop
+  type?: TxType
+
 }
 
 export function useNftPallets() {
@@ -528,6 +536,43 @@ export function useNftPallets() {
     })
   }
 
+  // TODO
+
+  async function airdropNfts({
+    items,
+    chain,
+    type = 'submit',
+  }: AirdropNftsParams) {
+    const { signer, address } = await getAccountSigner()
+    const transaction = generateAirdropTxs(items, chain)!
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction!.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+        }
+
+        result.value = {
+          type: 'airdrop',
+          hash: hash.value,
+          prefix: chain,
+
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
     mintNft,
@@ -536,5 +581,6 @@ export function useNftPallets() {
     userBalance,
     buyNfts,
     collectionRoyalties,
+    airdropNfts,
   }
 }

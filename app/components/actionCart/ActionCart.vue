@@ -7,6 +7,7 @@ const listingCartStore = useListingCartStore()
 const preferencesStore = usePreferencesStore()
 const router = useRouter()
 const airdropStore = useAirdropStore()
+const { currentChain } = useChain()
 
 const isListingDisabled = ref(false) // Allow listing for all chains for now
 
@@ -33,7 +34,7 @@ function onClickAirdrop() {
   actionCartStore.itemsInChain.forEach((item) => {
     airdropStore.setItem(item)
   })
-  router.push('/airdrop')
+  router.push(`/${currentChain.value}/airdrop`)
 }
 
 onDisconnect(actionCartStore.clear)

@@ -11,7 +11,7 @@ export function useCart<T extends CartItem>({
 }: {
   items?: Ref<T[]>
 } = {}) {
-  const chain = usePrefix().prefix
+  const chain = useChain().currentChain
   const decimals = useChain().decimals
   const allItemsInChain = computed(() => items.value.filter(item => item.chain === chain.value))
   const itemsInChain = computed(() => allItemsInChain.value.filter(item => !item.discarded))

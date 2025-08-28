@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import { useDebounceFn } from '@vueuse/core'
 import { decodeAddress, encodeAddress, isEvmAddress } from 'dedot/utils'
+import { DistributionMode } from '@/components/airdrop/types'
+import { downloadAirdropTemplate } from '@/components/airdrop/utils'
 import { useAirdropStore } from '@/stores/airdrop'
 import { CHAOTIC_MINTER } from '@/utils/support'
 import AddressFormatWarning from '~/components/airdrop/AddressFormatWarning.client.vue'
-
-enum DistributionMode {
-  ONE_PER_ADDRESS = 'ONE_PER_ADDRESS',
-  RANDOM = 'RANDOM',
-}
+import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
 const router = useRouter()
 const { $i18n } = useNuxtApp()
-// const { prefix } = usePrefix()
 const { isCurrentAccount } = useAuth()
 const airdropStore = useAirdropStore()
 const { currentChain } = useChain()
 const ss58Format = computed(() => chainSpec[currentChain.value].ss58Format)
+const { airdropNfts } = useNftPallets()
+const { open: isTransactionModalOpen, close: closeTransactionModal, isSuccess: isTransactionSuccess } = useTransactionModal()
 
 const batchAddressesInput = ref('')
 const airdropItems = computed(() => airdropStore.itemsInChain)
@@ -28,6 +27,7 @@ const isAirdropModalOpen = ref<boolean>(false)
 const distributionMode = ref<DistributionMode>(DistributionMode.ONE_PER_ADDRESS)
 const fileInput = ref<HTMLInputElement | null>(null)
 const addressPairNeedToBeFixed = ref<[string, string][]>([])
+const { accountId } = useAuth()
 
 const DISTRIBUTION_MODES = computed(() => [
   {
@@ -169,26 +169,21 @@ function correctAddressFormat(address: string) {
 }
 
 function handleConfirm() {
+  isTransactionModalOpen.value = true
+  airdropNfts({
+    items: {
+      addresses: validAddressList.value,
+      nfts: airdropItems.value.map(item => ({
+        sn: item.sn,
+        collectionId: item.collection.id,
+      })),
+      distributionMode: distributionMode.value,
+    },
+    chain: currentChain.value,
+    type: 'submit',
 
-  // setTimeout(() => {
-//     router.push(`/${currentChain.value}/profile`)
-//   }, 5000)
+  })
 }
-
-// function getAction() {
-//   return {
-//     interaction: Interaction.AIRDROP,
-//     urlPrefix: prefix.value,
-//     distributionMode: distributionMode.value,
-//     addresses: validAddressList.value,
-//     nfts: airdropItems.value
-//       .map(item => ({
-//         id: item.id,
-//         sn: item.sn,
-//         collectionId: item.collection.id,
-//       })),
-//   }
-// }
 
 function handleSubmit() {
   isAirdropModalOpen.value = true
@@ -223,6 +218,16 @@ async function handleFileSelect(event: Event) {
     }
   }
 }
+
+watch(isTransactionSuccess, (isSuccess) => {
+  if (isSuccess) {
+    closeTransactionModal()
+    successMessage('Airdrop successful! There is a 1 minute indexer and worker delay for this action to appear in the website.')
+    setTimeout(() => {
+      router.push(`/${currentChain.value}/u/${accountId.value}`)
+    }, 5000)
+  }
+})
 
 onBeforeUnmount(() => {
   airdropStore.clear()
@@ -277,7 +282,7 @@ onBeforeUnmount(() => {
               v-model="distributionMode"
               type="radio"
               :value="mode.value"
-              class="mr-3 accent-pink-500 cursor-pointer"
+              class="mr-3  accent-primary cursor-pointer"
             >
             <div class="text-sm">
               <div class="font-semibold mb-1">
@@ -369,7 +374,7 @@ onBeforeUnmount(() => {
 
           <div
             v-if="addressMoreThanNftWarning"
-            class="flex gap-4 px-2 py-1 bg-red-50 dark:bg-red-950"
+            class="flex gap-4 px-2 py-1 my-2 bg-red-50 dark:bg-red-950"
           >
             <UIcon
               name="i-lucide-alert-circle"
@@ -413,10 +418,8 @@ onBeforeUnmount(() => {
               variant="ghost"
               icon="i-lucide-download"
               size="sm"
-              tag="a"
-              href="/airdrop/airdrop-template.csv"
               class="text-sm px-2"
-              download
+              @click="downloadAirdropTemplate"
             >
               {{ $t('airdrop.template') }}
             </UButton>
