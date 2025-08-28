@@ -89,8 +89,8 @@ export function generateAirdropTxs(item: ActionAirdrop, chain: AssetHubChain) {
 }
 
 export function downloadAirdropTemplate() {
+  const templateContent = `${CHAOTIC_MINTER}\n${CHAOTIC_MINTER}`
   try {
-    const templateContent = `${CHAOTIC_MINTER}\n${CHAOTIC_MINTER}`
     const blob = new Blob([templateContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -105,7 +105,6 @@ export function downloadAirdropTemplate() {
   catch (error) {
     console.error('Error downloading template:', error)
     // Fallback: try to open in new tab
-    const templateContent = `${CHAOTIC_MINTER}\n${CHAOTIC_MINTER}`
     const dataUri = `data:text/csv;charset=utf-8,${encodeURIComponent(templateContent)}`
     window.open(dataUri, '_blank')
   }

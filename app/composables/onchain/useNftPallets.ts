@@ -536,8 +536,6 @@ export function useNftPallets() {
     })
   }
 
-  // TODO
-
   async function airdropNfts({
     items,
     chain,
