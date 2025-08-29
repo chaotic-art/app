@@ -104,7 +104,7 @@ const dropStartRelativeTime = computed(() => {
         </ClientOnly>
 
         <!-- stats section -->
-        <div class="border p-3 md:p-4 rounded-2xl border-gray-100 mt-4">
+        <div class="border p-6 rounded-3xl border-gray-100 mt-4">
           <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div v-if="drop.isFree">
               <p class="font-serif font-medium text-2xl md:text-3xl italic mx-2">
