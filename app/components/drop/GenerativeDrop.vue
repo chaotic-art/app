@@ -107,12 +107,12 @@ const dropStartRelativeTime = computed(() => {
         <div class="border p-3 md:p-4 rounded-2xl border-gray-100 mt-4">
           <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div v-if="drop.isFree">
-              <p class="font-serif font-bold text-2xl md:text-3xl italic mx-2">
+              <p class="font-serif font-medium text-2xl md:text-3xl italic mx-2">
                 Free
               </p>
             </div>
             <div v-else class="text-center md:text-left">
-              <p class="font-serif font-bold text-2xl md:text-3xl italic">
+              <p class="font-serif font-medium text-2xl md:text-3xl italic">
                 {{ formattedTokenPrice }}
               </p>
               <p class="text-sm text-gray-500">
