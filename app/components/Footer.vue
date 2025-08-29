@@ -9,28 +9,28 @@ interface FooterLinkItem {
 const footerLinks: Array<
   { title: string, type: 'links' | 'buttons', items: FooterLinkItem[] }
 > = [
-  {
-    title: 'Incentives',
-    type: 'links',
-    items: [
-      { label: 'Developers', href: '#' },
-      { label: 'FAQ', href: '#' },
-      { label: 'Referral Program', href: '#' },
-      { label: 'Artist Program', href: '#' },
-    ],
-  },
-  {
-    title: 'Chaotic',
-    type: 'links',
-    items: [
-      { label: 'Why Chaotic', href: '#' },
-      { label: 'FAQ', href: '#' },
-      { label: 'Tutorials', href: '#' },
-      { label: 'Blog', href: '#' },
-      { label: 'Privacy', href: '#' },
-      { label: 'Presskit', href: '#' },
-    ],
-  },
+  // {
+  //   title: 'Incentives',
+  //   type: 'links',
+  //   items: [
+  //     { label: 'Developers', href: '#' },
+  //     { label: 'FAQ', href: '#' },
+  //     { label: 'Referral Program', href: '#' },
+  //     { label: 'Artist Program', href: '#' },
+  //   ],
+  // },
+  // {
+  //   title: 'Chaotic',
+  //   type: 'links',
+  //   items: [
+  //     { label: 'Why Chaotic', href: '#' },
+  //     { label: 'FAQ', href: '#' },
+  //     { label: 'Tutorials', href: '#' },
+  //     { label: 'Blog', href: '#' },
+  //     { label: 'Privacy', href: '#' },
+  //     { label: 'Presskit', href: '#' },
+  //   ],
+  // },
   {
     title: 'Social',
     type: 'buttons',
@@ -55,12 +55,12 @@ const footerLinks: Array<
               {{ $t('footer.becomeArtist') }}
             </div>
             <div class="flex justify-center md:justify-start">
-              <UButton :label="$t('footer.getInTouch')" class="rounded-full px-6 md:px-4" />
+              <UButton :label="$t('footer.getInTouch')" class="rounded-full px-6 md:px-4" target="_blank" href="https://t.me/+A3xwht0aOIMxMjQ0" />
             </div>
           </div>
 
           <!-- Footer Links -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+          <div class="grid grid-cols-1 md:grid-cols-1 gap-8 md:gap-16 md:mr-12">
             <template v-for="col in footerLinks" :key="col.title">
               <div class="text-center md:text-left">
                 <h3 class="text-xl md:text-2xl font-serif italic font-medium mb-3 md:mb-4 text-foreground" :class="col.title === 'Social' ? 'mr-4' : ''">
