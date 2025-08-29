@@ -1,6 +1,6 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const subWalletStore = useSubWalletStore()
-  const { injected } = storeToRefs(subWalletStore)
+  const { injectionStatus } = storeToRefs(subWalletStore)
 
   const waitForInjection = async (timeout = 3000) => {
     return new Promise((resolve, reject) => {
@@ -26,10 +26,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:mounted', () => {
     waitForInjection()
       .then(() => {
-        injected.value = true
+        injectionStatus.value = 'injected'
         subWalletStore.init()
       })
       .catch(() => {
+        injectionStatus.value = 'not-injected'
         console.error('Failed to initialize sub wallet')
       })
   })
