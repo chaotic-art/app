@@ -1,8 +1,20 @@
 <script setup lang="ts">
+import { formatDetailedTimeToNow } from '~/utils/format/time'
+
 const { drop, amountToMint } = storeToRefs(useDropStore())
 
 const { decimals, chainSymbol, currentChain } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
+
+const dropStartRelativeTime = computed(() => {
+  if (drop.value?.dropStartTime) {
+    return formatDetailedTimeToNow(drop.value.dropStartTime)
+  }
+  if (drop.value?.start_at) {
+    return formatDetailedTimeToNow(drop.value.start_at)
+  }
+  return null
+})
 </script>
 
 <template>
@@ -58,6 +70,30 @@ const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() 
         <div class="text-sm md:text-base">
           <MarkdownPreview :source="drop?.collectionDescription ?? '---'" />
         </div>
+
+        <!-- drop start at section -->
+        <div v-if="dropStartRelativeTime" class="mt-6 p-4 bg-muted rounded-lg border border-border">
+          <h3 class="text-lg font-semibold text-foreground mb-2">
+            Drop Start Time
+          </h3>
+          <div class="flex items-center gap-2 text-muted-foreground">
+            <UIcon name="i-heroicons-clock" class="w-4 h-4" />
+            <time
+              v-if="drop?.dropStartTime"
+              :datetime="drop.dropStartTime.toISOString()"
+              class="capitalize"
+            >
+              {{ dropStartRelativeTime }}
+            </time>
+            <time
+              v-else-if="drop?.start_at"
+              :datetime="drop.start_at"
+              class="capitalize"
+            >
+              {{ dropStartRelativeTime }}
+            </time>
+          </div>
+        </div>
       </div>
 
       <!-- right side -->
@@ -70,7 +106,12 @@ const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() 
         <!-- stats section -->
         <div class="border p-3 md:p-4 rounded-2xl border-gray-100 mt-4">
           <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="text-center md:text-left">
+            <div v-if="drop.isFree">
+              <p class="font-serif font-bold text-2xl md:text-3xl italic mx-2">
+                Free
+              </p>
+            </div>
+            <div v-else class="text-center md:text-left">
               <p class="font-serif font-bold text-2xl md:text-3xl italic">
                 {{ formattedTokenPrice }}
               </p>

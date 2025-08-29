@@ -55,10 +55,8 @@ watch([accountId], () => {
 
 <template>
   <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
-    <iframe
-      class="aspect-square w-full"
+    <IframePreview
       :src="sanitizeIpfsUrl(generativeImageUrl)"
-      frameborder="0"
       sandbox="allow-scripts allow-same-origin allow-modals"
       allow="accelerometer *; camera *; gyroscope *; microphone *; xr-spatial-tracking *;"
     />
@@ -67,9 +65,9 @@ watch([accountId], () => {
       <UButton class="rounded-full bg-accent text-xs md:text-sm cursor-pointer" variant="soft" trailing-icon="i-lucide-refresh-cw" :loading="isCapturingImage" @click="generateNft">
         Preview Variation
       </UButton>
-      <UButton class="rounded-full bg-accent text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
+      <!-- <UButton class="rounded-full bg-accent text-xs md:text-sm" variant="soft" trailing-icon="i-lucide-joystick">
         Controls
-      </UButton>
+      </UButton> -->
     </div>
   </div>
 </template>

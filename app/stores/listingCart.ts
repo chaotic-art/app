@@ -4,9 +4,8 @@ export const DEFAULT_FLOOR_PRICE_RATE = 1.0
 
 export type ListingCartItem = {
   listPrice?: number
-  collection: {
+  collection: BaseActionCartItem['collection'] & {
     floor?: number
-    name: string
   }
 } & BaseActionCartItem
 

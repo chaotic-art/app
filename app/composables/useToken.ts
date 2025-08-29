@@ -1,5 +1,6 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { formatBalance } from 'dedot/utils'
+import { t } from 'try'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
 export function useToken(props: {
@@ -17,7 +18,7 @@ export function useToken(props: {
   const collectionCreator = ref<string | null>(null)
   const isLoading = ref(true)
   const error = ref<unknown | null>(null)
-  const mimeType = ref<string | null>(null)
+  const mimeType = ref('image/png')
 
   const { $sdk } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()
@@ -34,6 +35,7 @@ export function useToken(props: {
     const api = $sdk(props.chain).api
 
     try {
+      // TODO: add more oda data
       // Fetch token metadata, price, and owner in parallel
       const [tokenData, collectionData, priceData, ownerData, collectionConfig, collectionMetadata] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
@@ -61,8 +63,10 @@ export function useToken(props: {
 
       const media = token.value?.metadata?.animation_url || token.value?.metadata?.image || props.image
       if (media) {
-        const mimeTypeData = await fetchMimeType(media)
-        mimeType.value = mimeTypeData.mime_type
+        const [ok, _, mimeTypeData] = await t(fetchMimeType(media))
+        if (ok) {
+          mimeType.value = mimeTypeData.mime_type
+        }
       }
     }
     catch (err) {
@@ -100,7 +104,7 @@ export function useToken(props: {
   return {
     // Reactive data
     token,
-    collection,
+    collection: computed(() => collection.value),
     owner,
     collectionCreator,
     isLoading,

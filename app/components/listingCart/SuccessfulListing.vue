@@ -2,7 +2,7 @@
 import type { ItemMedia } from '@/components/common/successfulModal/SuccessfulItemsMedia.vue'
 
 const props = defineProps<{
-  result: ListingTransactionResult
+  result: ActionTransactionResult
   status: TransactionStatus
 }>()
 
@@ -72,11 +72,11 @@ const actionButtons = computed(() => ({
   >
     <SuccessfulItemsMedia
       :items="items"
+      show-price
       :header="{
         single: $t('listingCart.newListingPrice'),
         multiple: $t('listingCart.bulkListingSuccessful'),
       }"
-      show-price
     />
   </SuccessfulModalBody>
 </template>

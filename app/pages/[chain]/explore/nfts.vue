@@ -16,6 +16,7 @@ useSeoMeta({
   description: 'Browse and discover NFTs across different categories and collections.',
 })
 
+const { isLogIn } = useAuth()
 const route = useRoute()
 const { chain } = route.params as { chain: AssetHubChain }
 
@@ -27,6 +28,7 @@ const queryVariables = ref<Record<string, any>>({})
     <ExploreHeader>
       <template #controls>
         <NftsToolbar
+          :has-owned-filter="isLogIn"
           @update:query-variables="queryVariables = $event"
         />
       </template>

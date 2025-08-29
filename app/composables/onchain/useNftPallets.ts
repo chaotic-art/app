@@ -1,9 +1,17 @@
+import type { ActionAirdrop } from '~/components/airdrop/types'
 import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
+import { encodeAddress } from 'dedot/utils'
 import { Binary } from 'polkadot-api'
+import { generateAirdropTxs } from '@/components/airdrop/utils'
 import { MultiAddress } from '~/descriptors/dist'
 
 type TxType = 'submit' | 'estimate'
+
+interface CollectionRoyalty {
+  amount: number
+  recipient: string
+}
 
 interface CreateCollectionParams {
   chain: AssetHubChain
@@ -54,11 +62,36 @@ interface ListNftsParams {
   }[]
 }
 
+interface BuyNftItem {
+  id: string
+  sn: number
+  price: number
+  metadata: NFTMetadata
+  metadata_uri: string
+  collection: {
+    id: number
+    name: string
+  }
+}
+
+interface BuyNftsParams {
+  chain: AssetHubChain
+  type?: TxType
+  nfts: BuyNftItem[]
+}
+interface AirdropNftsParams {
+  chain: AssetHubChain
+  items: ActionAirdrop
+  type?: TxType
+
+}
+
 export function useNftPallets() {
   const { $sdk } = useNuxtApp()
-  const { getConnectedSubAccount } = storeToRefs(useWalletStore())
+  const { hash, error, status, result, open } = useTransactionModal()
+  const toast = useToast()
 
-  const { hash, error, status, result } = useTransactionModal()
+  const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
   async function createCollection({
     chain,
@@ -390,11 +423,228 @@ export function useNftPallets() {
     })
   }
 
+  async function collectionAttributes(chain: AssetHubChain, collectionId: number) {
+    const attributes = await $sdk(chain).api.query.Nfts.Attribute.getEntries(collectionId)
+
+    return attributes.map((item) => {
+      return {
+        key: item.keyArgs[3].asText(),
+        value: item.value[0],
+      }
+    })
+  }
+
+  async function collectionRoyalties(chain: AssetHubChain, collectionId: number): Promise<CollectionRoyalty | null> {
+    const attributes = await collectionAttributes(chain, collectionId)
+
+    const recipient = attributes.find(attr => attr.key === 'recipient')
+    const royalty = attributes.find(attr => attr.key === 'royalty')
+
+    // if !recipient should default to the collection owner?
+    if (!(royalty && recipient)) {
+      return null
+    }
+
+    return {
+      recipient: encodeAddress(recipient.value.asBytes(), chainSpec[chain].ss58Format),
+      amount: Number(royalty.value.asText()),
+    }
+  }
+
+  async function buyNfts({
+    nfts,
+    chain,
+    type = 'submit',
+  }: BuyNftsParams) {
+    const { signer, address } = await getAccountSigner()
+    const api = $sdk(chain).api
+
+    const totalPrice = sum(nfts.map(nft => Number(nft.price)))
+
+    const buyTxs = nfts.map(({ price, collection, sn }) => {
+      return api.tx.Nfts.buy_item({
+        collection: Number(collection.id),
+        item: Number(sn),
+        bid_price: BigInt(price),
+      })
+    })
+
+    const supportTx = api.tx.Balances.transfer_keep_alive({
+      dest: MultiAddress.Id(CHAOTIC_MINTER),
+      value: BigInt(getPercentSupportFee(totalPrice)),
+    })
+
+    const royalties = await Promise.all(nfts.map(async (item) => {
+      const royalty = await collectionRoyalties(chain, item.collection.id)
+      return {
+        royalty,
+        item,
+      }
+    }))
+
+    const itemsWithRoyalties = royalties.filter((i): i is { item: BuyNftItem, royalty: CollectionRoyalty } => i.royalty !== null)
+
+    const txs = [
+      ...buyTxs,
+      supportTx,
+      itemsWithRoyalties.length
+        ? api.tx.Nfts.pay_tips({
+            tips: itemsWithRoyalties.map(({ item, royalty }) => ({
+              collection: Number(item.collection.id),
+              item: Number(item.sn),
+              receiver: royalty.recipient,
+              amount: BigInt(item.price * (Number(royalty.amount) / 100)),
+            })),
+          })
+        : undefined,
+    ].filter(Boolean)
+
+    const transaction = api.tx.Utility.batch_all({
+      calls: txs.map(tx => tx!.decodedCall),
+    })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+        }
+
+        result.value = {
+          type: 'buy',
+          hash: hash.value,
+          prefix: chain,
+          items: nfts.map(nft => ({
+            id: nft.id,
+            sn: nft.sn,
+            price: nft.price,
+            collection: nft.collection,
+            metadata_uri: nft.metadata_uri,
+            metadata: nft.metadata,
+          })),
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
+  async function airdropNfts({
+    items,
+    chain,
+    type = 'submit',
+  }: AirdropNftsParams) {
+    const { signer, address } = await getAccountSigner()
+    const transaction = generateAirdropTxs(items, chain)!
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction!.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+        }
+
+        result.value = {
+          type: 'airdrop',
+          hash: hash.value,
+          prefix: chain,
+
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
+  async function burnNfts({ items, chain, type = 'submit' }: { items: BaseActionCartItem[], chain: AssetHubChain, type: TxType }) {
+    const { signer, address } = await getAccountSigner()
+
+    const api = $sdk(chain).api
+    await api.compatibilityToken
+
+    const calls = []
+    const itemsToBurn = items.filter(item => !item.mimeType?.includes('html'))
+
+    for (const item of itemsToBurn) {
+      const _txBurn = api.tx.Nfts.burn({
+        collection: item.collection.id,
+        item: item.sn,
+      })
+
+      calls.push(_txBurn.decodedCall)
+    }
+
+    if (itemsToBurn.length === 0) {
+      toast.add({
+        title: 'No items to burn',
+        color: 'error',
+      })
+      return
+    }
+
+    const transaction = api.tx.Utility.batch_all({ calls })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    open.value = true
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+
+          result.value = {
+            type: 'burn',
+            hash: hash.value,
+            prefix: chain,
+            items: itemsToBurn.map(nft => ({
+              id: nft.id,
+              sn: nft.sn,
+              price: 0,
+              collection: nft.collection,
+              metadata_uri: nft.metadata_uri,
+              metadata: nft.metadata,
+            })),
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
     mintNft,
     listNfts,
     userCollection,
     userBalance,
+    buyNfts,
+    burnNfts,
+    collectionRoyalties,
+    airdropNfts,
   }
 }

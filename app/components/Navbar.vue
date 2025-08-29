@@ -103,6 +103,8 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
             class="md:hidden"
             @click="isBottomSheetOpen = true"
           />
+          <ThemeSwitcher v-if="!accountId" />
+          <NavbarShoppingCart />
         </div>
       </nav>
     </UContainer>
@@ -138,6 +140,12 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
             </div>
           </UButton>
         </div>
+
+        <!-- Mobile Shopping Cart -->
+        <NavbarShoppingCart
+          mobile
+          @click="isBottomSheetOpen = false"
+        />
 
         <USeparator />
 
