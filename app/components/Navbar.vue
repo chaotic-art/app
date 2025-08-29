@@ -71,43 +71,44 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
 </script>
 
 <template>
-  <UContainer>
-    <nav class="rounded-full border border-border my-4 md:my-[26px] p-2 flex items-center gap-2 justify-between mx-auto overflow-hidden">
-      <div class="flex items-center gap-2 ml-4">
-        <Logo class="select-none w-6 h-6 md:w-8 md:h-8" :font-controlled="false" />
-        <NuxtLink
-          to="/" class="text-lg md:text-3xl font-medium font-serif italic text-foreground"
-        >
-          Chaotic
-        </NuxtLink>
-      </div>
+  <header class="border-b border-border bg-background backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full py-2">
+    <UContainer>
+      <nav class="flex items-center gap-2 justify-between mx-auto overflow-hidden">
+        <div class="flex items-center gap-2">
+          <Logo class="select-none w-6 h-6 md:w-8 md:h-8" :font-controlled="false" />
+          <NuxtLink to="/" class="text-lg md:text-xl font-bold font-serif italic text-foreground">
+            Chaotic
+          </NuxtLink>
+        </div>
 
-      <div class="flex items-center gap-3 md:gap-6">
-        <div class="hidden md:flex items-center h-10">
-          <UNavigationMenu
-            :items="navItems"
+        <div class="flex items-center gap-3 md:gap-6">
+          <div class="hidden md:flex items-center">
+            <UNavigationMenu
+              :items="navItems"
+            />
+            <ThemeSwitcher v-if="!accountId" />
+          </div>
+
+          <!-- Desktop Wallet -->
+          <div class="hidden md:block">
+            <NavbarWallet />
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <UButton
+            icon="i-heroicons-bars-3"
+            color="neutral"
+            variant="ghost"
+            size="sm"
+            class="md:hidden"
+            @click="isBottomSheetOpen = true"
           />
           <ThemeSwitcher v-if="!accountId" />
           <NavbarShoppingCart />
         </div>
-
-        <!-- Desktop Wallet -->
-        <div class="hidden md:block">
-          <NavbarWallet />
-        </div>
-
-        <!-- Mobile Menu Button -->
-        <UButton
-          icon="i-heroicons-bars-3"
-          color="neutral"
-          variant="ghost"
-          size="sm"
-          class="md:hidden"
-          @click="isBottomSheetOpen = true"
-        />
-      </div>
-    </nav>
-  </UContainer>
+      </nav>
+    </UContainer>
+  </header>
 
   <!-- Mobile Bottom Sheet -->
   <USlideover

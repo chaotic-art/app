@@ -1,32 +1,103 @@
 <script lang="ts" setup>
+import type { DropItem } from '~/types'
+import { getDrops } from '~/services/fxart'
+import { getEnrichedDrop } from '../drop/utils'
+
+const dropItems = ref<DropItem[]>([])
+
+onMounted(async () => {
+  const drops = await getDrops({
+    active: [true],
+    chain: ['ahp'],
+    limit: 9,
+  })
+
+  dropItems.value = (await Promise.all(drops.map(getEnrichedDrop))).filter((item): item is DropItem => item !== undefined)
+})
 </script>
 
 <template>
   <div>
-    <!-- <img
-      src="/img/landing/landing-bg.png" alt="Landing Background" class="w-full h-full object-cover bg-transparent opacity-[10%] mix-blend-exclusion"
-    > -->
-    <Navbar />
-
-    <UContainer>
-      <div class="flex flex-col items-center justify-center mt-4 mb-6 md:mt-[25px] md:mb-[35px]">
-        <div class="font-medium text-3xl md:text-[51px] capitalize font-serif italic text-center text-foreground">
-          {{ $t('landing.title') }}
-        </div>
-        <div class="text-base md:text-xl capitalize opacity-[0.66] text-center mt-2 text-muted-foreground">
-          {{ $t('landing.subtitle') }}
-        </div>
+    <!-- Hero Section -->
+    <section class="relative py-16 lg:py-32 overflow-hidden bg-muted">
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 opacity-10 dark:opacity-20">
+        <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0); background-size: 24px 24px;" />
       </div>
 
-      <LandingDropBanner />
-    </UContainer>
+      <UContainer class="relative">
+        <div class="text-center max-w-4xl mx-auto">
+          <!-- Badge -->
+          <UButton
+            href="https://medium.com/chaoticart/chaotic-a-fresh-start-for-polkadot-nfts-c285c2d724f4"
+            target="_blank"
+            variant="outline"
+            size="sm"
+            class="mb-8"
+          >
+            <UIcon name="i-heroicons-sparkles" class="h-4 w-4" />
+            <span class="text-sm font-medium">New: Chaotic NFT Marketplace Launch</span>
+          </UButton>
 
-    <LazyLandingArtistsList :hydrate-on-visible="{ rootMargin: '600px' }" />
+          <!-- Main Heading -->
+          <h1 class="text-4xl sm:text-5xl lg:text-7xl text-foreground mb-6 leading-tight font-serif">
+            Your
+            <span class="text-muted-foreground italic">
+              Polkadot
+            </span>
+            NFT
+            <br>
+            Marketplace
+          </h1>
 
-    <UContainer>
-      <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '600px' }" />
+          <!-- Description -->
+          <p class="text-xl text-primary mb-10 max-w-3xl mx-auto leading-relaxed">
+            Create, collect, and sell extraordinary NFTs on the most advanced blockchain. Join thousands of artists and
+            collectors in the decentralized future.
+          </p>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <UButton
+              to="/ahp/explore/collectibles"
+              size="lg"
+              variant="solid"
+              class="px-8 py-3 text-lg"
+            >
+              Start Exploring
+              <UIcon name="i-heroicons-arrow-right" class="ml-2 h-5 w-5" />
+            </UButton>
+            <UButton
+              to="/create/nft"
+              size="lg"
+              variant="outline"
+              class="px-8 py-3 text-lg"
+            >
+              Create NFT
+            </UButton>
+          </div>
+        </div>
+      </UContainer>
+    </section>
+
+    <!-- Featured NFT Section -->
+    <FeaturedNFT :drop="dropItems[0]" />
+
+    <!-- Latest Drops Section -->
+    <LatestDrops :drops="dropItems.slice(0, 9)" :hydrate-on-visible="{ rootMargin: '600px' }" />
+
+    <!-- Curated Artists Section -->
+    <LazyCuratedArtists :hydrate-on-visible="{ rootMargin: '600px' }" />
+
+    <div class="bg-muted py-16">
+      <UContainer>
+        <LazyLandingTopCollections :hydrate-on-visible="{ rootMargin: '600px' }" />
       <!-- <LazyArticles :hydrate-on-visible="{ rootMargin: '300px' }" /> -->
-    </UContainer>
+      </UContainer>
+    </div>
+
+    <!-- Partners Section -->
+    <LazyPartners :hydrate-on-visible="{ rootMargin: '600px' }" />
 
     <LazyDropMintModal />
   </div>

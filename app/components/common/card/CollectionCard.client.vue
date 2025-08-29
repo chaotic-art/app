@@ -64,7 +64,7 @@ onMounted(async () => {
 
 <template>
   <article
-    class="group relative rounded-xl shadow-xs hover:shadow-sm border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1"
+    class="group relative bg-background rounded-xl shadow-xs border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1"
     :class="{ 'animate-pulse': isLoading }"
   >
     <NuxtLink
@@ -79,7 +79,7 @@ onMounted(async () => {
             v-if="item.image && !isLoading && !isPlaceholder"
             :src="sanitizeIpfsUrl(item.image)"
             :alt="`${item.name} collection banner`"
-            class="w-full h-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-105"
+            class="w-full h-full object-cover opacity-80 transition-transform duration-300"
             loading="lazy"
             @error="imageStatus = 'placeholder'"
           >

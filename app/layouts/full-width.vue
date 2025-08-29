@@ -13,7 +13,8 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-full flex flex-col overflow-hidden">
+  <div class="min-h-full flex flex-col">
+    <Navbar />
     <main class="grow">
       <slot />
     </main>

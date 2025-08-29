@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { DropItem } from '@/types'
+import { formatBalance } from 'dedot/utils'
 import { useMintedDropsStore } from '@/stores/dropsMinted'
+import { tokenToUsd } from '@/utils/calculation'
 import { getDropAttributes, isTBA } from './utils'
 
 const props = defineProps<{
@@ -8,14 +10,50 @@ const props = defineProps<{
   showMinted?: boolean
 }>()
 
+const { currentChain } = useChain()
 const formattedDrop = ref<DropItem>()
-const { decimals, chainSymbol, currentChain } = useChain()
 
 const shouldShowDrop = computed(() =>
   props.showMinted || (formattedDrop.value && !formattedDrop.value.isMintedOut),
 )
 const isUnlimited = computed(() => formattedDrop.value?.max && formattedDrop.value.max >= Number.MAX_SAFE_INTEGER)
-const usdPrice = computed(() => tokenToUsd(Number(formattedDrop.value?.price), decimals.value, chainSymbol.value))
+
+// Format price for display
+const formattedPrice = computed(() => {
+  if (!formattedDrop.value?.price || isTBA(formattedDrop.value.price))
+    return 'TBA'
+
+  if (Number(formattedDrop.value.price) === 0)
+    return 'Free'
+
+  return formatBalance(formattedDrop.value.price, {
+    decimals: chainSpec[formattedDrop.value.chain].tokenDecimals,
+    symbol: chainSpec[formattedDrop.value.chain].tokenSymbol,
+  })
+})
+
+// Format USD equivalent
+const formattedPriceUSD = computed(() => {
+  if (!formattedDrop.value?.price || isTBA(formattedDrop.value.price) || Number(formattedDrop.value.price) === 0)
+    return ''
+
+  return tokenToUsd(Number(formattedDrop.value.price), chainSpec[formattedDrop.value.chain].tokenDecimals, chainSpec[formattedDrop.value.chain].tokenSymbol)
+})
+
+// Badge text based on drop status
+const badgeText = computed(() => {
+  if (!formattedDrop.value)
+    return ''
+
+  const status = formattedDrop.value.status
+  const isMintedOut = formattedDrop.value.isMintedOut
+
+  if (status === 'minting_live')
+    return 'Live Now'
+  if (status === 'minting_ended' || isMintedOut)
+    return 'Minted Out'
+  return 'Coming Soon'
+})
 
 onBeforeMount(async () => {
   formattedDrop.value = await getDropAttributes(props.drop.alias)
@@ -24,71 +62,96 @@ onBeforeMount(async () => {
     useMintedDropsStore().addMintedDrop(formattedDrop.value)
   }
 })
+
+const minted = computed(() => formattedDrop.value?.minted || 0)
 </script>
 
 <template>
-  <NuxtLink v-if="shouldShowDrop" :to="`/${currentChain}/drops/${drop.alias}`" class="relative border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group">
-    <!-- Collectors on Hover -->
-    <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-95">
-      <div v-if="formattedDrop?.minted" class="bg-secondary backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-2">
-        <div class="flex items-center gap-2">
-          <div class="flex items-center gap-1">
-            <UIcon name="mdi:account-group" class="text-gray-600 dark:text-gray-400 text-sm" />
-            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Collected by</span>
-          </div>
+  <NuxtLink v-if="shouldShowDrop" :to="`/${currentChain}/drops/${drop.alias}`" class="relative shadow-xs border border-border rounded-xl overflow-hidden bg-background transition-all duration-300 hover:-translate-y-1 group">
+    <!-- Badge -->
+    <div class="absolute top-3 left-3 z-10">
+      <UBadge>
+        {{ badgeText }}
+      </UBadge>
+    </div>
+
+    <!-- Image Section -->
+    <div class="relative aspect-square">
+      <img :src="sanitizeIpfsUrl(drop.image)" :alt="drop.name" class="w-full h-full object-cover">
+
+      <!-- Collectors on Hover -->
+      <div class="absolute bottom-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-95">
+        <UButton v-if="formattedDrop?.minted" icon="mdi:account-group" size="sm">
+          <span>Collected by</span>
           <DropCollectedBy :chain="currentChain" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
-        </div>
+        </UButton>
       </div>
     </div>
 
-    <img :src="sanitizeIpfsUrl(drop.image)" :alt="drop.name" class="aspect-square w-full object-cover">
+    <!-- Content Section -->
+    <div class="p-4 md:p-5">
+      <!-- Title and Creator -->
+      <div class="mb-4">
+        <h3 class="font-bold text-lg md:text-xl mb-2 line-clamp-2 text-foreground">
+          {{ drop.name }}
+        </h3>
 
-    <div class="p-3 md:p-4">
-      <p class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
-        {{ drop.name }}
-      </p>
-
-      <div class="flex items-center justify-between mt-3">
-        <!-- Minting Progress -->
-        <div class="flex flex-col gap-1">
-          <div class="flex items-center gap-1 text-xs text-gray-500">
-            <span class="font-medium">Minted</span>
-          </div>
-          <div class="flex items-center gap-1 font-mono">
-            <span class="text-sm font-semibold text-[var(--text-color)]">{{ formattedDrop?.minted }}</span>
-            <span class="text-xs text-gray-400">/</span>
-            <UIcon v-if="isUnlimited" name="mdi:infinity" class="text-sm text-gray-600" />
-            <span v-else class="text-sm text-gray-600">{{ formattedDrop?.max }}</span>
-          </div>
-        </div>
-
-        <!-- Price Display -->
-        <div class="flex flex-col items-end gap-1">
-          <div class="text-xs text-gray-500 font-medium">
-            Price
-          </div>
-          <div class="text-right">
-            <div v-if="isTBA(formattedDrop?.price)" class="px-2 py-1 bg-gray-100 rounded-md">
-              <span class="text-xs font-medium text-gray-600">TBA</span>
-            </div>
-            <div v-else-if="Number(formattedDrop?.price)" class="flex items-baseline gap-1">
-              <span class="text-sm font-semibold text-[var(--text-color)]">{{ usdPrice }}</span>
-              <span class="text-xs text-gray-500">USD</span>
-            </div>
-            <div v-else class="px-2 py-1 bg-green-50 rounded-md">
-              <span class="text-xs font-medium text-green-600">Free</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Creator Section -->
-      <div v-if="drop.creator" class="mt-3 pt-3 border-t border-gray-100">
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-500 font-medium">Created by</span>
+        <!-- Creator Section -->
+        <div v-if="drop.creator" class="flex items-center gap-2 mb-3">
+          <span class="text-xs text-muted-foreground font-medium">Created by</span>
           <UserInfo :avatar-size="20" :address="drop.creator" :transparent-background="true" class="min-w-0" />
         </div>
       </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <!-- Price -->
+        <div class="bg-muted rounded-lg p-3">
+          <p class="text-xs text-muted-foreground mb-1 font-medium">
+            Price
+          </p>
+          <p class="text-lg font-bold text-neutral-900 dark:text-white">
+            {{ formattedPrice }}
+          </p>
+          <p v-if="formattedPriceUSD" class="text-xs text-neutral-500 dark:text-neutral-500">
+            {{ formattedPriceUSD }}
+          </p>
+        </div>
+
+        <!-- Supply -->
+        <div class="bg-muted rounded-lg p-3">
+          <p class="text-xs text-muted-foreground mb-1 font-medium">
+            Supply
+          </p>
+          <p class="text-lg font-bold text-neutral-900 dark:text-white">
+            <UIcon v-if="isUnlimited" name="mdi:infinity" class="text-lg text-neutral-600" />
+            <span v-else>{{ formattedDrop?.max || 'Unknown' }}</span>
+          </p>
+          <p class="text-xs text-neutral-500 dark:text-neutral-500">
+            Total Items
+          </p>
+        </div>
+      </div>
+
+      <!-- Minting Progress -->
+      <div class="mb-4">
+        <div class="flex justify-between text-xs text-muted-foreground mb-2">
+          <span>Minted: {{ minted }}</span>
+          <span>{{ formattedDrop?.max && !isUnlimited ? Math.round((minted / formattedDrop.max) * 100) : 0 }}%</span>
+        </div>
+        <UProgress v-model="minted" :max="formattedDrop?.max || 0" />
+      </div>
+
+      <!-- Action Button -->
+      <UButton
+        color="neutral"
+        :variant="formattedDrop?.status === 'minting_live' ? 'solid' : 'outline'"
+        class="w-full text-sm"
+        size="md"
+        block
+      >
+        {{ formattedDrop?.status === 'minting_live' ? 'Mint Now' : 'View Collection' }}
+      </UButton>
     </div>
   </NuxtLink>
 </template>

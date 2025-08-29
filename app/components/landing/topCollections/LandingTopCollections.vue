@@ -15,17 +15,27 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="py-16 md:pt-16 md:px-0">
-    <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 text-center md:text-left text-foreground">
-      {{ $t('collection.topCollections') }}
+  <section>
+    <div class="text-center mb-12">
+      <h2 class="text-3xl lg:text-4xl xl:text-5xl text-neutral-900 dark:text-white mb-6 leading-tight font-serif">
+        Top <span class="text-neutral-500 italic">Collections</span>
+      </h2>
+      <p class="text-lg text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto leading-relaxed">
+        Discover the most popular and trending NFT collections from our vibrant community of creators and collectors.
+      </p>
     </div>
     <div class="">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         <TopCollectionsCard v-for="(collection, i) in data" :key="i" :collection="collection" />
       </div>
       <div class="flex justify-center mt-6 md:mt-8">
-        <UButton :to="`/${prefix}/explore/collectibles`" class="rounded-full" variant="outline">
-          {{ $t('collection.viewMore') }}
+        <UButton
+          variant="outline"
+          color="neutral"
+          :to="`/${prefix}/explore/collectibles`"
+          class="px-8 py-2 rounded-full"
+        >
+          Explore Collections
         </UButton>
       </div>
     </div>

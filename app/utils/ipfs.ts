@@ -67,7 +67,7 @@ export function toOriginalContentUrl(baseurl: string) {
   return url.toString()
 }
 
-export function ipfsToCfImageUrl(ipfsUrl?: string, variant = 'public') {
+export function ipfsToCfImageUrl(ipfsUrl?: string, variant: 'detail' | 'public' | 'small' = 'public') {
   if (!ipfsUrl) {
     return ''
   }
