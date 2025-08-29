@@ -16,7 +16,7 @@ const { data: drops } = await useAsyncData('drops', () => getDrops({
 
 <template>
   <UContainer>
-    <h1 class="text-2xl md:text-4xl font-bold font-serif italic mb-6 md:mb-10 text-center md:text-left px-4 md:px-0">
+    <h1 class="text-2xl md:text-4xl font-medium font-serif italic mb-6 md:mb-10 text-center md:text-left px-4 md:px-0">
       {{ $t('drop.generativeArtDrops') }}
     </h1>
 
@@ -27,7 +27,7 @@ const { data: drops } = await useAsyncData('drops', () => getDrops({
     <div v-if="sortedMintedDrops.length">
       <hr class="my-14 border-gray-300">
 
-      <h1 class="text-2xl md:text-4xl font-bold font-serif italic mb-6 md:mb-10 text-center md:text-left px-4 md:px-0">
+      <h1 class="text-2xl md:text-4xl font-medium font-serif italic mb-6 md:mb-10 text-center md:text-left px-4 md:px-0">
         {{ $t('drop.pastDrops') }}
       </h1>
 

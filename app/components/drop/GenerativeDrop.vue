@@ -31,7 +31,7 @@ const dropStartRelativeTime = computed(() => {
             Polkadot
           </UBadge>
         </div>
-        <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center lg:text-left mb-6 lg:mb-0">
+        <h1 class="text-3xl md:text-4xl lg:text-6xl font-medium font-serif italic text-center lg:text-left mb-6 lg:mb-0">
           {{ drop.collectionName ?? '---' }}
         </h1>
 
@@ -41,7 +41,7 @@ const dropStartRelativeTime = computed(() => {
               Created By
             </p>
             <div class="flex justify-between items-center gap-1">
-              <div class="p-1 bg-gray-100 inline-block rounded-full">
+              <div class="p-1 bg-secondary inline-block rounded-full">
                 <UserInfo :avatar-size="40" :address="drop?.creator" />
               </div>
 
