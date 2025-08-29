@@ -115,9 +115,11 @@ const dropStartRelativeTime = computed(() => {
               <p class="font-serif font-medium text-2xl md:text-3xl italic">
                 {{ formattedTokenPrice }}
               </p>
-              <p class="text-sm text-gray-500">
-                {{ usdPrice }} USD
-              </p>
+              <div class="flex items-center gap-2 text-sm text-gray-500">
+                <span>{{ usdPrice }} USD</span>
+                <span class="font-medium text-muted-foreground">·</span>
+                <span class="font-medium text-foreground">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
+              </div>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-2 md:gap-4 w-full md:w-auto">
