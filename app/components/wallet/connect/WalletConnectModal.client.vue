@@ -163,7 +163,7 @@ whenever(
           }
         }
       }
-    })
+    }, { immediate: true, deep: true })
   },
   { once: true, immediate: true },
 )
