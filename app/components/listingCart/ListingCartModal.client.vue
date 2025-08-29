@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import { computedAsync } from '@vueuse/core'
 import { toNative } from '@/utils/format/balance'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
+import { getExistentialDeposit } from '~/utils/api/substrate'
 
 const { $i18n } = useNuxtApp()
 const { accountId } = useAuth()
@@ -9,11 +10,10 @@ const { listNfts } = useNftPallets()
 const listingCartStore = useListingCartStore()
 const { itemsInChain: items } = storeToRefs(listingCartStore)
 const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
-const actionCartTransfer = useActionCartTransfer()
 const actionCartStore = useActionCartStore()
-const { decimals, chainSymbol } = useChain()
+const { decimals, chainSymbol, currentChain } = useChain()
 const { open: isTransactionModalOpen } = useTransactionModal()
-
+const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: listingCartModalOpen })
 const listingFees = ref()
 
 const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
@@ -29,6 +29,7 @@ const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
 const isLoading = computed(() => (
   listingCartModalOpen.value
   && !items.value.length
+  && !isBalanceLoading.value
 ))
 
 const cartHasNFTsWithPrice = computed(() =>
@@ -57,7 +58,16 @@ const confirmButtonDisabled = computed(
   () => Boolean(listingCartStore.incompleteListPrices),
 )
 
+const hasEnoughFunds = computedAsync(async () => {
+  const existentialDeposit = await getExistentialDeposit(currentChain.value)
+  return (Number(balance.value) - Number(existentialDeposit)) > listingFees.value
+})
+
 const label = computed(() => {
+  if (!hasEnoughFunds.value) {
+    return $i18n.t('balance.insufficient')
+  }
+
   switch (listingCartStore.incompleteListPrices) {
     case 0:
       return showChangePriceModal.value
@@ -79,15 +89,12 @@ function getListParams() {
     nfts: items.value.map(item => ({
       id: item.id,
       sn: item.sn,
-      collection: {
-        id: item.collectionId,
-        name: item.collection.name,
-      },
+      collection: item.collection,
       price: toNative(item.listPrice || 0, decimals.value),
       metadata_uri: item.metadata_uri,
       metadata: item.metadata,
     })),
-    chain: 'ahp' as AssetHubChain, // TODO: list for the other chains
+    chain: currentChain.value,
   }
 }
 
@@ -109,20 +116,20 @@ function handleListNfts() {
 watchEffect(async () => {
   // TODO: debounce
   if (accountId.value) {
-    listingFees.value = Number(
-      await listNfts({
-        ...getListParams(),
-        type: 'estimate',
-      }),
-    )
+    try {
+      listingFees.value = Number(
+        await listNfts({
+          ...getListParams(),
+          type: 'estimate',
+        }),
+      )
+    }
+    catch {}
   }
 })
 
 useModalIsOpenTracker({
   isOpen: listingCartModalOpen,
-  onOpen: () => {
-    actionCartTransfer.transferToListingCart()
-  },
   onClose: () => {
     if (!isTransactionModalOpen.value) {
       listingCartStore.clearCartItems()
@@ -172,7 +179,7 @@ useModalIsOpenTracker({
 
       <div v-else>
         <div class="flex flex-col">
-          <div class="p-3 border rounded-full">
+          <div class="p-3 border border-border rounded-full">
             <UserInfo
               :address="accountId"
               :avatar-size="40"

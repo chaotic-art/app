@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import type { OdaToken } from '~/services/oda'
 
 const props = defineProps<{
   tokenId: number
@@ -8,11 +7,14 @@ const props = defineProps<{
   chain: AssetHubChain
   image?: string | null
   name?: string | null
+  price?: string | null
+  currentOwner?: string | null
 }>()
 
 const {
   token,
   owner,
+  collection,
   isLoading,
   error,
   mimeType,
@@ -22,47 +24,39 @@ const {
   nativePrice,
 } = useToken(props)
 
+const {
+  addToActionCart,
+  addToShoppingCart,
+  buyNow,
+  createActionCartItem,
+  isItemInActionCart,
+  isItemInShoppingCart,
+  isItemInCart,
+  canBuy,
+} = useCartActions({
+  tokenId: props.tokenId,
+  collectionId: props.collectionId,
+  chain: props.chain,
+  token,
+  collection,
+  owner,
+  price: nativePrice,
+  mimeType: computed(() => mimeType.value || ''),
+})
+
 const actionCartStore = useActionCartStore()
 const route = useRoute()
 const { isCurrentAccount } = useAuth()
 
-const id = computed(() => `${props.collectionId}-${props.tokenId}`)
-const isItemInActionCart = computed(() => actionCartStore.isItemInCart(id.value))
-const isItemInCart = computed(() => isItemInActionCart.value)
+const imageStatus = ref<'normal' | 'fallback'>('normal')
+const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
-const canAddToActionCart = computed(() => isProfileRoute.value && owner.value && isCurrentAccount(owner.value))
-
-function createActionCartItem({ token, owner }: { token: OdaToken, owner: string }): BaseActionCartItem {
-  return {
-    id: id.value,
-    sn: props.tokenId,
-    collectionId: props.collectionId,
-    name: token.metadata?.name || '',
-    chain: props.chain,
-    price: Number(nativePrice.value),
-    currentOwner: owner,
-    metadata: token.metadata!,
-    metadata_uri: token.metadata_uri || '',
-  }
-}
-
-function addToActionCart() {
-  if (!token.value || !owner.value) {
-    return
-  }
-
-  if (isItemInActionCart.value) {
-    actionCartStore.removeItem(id.value)
-  }
-  else {
-    actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value }))
-  }
-}
+const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
 
 watchEffect(() => {
-  if (token.value && owner.value && canAddToActionCart.value) {
-    actionCartStore.setOwnedItem(createActionCartItem({ token: token.value, owner: owner.value }))
+  if (token.value && dataOwner.value && canAddToActionCart.value) {
+    actionCartStore.setOwnedItem(createActionCartItem({ token: token.value, owner: dataOwner.value }))
   }
 })
 </script>
@@ -75,27 +69,8 @@ watchEffect(() => {
       'border-gray-300 dark:border-neutral-700': !isItemInCart,
     }"
   >
-    <!-- Loading State -->
-    <template v-if="isLoading">
-      <!-- Image Skeleton -->
-      <div class="aspect-square bg-gray-200 dark:bg-neutral-800 animate-pulse flex items-center justify-center">
-        <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
-      </div>
-
-      <!-- Content Skeleton -->
-      <div class="p-3 md:p-4 space-y-3">
-        <!-- Title Skeleton -->
-        <div class="h-4 bg-gray-200 dark:bg-neutral-800 rounded animate-pulse w-3/4" />
-
-        <!-- Price Skeleton -->
-        <div class="flex items-center justify-between">
-          <div class="h-3 bg-gray-100 dark:bg-neutral-700 rounded animate-pulse w-1/3" />
-        </div>
-      </div>
-    </template>
-
     <!-- Error State -->
-    <template v-else-if="error">
+    <template v-if="error">
       <div class="aspect-square bg-red-50 dark:bg-red-900 flex items-center justify-center">
         <UIcon name="i-heroicons-exclamation-triangle" class="w-16 h-16 text-red-400 dark:text-red-300" />
       </div>
@@ -131,11 +106,17 @@ watchEffect(() => {
             />
           </div>
           <img
-            v-else-if="image || token?.metadata?.image"
+            v-else-if="imageStatus === 'normal' && (image || token?.metadata?.image)"
             :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
             :alt="token?.metadata?.name || 'NFT'"
             class="w-full h-full object-contain"
-            @error="($event.target as HTMLImageElement).style.display = 'none'"
+            @error="imageStatus = 'fallback'"
+          >
+          <img
+            v-else-if="imageStatus === 'fallback' && collection?.metadata?.image"
+            :src="sanitizeIpfsUrl(collection?.metadata?.image)"
+            :alt="token?.metadata?.name || 'NFT'"
+            class="w-full h-full object-contain"
           >
           <div
             v-else
@@ -152,17 +133,28 @@ watchEffect(() => {
             <UIcon :name="mediaIcon" class="w-3 h-3 text-white" />
           </div>
 
-          <div v-if="canAddToActionCart" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
+          <div v-if="token && (canAddToActionCart || canBuy)" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
             <UButton
+              v-if="canAddToActionCart"
               :icon="isItemInActionCart ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
-              size="sm"
               variant="solid"
-              color="primary"
-              class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-xl border border-white/30 text-gray-900 dark:text-white"
               @click.prevent.stop="addToActionCart"
             >
               {{ isItemInActionCart ? 'Remove' : 'Select' }}
             </UButton>
+            <div v-else-if="canBuy" class="flex">
+              <UButton
+                class="rounded-r-none"
+                color="primary"
+                :label="$t('shoppingCart.buyNow')"
+                @click.prevent.stop="buyNow"
+              />
+              <UButton
+                class="rounded-l-none pr-3"
+                :icon="isItemInShoppingCart ? 'ic:outline-remove-shopping-cart' : 'ic:outline-shopping-cart'"
+                @click.prevent.stop="addToShoppingCart"
+              />
+            </div>
           </div>
         </div>
 
@@ -179,8 +171,11 @@ watchEffect(() => {
                 Price
               </div>
               <div class="text-right">
-                <div v-if="price" class="flex items-baseline gap-1">
-                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ price }}</span>
+                <div v-if="isLoading" class="flex items-baseline gap-1">
+                  <USkeleton class="h-4 w-16" />
+                </div>
+                <div v-else-if="price" class="flex items-baseline gap-1">
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ price }}</span>
                 </div>
                 <div v-else>
                   <span class="text-xs font-medium text-gray-600 dark:text-gray-300">No price set</span>
@@ -194,7 +189,10 @@ watchEffect(() => {
                 USD
               </div>
               <div class="text-right">
-                <div v-if="price" class="flex items-baseline gap-1">
+                <div v-if="isLoading" class="flex items-baseline gap-1">
+                  <USkeleton class="h-4 w-12" />
+                </div>
+                <div v-else-if="price" class="flex items-baseline gap-1">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ usdPrice || '$0.00' }}</span>
                 </div>
                 <div v-else>
@@ -209,8 +207,8 @@ watchEffect(() => {
             <div class="flex items-center gap-2">
               <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Owner</span>
               <UserInfo
-                v-if="owner"
-                :address="owner"
+                v-if="dataOwner"
+                :address="dataOwner || ''"
                 :avatar-size="20"
                 :transparent-background="true"
                 class="!p-0"

@@ -27,7 +27,9 @@ export const useSubWalletStore = defineStore('subWallet', () => {
   const isLoading = ref(false)
   const error = ref<Error | null>(null)
   const initialized = ref(false)
+  const injectionStatus = ref<'checking' | 'injected' | 'not-injected'>('checking')
 
+  const injected = computed(() => injectionStatus.value === 'injected')
   const enabledWallets = computed(() => wallets.value.filter(wallet => wallet.enabled))
 
   function init(): SubstrateWallet[] {
@@ -197,6 +199,8 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     isLoading,
     error,
     initialized,
+    injected,
+    injectionStatus,
 
     init,
     connectWallet,

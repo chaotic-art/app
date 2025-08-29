@@ -24,6 +24,9 @@ const collectionData = reactive({
 })
 
 const isLoadingData = ref(false)
+const imageStatus = ref<'normal' | 'placeholder'>('normal')
+
+const isPlaceholder = computed(() => imageStatus.value === 'placeholder' || !props.item.image)
 
 // temporary: fetch onchain data
 onMounted(async () => {
@@ -73,13 +76,14 @@ onMounted(async () => {
         <!-- Banner Background Image -->
         <div class="absolute inset-0">
           <img
-            v-if="item.image && !isLoading"
+            v-if="item.image && !isLoading && !isPlaceholder"
             :src="sanitizeIpfsUrl(item.image)"
             :alt="`${item.name} collection banner`"
             class="w-full h-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
-            @error="($event.target as HTMLImageElement).style.display = 'none'"
+            @error="imageStatus = 'placeholder'"
           >
+          <img v-else-if="isPlaceholder" src="/placeholder.jpg" alt="placeholder" class="w-full h-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-105">
           <!-- Gradient overlay -->
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         </div>
@@ -90,13 +94,14 @@ onMounted(async () => {
             <!-- Collection Thumbnail -->
             <div class="flex-shrink-0 w-16 h-16 rounded-xl bg-white dark:bg-neutral-800 shadow-lg p-1 border-2 border-white/20">
               <img
-                v-if="item.image && !isLoading"
+                v-if="item.image && !isLoading && !isPlaceholder"
                 :src="sanitizeIpfsUrl(item.image)"
                 :alt="`${item.name} collection`"
                 class="w-full h-full rounded-lg object-cover"
                 loading="lazy"
-                @error="($event.target as HTMLImageElement).style.display = 'none'"
+                @error="imageStatus = 'placeholder'"
               >
+              <img v-else-if="isPlaceholder" src="/placeholder.jpg" alt="placeholder" class="w-full h-full rounded-lg object-cover">
               <div
                 v-else
                 class="w-full h-full rounded-lg bg-gradient-to-br from-gray-100 dark:from-neutral-700 to-gray-200 dark:to-neutral-800 flex items-center justify-center"
@@ -154,7 +159,7 @@ onMounted(async () => {
               Floor
             </div>
             <div class="text-sm font-bold text-gray-900 dark:text-white">
-              <Money v-if="collectionData.floor" :value="collectionData.floor" :round="2" inline />
+              <Money v-if="collectionData.floor" :value="collectionData.floor" :round="2" inline class="truncate" />
               <span v-else class="text-gray-400 dark:text-gray-500">–</span>
             </div>
           </div>

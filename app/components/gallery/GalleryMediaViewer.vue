@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { OdaToken } from '~/services/oda'
+import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { useFullscreen } from '@vueuse/core'
 import { MediaType, resolveMedia } from '@/utils/gallery/media'
 
 interface Props {
   tokenData: OdaToken | null
+  collectionData: OnchainCollection | null
   mimeType?: string
   mediaIcon: string
   containerId: string
@@ -12,6 +13,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const imageStatus = ref<'normal' | 'fallback'>('normal')
 const fullScreenDisabled = ref(false)
 const mediaItemRef = ref<HTMLDivElement & { toggleFullscreen: () => void } | null>(null)
 const { toggle, isFullscreen, isSupported } = useFullscreen(mediaItemRef)
@@ -78,23 +80,27 @@ defineExpose({
       </div>
 
       <!-- Iframe Media -->
-      <iframe
+      <IframePreview
         v-else-if="tokenData?.metadata?.animation_url"
         :src="sanitizeIpfsUrl(tokenData?.metadata?.animation_url)"
         :alt="tokenData?.metadata?.name || 'NFT'"
-        class="aspect-square w-full"
         @error="($event.target as HTMLIFrameElement).style.display = 'none'"
       />
 
       <!-- Image Media -->
       <img
-        v-else-if="tokenData?.metadata?.image"
+        v-else-if="imageStatus === 'normal' && tokenData?.metadata?.image"
         :src="sanitizeIpfsUrl(tokenData?.metadata?.image)"
         :alt="tokenData?.metadata?.name || 'NFT'"
         class="aspect-square w-full object-contain"
-        @error="($event.target as HTMLImageElement).style.display = 'none'"
+        @error="imageStatus = 'fallback'"
       >
-
+      <img
+        v-else-if="imageStatus === 'fallback' && collectionData?.metadata?.image"
+        :src="sanitizeIpfsUrl(collectionData?.metadata?.image)"
+        :alt="tokenData?.metadata?.name || 'NFT'"
+        class="aspect-square w-full object-contain"
+      >
       <!-- Fallback -->
       <div
         v-else

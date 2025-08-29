@@ -176,6 +176,8 @@ function onTotalCountChange(slot: string, totalCount: number) {
         />
       </div>
 
+      <ProfileCuratedDrops :id="address" />
+
       <LazyProfileFollowModal
         :key="`${followersCount}-${followingCount}`"
         v-model="isFollowModalActive"

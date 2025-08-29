@@ -61,7 +61,7 @@ const isFinalized = computed(() => props.status === TransactionStatus.Finalized)
 
       <UButton
         variant="ghost"
-        size="md"
+        size="sm"
         @click="() => {
           copy()
           toast({ title: $t('general.copyToClipboard') })
@@ -69,7 +69,7 @@ const isFinalized = computed(() => props.status === TransactionStatus.Finalized)
       >
         <UIcon
           name="i-mdi:content-copy"
-          class="text-gray-500 cursor-pointer"
+          class="h-4 w-4  text-gray-500 cursor-pointer"
         />
       </UButton>
     </div>

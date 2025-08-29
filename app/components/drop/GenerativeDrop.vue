@@ -1,8 +1,20 @@
 <script setup lang="ts">
+import { formatDetailedTimeToNow } from '~/utils/format/time'
+
 const { drop, amountToMint } = storeToRefs(useDropStore())
 
 const { decimals, chainSymbol } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
+
+const dropStartRelativeTime = computed(() => {
+  if (drop.value?.dropStartTime) {
+    return formatDetailedTimeToNow(drop.value.dropStartTime)
+  }
+  if (drop.value?.start_at) {
+    return formatDetailedTimeToNow(drop.value.start_at)
+  }
+  return null
+})
 </script>
 
 <template>
@@ -41,6 +53,30 @@ const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() 
           <ClientOnly>
             <DropPreviewItem />
           </ClientOnly>
+        </div>
+
+        <!-- drop start at section -->
+        <div v-if="dropStartRelativeTime" class="mt-6 p-4 bg-muted rounded-lg border border-border">
+          <h3 class="text-lg font-semibold text-foreground mb-2">
+            Drop Start Time
+          </h3>
+          <div class="flex items-center gap-2 text-muted-foreground">
+            <UIcon name="i-heroicons-clock" class="w-4 h-4" />
+            <time
+              v-if="drop?.dropStartTime"
+              :datetime="drop.dropStartTime.toISOString()"
+              class="capitalize"
+            >
+              {{ dropStartRelativeTime }}
+            </time>
+            <time
+              v-else-if="drop?.start_at"
+              :datetime="drop.start_at"
+              class="capitalize"
+            >
+              {{ dropStartRelativeTime }}
+            </time>
+          </div>
         </div>
       </div>
 

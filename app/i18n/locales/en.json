@@ -75,7 +75,8 @@
     "follow": "Follow",
     "unfollow": "Unfollow",
     "following": "Following",
-    "unfollowing": "Unfollowing"
+    "unfollowing": "Unfollowing",
+    "followAll": "Follow all"
   },
   "profiles": {
     "created": "Profile Created",
@@ -148,9 +149,75 @@
     "bulkListingSuccessful": "Bulk Listing Successful"
   },
   "sharing": {
-    "dropNft": "I've minted {0} generative art piece on Chaotic!",
-    "dropNfts": "I've minted {0} generative art pieces on Chaotic!",
+    "dropNft": "I've minted {0} {1} generative art piece on Chaotic!",
+    "dropNfts": "I've minted {0} {1} generative art pieces on Chaotic!",
     "listedNft": "Check out this awesome NFT I just listed on Chaotic!",
-    "listedNfts": "Check out these awesome NFTs I just listed on Chaotic:\n {0}"
+    "listedNfts": "Check out these awesome NFTs I just listed on Chaotic:\n {0}",
+    "boughtNft": "Check out this awesome NFT I bought on Chaotic! | Check out these awesome NFTs I bought on Chaotic:\n {0}"
+  },
+  "shoppingCart": {
+    "completePurchase": "Complete Purchase",
+    "buyNow": "Buy Now",
+    "emptyTitle": "Your cart is a little empty",
+    "emptySubtitle": "Give it some company with cool NFTs from artists across multiple chains!",
+    "exploreNfts": "Explore Nfts",
+    "confirmPurchase": "Confirm Purchase",
+    "priceForNfts": "Price for NFT(s)",
+    "serviceCommission": "Service Commission (3%)",
+    "royalties": "Royalties",
+    "youWillPay": "You Will Pay"
+  },
+  "airdrop": {
+    "addressFormatWarning": "Oops! You have entered {addressChain} address. Enter {selectedChain} address to proceed with the transaction or allow us to change it for you.",
+    "addressValidation": "Address Validation",
+    "addressWrongNetworkError": "The network of the address does not match",
+    "addresses": "Addresses",
+    "airdropNfts": "Airdrop NFTs",
+    "back": "Back",
+    "confirmAndSend": "Confirm and Send",
+    "distribution": "Distribution",
+    "distributionMethod": "Distribution Method",
+    "duplicateAddressError": "Duplicate wallet address",
+    "emptyLineError": "Empty line",
+    "enterMultipleAddresses": "Enter multiple addresses separated by commas (address1, address2, address3)",
+    "enterOneWalletAddressPerLine": "Enter one wallet address per line",
+    "error": "Error",
+    "errorReadingCsvFile": "Error reading CSV file",
+    "errors": "Errors",
+    "fixErrorsFirst": "Fix errors first",
+    "incorrectAddresses": "NFTs sent to incorrect addresses cannot be recovered.",
+    "invalidAddressError": "Invalid wallet address format",
+    "line": "Line",
+    "max": "{0} of {1} max",
+    "modalTitle": "Review Airdrop",
+    "moreThanNftWarning": "Too Many Addresses",
+    "nftDistribution": "NFT Distribution",
+    "nfts": "NFTs",
+    "noAddressesEntered": "No addresses entered",
+    "notAssigned": "Not assigned",
+    "onePerAddress": "One NFT Per Address",
+    "onePerAddressDescription": "Each recipient gets exactly one NFT",
+    "onePerAddressLessWarning": "You've entered {0} addresses for {1} NFTs. With 'One NFT Per Address' distribution, only {2} NFTs will be used. The remaining {3} NFTs will stay in your wallet.",
+    "onePerAddressWarning": "Too many addresses ({0}) for your {1} NFTs. With 'One NFT Per Address', please remove {2} addresses or select more NFTs.",
+    "ownAddressError": "Your own address",
+    "random": "Random Distribution",
+    "randomDescription": "NFTs Randomly Assigned To Addresses",
+    "recipientAddresses": "Recipient Addresses",
+    "reviewAirdrop": "Review airdrop",
+    "selected": "Selected",
+    "selectedNfts": "Selected NFTs",
+    "template": "Template",
+    "title": "Airdrop",
+    "transferTo": "Airdrop to",
+    "upTo": "You can airdrop to up to {0} addresses",
+    "validAddresses": "Valid Addresses",
+    "wrongAddressFormatError": "Wrong address format"
+  },
+  "buyModal": {
+    "amountPurchaseSuccessfully": "{0} NFTs purchased successfully",
+    "purchaseSuccessful": "Purchase successful"
+  },
+  "balance": {
+    "insufficient": "Insufficient Balance"
   }
 }

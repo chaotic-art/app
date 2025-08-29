@@ -2,6 +2,8 @@
 definePageMeta({
   layout: 'full-width',
 })
+
+defineOgImageComponent('OgBase')
 </script>
 
 <template>

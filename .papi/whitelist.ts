@@ -11,6 +11,7 @@ const assetHubWhitelist: AhkWhitelistEntry[] | AhpWhitelistEntry[] = [
   'tx.Nfts.*',
   'tx.System.remark',
   'tx.Utility.*',
+  'tx.Balances.*',
   'const.*',
 ]
 

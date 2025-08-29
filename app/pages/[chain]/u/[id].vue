@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Prefix } from '@kodadot1/static'
 import { CHAINS } from '@kodadot1/static'
 import { encodeAddress } from 'dedot/utils'
 
@@ -24,13 +25,13 @@ useSeoMeta({
 })
 
 const route = useRoute()
+const { currentChain } = useChain()
 </script>
 
 <template>
   <UContainer class="px-4 md:px-6">
-    <ProfileDetail :address="String(route.params.id)" />
+    <ProfileDetail :address="getss58AddressByPrefix(String(route.params.id), currentChain as Prefix)" />
 
-    <ActionCart />
-    <ListingCartModal />
+    <LazyActionCart />
   </UContainer>
 </template>

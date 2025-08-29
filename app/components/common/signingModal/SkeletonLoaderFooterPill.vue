@@ -10,7 +10,7 @@ defineProps<{
       'min-w-[80px]': !fullWidth,
       'w-max': fullWidth,
     }"
-    class="absolute z-4 left-2/4 top-[90%] -translate-x-2/4 -translate-y-[90%] px-3 text-center rounded-full py-1 text-gray-500 text-xs"
+    class="absolute z-4 left-2/4 top-[90%] -translate-x-2/4 -translate-y-[90%] px-3 text-center rounded-full py-1 bg-background text-gray-500 text-xs"
   >
     <slot />
   </div>

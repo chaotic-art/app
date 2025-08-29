@@ -56,6 +56,8 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
           chain: endpoint,
           image: item.image,
           isPlaceholder: true,
+          price: null,
+          currentOwner: null,
         }
       }
 
@@ -64,6 +66,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
       const [collectionId, tokenId] = String(nft.id).split('-').map(Number)
 
       return {
+        ...nft,
         id: nft.id,
         name: nft.name || 'Untitled NFT',
         tokenId: tokenId || 0,

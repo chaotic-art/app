@@ -1,5 +1,7 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { $fetch } from 'ofetch'
 import { lastItemId } from '~/utils/api/substrate.nft-pallets'
+import { isProduction } from '~/utils/env'
 
 const BASE_URL = isProduction
   ? 'https://dyndata.koda.art'
