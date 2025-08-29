@@ -50,10 +50,6 @@ const label = computed(() => {
 })
 
 const enabled = computed(() => {
-  if (!isLogIn.value) {
-    return true
-  }
-
   if (drop.value?.isMintedOut) {
     return true
   }

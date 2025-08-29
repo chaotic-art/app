@@ -192,7 +192,7 @@ defineOgImageComponent('Frame', {
       <!-- Items Section -->
       <div class="space-y-6">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-          <h2 class="text-2xl md:text-3xl font-bold font-serif italic text-center md:text-left text-gray-900 dark:text-white">
+          <h2 class="text-2xl md:text-3xl font-medium font-serif italic text-center md:text-left text-gray-900 dark:text-white">
             Collection Items
           </h2>
 

@@ -19,18 +19,13 @@ const footerLinks: Array<
   //     { label: 'Artist Program', href: '#' },
   //   ],
   // },
-  // {
-  //   title: 'Chaotic',
-  //   type: 'links',
-  //   items: [
-  //     { label: 'Why Chaotic', href: '#' },
-  //     { label: 'FAQ', href: '#' },
-  //     { label: 'Tutorials', href: '#' },
-  //     { label: 'Blog', href: '#' },
-  //     { label: 'Privacy', href: '#' },
-  //     { label: 'Presskit', href: '#' },
-  //   ],
-  // },
+  {
+    title: 'Chaotic',
+    type: 'links',
+    items: [
+      { label: 'Presskit', href: 'https://github.com/chaotic-art/presskit' },
+    ],
+  },
   {
     title: 'Social',
     type: 'buttons',
@@ -60,15 +55,15 @@ const footerLinks: Array<
           </div>
 
           <!-- Footer Links -->
-          <div class="grid grid-cols-1 md:grid-cols-1 gap-8 md:gap-16 md:mr-12">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 md:mr-12">
             <template v-for="col in footerLinks" :key="col.title">
               <div class="text-center md:text-left">
                 <h3 class="text-xl md:text-2xl font-serif italic font-medium mb-3 md:mb-4 text-foreground" :class="col.title === 'Social' ? 'mr-4' : ''">
                   {{ col.title }}
                 </h3>
                 <ul v-if="col.type === 'links'" class="space-y-2">
-                  <li v-for="item in col.items" :key="item.label" class="text-muted-foreground hover:text-accent-foreground">
-                    <a :href="item.href">{{ item.label }}</a>
+                  <li v-for="item in col.items" :key="item.label">
+                    <a :href="item.href" target="_blank" class="text-muted-foreground hover:text-accent-foreground transition-colors">{{ item.label }}</a>
                   </li>
                 </ul>
                 <div v-else-if="col.type === 'buttons'" class="flex flex-col gap-2 items-center md:items-start">
