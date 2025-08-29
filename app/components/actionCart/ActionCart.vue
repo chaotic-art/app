@@ -6,6 +6,9 @@ const { onDisconnect } = useWalletManager()
 const actionCartStore = useActionCartStore()
 const listingCartStore = useListingCartStore()
 const preferencesStore = usePreferencesStore()
+const router = useRouter()
+const airdropStore = useAirdropStore()
+const { currentChain } = useChain()
 
 const isListingDisabled = ref(false) // Allow listing for all chains for now
 
@@ -26,6 +29,13 @@ function transferToListingCart() {
     })
   }
   catch { }
+}
+
+function onClickAirdrop() {
+  actionCartStore.itemsInChain.forEach((item) => {
+    airdropStore.setItem(item)
+  })
+  router.push(`/${currentChain.value}/airdrop`)
 }
 
 onDisconnect(actionCartStore.clear)
@@ -80,8 +90,23 @@ function openBurnModal() {
               @click="openBurnModal"
             >
               Burn
+              <UIcon
+                name="i-lucide-trash"
+              />
             </UButton>
+            <UButton
+              variant="outline"
+              :disabled="actionCartStore.count <= 1"
+              @click="onClickAirdrop"
+            >
+              Airdrop
+              <UIcon
+                name="i-lucide-gift"
+              />
+            </UButton>
+          </div>
 
+          <div class="flex gap-4">
             <UTooltip
               class="cursor-pointer"
               text="Unsupported Operation"
@@ -94,6 +119,9 @@ function openBurnModal() {
                 @click="preferencesStore.listingCartModalOpen = true"
               >
                 {{ $t('actionCart.listItem', { count: actionCartStore.count }) }}
+                <UIcon
+                  name="i-lucide-list"
+                />
               </UButton>
             </UTooltip>
           </div>
