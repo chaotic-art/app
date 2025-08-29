@@ -179,7 +179,7 @@ useModalIsOpenTracker({
 
       <div v-else>
         <div class="flex flex-col">
-          <div class="p-3 border rounded-full">
+          <div class="p-3 border border-border rounded-full">
             <UserInfo
               :address="accountId"
               :avatar-size="40"
