@@ -18,7 +18,7 @@ export function useToken(props: {
   const collectionCreator = ref<string | null>(null)
   const isLoading = ref(true)
   const error = ref<unknown | null>(null)
-  const mimeType = ref<string | null>('image/png')
+  const mimeType = ref('image/png')
 
   const { $sdk } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()
@@ -35,6 +35,7 @@ export function useToken(props: {
     const api = $sdk(props.chain).api
 
     try {
+      // TODO: add more oda data
       // Fetch token metadata, price, and owner in parallel
       const [tokenData, collectionData, priceData, ownerData, collectionConfig, collectionMetadata] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
