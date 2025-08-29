@@ -14,7 +14,7 @@ const queryVariables = computed(() =>
 
 <template>
   <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 md:mb-0">
-    <p class="text-2xl md:text-3xl font-bold font-serif italic text-center md:text-left">
+    <p class="text-2xl md:text-3xl font-medium font-serif italic text-center md:text-left">
       Latest NFT Mints
     </p>
 

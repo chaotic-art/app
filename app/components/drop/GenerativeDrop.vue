@@ -19,7 +19,7 @@ const dropStartRelativeTime = computed(() => {
 
 <template>
   <UContainer class="max-w-7xl px-4 md:px-6">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 pt-15">
       <!-- left side -->
       <div>
         <!-- badge section -->
@@ -31,17 +31,17 @@ const dropStartRelativeTime = computed(() => {
             Polkadot
           </UBadge>
         </div>
-        <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center lg:text-left mb-6 lg:mb-0">
+        <h1 class="text-3xl md:text-4xl lg:text-6xl font-medium font-serif italic text-center lg:text-left mb-6 lg:mb-0">
           {{ drop.collectionName ?? '---' }}
         </h1>
 
-        <div class="flex flex-col items-start md:flex-row md:items-center gap-4 justify-between my-6 lg:my-10">
+        <div class="flex flex-col items-start md:flex-row md:items-center gap-4 justify-between my-6 lg:my-8">
           <div v-if="drop.creator" class="flex flex-col gap-2">
             <p class="text-sm text-gray-500">
               Created By
             </p>
             <div class="flex justify-between items-center gap-1">
-              <div class="p-1 bg-gray-100 inline-block rounded-full">
+              <div class="p-1 bg-secondary inline-block rounded-full">
                 <UserInfo :avatar-size="40" :address="drop?.creator" />
               </div>
 
@@ -104,15 +104,15 @@ const dropStartRelativeTime = computed(() => {
         </ClientOnly>
 
         <!-- stats section -->
-        <div class="border p-3 md:p-4 rounded-2xl border-gray-100 mt-4">
+        <div class="border p-6 rounded-2xl border-border mt-4">
           <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div v-if="drop.isFree">
-              <p class="font-serif font-bold text-2xl md:text-3xl italic mx-2">
+              <p class="font-serif font-medium text-2xl md:text-3xl italic mx-2">
                 Free
               </p>
             </div>
             <div v-else class="text-center md:text-left">
-              <p class="font-serif font-bold text-2xl md:text-3xl italic">
+              <p class="font-serif font-medium text-2xl md:text-3xl italic">
                 {{ formattedTokenPrice }}
               </p>
               <p class="text-sm text-gray-500">

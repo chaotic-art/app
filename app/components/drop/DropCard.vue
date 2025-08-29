@@ -27,10 +27,10 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <NuxtLink v-if="shouldShowDrop" :to="`/${currentChain}/drops/${drop.alias}`" class="relative border rounded-xl border-gray-300 overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group">
+  <NuxtLink v-if="shouldShowDrop" :to="`/${currentChain}/drops/${drop.alias}`" class="relative border rounded-xl border-border overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group">
     <!-- Collectors on Hover -->
     <div class="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-100 scale-95">
-      <div v-if="formattedDrop?.minted" class="bg-secondary backdrop-blur-sm rounded-lg shadow-lg border border-white/20 p-2">
+      <div v-if="formattedDrop?.minted" class="bg-background/90 backdrop-blur-sm rounded-lg shadow-lg border border-border p-2">
         <div class="flex items-center gap-2">
           <div class="flex items-center gap-1">
             <UIcon name="mdi:account-group" class="text-gray-600 dark:text-gray-400 text-sm" />
@@ -68,22 +68,22 @@ onBeforeMount(async () => {
             Price
           </div>
           <div class="text-right">
-            <div v-if="isTBA(formattedDrop?.price)" class="px-2 py-1 bg-gray-100 rounded-md">
-              <span class="text-xs font-medium text-gray-600">TBA</span>
+            <div v-if="isTBA(formattedDrop?.price)" class="px-2 py-1 bg-muted rounded-md">
+              <span class="text-xs font-medium text-muted-foreground">TBA</span>
             </div>
             <div v-else-if="Number(formattedDrop?.price)" class="flex items-baseline gap-1">
               <span class="text-sm font-semibold text-[var(--text-color)]">{{ usdPrice }}</span>
               <span class="text-xs text-gray-500">USD</span>
             </div>
-            <div v-else class="px-2 py-1 bg-green-50 rounded-md">
-              <span class="text-xs font-medium text-green-600">Free</span>
+            <div v-else class="px-2 py-1 bg-green-50 dark:bg-green-950 rounded-md">
+              <span class="text-xs font-medium text-green-600 dark:text-green-400">Free</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Creator Section -->
-      <div v-if="drop.creator" class="mt-3 pt-3 border-t border-gray-100">
+      <div v-if="drop.creator" class="mt-3 pt-3 border-t border-border">
         <div class="flex items-center gap-2">
           <span class="text-xs text-gray-500 font-medium">Created by</span>
           <UserInfo :avatar-size="20" :address="drop.creator" :transparent-background="true" class="min-w-0" />
