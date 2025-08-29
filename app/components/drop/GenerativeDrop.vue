@@ -7,13 +7,26 @@ const { decimals, chainSymbol, currentChain } = useChain()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
 
 const dropStartRelativeTime = computed(() => {
+  let targetDate: Date | null = null
+
   if (drop.value?.dropStartTime) {
-    return formatDetailedTimeToNow(drop.value.dropStartTime)
+    targetDate = new Date(drop.value.dropStartTime)
   }
-  if (drop.value?.start_at) {
-    return formatDetailedTimeToNow(drop.value.start_at)
+  else if (drop.value?.start_at) {
+    targetDate = new Date(drop.value.start_at)
   }
-  return null
+
+  if (!targetDate) {
+    return null
+  }
+
+  // Don't show time if it's already in the past
+  const now = new Date()
+  if (targetDate.getTime() < now.getTime()) {
+    return null
+  }
+
+  return formatDetailedTimeToNow(targetDate)
 })
 </script>
 
