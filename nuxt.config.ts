@@ -2,6 +2,7 @@ import { createLogger } from 'vite'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  sourcemap: true,
   experimental: {
     appManifest: false,
   },
