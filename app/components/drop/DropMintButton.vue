@@ -82,7 +82,7 @@ function openMintModal() {
 }
 
 function handleMint() {
-  if (!drop.value || !enabled.value) {
+  if (!drop.value || enabled.value) {
     return
   }
 
