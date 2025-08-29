@@ -54,7 +54,7 @@ watch([accountId], () => {
 </script>
 
 <template>
-  <div class="border p-6 rounded-3xl border-gray-100">
+  <div class="border p-6 rounded-2xl border-border">
     <IframePreview
       :src="sanitizeIpfsUrl(generativeImageUrl)"
       sandbox="allow-scripts allow-same-origin allow-modals"

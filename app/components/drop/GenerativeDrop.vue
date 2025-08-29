@@ -19,7 +19,7 @@ const dropStartRelativeTime = computed(() => {
 
 <template>
   <UContainer class="max-w-7xl px-4 md:px-6">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 pt-15">
       <!-- left side -->
       <div>
         <!-- badge section -->
@@ -35,7 +35,7 @@ const dropStartRelativeTime = computed(() => {
           {{ drop.collectionName ?? '---' }}
         </h1>
 
-        <div class="flex flex-col items-start md:flex-row md:items-center gap-4 justify-between my-6 lg:my-10">
+        <div class="flex flex-col items-start md:flex-row md:items-center gap-4 justify-between my-6 lg:my-8">
           <div v-if="drop.creator" class="flex flex-col gap-2">
             <p class="text-sm text-gray-500">
               Created By
@@ -104,7 +104,7 @@ const dropStartRelativeTime = computed(() => {
         </ClientOnly>
 
         <!-- stats section -->
-        <div class="border p-6 rounded-3xl border-gray-100 mt-4">
+        <div class="border p-6 rounded-2xl border-border mt-4">
           <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div v-if="drop.isFree">
               <p class="font-serif font-medium text-2xl md:text-3xl italic mx-2">
