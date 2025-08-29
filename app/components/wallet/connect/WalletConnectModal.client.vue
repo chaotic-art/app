@@ -179,18 +179,6 @@ whenever(
   },
   { once: true, immediate: true },
 )
-
-const title = computed(() => {
-  if (stage.value === WalletStageTypes.Wallet) {
-    return t('wallet.selectWallet')
-  }
-  else if (stage.value === WalletStageTypes.Account) {
-    return t('wallet.selectAccount')
-  }
-  return ''
-})
-
-onMounted(init)
 </script>
 
 <template>
