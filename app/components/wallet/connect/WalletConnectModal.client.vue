@@ -143,13 +143,25 @@ const walletStates = computed<Record<string, WalletState>>(() => {
   }, {})
 })
 
+const title = computed(() => {
+  if (stage.value === WalletStageTypes.Wallet) {
+    return t('wallet.selectWallet')
+  }
+  else if (stage.value === WalletStageTypes.Account) {
+    return t('wallet.selectAccount')
+  }
+  return ''
+})
+
 whenever(
   () => subWalletStore.injected,
   () => {
+    init()
+
     // watch for unsyncedExtensions
     watch(walletStates, async (_, prevState) => {
       for (const wallet of wallets.value) {
-        if (wallet.state === WalletStates.Authorized && prevState[wallet.id] !== WalletStates.Authorized) {
+        if (wallet.state === WalletStates.Authorized && prevState?.[wallet.id] !== WalletStates.Authorized) {
           if (wallet.vm === 'SUB') {
             walletStore.updateWallet(wallet.id, { state: WalletStates.Connecting })
 
