@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
+import { whenever } from '@vueuse/core'
 import { formatEvmAccounts, formatSubAccounts } from '@/utils/wallet'
 import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
 
@@ -142,24 +143,30 @@ const walletStates = computed<Record<string, WalletState>>(() => {
   }, {})
 })
 
-// watch for unsyncedExtensions
-watch(walletStates, async (_, prevState) => {
-  for (const wallet of wallets.value) {
-    if (wallet.state === WalletStates.Authorized && prevState[wallet.id] !== WalletStates.Authorized) {
-      if (wallet.vm === 'SUB') {
-        walletStore.updateWallet(wallet.id, { state: WalletStates.Connecting })
+whenever(
+  () => subWalletStore.injected,
+  () => {
+    // watch for unsyncedExtensions
+    watch(walletStates, async (_, prevState) => {
+      for (const wallet of wallets.value) {
+        if (wallet.state === WalletStates.Authorized && prevState[wallet.id] !== WalletStates.Authorized) {
+          if (wallet.vm === 'SUB') {
+            walletStore.updateWallet(wallet.id, { state: WalletStates.Connecting })
 
-        if (!subWalletStore.isWalletInitialized(wallet.id)) {
-          await subWalletStore.connectWallet(wallet.source as SubstrateWalletSource)
+            if (!subWalletStore.isWalletInitialized(wallet.id)) {
+              await subWalletStore.connectWallet(wallet.source as SubstrateWalletSource)
+            }
+
+            subWalletStore.subscribeAccounts(wallet.id)
+
+            walletStore.updateWallet(wallet.id, { state: WalletStates.Connected })
+          }
         }
-
-        subWalletStore.subscribeAccounts(wallet.id)
-
-        walletStore.updateWallet(wallet.id, { state: WalletStates.Connected })
       }
-    }
-  }
-})
+    })
+  },
+  { once: true, immediate: true },
+)
 
 const title = computed(() => {
   if (stage.value === WalletStageTypes.Wallet) {
