@@ -1,17 +1,30 @@
+import type { SubstrateWalletSource } from '~/utils/wallet/substrate/types'
+import { isExtensionInstalled } from '~/utils/wallet/substrate'
+
 export default defineNuxtPlugin((nuxtApp) => {
   const subWalletStore = useSubWalletStore()
+  const { getInstalledWallets } = storeToRefs(useWalletStore())
   const { injectionStatus } = storeToRefs(subWalletStore)
+
+  const isInjectedWeb3FullyLoaded = () => {
+    const isFullyLoaded = getInstalledWallets.value
+      .filter(wallet => wallet.vm === 'SUB')
+      .map(wallet => isExtensionInstalled(wallet.source as SubstrateWalletSource))
+      .every(Boolean)
+
+    return Boolean(window.injectedWeb3) && isFullyLoaded
+  }
 
   const waitForInjection = async (timeout = 3000) => {
     return new Promise((resolve, reject) => {
-      if (window.injectedWeb3) {
+      if (isInjectedWeb3FullyLoaded()) {
         resolve(true)
         return
       }
 
       const startTime = Date.now()
       const checkInterval = setInterval(() => {
-        if (window.injectedWeb3) {
+        if (isInjectedWeb3FullyLoaded()) {
           clearInterval(checkInterval)
           resolve(true)
         }
