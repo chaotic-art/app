@@ -55,10 +55,8 @@ watch([accountId], () => {
 
 <template>
   <div class="border p-3 md:p-4 rounded-2xl border-gray-100">
-    <iframe
-      class="aspect-square w-full"
+    <IframePreview
       :src="sanitizeIpfsUrl(generativeImageUrl)"
-      frameborder="0"
       sandbox="allow-scripts allow-same-origin allow-modals"
       allow="accelerometer *; camera *; gyroscope *; microphone *; xr-spatial-tracking *;"
     />

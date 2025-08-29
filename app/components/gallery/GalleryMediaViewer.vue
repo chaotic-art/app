@@ -80,11 +80,10 @@ defineExpose({
       </div>
 
       <!-- Iframe Media -->
-      <iframe
+      <IframePreview
         v-else-if="tokenData?.metadata?.animation_url"
         :src="sanitizeIpfsUrl(tokenData?.metadata?.animation_url)"
         :alt="tokenData?.metadata?.name || 'NFT'"
-        class="aspect-square w-full"
         @error="($event.target as HTMLIFrameElement).style.display = 'none'"
       />
 
