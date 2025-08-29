@@ -88,9 +88,10 @@ interface AirdropNftsParams {
 
 export function useNftPallets() {
   const { $sdk } = useNuxtApp()
-  const { getConnectedSubAccount } = storeToRefs(useWalletStore())
-
   const { hash, error, status, result, open } = useTransactionModal()
+  const toast = useToast()
+
+  const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
   async function createCollection({
     chain,
@@ -578,16 +579,23 @@ export function useNftPallets() {
     await api.compatibilityToken
 
     const calls = []
+    const itemsToBurn = items.filter(item => !item.mimeType?.includes('html'))
 
-    for (const item of items) {
+    for (const item of itemsToBurn) {
       const _txBurn = api.tx.Nfts.burn({
         collection: item.collection.id,
         item: item.sn,
       })
 
-      if (!item.mimeType?.includes('html')) {
-        calls.push(_txBurn.decodedCall)
-      }
+      calls.push(_txBurn.decodedCall)
+    }
+
+    if (itemsToBurn.length === 0) {
+      toast.add({
+        title: 'No items to burn',
+        color: 'error',
+      })
+      return
     }
 
     const transaction = api.tx.Utility.batch_all({ calls })
@@ -610,7 +618,7 @@ export function useNftPallets() {
             type: 'burn',
             hash: hash.value,
             prefix: chain,
-            items: items.map(nft => ({
+            items: itemsToBurn.map(nft => ({
               id: nft.id,
               sn: nft.sn,
               price: 0,

@@ -20,6 +20,7 @@ function handleClick() {
     color="neutral"
     variant="ghost"
     size="sm"
+    class="size-10"
     :class="mobile ? 'w-full justify-start' : ''"
     @click="handleClick"
   >

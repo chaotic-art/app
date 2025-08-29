@@ -138,8 +138,6 @@ watchEffect(() => {
               v-if="canAddToActionCart"
               :icon="isItemInActionCart ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
               variant="solid"
-              color="primary"
-              class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-xl border border-white/30 text-gray-900 dark:text-white"
               @click.prevent.stop="addToActionCart"
             >
               {{ isItemInActionCart ? 'Remove' : 'Select' }}
