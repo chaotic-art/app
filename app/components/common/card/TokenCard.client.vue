@@ -41,6 +41,7 @@ const {
   collection,
   owner,
   price: nativePrice,
+  mimeType: computed(() => mimeType.value || ''),
 })
 
 const actionCartStore = useActionCartStore()
@@ -51,7 +52,7 @@ const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
-const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value))
+const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
@@ -137,8 +138,6 @@ watchEffect(() => {
               v-if="canAddToActionCart"
               :icon="isItemInActionCart ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
               variant="solid"
-              color="primary"
-              class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm shadow-xl border border-white/30 text-gray-900 dark:text-white"
               @click.prevent.stop="addToActionCart"
             >
               {{ isItemInActionCart ? 'Remove' : 'Select' }}

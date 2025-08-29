@@ -18,7 +18,7 @@ export function useToken(props: {
   const collectionCreator = ref<string | null>(null)
   const isLoading = ref(true)
   const error = ref<unknown | null>(null)
-  const mimeType = ref<string | null>(null)
+  const mimeType = ref<string | null>('image/png')
 
   const { $sdk } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()

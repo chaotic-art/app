@@ -11,9 +11,8 @@ export function useCart<T extends CartItem>({
 }: {
   items?: Ref<T[]>
 } = {}) {
-  const chain = useChain().currentChain
-  const decimals = useChain().decimals
-  const allItemsInChain = computed(() => items.value.filter(item => item.chain === chain.value))
+  const { currentChain, decimals } = useChain()
+  const allItemsInChain = computed(() => items.value.filter(item => item.chain === currentChain.value))
   const itemsInChain = computed(() => allItemsInChain.value.filter(item => !item.discarded))
   const count = computed(() => itemsInChain.value.length)
 
@@ -70,7 +69,7 @@ export function useCart<T extends CartItem>({
 
   return {
     items,
-    chain,
+    chain: currentChain.value,
     decimals,
     count,
     allItemsInChain,

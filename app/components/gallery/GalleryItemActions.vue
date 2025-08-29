@@ -46,10 +46,11 @@ const {
       <UButton
         size="lg"
         :icon="isItemInShoppingCart ? 'ic:outline-remove-shopping-cart' : 'ic:outline-shopping-cart'"
+        class="size-10"
         @click="addToShoppingCart"
       />
     </div>
-    <div v-else-if="canList" class="flex">
+    <div v-else-if="canList" class="flex gap-4">
       <UButton
         color="primary"
         size="lg"
