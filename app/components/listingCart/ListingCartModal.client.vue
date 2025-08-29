@@ -114,12 +114,15 @@ function handleListNfts() {
 watchEffect(async () => {
   // TODO: debounce
   if (accountId.value) {
-    listingFees.value = Number(
-      await listNfts({
-        ...getListParams(),
-        type: 'estimate',
-      }),
-    )
+    try {
+      listingFees.value = Number(
+        await listNfts({
+          ...getListParams(),
+          type: 'estimate',
+        }),
+      )
+    }
+    catch {}
   }
 })
 
