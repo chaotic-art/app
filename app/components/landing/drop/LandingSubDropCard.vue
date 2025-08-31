@@ -16,51 +16,69 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
 </script>
 
 <template>
-  <div class="flex rounded-xl h-auto md:h-[440px] overflow-hidden border border-border">
-    <div class="h-full relative rounded-xl overflow-hidden border border-border cursor-pointer aspect-square" @click="emit('click', drop)">
+  <div class="flex flex-col sm:flex-row rounded-xl h-auto md:h-[440px] overflow-hidden border border-border bg-card">
+    <!-- Image container with better mobile sizing -->
+    <div class="relative rounded-t-xl sm:rounded-l-xl sm:rounded-t-none overflow-hidden border-b sm:border-b-0 sm:border-r border-border cursor-pointer w-full sm:w-auto sm:aspect-square sm:h-full" @click="emit('click', drop)">
       <img
         :src="ipfsToCfImageUrl(drop?.banner)"
         :alt="drop?.name"
-        class="w-full h-full object-cover"
+        class="w-full h-48 sm:h-full object-cover"
       >
     </div>
-    <div class="p-4 md:p-6 flex flex-col justify-between flex-1">
-      <div class="flex flex-col gap-3 md:gap-4">
-        <div class="font-serif italic line-clamp-1 font-medium text-xl md:text-[40px] text-center md:text-left text-foreground">
+
+    <!-- Content container with improved mobile spacing -->
+    <div class="p-4 sm:p-6 flex flex-col justify-between flex-1 min-h-0">
+      <div class="flex flex-col gap-3 sm:gap-4">
+        <!-- Title with better mobile typography -->
+        <div class="font-serif italic line-clamp-2 sm:line-clamp-1 font-medium text-lg sm:text-xl md:text-[40px] text-left text-foreground leading-tight">
           {{ drop?.name }}
         </div>
-        <div class="flex flex-row justify-between flex-wrap items-center gap-2 md:gap-1 mb-1">
-          <UserInfo :address="drop?.creator" :avatar-size="30" class="h-[40px]" />
+
+        <!-- User info and follow button on one line -->
+        <div class="flex justify-between items-center gap-2 mb-2">
+          <UserInfo :address="drop?.creator" :avatar-size="30" class="h-[40px] flex-shrink-0" />
           <FollowButton
             :target="drop?.creator!"
+            class="flex-shrink-0"
           />
         </div>
-        <div class="text-muted-foreground max-w-full md:max-w-[300px] line-clamp-3 md:line-clamp-4">
+
+        <!-- Description with mobile-optimized line clamping -->
+        <div class="text-muted-foreground max-w-full md:max-w-[300px] line-clamp-2 sm:line-clamp-3 md:line-clamp-4 text-sm sm:text-base">
           <MarkdownPreview :source="drop?.collectionDescription || ''" />
         </div>
       </div>
 
-      <div class="flex flex-col gap-4 md:gap-6 mt-4 md:mt-2">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-0">
-          <div class="flex items-center gap-2 justify-center md:justify-start">
-            <span class="text-foreground">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
+      <!-- Bottom section with improved mobile layout -->
+      <div class="flex flex-col gap-4 sm:gap-6 mt-4 sm:mt-2">
+        <!-- Stats section with single line mobile layout -->
+        <div class="flex flex-wrap items-center justify-between gap-2 text-sm sm:text-base">
+          <div class="flex items-center gap-2">
+            <span class="text-foreground whitespace-nowrap">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
             <span class="font-bold text-muted-foreground">·</span>
-            <span class="text-foreground">{{ usdPrice }} USD</span>
-          </div>
-
-          <div v-if="drop?.chain" class="flex items-center gap-1 justify-center md:justify-end">
-            <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4" :alt="drop.chain">
-            <div class="capitalize text-foreground">
-              {{ chainSpec[drop.chain].tokenSymbol }}
-            </div>
+            <span class="text-foreground whitespace-nowrap">{{ usdPrice }} USD</span>
+            <template v-if="drop?.chain">
+              <span class="font-bold text-muted-foreground">·</span>
+              <div class="flex items-center gap-1">
+                <img v-if="chainIcon" :src="chainIcon" class="w-4 h-4 flex-shrink-0" :alt="drop.chain">
+                <div class="capitalize text-foreground">
+                  {{ chainSpec[drop.chain].tokenSymbol }}
+                </div>
+              </div>
+            </template>
           </div>
         </div>
 
-        <div class="flex flex-col items-center md:flex-row gap-3 md:gap-1 md:justify-between">
-          <div class="text-muted-foreground text-center md:text-left">
+        <!-- Action section with mobile-friendly button -->
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-1 sm:justify-between sm:items-center">
+          <div class="hidden sm:block text-muted-foreground text-left text-sm sm:text-base">
             {{ drop?.start_at ? formatToNow(parseCETDate(drop.start_at || '')) : 'N/A' }}
           </div>
-          <DropMintButton class="w-fit md:w-auto" :drop="drop" size="sm" />
+          <DropMintButton
+            class="w-full sm:w-fit"
+            :drop="drop"
+            size="sm"
+          />
         </div>
       </div>
     </div>
