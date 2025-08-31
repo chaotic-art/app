@@ -12,6 +12,7 @@ definePageMeta({
 const {
   state,
   mediaFile,
+  coverImage,
   blockchains,
   collections,
   collectionsLoading,
@@ -103,6 +104,26 @@ watchDebounced(
                   icon="i-heroicons-photo"
                   label="Drop your media here"
                   description="PNG, JPG, GIF, SVG, MP4, MP3, GLB, GLTF (max. 50MB)"
+                  color="neutral"
+                  class="size-80 mx-auto"
+                />
+              </UFormField>
+            </div>
+
+            <!-- Cover Image (only for non-image media) -->
+            <div v-if="mediaFile && !mediaFile.type.startsWith('image/')" class="w-full">
+              <UFormField
+                name="coverImage"
+                label="Cover Image"
+                required
+                help="Required when media is video, audio, or 3D model"
+              >
+                <UFileUpload
+                  v-model="coverImage"
+                  accept="image/*"
+                  icon="i-heroicons-photo"
+                  label="Upload a cover image"
+                  description="PNG, JPG, GIF, SVG (max. 20MB)"
                   color="neutral"
                   class="size-80 mx-auto"
                 />

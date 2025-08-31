@@ -100,6 +100,7 @@ export function useNftForm() {
 
   // File upload state
   const mediaFile = ref<File | null>(null)
+  const coverImage = ref<File | null>(null)
 
   // Property management
   function addProperty() {
@@ -147,6 +148,22 @@ export function useNftForm() {
       }
     }
 
+    // Cover image validation (required for non-image media)
+    if (mediaFile.value && !mediaFile.value.type.startsWith('image/')) {
+      if (!coverImage.value) {
+        errors.push({ name: 'coverImage', message: 'Cover image is required for non-image media' })
+      }
+      else {
+        const maxCoverSize = 20 * 1024 * 1024 // 20MB
+        if (coverImage.value.size > maxCoverSize) {
+          errors.push({ name: 'coverImage', message: 'Cover image size must be less than 20MB' })
+        }
+        if (!coverImage.value.type.startsWith('image/')) {
+          errors.push({ name: 'coverImage', message: 'Cover must be an image file' })
+        }
+      }
+    }
+
     // Properties validation (only if filled)
     state.properties.forEach((prop: Property, index: number) => {
       if (prop.trait.trim() && !prop.value.trim()) {
@@ -182,7 +199,15 @@ export function useNftForm() {
 
     // Upload media file to IPFS
     const cidMedia = await pinDirectory([mediaFile.value!])
-    const image = `ipfs://${cidMedia}`
+    const isImageMedia = mediaFile.value?.type.startsWith('image/')
+    let image = `ipfs://${cidMedia}`
+    let animationUrl: string | undefined
+
+    if (!isImageMedia) {
+      const cidCover = await pinDirectory([coverImage.value!])
+      image = `ipfs://${cidCover}`
+      animationUrl = `ipfs://${cidMedia}`
+    }
 
     // Prepare NFT metadata
     const metadata: any = {
@@ -190,6 +215,9 @@ export function useNftForm() {
       description: formData.description,
       image,
       external_url: 'https://chaotic.art',
+    }
+    if (animationUrl) {
+      metadata.animation_url = animationUrl
     }
 
     // Add properties as attributes if they exist
@@ -235,6 +263,15 @@ export function useNftForm() {
   // Combined function to handle both fee estimation and NFT creation
   async function handleNftOperation(formData: typeof state, type: 'estimate' | 'submit') {
     if (!isWalletConnected.value || !mediaFile.value || !formData.collection || !formData.name || !formData.description) {
+      if (type === 'estimate') {
+        balance.estimatedFee = 0n
+        balance.estimatedFeeFormatted = '0'
+      }
+      return
+    }
+
+    // For non-image media, require a cover image before proceeding
+    if (mediaFile.value && !mediaFile.value.type.startsWith('image/') && !coverImage.value) {
       if (type === 'estimate') {
         balance.estimatedFee = 0n
         balance.estimatedFeeFormatted = '0'
@@ -305,7 +342,9 @@ export function useNftForm() {
         title: 'Create NFT',
         items: Array.from({ length: event.data.supply }, () => ({
           name: event.data.name,
-          image: mediaFile.value ? URL.createObjectURL(mediaFile.value) : '',
+          image: mediaFile.value?.type.startsWith('image/')
+            ? (mediaFile.value ? URL.createObjectURL(mediaFile.value) : '')
+            : (coverImage.value ? URL.createObjectURL(coverImage.value) : ''),
         })),
       })
 
@@ -342,6 +381,7 @@ export function useNftForm() {
     // State
     state,
     mediaFile,
+    coverImage,
     blockchains,
     collections,
     collectionsLoading,
