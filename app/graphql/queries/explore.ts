@@ -15,6 +15,7 @@ export const exploreCollections = graphql(`
         currentOwner
         blockNumber
         name
+        floor
         meta {
             image
             banner
