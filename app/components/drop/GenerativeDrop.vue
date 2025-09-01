@@ -131,7 +131,12 @@ const dropStartRelativeTime = computed(() => {
               <div class="flex items-center gap-2 text-sm text-gray-500">
                 <span>{{ usdPrice }} USD</span>
                 <span class="font-medium text-muted-foreground">·</span>
-                <span class="font-medium text-foreground">{{ drop?.minted }}/{{ drop?.max }} {{ $t('drop.minted') }}</span>
+                <span class="font-medium text-foreground flex items-center">{{ drop?.minted }}/
+                  <UIcon v-if="drop?.max && drop?.max >= Number.MAX_SAFE_INTEGER" name="mdi:infinity" class="w-4 h-4" />
+                  <span v-else>{{ drop?.max }}</span>
+
+                  <span class="ml-1">{{ $t('drop.minted') }}</span>
+                </span>
               </div>
             </div>
 
