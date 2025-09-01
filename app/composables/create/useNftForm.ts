@@ -4,6 +4,7 @@ import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
+import { toNative } from '~/utils/format/balance'
 import { blockchains } from './useCollectionForm'
 
 interface Property {
@@ -293,6 +294,7 @@ export function useNftForm() {
         metadataUri: metadataUris,
         supply: formData.supply,
         properties: validProperties,
+        price: formData.listDirectly ? toNative(formData.price, chainSpec[state.blockchain].tokenDecimals) : undefined,
         context,
       })
 

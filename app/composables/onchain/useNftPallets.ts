@@ -38,6 +38,7 @@ interface CreateNftParams {
   metadataUri: string | string[]
   supply: number
   properties: Property[]
+  price?: number
   context: {
     name: string
     description: string
@@ -254,6 +255,7 @@ export function useNftPallets() {
     metadataUri,
     supply,
     properties,
+    price,
     context: nftData,
   }: CreateNftParams) {
     const { signer, address } = await getAccountSigner()
@@ -298,6 +300,17 @@ export function useNftPallets() {
       })
 
       calls.push(_txMint.decodedCall, _txItemMetadata.decodedCall)
+
+      // Set price if provided
+      if (price !== undefined) {
+        const _txSetPrice = api.tx.Nfts.set_price({
+          collection: collectionId,
+          item: nextItemId + i,
+          price: BigInt(price),
+          whitelisted_buyer: undefined,
+        })
+        calls.push(_txSetPrice.decodedCall)
+      }
 
       // Add properties as attributes
       properties.forEach((property) => {
