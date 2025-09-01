@@ -160,8 +160,14 @@ onClickOutside(searchDropdownRef, () => {
       v-model="searchQuery"
       placeholder="Search collections, NFTs, users..."
       icon="i-heroicons-magnifying-glass"
-      class="w-64 lg:w-100 transition-all duration-200 ease-in-out hover:shadow-md focus-within:shadow-lg"
-      size="sm"
+      class="w-full rounded-full lg:w-60 lg:focus-within:w-100 overflow-hidden transition-all duration-200 ease-in-out hover:shadow-md focus-within:shadow-lg"
+      :class="{
+        'lg:w-100': showSuggestions,
+      }"
+      :ui="{
+        base: 'rounded-full',
+      }"
+      size="lg"
       @focus="showSuggestions = true"
     />
 
@@ -169,7 +175,7 @@ onClickOutside(searchDropdownRef, () => {
     <div
       v-if="showSuggestions && searchQuery"
       ref="searchDropdownRef"
-      class="absolute w-100 top-full left-0 right-0 mt-3 bg-background/95 backdrop-blur-sm border border-border/50 rounded-xl shadow-2xl z-50 overflow-hidden"
+      class="absolute w-full top-full left-0 right-0 mt-3 bg-background/95 backdrop-blur-sm border border-border/50 rounded-xl shadow-2xl z-50 overflow-hidden"
     >
       <!-- Search Tabs -->
       <div class="flex border-b border-border/20 bg-muted/30">
