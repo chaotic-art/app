@@ -49,6 +49,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
       collection: {
         id: collectionId,
         name: collection.value?.metadata?.name || '',
+        floor: Number(collection.value?.floor) || 0,
       },
     }
   }
@@ -98,7 +99,6 @@ export function useCartActions({ collection, price, chain, owner, token, collect
       ...baseCartItem,
       collection: {
         ...baseCartItem.collection,
-        floor: undefined, // TODO
       },
     }
   }

@@ -23,7 +23,6 @@ function transferToListingCart() {
         ...item,
         collection: {
           ...item.collection,
-          floor: undefined,
         },
       })
     })
