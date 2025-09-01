@@ -37,13 +37,14 @@ export function useToken(props: {
     try {
       // TODO: add more oda data
       // Fetch token metadata, price, and owner in parallel
-      const [tokenData, collectionData, priceData, ownerData, collectionConfig, collectionMetadata] = await Promise.all([
+      const [tokenData, collectionData, priceData, ownerData, collectionConfig, collectionMetadata, collectionFloor] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
         fetchOdaCollection(props.chain, props.collectionId.toString()),
         api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId).catch(() => null),
         api.query.Nfts.Item.getValue(props.collectionId, props.tokenId).catch(() => null),
         api.query.Nfts.Collection.getValue(props.collectionId).catch(() => null),
         api.query.Nfts.CollectionMetadataOf.getValue(props.collectionId).catch(() => null),
+        api.query.Nfts.ItemPriceOf.getEntries(Number(props.collectionId)).catch(() => null),
       ])
 
       token.value = tokenData
@@ -51,6 +52,13 @@ export function useToken(props: {
       queryPrice.value = priceData?.[0] || null
       owner.value = ownerData?.owner || null
       collectionCreator.value = collectionConfig?.owner || null
+
+      if (collectionFloor?.length) {
+        const floorValues = collectionFloor
+          .filter(item => Number(item.value[0]) > 0)
+          .map(item => Number(item.value[0]))
+        collection.value.floor = Math.min(...floorValues)
+      }
 
       if (!tokenData.metadata && collectionData?.metadata) {
         // fallback to collection metadata

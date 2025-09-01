@@ -16,6 +16,7 @@ export interface OnchainCollection {
   supply?: string
   claimed?: string
   owner?: string
+  floor?: number
 }
 
 export function fetchOdaCollection(chain: AssetHubChain, address: string) {

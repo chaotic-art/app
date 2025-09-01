@@ -1,19 +1,15 @@
 <script setup lang="ts">
-import { DEFAULT_FLOOR_PRICE_RATE } from '@/stores/listingCart'
-
 defineProps<{
   showCollectionFloorPrice?: boolean
 }>()
 
-const rate = ref(DEFAULT_FLOOR_PRICE_RATE)
+const rate = ref(0)
 
 const listingCartStore = useListingCartStore()
 
 const isDisabled = computed(
   () =>
-    !listingCartStore.itemsInChain
-      .map(item => item.collection.floor || 0)
-      .some(Boolean),
+    !listingCartStore.isFloorPriceExisting,
 )
 
 watch(rate, rate => listingCartStore.setFloorPrice(rate))

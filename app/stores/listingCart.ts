@@ -34,6 +34,13 @@ export const useListingCartStore = defineStore('listingCart', () => {
     itemsInChain.value.filter(item => !item.listPrice).length,
   )
 
+  const isFloorPriceExisting = computed(
+    () =>
+      itemsInChain.value
+        .map(item => item.collection.floor || 0)
+        .some(Boolean),
+  )
+
   function clearCartItems() {
     clearItems()
   }
@@ -81,6 +88,7 @@ export const useListingCartStore = defineStore('listingCart', () => {
 
     // Listing-specific additions
     incompleteListPrices,
+    isFloorPriceExisting,
     setItemPrice,
     setFixedPrice,
     setFloorPrice,
