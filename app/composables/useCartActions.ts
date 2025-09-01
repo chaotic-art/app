@@ -1,5 +1,6 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import { LazyBurnModal } from '#components'
 
 interface UseCartActionsParams {
   tokenId: number
@@ -9,9 +10,10 @@ interface UseCartActionsParams {
   owner: Ref<string | null>
   price: Ref<bigint | null>
   chain: AssetHubChain
+  mimeType?: ComputedRef<string>
 }
 
-export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId }: UseCartActionsParams) {
+export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId, mimeType }: UseCartActionsParams) {
   const { isCurrentAccount } = useAuth()
 
   const actionCartStore = useActionCartStore()
@@ -28,8 +30,12 @@ export function useCartActions({ collection, price, chain, owner, token, collect
 
   const canBuy = computed(() => Boolean(price.value) && Boolean(owner.value && !isCurrentAccount(owner.value)))
   const canList = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)))
+  const canBurn = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)) && !mimeType?.value?.includes('html'))
 
-  function createActionCartItem({ token, owner }: { token: OdaToken, owner: string }): BaseActionCartItem {
+  const overlay = useOverlay()
+  const burnModal = overlay.create(LazyBurnModal)
+
+  function createActionCartItem({ token, owner, mimeType }: { token: OdaToken, owner: string, mimeType?: string }): BaseActionCartItem {
     return {
       id: id.value,
       sn: tokenId,
@@ -37,6 +43,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
       chain,
       price: Number(price.value),
       currentOwner: owner,
+      mimeType,
       metadata: token.metadata!,
       metadata_uri: token.metadata_uri || '',
       collection: {
@@ -55,7 +62,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
       actionCartStore.removeItem(id.value)
     }
     else {
-      actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value }))
+      actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value, mimeType: mimeType?.value || '' }))
     }
   }
 
@@ -105,12 +112,24 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     listingCartModalOpen.value = true
   }
 
+  function burnNow() {
+    if (!token.value || !owner.value) {
+      return
+    }
+
+    if (canBurn.value) {
+      actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value, mimeType: mimeType?.value || '' }))
+      burnModal.open()
+    }
+  }
+
   return {
     // actions
     addToActionCart,
     addToShoppingCart,
     buyNow,
     listNow,
+    burnNow,
     createActionCartItem,
 
     // computed
@@ -119,5 +138,6 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     isItemInCart,
     canBuy,
     canList,
+    canBurn,
   }
 }

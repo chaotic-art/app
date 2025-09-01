@@ -2,7 +2,7 @@
 import type { ItemMedia } from '@/components/common/successfulModal/SuccessfulItemsMedia.vue'
 
 const props = defineProps<{
-  result: BuyTransactionResult
+  result: ActionTransactionResult
   status: TransactionStatus
 }>()
 
@@ -52,12 +52,23 @@ function handleViewNft() {
   window.open(shareUrl.value, '_blank')
 }
 
-const actionButtons = computed(() => ({
-  primary: {
-    label: $i18n.t('general.viewNft', items.value.length),
-    onClick: handleViewNft,
-  },
-}))
+const actionButtons = computed(() => {
+  if (props.result.type === 'burn') {
+    return {
+      primary: {
+        label: 'Done',
+        onClick: () => {},
+      },
+    }
+  }
+
+  return {
+    primary: {
+      label: $i18n.t('general.viewNft', items.value.length),
+      onClick: handleViewNft,
+    },
+  }
+})
 </script>
 
 <template>
@@ -70,8 +81,8 @@ const actionButtons = computed(() => ({
     <SuccessfulItemsMedia
       :items="items"
       :header="{
-        single: $t('buyModal.purchaseSuccessful'),
-        multiple: $t('buyModal.amountPurchaseSuccessfully'),
+        single: result.type === 'buy' ? $t('buyModal.purchaseSuccessful') : 'NFT Burned',
+        multiple: result.type === 'buy' ? $t('buyModal.amountPurchaseSuccessfully') : 'NFTs Burned',
       }"
     />
   </SuccessfulModalBody>

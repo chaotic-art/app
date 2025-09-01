@@ -9,26 +9,21 @@ interface FooterLinkItem {
 const footerLinks: Array<
   { title: string, type: 'links' | 'buttons', items: FooterLinkItem[] }
 > = [
-  {
-    title: 'Incentives',
-    type: 'links',
-    items: [
-      { label: 'Developers', href: '#' },
-      { label: 'FAQ', href: '#' },
-      { label: 'Referral Program', href: '#' },
-      { label: 'Artist Program', href: '#' },
-    ],
-  },
+  // {
+  //   title: 'Incentives',
+  //   type: 'links',
+  //   items: [
+  //     { label: 'Developers', href: '#' },
+  //     { label: 'FAQ', href: '#' },
+  //     { label: 'Referral Program', href: '#' },
+  //     { label: 'Artist Program', href: '#' },
+  //   ],
+  // },
   {
     title: 'Chaotic',
     type: 'links',
     items: [
-      { label: 'Why Chaotic', href: '#' },
-      { label: 'FAQ', href: '#' },
-      { label: 'Tutorials', href: '#' },
-      { label: 'Blog', href: '#' },
-      { label: 'Privacy', href: '#' },
-      { label: 'Presskit', href: '#' },
+      { label: 'Presskit', href: 'https://github.com/chaotic-art/presskit' },
     ],
   },
   {
@@ -55,20 +50,20 @@ const footerLinks: Array<
               {{ $t('footer.becomeArtist') }}
             </div>
             <div class="flex justify-center md:justify-start">
-              <UButton :label="$t('footer.getInTouch')" class="rounded-full px-6 md:px-4" />
+              <UButton :label="$t('footer.getInTouch')" class="rounded-full px-6 md:px-4" target="_blank" href="https://t.me/+A3xwht0aOIMxMjQ0" />
             </div>
           </div>
 
           <!-- Footer Links -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-16">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 md:mr-12">
             <template v-for="col in footerLinks" :key="col.title">
               <div class="text-center md:text-left">
                 <h3 class="text-xl md:text-2xl font-serif italic font-medium mb-3 md:mb-4 text-foreground" :class="col.title === 'Social' ? 'mr-4' : ''">
                   {{ col.title }}
                 </h3>
                 <ul v-if="col.type === 'links'" class="space-y-2">
-                  <li v-for="item in col.items" :key="item.label" class="text-muted-foreground hover:text-accent-foreground">
-                    <a :href="item.href">{{ item.label }}</a>
+                  <li v-for="item in col.items" :key="item.label">
+                    <a :href="item.href" target="_blank" class="text-muted-foreground hover:text-accent-foreground transition-colors">{{ item.label }}</a>
                   </li>
                 </ul>
                 <div v-else-if="col.type === 'buttons'" class="flex flex-col gap-2 items-center md:items-start">

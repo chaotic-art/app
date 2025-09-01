@@ -29,7 +29,7 @@ function handleTypeChange(type: string) {
   <div class="space-y-8">
     <!-- Header -->
     <div class="space-y-6">
-      <h1 class="text-3xl md:text-4xl lg:text-6xl font-bold font-serif italic text-center md:text-left text-gray-900 dark:text-white">
+      <h1 class="text-3xl md:text-4xl lg:text-6xl font-medium font-serif italic text-center md:text-left text-gray-900 dark:text-white">
         Explore
       </h1>
     </div>

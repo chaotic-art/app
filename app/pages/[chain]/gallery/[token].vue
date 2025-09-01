@@ -14,7 +14,6 @@ const safeTokenId = computed(() => tokenId?.toString() ?? '')
 const {
   owner,
   collectionCreator,
-  isLoading,
   error,
   mimeType,
   nativePrice: price,
@@ -29,8 +28,7 @@ const {
   chain: chainPrefix.value,
 })
 
-// for opengraph purposes
-const { data: item } = useLazyAsyncData(
+const { data: item, status } = useLazyAsyncData(
   `token:${chainPrefix.value}:${tokenId}`,
   async () => {
     const item = await fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value)
@@ -42,7 +40,7 @@ const { data: item } = useLazyAsyncData(
         ...data,
         metadata: {
           ...data.metadata,
-          image: ipfsToCfImageUrl(data?.metadata?.image ?? '', 'small'),
+          image: sanitizeIpfsUrl(data?.metadata?.image ?? ''),
         },
       }
     },
@@ -60,7 +58,7 @@ useSeoMeta({
   <div>
     <UContainer class="px-4 md:px-6">
       <!-- Loading State -->
-      <GalleryLoadingState v-if="isLoading" />
+      <GalleryLoadingState v-if="status !== 'success'" />
 
       <!-- Error State -->
       <GalleryErrorState v-else-if="error" />
@@ -71,7 +69,7 @@ useSeoMeta({
           <!-- Media Section -->
           <div class="order-2 lg:order-1">
             <GalleryMediaViewer
-              :token-data="tokenData"
+              :token-data="item || tokenData"
               :collection-data="collection"
               :mime-type="mimeType || undefined"
               :media-icon="mediaIcon"
@@ -82,7 +80,7 @@ useSeoMeta({
           <!-- Details Section -->
           <div class="order-1 lg:order-2">
             <GalleryDetails
-              :token-data="tokenData"
+              :token-data="item || tokenData"
               :collection="collection"
               :chain="chainPrefix"
               :collection-id="safeCollectionId"
@@ -92,6 +90,7 @@ useSeoMeta({
               :formatted-price="formattedPrice || undefined"
               :usd-price="usdPrice"
               :price="price"
+              :mime-type="mimeType"
             />
             <GalleryItemActions
               class="mt-6"

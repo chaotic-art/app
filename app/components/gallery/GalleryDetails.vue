@@ -16,6 +16,7 @@ interface Props {
   price: bigint | null
   formattedPrice?: string
   usdPrice?: string
+  mimeType: string
 }
 
 const props = defineProps<Props>()
@@ -73,6 +74,18 @@ async function handleRefreshMetadata() {
   }
 }
 
+// burn action
+const { canBurn, burnNow } = useCartActions({
+  tokenId: Number(props.tokenId),
+  collectionId: Number(props.collectionId),
+  chain: props.chain,
+  token: computed(() => props.tokenData),
+  collection: computed(() => props.collection),
+  owner: computed(() => props.owner || null),
+  price: computed(() => props.price || null),
+  mimeType: computed(() => props.mimeType),
+})
+
 // Action items for dropdown menu
 const actionItems = computed(() => [
   [
@@ -80,6 +93,12 @@ const actionItems = computed(() => [
       label: 'Share',
       icon: 'i-heroicons-share',
       onSelect: shareToken,
+    },
+    {
+      label: 'Burn',
+      icon: 'i-heroicons-fire',
+      onSelect: burnNow,
+      disabled: !canBurn,
     },
   ],
   [
@@ -105,16 +124,29 @@ const actionItems = computed(() => [
       <div v-if="collection" class="flex items-center gap-2">
         <NuxtLink
           :to="`/${chain}/collection/${collectionId || ''}`"
-          class="font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2"
+          class="font-medium transition-colors flex items-center gap-2 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500"
         >
-          <UIcon name="i-heroicons-rectangle-stack" class="w-4 h-4" />
+          <!-- Collection Image -->
+          <div class="w-6 h-6 rounded-full overflow-hidden bg-muted flex-shrink-0">
+            <img
+              v-if="collection.metadata?.image"
+              :src="sanitizeIpfsUrl(collection.metadata.image)"
+              :alt="collection.metadata?.name || 'Collection'"
+              class="w-full h-full object-cover"
+            >
+            <UIcon
+              v-else
+              name="i-heroicons-rectangle-stack"
+              class="w-4 h-4 text-muted-foreground m-0.5"
+            />
+          </div>
           {{ collection.metadata?.name || `Collection ${collectionId || ''}` }}
         </NuxtLink>
       </div>
 
       <!-- Title with Action Dropdown -->
       <div class="flex items-center justify-between gap-3 md:gap-4">
-        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white leading-tight flex-1 min-w-0">
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight flex-1 min-w-0">
           {{ tokenData?.metadata?.name || 'Untitled NFT' }}
         </h1>
 
@@ -178,14 +210,14 @@ const actionItems = computed(() => [
 
     <div class="space-y-3 bg-secondary rounded-md p-6">
       <!-- Current Price Section -->
-      <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
+      <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">
         Current Price
       </p>
       <div class="flex items-baseline gap-2">
-        <p class="text-2xl font-bold text-gray-900 dark:text-white">
+        <p class="text-2xl font-bold text-foreground">
           {{ formattedPrice || 'Not for sale' }}
         </p>
-        <p v-if="formattedPrice && usdPrice" class="text-sm text-gray-500 dark:text-gray-400">
+        <p v-if="formattedPrice && usdPrice" class="text-sm text-muted-foreground">
           ({{ usdPrice }})
         </p>
       </div>

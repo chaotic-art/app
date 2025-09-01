@@ -12,6 +12,7 @@ export type BaseActionCartItem = {
   currentOwner: string
   metadata: NFTMetadata
   metadata_uri: string
+  mimeType?: string
 } & CartItem
 
 export const useActionCartStore = defineStore('actionCart', () => {

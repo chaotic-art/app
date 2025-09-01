@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { TokenActivityData } from '~/graphql/queries/token'
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import { formatBalance } from 'dedot/utils'
+import { encodeAddress, formatBalance } from 'dedot/utils'
+import { t } from 'try'
 import UserInfo from '~/components/common/UserInfo.vue'
 import { tokenActivity } from '~/graphql/queries/token'
 import { formatToNow } from '~/utils/format/time'
@@ -110,12 +111,20 @@ watchEffect(async () => {
             header: 'Price',
             cell: ({ row }) => {
               const meta = row.getValue('meta') as string
-              const format = formatBalance(meta, {
+              const [ok, _, address] = t(() => encodeAddress(meta, 0))
+              if (ok && address) {
+                return '-'
+              }
+
+              const [ok2, _2, format] = t(() => formatBalance(meta, {
                 decimals: chainSpec[chain].tokenDecimals,
                 symbol: chainSpec[chain].tokenSymbol,
-              })
+              }))
+              if (ok2 && format) {
+                return format
+              }
 
-              return meta && meta !== '0' ? format : '-'
+              return '-'
             },
           },
           {

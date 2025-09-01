@@ -41,3 +41,12 @@ export async function getBalance(chainPrefix: SupportedChain, address: string) {
     usdNumeric,
   }
 }
+
+export async function getExistentialDeposit(chainPrefix: SupportedChain) {
+  const { $sdk } = useNuxtApp()
+  const { api } = $sdk(chainPrefix)
+
+  const existentialDeposit = await api.constants.Balances.ExistentialDeposit()
+
+  return existentialDeposit
+}
