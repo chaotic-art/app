@@ -160,7 +160,7 @@ onClickOutside(searchDropdownRef, () => {
       v-model="searchQuery"
       placeholder="Search collections, NFTs, users..."
       icon="i-heroicons-magnifying-glass"
-      class="w-full rounded-full lg:w-60 lg:focus-within:w-100 overflow-hidden transition-all duration-200 ease-in-out hover:shadow-md focus-within:shadow-lg"
+      class="w-full rounded-full lg:w-65 lg:focus-within:w-100 overflow-hidden transition-all duration-200 ease-in-out hover:shadow-md focus-within:shadow-lg"
       :class="{
         'lg:w-100': showSuggestions,
       }"
