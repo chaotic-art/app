@@ -2,10 +2,10 @@
 import type { DropItem } from '@/types'
 import { getEnrichedDrop, parseCETDate } from '@/components/drop/utils'
 import { getDrops } from '@/services/fxart'
-import { isProduction } from '@/utils/env'
-import { formatToNow } from '@/utils/format/time'
 import { tokenToUsd } from '@/utils/calculation'
 import { chainSpec } from '@/utils/chain'
+import { isProduction } from '@/utils/env'
+import { formatToNow } from '@/utils/format/time'
 import { ipfsToCfImageUrl } from '@/utils/ipfs'
 
 const props = defineProps<{
@@ -25,7 +25,7 @@ const { data: fetched } = await useLazyAsyncData(() => (getDrops({
   chain: [isProduction ? 'ahp' : prefix.value],
   limit: 3,
 })), {
-  transform: async (data) => await Promise.all(data.map(getEnrichedDrop)),
+  transform: async data => await Promise.all(data.map(getEnrichedDrop)),
 })
 
 const items = computed<DropItem[]>(() => {
@@ -58,20 +58,23 @@ const carouselRoot = ref<HTMLElement | null>(null)
  */
 function centerFirstItem(): void {
   const root = carouselRoot.value
-  if (!root) return
-  
+  if (!root)
+    return
+
   const viewport = root.querySelector(VIEWPORT_CLASS) as HTMLElement | null
   const firstItem = root.querySelector(ITEM_CLASS) as HTMLElement | null
-  
-  if (!viewport || !firstItem) return
-  
+
+  if (!viewport || !firstItem)
+    return
+
   try {
     const targetScrollLeft = firstItem.offsetLeft - (viewport.clientWidth - firstItem.clientWidth) / 2
-    viewport.scrollTo({ 
-      left: Math.max(0, targetScrollLeft), 
-      behavior: 'auto' 
+    viewport.scrollTo({
+      left: Math.max(0, targetScrollLeft),
+      behavior: 'auto',
     })
-  } catch (error) {
+  }
+  catch (error) {
     // Silently fail if DOM manipulation fails
     console.warn('Failed to center carousel item:', error)
   }
@@ -79,8 +82,9 @@ function centerFirstItem(): void {
 
 // Center first item when items are loaded
 watch(() => items.value.length, (itemCount: number) => {
-  if (!itemCount) return
-  
+  if (!itemCount)
+    return
+
   nextTick(() => {
     // Use RAF for immediate centering, timeout for layout-complete centering
     requestAnimationFrame(centerFirstItem)
@@ -109,7 +113,7 @@ watch(() => items.value.length, (itemCount: number) => {
         prev: 'pointer-events-auto rounded-full border-[1px] border-border bg-white dark:bg-zinc-900 shadow hover:bg-gray-100 hover:dark:bg-zinc-800 text-foreground w-10 h-10',
         next: 'pointer-events-auto rounded-full border-[1px] border-border bg-white dark:bg-zinc-900 shadow hover:bg-gray-100 hover:dark:bg-zinc-800 text-foreground w-10 h-10',
         dots: '',
-        dot: ''
+        dot: '',
       }"
       class="w-full"
     >
@@ -138,9 +142,9 @@ watch(() => items.value.length, (itemCount: number) => {
                 class="h-10 !bg-background border border-border !p-0 !pr-4"
               />
               <div v-if="item.chain" class="flex items-center gap-1 bg-background rounded-full px-1.5 py-[3px] border border-border">
-                <img 
+                <img
                   :src="getChainIcon(item.chain) || ''"
-                  :alt="`${chainSpec[item.chain]?.tokenSymbol || item.chain} chain`" 
+                  :alt="`${chainSpec[item.chain]?.tokenSymbol || item.chain} chain`"
                   class="w-[13px] h-[13px]"
                 >
                 <span class="text-base">{{ chainSpec[item.chain]?.tokenSymbol }}</span>
