@@ -219,5 +219,17 @@
   },
   "balance": {
     "insufficient": "Insufficient Balance"
+  },
+  "transfer": {
+    "title": "Transfer",
+    "sender": "Sender",
+    "recipient": "Recipient",
+    "amount": "Amount",
+    "addRecipient": "Add recipient",
+    "sendSameAmount": "Send same amount",
+    "displayUnits": "Display units",
+    "transferable": "Transferable",
+    "networkFee": "Network Fee",
+    "continue": "Continue"
   }
 }

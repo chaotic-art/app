@@ -2,6 +2,10 @@ export function calculateUsdFromToken(amount: number, price: number): number {
   return Math.floor(amount * price * 100) / 100
 }
 
+export function calculateTokenFromUsd(usd: number, tokenPrice: number): number {
+  return Math.ceil((usd / tokenPrice) * 10000) / 10000
+}
+
 export function calculateExactUsdFromToken(
   token: number,
   price: number,
@@ -10,7 +14,7 @@ export function calculateExactUsdFromToken(
 }
 
 export function amountToNative(amount: number, tokenDecimals: number): number {
-  return Number(amount) * 10 ** -tokenDecimals
+  return Number(amount) * 10 ** tokenDecimals
 }
 
 export function nativeToAmount(native: number, tokenDecimals: number): number {
