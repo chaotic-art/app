@@ -7,6 +7,7 @@ const props = defineProps<{
 
 const listingCartStore = useListingCartStore()
 const floorPrice = computed(() => Number(props.item.collection.floor) || 0)
+const isFloorPriceExisting = computed(() => listingCartStore.isFloorPriceExisting)
 
 const listPrice = computed({
   get() {
@@ -38,11 +39,11 @@ const listPrice = computed({
 
     <!-- Choose a price section -->
     <div class="space-y-4">
-      <h3 class="font-bold text-gray-900 dark:text-white">
+      <h3 v-if="isFloorPriceExisting" class="font-bold text-gray-900 dark:text-white">
         Choose a price
       </h3>
 
-      <ListingCartFloorPrice />
+      <ListingCartFloorPrice v-if="isFloorPriceExisting" />
 
       <ListingCartPriceInput v-model="listPrice" />
     </div>
