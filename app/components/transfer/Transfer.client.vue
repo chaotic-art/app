@@ -231,7 +231,7 @@ watchDebounced(
         </div>
 
         <div class="flex flex-col items-end">
-          <span class="font-bold mb-2">{{ t('transfer.balance') }}</span>
+          <span class="font-bold mb-2">{{ t('general.balance') }}</span>
           <span>{{ balanceFormatted }}</span>
           <span class="text-gray-600 dark:text-gray-400"> = {{ balanceUsd }}</span>
         </div>

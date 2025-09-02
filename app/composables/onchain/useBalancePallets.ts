@@ -14,6 +14,7 @@ export function useBalancesPallets() {
   const { $sdk } = useNuxtApp()
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
   const { getAccountSigner } = useNftPallets()
+  const { hash, error, status, result, open } = useTransactionModal()
 
   async function transfer({
     chain,
@@ -42,12 +43,25 @@ export function useBalancesPallets() {
       throw new Error('No address found')
     }
 
+    open.value = true
+
     transaction.signSubmitAndWatch(signer).subscribe({
       next: (event) => {
-        console.log(event)
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found && event.ok) {
+          hash.value = event.block.hash.toString()
+
+          result.value = {
+            type: 'transfer',
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
       },
       error: (err) => {
         console.error('error', err)
+        error.value = err
       },
     })
   }

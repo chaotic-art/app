@@ -25,9 +25,7 @@ const value = defineModel<boolean>({ required: true })
       </template>
 
       <template #footer>
-        <div>
-          <ThemeSwitcher show-label />
-        </div>
+        <WalletAssetFooter />
       </template>
     </USlideover>
   </div>
