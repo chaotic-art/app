@@ -9,7 +9,7 @@ const { items } = useActionCartStore()
 const { burnNfts } = useNftPallets()
 
 const acknowledged = ref(false)
-const elligibleToBurn = computed(() => items.filter(item => !item.mimeType?.includes('html')))
+const eligibleToBurn = computed(() => items.filter(item => !item.mimeType?.includes('html')))
 
 function burn() {
   burnNfts({ items, chain: currentChain.value, type: 'submit' })
@@ -58,7 +58,7 @@ function burn() {
 
         <USeparator class="my-4" />
 
-        <div v-if="elligibleToBurn.length" class="flex items-start gap-3 mb-6">
+        <div v-if="eligibleToBurn.length" class="flex items-start gap-3 mb-6">
           <UCheckbox
             v-model="acknowledged"
             :ui="{ base: 'mt-1' }"
@@ -69,7 +69,7 @@ function burn() {
         </div>
 
         <UButton
-          v-if="elligibleToBurn.length"
+          v-if="eligibleToBurn.length"
           class="w-full"
           :disabled="!acknowledged"
           variant="outline"
