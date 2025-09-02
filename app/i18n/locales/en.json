@@ -230,6 +230,14 @@
     "displayUnits": "Display units",
     "transferable": "Transferable",
     "networkFee": "Network Fee",
-    "continue": "Continue"
+    "continue": "Continue",
+    "send": "Send",
+    "network": "Network",
+    "from": "From",
+    "sendingTo": "Sending to",
+    "recipients": "{count} Recipients",
+    "recipientCount": "Recipient {count}",
+    "polkadotHub": "PolkadotHub",
+    "totalAmount": "Total Amount"
   }
 }

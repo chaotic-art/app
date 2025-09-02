@@ -4,7 +4,7 @@ import { watchDebounced } from '@vueuse/core'
 import { decodeAddress, encodeAddress } from 'dedot/utils'
 import { useBalancesPallets } from '@/composables/onchain/useBalancePallets'
 
-interface TargetAddress {
+export interface TargetAddress {
   address: string
   usd: number
   token: number
@@ -24,6 +24,7 @@ const { usd: balanceUsd, formatted: balanceFormatted } = useAmount(balance, deci
 const { transfer } = useBalancesPallets()
 const currentTokenValue = computed(() => Number(getCurrentTokenValue(chainSymbol.value as any)))
 
+const isConfirmModalOpen = ref(false)
 const sendSameAmount = ref(false)
 const displayUnit = ref<DisplayUnit>('token')
 const targetAddresses = ref<TargetAddress[]>([getDefaultAddress()])
@@ -149,6 +150,8 @@ function unifyAddressAmount(target: TargetAddress) {
 
 async function handleTransfer() {
   try {
+    isConfirmModalOpen.value = false
+
     await transfer({
       chain: prefix.value as AssetHubChain,
       targets: targetAddresses.value.map(address => ({
@@ -171,7 +174,7 @@ watch(() => targetAddresses.value.length, async () => {
       chain: prefix.value as AssetHubChain,
       targets: targetAddresses.value.map(() => ({
         address: CHAOTIC_MINTER,
-        amount: amountToNative(1, decimals.value)
+        amount: amountToNative(1, decimals.value),
       })),
     })
 
@@ -207,7 +210,7 @@ watchDebounced(
 <template>
   <UContainer class="max-w-3xl px-4 md:px-6 py-10">
     <div class="border border-gray-300 rounded-xl p-5">
-      <h1 class="font-bold text-4xl mb-4">
+      <h1 class="font-bold text-4xl mb-5">
         {{ t('transfer.title') }}
       </h1>
 
@@ -344,8 +347,15 @@ watchDebounced(
         :disabled="isDisabled"
         :label="t('transfer.continue')"
         size="xl"
-        @click="handleTransfer"
+        @click="isConfirmModalOpen = true"
       />
     </div>
+
+    <LazyTransferConfirmModal
+      v-model="isConfirmModalOpen"
+      :target-addresses="targetAddresses"
+      :display-total-value="displayValues.total.withFee"
+      @confirm="handleTransfer"
+    />
   </UContainer>
 </template>
