@@ -90,7 +90,6 @@ interface AirdropNftsParams {
 export function useNftPallets() {
   const { $sdk } = useNuxtApp()
   const { hash, error, status, result, open } = useTransactionModal()
-  const toast = useToast()
 
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
@@ -601,14 +600,6 @@ export function useNftPallets() {
       })
 
       calls.push(_txBurn.decodedCall)
-    }
-
-    if (itemsToBurn.length === 0) {
-      toast.add({
-        title: 'No items to burn',
-        color: 'error',
-      })
-      return
     }
 
     const transaction = api.tx.Utility.batch_all({ calls })
