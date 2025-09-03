@@ -50,7 +50,7 @@ export function useBalancesPallets() {
         status.value = event.type
 
         if (event.type === 'txBestBlocksState' && event.found && event.ok) {
-          hash.value = event.block.hash.toString()
+          hash.value = event.txHash.toString()
 
           result.value = {
             type: 'transfer',
