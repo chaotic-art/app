@@ -13,7 +13,7 @@ const txUrl = computed(() =>
 
 <template>
   <div>
-    <img src="/congrats-message-header.svg" alt="Success transfer" class="h-[200px] w-full grayscale">
+    <img src="/congrats-message-header.svg" alt="Success transfer" class="h-[200px] w-full">
 
     <div class="flex items-center flex-col gap-4">
       <p class="text-center">
