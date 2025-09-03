@@ -7,8 +7,8 @@ const props = defineProps<{
 }>()
 
 const { $i18n } = useNuxtApp()
-const { prefix } = usePrefix()
 const { accountId } = useAuth()
+const { currentChain } = useChain()
 
 const items = computed<ItemMedia[]>(() =>
   props.result.items.map(item => ({
@@ -33,8 +33,8 @@ const shareText = computed(() => {
 })
 
 const url = computed(() => window.location.origin)
-const userProfilePath = computed(() => `/${prefix.value}/u/${accountId.value}`)
-const nftPath = computed(() => `/${prefix.value}/gallery/${items.value[0]?.id}`)
+const userProfilePath = computed(() => `/${currentChain.value}/u/${accountId.value}`)
+const nftPath = computed(() => `/${currentChain.value}/gallery/${items.value[0]?.id}`)
 
 const shareUrl = computed(() =>
   singleListing.value
@@ -78,7 +78,7 @@ const headerContent = computed<{ single: string, multiple: string }>(() => {
         multiple: $i18n.t('buyModal.amountPurchaseSuccessfully'),
       }
 
-    case 'transfer':
+    case 'token_transfer':
       return {
         single: 'NFT Transferred',
         multiple: 'NFTs Transferred',

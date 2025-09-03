@@ -691,7 +691,7 @@ export function useNftPallets() {
           hash.value = event.block.hash.toString()
 
           result.value = {
-            type: 'transfer',
+            type: 'token_transfer',
             hash: hash.value,
             prefix: chain,
             items: items.map(nft => ({
