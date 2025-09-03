@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computedAsync } from '@vueuse/core'
 import { toNative } from '@/utils/format/balance'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
-import { getExistentialDeposit } from '~/utils/api/substrate'
 
 const { $i18n } = useNuxtApp()
 const { accountId } = useAuth()
 const { listNfts } = useNftPallets()
+const { prefix } = usePrefix()
 const listingCartStore = useListingCartStore()
 const { itemsInChain: items } = storeToRefs(listingCartStore)
 const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
@@ -15,6 +14,7 @@ const { decimals, chainSymbol, currentChain } = useChain()
 const { open: isTransactionModalOpen } = useTransactionModal()
 const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: listingCartModalOpen })
 const listingFees = ref()
+const { existentialDeposit } = useDeposit(prefix)
 
 const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
   computed(() =>
@@ -58,9 +58,8 @@ const confirmButtonDisabled = computed(
   () => Boolean(listingCartStore.incompleteListPrices),
 )
 
-const hasEnoughFunds = computedAsync(async () => {
-  const existentialDeposit = await getExistentialDeposit(currentChain.value)
-  return (Number(balance.value) - Number(existentialDeposit)) > listingFees.value
+const hasEnoughFunds = computed(() => {
+  return (Number(balance.value) - Number(existentialDeposit.value)) > listingFees.value
 })
 
 const label = computed(() => {
