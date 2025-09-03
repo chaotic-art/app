@@ -14,14 +14,14 @@ export interface TargetAddress {
 type DisplayUnit = 'token' | 'usd'
 
 const { t } = useI18n()
-const { balance, isLoading: isBalanceLoading } = useBalance()
+const { balance, transferableBalance, isLoading: isBalanceLoading } = useBalance()
 const { chainSymbol, decimals } = useChain()
 const { accountId } = useAuth()
 const { prefix } = usePrefix()
 const { getCurrentTokenValue } = useFiatStore()
-const { existentialDeposit } = useDeposit(prefix)
 const { usd: balanceUsd, formatted: balanceFormatted } = useAmount(balance, decimals, chainSymbol)
 const { transfer } = useBalancesPallets()
+const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
 const currentTokenValue = computed(() => Number(getCurrentTokenValue(chainSymbol.value as any)))
 
 const isConfirmModalOpen = ref(false)
@@ -83,15 +83,18 @@ const {
   usd: transferableBalanceUsd,
   formatted: transferableBalanceFormatted,
 } = useAmount(
-  computed(() => Math.max(balance.value - existentialDeposit.value, 0)),
+  transferableBalance,
   decimals,
   chainSymbol,
 )
+
+const insufficientBalance = computed(() => transferableBalance.value < amountToNative(totalValues.withFee.token, decimals.value))
 
 const isDisabled = computed(() => (
   targetAddresses.value.some(address =>
     address.isInvalid
     || address.address === ''
+    || insufficientBalance.value
     || (!address.usd && !address.token),
   )
   || isBalanceLoading.value
@@ -108,6 +111,14 @@ const tabs = computed(() => {
       value: 'usd',
     },
   ]
+})
+
+const label = computed(() => {
+  if (insufficientBalance.value) {
+    return t('balance.insufficient')
+  }
+
+  return t('transfer.continue')
 })
 
 function getDefaultAddress(): TargetAddress {
@@ -226,14 +237,21 @@ watchDebounced(
           />
           <UButton
             v-else
-            :label="t('transfer.connectWallet')"
+            :label="t('general.connectWallet')"
+            @click="walletConnectModalOpen = true"
           />
         </div>
 
         <div class="flex flex-col items-end">
           <span class="font-bold mb-2">{{ t('general.balance') }}</span>
-          <span>{{ balanceFormatted }}</span>
-          <span class="text-gray-600 dark:text-gray-400"> = {{ balanceUsd }}</span>
+          <template v-if="isBalanceLoading">
+            <USkeleton class="h-5 w-20 rounded mb-2" />
+            <USkeleton class="h-5 w-16 rounded" />
+          </template>
+          <template v-else>
+            <span>{{ balanceFormatted }}</span>
+            <span class="text-gray-600 dark:text-gray-400"> = {{ balanceUsd }}</span>
+          </template>
         </div>
       </div>
 
@@ -315,9 +333,10 @@ watchDebounced(
       <!-- Display Unit -->
       <div class="flex justify-between items-end mb-5">
         <span>{{ t('transfer.displayUnits') }}</span>
-        <div class="flex gap-1">
+        <div class="flex items-center gap-1">
           <span>{{ t('transfer.transferable') }}:</span>
-          <span class="font-bold">{{ displayUnit === 'usd' ? transferableBalanceUsd : transferableBalanceFormatted }}</span>
+          <USkeleton v-if="isBalanceLoading" class="h-5 w-20 rounded ml-1" />
+          <span v-else class="font-bold">{{ displayUnit === 'usd' ? transferableBalanceUsd : transferableBalanceFormatted }}</span>
         </div>
       </div>
 
@@ -345,7 +364,7 @@ watchDebounced(
         class="w-full"
         color="neutral"
         :disabled="isDisabled"
-        :label="t('transfer.continue')"
+        :label="label"
         size="xl"
         @click="isConfirmModalOpen = true"
       />

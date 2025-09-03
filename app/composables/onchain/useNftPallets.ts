@@ -349,7 +349,14 @@ export function useNftPallets() {
     })
   }
 
-  async function getAccountSigner() {
+  async function getAccountSigner(type?: TxType) {
+    if (type === 'estimate') {
+      return {
+        signer: null as any,
+        address: getConnectedSubAccount.value?.address || CHAOTIC_MINTER,
+      }
+    }
+
     const account = getConnectedSubAccount.value
 
     if (!account?.address) {

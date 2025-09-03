@@ -22,7 +22,7 @@ export function useBalancesPallets() {
     type = 'submit',
   }: TransferBalanceParams) {
     const api = $sdk(chain).api
-    const { address, signer } = await getAccountSigner()
+    const { address, signer } = await getAccountSigner(type)
 
     const txs = targets.map(({ address, amount }) => {
       return api.tx.Balances.transfer_keep_alive({
