@@ -10,7 +10,7 @@ defineEmits<{
   (e: 'confirm'): void
 }>()
 
-const { decimals, chainSymbol } = useChain()
+const { decimals, chainSymbol, chainName } = useChain()
 const { accountId } = useAuth()
 const isOpen = defineModel<boolean>({ required: true })
 const showMore = ref(false)
@@ -27,7 +27,7 @@ const showMore = ref(false)
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <span class="font-bold">{{ $t('transfer.network') }}</span>
-            <span>PolkadotHub</span>
+            <span>{{ chainName }}</span>
           </div>
 
           <div class="flex items-center justify-between">
