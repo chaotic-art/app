@@ -1,11 +1,11 @@
 <script setup lang="ts">
-const value = defineModel<boolean>({ required: true })
+const isOpen = defineModel<boolean>({ required: true })
 </script>
 
 <template>
   <div>
     <USlideover
-      v-model:open="value"
+      v-model:open="isOpen"
       title="Profile"
       side="right"
       :ui="{
@@ -25,9 +25,7 @@ const value = defineModel<boolean>({ required: true })
       </template>
 
       <template #footer>
-        <div>
-          <ThemeSwitcher show-label />
-        </div>
+        <WalletAssetFooter />
       </template>
     </USlideover>
   </div>

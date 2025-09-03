@@ -6,7 +6,7 @@ import { Binary } from 'polkadot-api'
 import { generateAirdropTxs } from '@/components/airdrop/utils'
 import { MultiAddress } from '~/descriptors/dist'
 
-type TxType = 'submit' | 'estimate'
+export type TxType = 'submit' | 'estimate'
 
 interface CollectionRoyalty {
   amount: number
@@ -361,7 +361,14 @@ export function useNftPallets() {
     })
   }
 
-  async function getAccountSigner() {
+  async function getAccountSigner(type?: TxType) {
+    if (type === 'estimate') {
+      return {
+        signer: null as any,
+        address: getConnectedSubAccount.value?.address || CHAOTIC_MINTER,
+      }
+    }
+
     const account = getConnectedSubAccount.value
 
     if (!account?.address) {
@@ -649,6 +656,8 @@ export function useNftPallets() {
     buyNfts,
     burnNfts,
     collectionRoyalties,
+    // TODO move else where
+    getAccountSigner,
     airdropNfts,
   }
 }

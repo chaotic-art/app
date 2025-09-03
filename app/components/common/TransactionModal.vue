@@ -61,6 +61,13 @@ const resolvedStatus = computed(() => {
         :status="resolvedStatus"
       />
 
+      <!-- Transfer success preview -->
+      <LazySuccessfulTransfer
+        v-else-if="isSuccess && result?.type === 'transfer'"
+        :result="result"
+        :status="resolvedStatus"
+      />
+
       <!-- Error State -->
       <div v-else-if="error" class="text-center space-y-4">
         <div class="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto">
