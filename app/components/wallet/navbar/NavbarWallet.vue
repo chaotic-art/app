@@ -1,25 +1,15 @@
 <script setup lang="ts">
-import { LazyWalletAssetModal } from '#components'
-
-const {
-  walletConnectModalOpen,
-} = storeToRefs(usePreferencesStore())
+const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
 
 const route = useRoute()
-
-const overlay = useOverlay()
-const slideover = overlay.create(LazyWalletAssetModal)
-
-function openWalletAssetModal() {
-  slideover.open()
-}
+const { walletAssetModal } = useWalletSidebar()
 
 // Auto-close slide over when navigating to different pages
 watch(
   () => route.path,
   (newPath, oldPath) => {
     if (oldPath && newPath !== oldPath) {
-      slideover.close()
+      walletAssetModal.close()
     }
   },
 )
@@ -30,7 +20,7 @@ watch(
     <client-only>
       <WalletDropdown
         @open-wallet="walletConnectModalOpen = true"
-        @open-asset="openWalletAssetModal"
+        @open-asset="walletAssetModal.open"
       />
       <template #fallback>
         <div class="flex items-center justify-center">

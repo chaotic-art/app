@@ -1,4 +1,14 @@
+import { LazyWalletAssetModal } from '#components'
 import { createEventHook, whenever } from '@vueuse/core'
+
+export function useWalletSidebar() {
+  const overlay = useOverlay()
+  const walletAssetModal = overlay.create(LazyWalletAssetModal)
+
+  return {
+    walletAssetModal,
+  }
+}
 
 export default function useWalletManager() {
   const walletStore = useWalletStore()

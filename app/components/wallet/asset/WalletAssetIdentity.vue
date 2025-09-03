@@ -2,7 +2,8 @@
 import { copyAddress } from '~/utils/format/address'
 
 const { accountId } = useAuth()
-const { walletConnectModalOpen, walletAccountModalOpen } = storeToRefs(usePreferencesStore())
+const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
+const { walletAssetModal } = useWalletSidebar()
 
 async function handleCopyAddress() {
   if (accountId.value) {
@@ -11,7 +12,7 @@ async function handleCopyAddress() {
 }
 
 function handleWalletSettings() {
-  walletAccountModalOpen.value = false
+  walletAssetModal.close()
   walletConnectModalOpen.value = true
 }
 </script>
