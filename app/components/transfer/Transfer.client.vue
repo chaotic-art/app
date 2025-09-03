@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import { watchDebounced } from '@vueuse/core'
-import { decodeAddress, encodeAddress } from 'dedot/utils'
 import { useBalancesPallets } from '@/composables/onchain/useBalancePallets'
 
 export interface TargetAddress {
@@ -196,26 +194,20 @@ watch(() => targetAddresses.value.length, async () => {
   }
 }, { immediate: true })
 
-watchDebounced(
-  targetAddresses,
-  () => {
-    targetAddresses.value.forEach((address) => {
-      if (!address.address) {
-        address.isInvalid = false
-        return
-      }
+// watchDebounced(
+//   targetAddresses,
+//   () => {
+//     targetAddresses.value.forEach((address) => {
+//       if (!address.address) {
+//         address.isInvalid = false
+//         return
+//       }
 
-      try {
-        decodeAddress(encodeAddress(address.address))
-        address.isInvalid = false
-      }
-      catch {
-        address.isInvalid = true
-      }
-    })
-  },
-  { debounce: 200, deep: true },
-)
+//       address.isInvalid = !isValidAddress(address.address)
+//     })
+//   },
+//   { debounce: 200, deep: true },
+// )
 </script>
 
 <template>
@@ -265,52 +257,62 @@ watchDebounced(
         </div>
 
         <!-- Multi Address Input -->
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-3">
           <div
             v-for="(targetAddress, index) in targetAddresses" :key="index"
-            class="flex gap-2"
+            class="flex flex-col gap-2"
           >
-            <UInput
-              v-model="targetAddress.address"
-              :placeholder="t('airdrop.enterOneWalletAddressPerLine')"
-              class="w-full"
-              size="xl"
-              :color="targetAddress.isInvalid ? 'error' : 'primary'"
-            />
-
-            <div class="flex items-center gap-2">
+            <div class="flex gap-2">
               <UInput
-                v-if="displayUnit === 'token'"
-                v-model.number="targetAddress.token"
-                type="number"
+                v-model="targetAddress.address"
+                :placeholder="t('airdrop.enterOneWalletAddressPerLine')"
+                class="w-full"
                 size="xl"
-                :min="0"
-                @update:model-value="() => onAmountChnage(targetAddress)"
-              >
-                <template #trailing>
-                  <div class="text-gray-400 flex items-center">
-                    <span class="text-sm">{{ chainSymbol }}</span>
-                  </div>
-                </template>
-              </UInput>
-
-              <UInput
-                v-else
-                v-model.number="targetAddress.usd"
-                type="number"
-                trailing-icon="i-material-symbols-attach-money"
-                size="xl"
-                :min="0"
-                @update:model-value="() => onUsdChnage(targetAddress)"
+                :color="targetAddress.isInvalid ? 'error' : 'primary'"
+                :trailing-icon="!targetAddress.isInvalid && targetAddress.address ? 'material-symbols:check-rounded' : undefined"
+                :ui="{ base: targetAddress.isInvalid ? 'ring-2 ring-error' : undefined }"
               />
 
-              <UButton
-                v-if="targetAddresses.length > 1"
-                variant="ghost"
-                trailing-icon="i-lucide-trash"
-                @click="targetAddresses.splice(index, 1)"
-              />
+              <div class="flex items-center gap-2">
+                <UInput
+                  v-if="displayUnit === 'token'"
+                  v-model.number="targetAddress.token"
+                  type="number"
+                  size="xl"
+                  :min="0"
+                  @update:model-value="() => onAmountChnage(targetAddress)"
+                >
+                  <template #trailing>
+                    <div class="text-gray-400 flex items-center">
+                      <span class="text-sm">{{ chainSymbol }}</span>
+                    </div>
+                  </template>
+                </UInput>
+
+                <UInput
+                  v-else
+                  v-model.number="targetAddress.usd"
+                  type="number"
+                  trailing-icon="i-material-symbols-attach-money"
+                  size="xl"
+                  :min="0"
+                  @update:model-value="() => onUsdChnage(targetAddress)"
+                />
+
+                <UButton
+                  v-if="targetAddresses.length > 1"
+                  variant="ghost"
+                  trailing-icon="i-lucide-trash"
+                  @click="targetAddresses.splice(index, 1)"
+                />
+              </div>
             </div>
+
+            <AddressChecker
+              :address="targetAddress.address"
+              @check="valid => targetAddress.isInvalid = !valid"
+              @change="address => targetAddress.address = address"
+            />
           </div>
 
           <div class="flex justify-center">
