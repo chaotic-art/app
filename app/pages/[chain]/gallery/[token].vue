@@ -14,7 +14,6 @@ const safeTokenId = computed(() => tokenId?.toString() ?? '')
 const {
   owner,
   collectionCreator,
-  error,
   mimeType,
   nativePrice: price,
   price: formattedPrice,
@@ -28,7 +27,7 @@ const {
   chain: chainPrefix.value,
 })
 
-const { data: item, status } = useLazyAsyncData(
+const { data: item } = useLazyAsyncData(
   `token:${chainPrefix.value}:${tokenId}`,
   async () => {
     const item = await fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value)
@@ -40,7 +39,7 @@ const { data: item, status } = useLazyAsyncData(
         ...data,
         metadata: {
           ...data.metadata,
-          image: sanitizeIpfsUrl(data?.metadata?.image ?? ''),
+          image: data.metadata?.image ? sanitizeIpfsUrl(data.metadata.image) : undefined,
         },
       }
     },
@@ -52,57 +51,56 @@ useSeoMeta({
   description: () => item.value?.metadata?.description?.slice(0, 150),
   ogImage: () => `https://ogi.koda.art/__og-image__/image/${chainPrefix.value}/gallery/${collectionId}-${tokenId}/og.png`, // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
 })
+
+const tokenMetadata = computed(() => {
+  if (item.value?.metadata.name) {
+    return item.value
+  }
+
+  return tokenData.value
+})
 </script>
 
 <template>
   <div>
     <UContainer class="px-4 md:px-6">
-      <!-- Loading State -->
-      <GalleryLoadingState v-if="status !== 'success'" />
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <!-- Media Section -->
+        <div class="order-2 lg:order-1">
+          <GalleryMediaViewer
+            :token-data="tokenMetadata"
+            :collection-data="collection"
+            :mime-type="mimeType || undefined"
+            :media-icon="mediaIcon"
+            :container-id="CONTAINER_ID"
+          />
+        </div>
 
-      <!-- Error State -->
-      <GalleryErrorState v-else-if="error" />
-
-      <!-- Content -->
-      <div v-else>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          <!-- Media Section -->
-          <div class="order-2 lg:order-1">
-            <GalleryMediaViewer
-              :token-data="item || tokenData"
-              :collection-data="collection"
-              :mime-type="mimeType || undefined"
-              :media-icon="mediaIcon"
-              :container-id="CONTAINER_ID"
-            />
-          </div>
-
-          <!-- Details Section -->
-          <div class="order-1 lg:order-2">
-            <GalleryDetails
-              :token-data="item || tokenData"
-              :collection="collection"
-              :chain="chainPrefix"
-              :collection-id="safeCollectionId"
-              :token-id="safeTokenId"
-              :owner="owner || undefined"
-              :collection-creator="collectionCreator || undefined"
-              :formatted-price="formattedPrice || undefined"
-              :usd-price="usdPrice"
-              :price="price"
-              :mime-type="mimeType"
-            />
-            <GalleryItemActions
-              class="mt-6"
-              :token-data="tokenData"
-              :collection="collection"
-              :chain="chainPrefix"
-              :collection-id="Number(safeCollectionId)"
-              :token-id="Number(safeTokenId)"
-              :owner="owner"
-              :price="price"
-            />
-          </div>
+        <!-- Details Section -->
+        <div class="order-1 lg:order-2">
+          <GalleryDetails
+            :token-data="tokenMetadata"
+            :collection="collection"
+            :chain="chainPrefix"
+            :collection-id="safeCollectionId"
+            :token-id="safeTokenId"
+            :owner="owner || undefined"
+            :collection-creator="collectionCreator || undefined"
+            :formatted-price="formattedPrice || undefined"
+            :usd-price="usdPrice"
+            :price="price"
+            :mime-type="mimeType"
+          />
+          <GalleryItemActions
+            class="mt-6"
+            :token-data="tokenData"
+            :collection="collection"
+            :chain="chainPrefix"
+            :collection-id="Number(safeCollectionId)"
+            :token-id="Number(safeTokenId)"
+            :owner="owner"
+            :price="price"
+          />
         </div>
       </div>
     </UContainer>
