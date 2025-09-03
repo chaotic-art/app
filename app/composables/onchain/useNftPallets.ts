@@ -6,7 +6,7 @@ import { Binary } from 'polkadot-api'
 import { generateAirdropTxs } from '@/components/airdrop/utils'
 import { MultiAddress } from '~/descriptors/dist'
 
-type TxType = 'submit' | 'estimate'
+export type TxType = 'submit' | 'estimate'
 
 interface CollectionRoyalty {
   amount: number
@@ -97,7 +97,6 @@ interface TransferNftsParams {
 export function useNftPallets() {
   const { $sdk } = useNuxtApp()
   const { hash, error, status, result, open } = useTransactionModal()
-  const toast = useToast()
 
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
@@ -369,7 +368,14 @@ export function useNftPallets() {
     })
   }
 
-  async function getAccountSigner() {
+  async function getAccountSigner(type?: TxType) {
+    if (type === 'estimate') {
+      return {
+        signer: null as any,
+        address: getConnectedSubAccount.value?.address || CHAOTIC_MINTER,
+      }
+    }
+
     const account = getConnectedSubAccount.value
 
     if (!account?.address) {
@@ -610,14 +616,6 @@ export function useNftPallets() {
       calls.push(_txBurn.decodedCall)
     }
 
-    if (itemsToBurn.length === 0) {
-      toast.add({
-        title: 'No items to burn',
-        color: 'error',
-      })
-      return
-    }
-
     const transaction = api.tx.Utility.batch_all({ calls })
 
     if (type === 'estimate') {
@@ -723,6 +721,8 @@ export function useNftPallets() {
     buyNfts,
     burnNfts,
     collectionRoyalties,
+    // TODO move else where
+    getAccountSigner,
     airdropNfts,
     transferNfts,
   }

@@ -4,6 +4,7 @@ export default function ({ enabled = ref(true) }: { enabled?: Ref<boolean> } = {
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
   const { getBalance } = useBalances()
   const { prefix } = usePrefix()
+  const { existentialDeposit } = useDeposit(prefix)
 
   const { data, isPending: isLoading } = useQuery({
     queryKey: ['wallet-balance', computed(() => getConnectedSubAccount.value?.address)],
@@ -20,8 +21,12 @@ export default function ({ enabled = ref(true) }: { enabled?: Ref<boolean> } = {
     refetchInterval: 20000,
   })
 
+  const balance = computed(() => Number(data.value?.balance ?? 0))
+  const transferableBalance = computed(() => Math.max(balance.value - existentialDeposit.value, 0))
+
   return {
-    balance: computed(() => Number(data.value?.balance ?? 0)),
+    balance,
+    transferableBalance,
     isLoading,
   }
 }

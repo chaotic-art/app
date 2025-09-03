@@ -20,7 +20,6 @@ const nftAnimation = computed(() => sanitizeIpfsUrl(props.nft.metadata?.animatio
 const nftMimeType = computed(() => props.mimeType || props.nft.metadata?.mime_type)
 
 const toast = useToast()
-const { $i18n } = useNuxtApp()
 const imageData = ref()
 
 const isDownloadEnabled = computed(() => {
@@ -47,7 +46,7 @@ async function downloadMedia() {
   }
 
   if (isMobileDevice) {
-    toast.add({ title: $i18n.t('toast.downloadOnMobile') })
+    toast.add({ title: 'Download will open in new tab on mobile' })
     setTimeout(() => {
       window.open(imageUrl, '_blank')
     }, 2000)
@@ -55,12 +54,12 @@ async function downloadMedia() {
   }
 
   try {
-    toast.add({ title: $i18n.t('toast.downloadImage') })
+    toast.add({ title: 'Downloading image...' })
     downloadImage(imageUrl, props.nft.metadata?.name ?? '')
   }
   catch (error) {
     console.warn('[ERR] unable to fetch image', error)
-    toast.add({ title: $i18n.t('toast.downloadError') })
+    toast.add({ title: 'Failed to download image' })
   }
 }
 
@@ -86,7 +85,7 @@ onKodahashRenderCompleted(({ payload }) => {
 
 <template>
   <div class="flex justify-center mt-4 md:mt-6">
-    <div class="inline-flex items-center gap-1 p-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+    <div class="inline-flex items-center gap-1 p-1 bg-card/90 backdrop-blur-sm rounded-xl border border-border shadow-sm">
       <!-- Fullscreen Button -->
       <UTooltip text="Fullscreen" :popper="{ placement: 'top' }">
         <UButton
@@ -94,13 +93,13 @@ onKodahashRenderCompleted(({ payload }) => {
           variant="ghost"
           color="neutral"
           size="sm"
-          class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          class="text-muted-foreground hover:text-foreground transition-colors size-8"
           @click="$emit('toggleFullscreen')"
         />
       </UTooltip>
 
       <!-- Separator -->
-      <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+      <div class="w-px h-6 bg-border mx-1" />
 
       <!-- Open in New Tab Button -->
       <UTooltip text="Open in New Tab" :popper="{ placement: 'top' }">
@@ -109,16 +108,17 @@ onKodahashRenderCompleted(({ payload }) => {
           variant="ghost"
           color="neutral"
           size="sm"
+          class="size-8"
           :disabled="!isNewTabEnabled"
           :class="isNewTabEnabled
-            ? 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors'
-            : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'"
+            ? 'text-muted-foreground hover:text-foreground transition-colors'
+            : 'text-muted-foreground/50 cursor-not-allowed'"
           @click="isNewTabEnabled ? handleNewTab() : undefined"
         />
       </UTooltip>
 
       <!-- Separator -->
-      <div v-if="isDownloadEnabled" class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
+      <div v-if="isDownloadEnabled" class="w-px h-6 bg-border mx-1" />
 
       <!-- Download Button -->
       <UTooltip v-if="isDownloadEnabled" text="Download" :popper="{ placement: 'top' }">
@@ -127,7 +127,7 @@ onKodahashRenderCompleted(({ payload }) => {
           variant="ghost"
           color="neutral"
           size="sm"
-          class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          class="text-muted-foreground hover:text-foreground transition-colors size-8"
           @click="downloadMedia"
         />
       </UTooltip>

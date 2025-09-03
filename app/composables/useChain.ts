@@ -6,6 +6,7 @@ export function useChain() {
 
   const currentChain = computed(() => (route.params as { chain: AssetHubChain }).chain || 'ahp')
 
+  const chainName = computed(() => chainSpec[currentChain.value].name)
   const chainSymbol = computed(() => chainSpec[currentChain.value].tokenSymbol)
   const decimals = computed(() => chainSpec[currentChain.value].tokenDecimals)
 
@@ -13,5 +14,6 @@ export function useChain() {
     decimals,
     chainSymbol,
     currentChain,
+    chainName,
   }
 }

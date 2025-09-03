@@ -219,5 +219,25 @@
   },
   "balance": {
     "insufficient": "Insufficient Balance"
+  },
+  "transfer": {
+    "title": "Transfer",
+    "sender": "Sender",
+    "recipient": "Recipient",
+    "amount": "Amount",
+    "addRecipient": "Add recipient",
+    "sendSameAmount": "Send same amount",
+    "displayUnits": "Display units",
+    "transferable": "Transferable",
+    "networkFee": "Network Fee",
+    "continue": "Continue",
+    "send": "Send",
+    "network": "Network",
+    "from": "From",
+    "sendingTo": "Sending to",
+    "recipients": "{count} Recipients",
+    "recipientCount": "Recipient {count}",
+    "polkadotHub": "PolkadotHub",
+    "totalAmount": "Total Amount"
   }
 }
