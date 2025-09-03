@@ -1,4 +1,6 @@
 import type { SupportedChain } from '~/plugins/sdk.client'
+import { checkAddress } from '@polkadot/util-crypto'
+import { decodeAddress, encodeAddress } from 'dedot/utils'
 
 export function shortenAddress(address: string): string {
   if (!address || address.length < 10)
@@ -55,4 +57,18 @@ export async function copyAddress(address = '') {
       color: 'error',
     })
   }
+}
+
+export function isValidAddress(address: string) {
+  try {
+    decodeAddress(encodeAddress(address))
+    return true
+  }
+  catch {
+    return false
+  }
+}
+
+export function isValidAddressByss58Format(value: string, ss58: number) {
+  return checkAddress(value, ss58)[0]
 }

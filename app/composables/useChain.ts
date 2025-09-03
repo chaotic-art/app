@@ -9,11 +9,13 @@ export function useChain() {
   const chainName = computed(() => chainSpec[currentChain.value].name)
   const chainSymbol = computed(() => chainSpec[currentChain.value].tokenSymbol)
   const decimals = computed(() => chainSpec[currentChain.value].tokenDecimals)
+  const ss58Format = computed(() => chainSpec[currentChain.value].ss58Format)
 
   return {
     decimals,
     chainSymbol,
     currentChain,
     chainName,
+    ss58Format,
   }
 }

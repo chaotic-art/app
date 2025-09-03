@@ -111,7 +111,8 @@
     "success": "Success",
     "viewNft": "View NFT | View NFTs",
     "copyToClipboard": "Copied to clipboard",
-    "connectWallet": "Connect Wallet"
+    "connectWallet": "Connect Wallet",
+    "learnMore": "Learn More"
   },
   "signing": {
     "transaction": "Sign Transaction",
@@ -239,5 +240,22 @@
     "recipientCount": "Recipient {count}",
     "polkadotHub": "PolkadotHub",
     "totalAmount": "Total Amount"
+  },
+  "addressChecker": {
+    "error": {
+      "unknown": {
+        "title": "Not Polkadot ecosystem address",
+        "message": "Oops! The address you entered is not supported by Polkadot ecosystem. Please enter Polkadot supported address to proceed with the transaction."
+      },
+      "wrongChain": {
+        "title": "Wrong polkadot Network address",
+        "message": "Oops! You have entered {addressChainToken} address. Enter {currentChainToken} address to proceed with the transaction or allow us to change it for you."
+      }
+    },
+    "changed": {
+      "title": "Changed to {0} address",
+      "message": "Address was successfully changed for {0} network."
+    },
+    "changeTo": "Change to {chainSymbol} address"
   }
 }
