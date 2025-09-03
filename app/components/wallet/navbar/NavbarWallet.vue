@@ -1,18 +1,6 @@
 <script setup lang="ts">
 const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
-
-const route = useRoute()
 const { walletAssetModal } = useWalletSidebar()
-
-// Auto-close slide over when navigating to different pages
-watch(
-  () => route.path,
-  (newPath, oldPath) => {
-    if (oldPath && newPath !== oldPath) {
-      walletAssetModal.close()
-    }
-  },
-)
 </script>
 
 <template>
