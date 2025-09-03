@@ -146,12 +146,19 @@ const actionItems = computed(() => [
 
       <!-- Title with Action Dropdown -->
       <div class="flex items-center justify-between gap-3 md:gap-4">
-        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight flex-1 min-w-0">
+        <div v-if="!tokenData" class="flex-1">
+          <USkeleton class="h-12 md:h-16 lg:h-20 w-3/4 rounded-lg" />
+        </div>
+        <h1 v-else class="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight flex-1 min-w-0">
           {{ tokenData?.metadata?.name || 'Untitled NFT' }}
         </h1>
 
         <!-- Action Dropdown Menu -->
+        <div v-if="!tokenData">
+          <USkeleton class="h-7 w-7 rounded-md" />
+        </div>
         <UDropdownMenu
+          v-else
           :items="actionItems"
           :content="{ align: 'end', side: 'bottom', sideOffset: 8 }"
           :ui="{ content: 'w-48' }"
@@ -178,7 +185,14 @@ const actionItems = computed(() => [
         <p class="font-bold">
           Collection Creator
         </p>
-        <UserInfo :size="40" :address="creator || undefined" transparent-background custom-name>
+        <div v-if="!creator" class="flex items-center gap-3">
+          <USkeleton class="h-10 w-10 rounded-full" />
+          <div class="space-y-2 flex-1">
+            <USkeleton class="h-4 w-24" />
+            <USkeleton class="h-3 w-20" />
+          </div>
+        </div>
+        <UserInfo v-else :size="40" :address="creator" transparent-background custom-name>
           <template #name="{ addressName }">
             <div>
               <p class="font-bold">
@@ -195,7 +209,14 @@ const actionItems = computed(() => [
         <p class="font-bold">
           Owner
         </p>
-        <UserInfo :size="40" :address="owner || undefined" transparent-background custom-name>
+        <div v-if="!owner" class="flex items-center gap-3">
+          <USkeleton class="h-10 w-10 rounded-full" />
+          <div class="space-y-2 flex-1">
+            <USkeleton class="h-4 w-24" />
+            <USkeleton class="h-3 w-20" />
+          </div>
+        </div>
+        <UserInfo v-else :size="40" :address="owner" transparent-background custom-name>
           <template #name="{ addressName }">
             <div>
               <p class="font-bold">
