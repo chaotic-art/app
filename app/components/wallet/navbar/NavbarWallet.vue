@@ -1,8 +1,28 @@
 <script setup lang="ts">
+import { LazyWalletAssetModal } from '#components'
+
 const {
   walletConnectModalOpen,
-  walletAccountModalOpen,
 } = storeToRefs(usePreferencesStore())
+
+const route = useRoute()
+
+const overlay = useOverlay()
+const slideover = overlay.create(LazyWalletAssetModal)
+
+function openWalletAssetModal() {
+  slideover.open()
+}
+
+// Auto-close slide over when navigating to different pages
+watch(
+  () => route.path,
+  (newPath, oldPath) => {
+    if (oldPath && newPath !== oldPath) {
+      slideover.close()
+    }
+  },
+)
 </script>
 
 <template>
@@ -10,7 +30,7 @@ const {
     <client-only>
       <WalletDropdown
         @open-wallet="walletConnectModalOpen = true"
-        @open-asset="walletAccountModalOpen = true"
+        @open-asset="openWalletAssetModal"
       />
       <template #fallback>
         <div class="flex items-center justify-center">
@@ -18,11 +38,6 @@ const {
         </div>
       </template>
     </client-only>
-
-    <!-- Wallet Asset Modal -->
-    <WalletAssetModal
-      v-model="walletAccountModalOpen"
-    />
 
     <!-- Wallet Connect Modal -->
     <LazyWalletConnectModal

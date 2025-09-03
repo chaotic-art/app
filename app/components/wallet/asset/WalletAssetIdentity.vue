@@ -18,7 +18,18 @@ function handleWalletSettings() {
 
 <template>
   <div class="flex items-center justify-between">
-    <UserInfo :avatar-size="40" :address="accountId" :transparent-background="true" class="min-w-0" />
+    <UserInfo v-if="accountId" :avatar-size="40" :address="accountId" :transparent-background="true" class="min-w-0" custom-name>
+      <template #name="{ addressName }">
+        <div class="flex flex-col">
+          <span class="text-sm font-medium text-foreground">{{ addressName }}</span>
+          <span
+            class="text-xs text-muted-foreground"
+          >
+            View my profile
+          </span>
+        </div>
+      </template>
+    </UserInfo>
 
     <div class="flex items-center gap-2">
       <UButton
