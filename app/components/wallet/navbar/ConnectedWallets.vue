@@ -9,7 +9,7 @@ const connectedWallet = computed(() => getConnectedSubAccount.value || getConnec
 <template>
   <div
     v-if="connectedWallet"
-    class="flex items-center bg-primary hover:bg-primary/90 rounded-full py-2 px-4 transition-colors cursor-pointer"
+    class="flex items-center bg-primary hover:bg-primary/90 rounded-full py-1 pl-2 pr-3 transition-colors cursor-pointer"
   >
     <ConnectedWalletBadge :account="connectedWallet" />
   </div>
