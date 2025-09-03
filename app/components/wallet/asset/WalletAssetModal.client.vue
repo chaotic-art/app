@@ -1,11 +1,18 @@
 <script setup lang="ts">
-const value = defineModel<boolean>({ required: true })
+const isOpen = defineModel<boolean>({ required: true })
+const route = useRoute()
+
+watch(route, () => {
+  if (isOpen.value) {
+    isOpen.value = false
+  }
+})
 </script>
 
 <template>
   <div>
     <USlideover
-      v-model:open="value"
+      v-model:open="isOpen"
       title="Profile"
       side="right"
       :ui="{
