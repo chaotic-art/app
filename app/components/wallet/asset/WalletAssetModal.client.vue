@@ -1,12 +1,5 @@
 <script setup lang="ts">
 const isOpen = defineModel<boolean>({ required: true })
-const route = useRoute()
-
-watch(route, () => {
-  if (isOpen.value) {
-    isOpen.value = false
-  }
-})
 </script>
 
 <template>
