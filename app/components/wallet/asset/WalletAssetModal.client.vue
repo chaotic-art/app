@@ -24,9 +24,7 @@ const emit = defineEmits<{ close: [boolean] }>()
     </template>
 
     <template #footer>
-      <div>
-        <ThemeSwitcher show-label />
-      </div>
+      <WalletAssetFooter />
     </template>
   </USlideover>
 </template>
