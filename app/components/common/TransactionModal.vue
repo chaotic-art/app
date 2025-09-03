@@ -56,7 +56,7 @@ const resolvedStatus = computed(() => {
 
       <!-- Shopping success preview -->
       <LazySuccessfulBuy
-        v-else-if="isSuccess && (result?.type === 'buy' || result?.type === 'burn')"
+        v-else-if="isSuccess && (result?.type === 'buy' || result?.type === 'burn' || result?.type === 'transfer')"
         :result="result"
         :status="resolvedStatus"
       />

@@ -69,6 +69,33 @@ const actionButtons = computed(() => {
     },
   }
 })
+
+const headerContent = computed<{ single: string, multiple: string }>(() => {
+  switch (props.result.type) {
+    case 'buy':
+      return {
+        single: $i18n.t('buyModal.purchaseSuccessful'),
+        multiple: $i18n.t('buyModal.amountPurchaseSuccessfully'),
+      }
+
+    case 'transfer':
+      return {
+        single: 'NFT Transferred',
+        multiple: 'NFTs Transferred',
+      }
+
+    case 'burn':
+      return {
+        single: 'NFT Burned',
+        multiple: 'NFTs Burned',
+      }
+  }
+
+  return {
+    single: $i18n.t('transferModal.nftTransferred'),
+    multiple: $i18n.t('transferModal.amountNftTransferred'),
+  }
+})
 </script>
 
 <template>
@@ -80,10 +107,7 @@ const actionButtons = computed(() => {
   >
     <SuccessfulItemsMedia
       :items="items"
-      :header="{
-        single: result.type === 'buy' ? $t('buyModal.purchaseSuccessful') : 'NFT Burned',
-        multiple: result.type === 'buy' ? $t('buyModal.amountPurchaseSuccessfully') : 'NFTs Burned',
-      }"
+      :header="headerContent"
     />
   </SuccessfulModalBody>
 </template>

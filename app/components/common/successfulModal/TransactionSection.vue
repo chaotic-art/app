@@ -10,10 +10,10 @@ const props = defineProps<{
 }>()
 
 const { add: toast } = useToast()
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 
 const txUrl = computed(() =>
-  getSubscanExtrinsicUrl(props.txHash || '', prefix.value as SupportedChain),
+  getSubscanExtrinsicUrl(props.txHash || '', currentChain.value as SupportedChain),
 )
 const { copy } = useClipboard({ source: txUrl })
 
