@@ -25,7 +25,7 @@ export interface NftCategory {
 }
 
 export interface ActionTransactionResult {
-  type: 'listing' | 'buy' | 'burn'
+  type: 'listing' | 'buy' | 'burn' | 'token_transfer'
   items: {
     id: string
     sn: number

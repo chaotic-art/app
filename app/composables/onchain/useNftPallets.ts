@@ -87,6 +87,13 @@ interface AirdropNftsParams {
 
 }
 
+interface TransferNftsParams {
+  items: BaseActionCartItem[]
+  chain: AssetHubChain
+  targetAddress: string
+  type?: TxType
+}
+
 export function useNftPallets() {
   const { $sdk } = useNuxtApp()
   const { hash, error, status, result, open } = useTransactionModal()
@@ -647,6 +654,64 @@ export function useNftPallets() {
     })
   }
 
+  async function transferNfts({
+    items,
+    chain,
+    targetAddress,
+    type = 'submit',
+  }: TransferNftsParams) {
+    const { signer, address } = await getAccountSigner()
+    const api = $sdk(chain).api
+    await api.compatibilityToken
+
+    const calls = items.map((item) => {
+      return api.tx.Nfts.transfer({
+        collection: item.collection.id,
+        item: item.sn,
+        dest: MultiAddress.Id(targetAddress),
+      })
+    })
+
+    const transaction = api.tx.Utility.batch_all({
+      calls: calls.map(call => call.decodedCall),
+    })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    open.value = true
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+
+          result.value = {
+            type: 'token_transfer',
+            hash: hash.value,
+            prefix: chain,
+            items: items.map(nft => ({
+              id: nft.id,
+              sn: nft.sn,
+              price: 0,
+              collection: nft.collection,
+              metadata_uri: nft.metadata_uri,
+              metadata: nft.metadata,
+            })),
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
     mintNft,
@@ -659,5 +724,6 @@ export function useNftPallets() {
     // TODO move else where
     getAccountSigner,
     airdropNfts,
+    transferNfts,
   }
 }
