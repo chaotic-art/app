@@ -2,7 +2,8 @@
 import { copyAddress } from '~/utils/format/address'
 
 const { accountId } = useAuth()
-const { walletConnectModalOpen, walletAccountModalOpen } = storeToRefs(usePreferencesStore())
+const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
+const { walletAssetModal } = useWalletSidebar()
 
 async function handleCopyAddress() {
   if (accountId.value) {
@@ -11,14 +12,25 @@ async function handleCopyAddress() {
 }
 
 function handleWalletSettings() {
-  walletAccountModalOpen.value = false
+  walletAssetModal.close()
   walletConnectModalOpen.value = true
 }
 </script>
 
 <template>
   <div class="flex items-center justify-between">
-    <UserInfo :avatar-size="40" :address="accountId" :transparent-background="true" class="min-w-0" />
+    <UserInfo v-if="accountId" :avatar-size="40" :address="accountId" :transparent-background="true" class="min-w-0" custom-name>
+      <template #name="{ addressName }">
+        <div class="flex flex-col">
+          <span class="text-sm font-medium text-foreground">{{ addressName }}</span>
+          <span
+            class="text-xs text-muted-foreground"
+          >
+            View my profile
+          </span>
+        </div>
+      </template>
+    </UserInfo>
 
     <div class="flex items-center gap-2">
       <UButton
