@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui'
+import type { SocialLink } from '~/services/profile'
+import { fetchFollowersOf, fetchProfileByAddress } from '~/services/profile'
 import { formatDetailedTimeToNow } from '~/utils/format/time'
 
 const { drop, amountToMint } = storeToRefs(useDropStore())
@@ -83,6 +85,26 @@ const tabItems = ref<TabsItem[]>([
     icon: 'i-lucide-info',
   },
 ])
+
+// Artist info
+const artistDescription = ref('')
+const followersCount = ref(0)
+const socials = ref<SocialLink[]>([])
+
+watchEffect(async () => {
+  if (!drop.value?.creator) {
+    return
+  }
+
+  const [profile, followers] = await Promise.all([
+    fetchProfileByAddress(drop.value.creator),
+    fetchFollowersOf(drop.value.creator),
+  ])
+
+  followersCount.value = followers.totalCount
+  socials.value = profile.socials
+  artistDescription.value = profile.description
+})
 </script>
 
 <template>
@@ -188,29 +210,36 @@ const tabItems = ref<TabsItem[]>([
 
         <!-- Title -->
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
-          {{ drop?.collectionName || 'ENIGRAMS' }}
+          {{ drop?.collectionName || '' }}
         </h1>
 
         <!-- Artist Info -->
         <div v-if="drop?.creator" class="flex items-center gap-3 mb-6">
-          <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center">
-            <UserInfo :avatar-size="40" :address="drop?.creator" />
-          </div>
-          <div class="flex-1">
-            <p class="font-medium text-foreground">
-              AOWISEONE
-            </p>
-            <p class="text-sm text-muted-foreground">
-              Artist • 2.1K followers
-            </p>
-          </div>
-          <FollowButton :target="drop?.creator" class="px-4 py-2" />
+          <UserInfo
+            :avatar-size="48"
+            :address="drop?.creator"
+            custom-name
+            transparent-background
+            class="flex items-center gap-3 flex-1"
+          >
+            <template #name="{ addressName }">
+              <div>
+                <p class="font-medium text-foreground">
+                  {{ addressName }}
+                </p>
+                <p class="text-sm text-muted-foreground">
+                  Artist • {{ followersCount }} followers
+                </p>
+              </div>
+              <FollowButton :target="drop?.creator" class="px-4 py-2" />
+            </template>
+          </UserInfo>
         </div>
 
         <!-- Description -->
-        <div class="text-muted-foreground mb-8">
+        <div class="mb-8">
           <MarkdownPreview
-            :source="drop?.collectionDescription || 'ENIGRAMS is a generative art collection that uses coded language getting aid from abstract geometry, creating visual ciphers filled with mysterious glyphs. Each piece feels like a secret waiting to be uncovered, inviting collectors to step into the chaos and find the hidden meaning within.'"
+            :source="drop?.collectionDescription || ''" class="line-clamp-6"
           />
         </div>
 
@@ -367,7 +396,7 @@ const tabItems = ref<TabsItem[]>([
 
         <!-- About Tab -->
         <div v-else-if="item.value === 'about'" class="mt-8">
-          <DropAbout :drop="drop" :formatted-token-price="formattedTokenPrice" />
+          <DropAbout :drop="drop" :formatted-token-price="formattedTokenPrice" :socials="socials" :artist-description="artistDescription" :followers-count="followersCount" />
         </div>
       </template>
     </UTabs>
