@@ -75,7 +75,7 @@ async function handleRefreshMetadata() {
 }
 
 // burn action
-const { canBurn, burnNow } = useCartActions({
+const { canBurn, burnNow, canTransfer, transferNow } = useCartActions({
   tokenId: Number(props.tokenId),
   collectionId: Number(props.collectionId),
   chain: props.chain,
@@ -93,6 +93,12 @@ const actionItems = computed(() => [
       label: 'Share',
       icon: 'i-heroicons-share',
       onSelect: shareToken,
+    },
+    {
+      label: 'Transfer',
+      icon: 'i-heroicons-paper-airplane',
+      onSelect: transferNow,
+      disabled: !canTransfer,
     },
     {
       label: 'Burn',
