@@ -282,7 +282,7 @@ whenever(() => Boolean(currentTokenValue.value), () => {
       usd = calculateUsdFromToken(token, currentTokenValue.value)
     }
     else if (usd) {
-      token = calculateTokenFromUsd(currentTokenValue.value, usd)
+      token = calculateTokenFromUsd(usd, currentTokenValue.value)
     }
 
     return {
