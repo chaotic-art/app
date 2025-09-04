@@ -44,7 +44,7 @@ const randomSixArtist = computed(() => allArtists.value?.slice().sort(() => Math
               </span>
             </template>
           </UserInfo>
-          <FollowButton :target="artist!" class="text-sm md:text-base" />
+          <FollowButton :target="artist!" class="text-sm md:text-base hidden md:block" />
         </div>
       </div>
       <div class="flex justify-center mt-6 md:mt-8">
