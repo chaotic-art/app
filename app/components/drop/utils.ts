@@ -110,3 +110,76 @@ export async function getDropAttributes(alias: string): Promise<DropItem | undef
 }
 
 export const isTBA = (price: unknown) => price === null || price === ''
+
+export async function dropStats(collection?: string) {
+  if (!collection) {
+    return {
+      floorPrice: 0,
+      listedPercentage: '0%',
+      ownershipMap: new Map(),
+      ownerTokenIds: [],
+      collectionStats: {
+        uniqueHolders: 0,
+        avgPerHolder: '0 NFTs',
+        holderRatio: '0%',
+      },
+    }
+  }
+
+  const { $sdk } = useNuxtApp()
+  const api = $sdk('ahp').api
+
+  const [queryItems, queryFloor] = await Promise.all([
+    api.query.Nfts.Item.getEntries(Number(collection)),
+    api.query.Nfts.ItemPriceOf.getEntries(Number(collection)),
+  ])
+
+  // Group items by owner
+  const ownershipMap = new Map<string, { address: string, items: number }>()
+  const ownerTokenIds: Array<{ owner: string, tokenId: number }> = []
+
+  queryItems.forEach(async (item) => {
+    const owner = item.value.owner.toString()
+    const tokenId = Number(item.keyArgs[1])
+
+    if (!ownershipMap.has(owner)) {
+      ownershipMap.set(owner, { address: owner, items: 0 })
+    }
+
+    ownershipMap.get(owner)!.items++
+    ownerTokenIds.push({ owner, tokenId })
+  })
+
+  // Floor price and Listed percentage
+  let floorPrice = 0
+  if (queryFloor.length) {
+    const floorValues = queryFloor
+      .filter(item => Number(item.value[0]) > 0)
+      .map(item => Number(item.value[0]))
+    floorPrice = Math.min(...floorValues)
+  }
+
+  const listedPercentage = queryItems.length > 0 && queryFloor.length > 0
+    ? `${((queryFloor.length / queryItems.length) * 100).toFixed(1)}%`
+    : '0%'
+
+  // Collection stats
+  const totalItems = queryItems.length
+  const uniqueHolders = ownershipMap.size
+  const avgPerHolder = uniqueHolders > 0 ? `${(totalItems / uniqueHolders).toFixed(1)} NFTs` : '0 NFTs'
+  const holderRatio = totalItems > 0 && uniqueHolders > 0
+    ? `${((uniqueHolders / totalItems) * 100).toFixed(1)}%`
+    : '0%'
+
+  return {
+    floorPrice,
+    listedPercentage,
+    ownershipMap,
+    ownerTokenIds,
+    collectionStats: {
+      uniqueHolders,
+      avgPerHolder,
+      holderRatio,
+    },
+  }
+}

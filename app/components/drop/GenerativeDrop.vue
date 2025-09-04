@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui'
 import type { SocialLink } from '~/services/profile'
+import { formatBalance } from 'dedot/utils'
 import { fetchFollowersOf, fetchProfileByAddress } from '~/services/profile'
 import { formatDetailedTimeToNow } from '~/utils/format/time'
+import { dropStats } from './utils'
 
 const { drop, amountToMint } = storeToRefs(useDropStore())
 
@@ -104,6 +106,18 @@ watchEffect(async () => {
   followersCount.value = followers.totalCount
   socials.value = profile.socials
   artistDescription.value = profile.description
+})
+
+// Drop stats
+const collectionStats = ref<Awaited<ReturnType<typeof dropStats>>>()
+
+watchEffect(async () => {
+  if (!drop.value?.collection) {
+    return
+  }
+
+  const stats = await dropStats(drop.value.collection)
+  collectionStats.value = stats
 })
 </script>
 
@@ -261,7 +275,7 @@ watchEffect(async () => {
               <UIcon name="i-heroicons-users" class="text-muted-foreground size-6" />
             </div>
             <p class="text-2xl font-bold text-foreground">
-              1,234
+              {{ collectionStats?.collectionStats.uniqueHolders.toLocaleString() || '0' }}
             </p>
             <p class="text-sm text-muted-foreground">
               Collectors
@@ -272,7 +286,7 @@ watchEffect(async () => {
               <UIcon name="i-heroicons-chart-bar" class="text-muted-foreground size-6" />
             </div>
             <p class="text-2xl font-bold text-foreground">
-              854 DOT
+              {{ formatBalance(collectionStats?.floorPrice || '0', { decimals, symbol: chainSymbol }) }}
             </p>
             <p class="text-sm text-muted-foreground">
               Floor Price
@@ -283,7 +297,7 @@ watchEffect(async () => {
               <UIcon name="i-heroicons-clock" class="text-muted-foreground size-6" />
             </div>
             <p class="text-2xl font-bold text-foreground">
-              28.47%
+              {{ collectionStats?.listedPercentage || '0%' }}
             </p>
             <p class="text-sm text-muted-foreground">
               Listed
@@ -391,7 +405,7 @@ watchEffect(async () => {
 
         <!-- Collectors Tab -->
         <div v-else-if="item.value === 'collectors'" class="mt-8">
-          <DropCollectors :drop="drop" />
+          <DropCollectors :drop="drop" :collection-stats="collectionStats" />
         </div>
 
         <!-- About Tab -->
