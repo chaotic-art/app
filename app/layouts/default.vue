@@ -17,9 +17,7 @@ useHead({
     <Navbar />
 
     <main class="grow">
-      <div class="container-fluid">
-        <slot />
-      </div>
+      <slot />
     </main>
     <LazyFooter />
   </div>

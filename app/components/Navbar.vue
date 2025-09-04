@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import type { NavigationMenuItem } from '@nuxt/ui'
 import Logo from '@/assets/svg/navbar-logo.svg'
+import SearchBar from '@/components/common/SearchBar.vue'
 import ThemeSwitcher from '@/components/common/ThemeSwitcher.vue'
+import { isProduction } from '@/utils/env'
 
 const { accountId } = useAuth()
 const { prefix } = usePrefix()
@@ -72,7 +74,7 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
 
 <template>
   <UContainer>
-    <nav class="rounded-full border border-border my-6 p-2 flex items-center gap-2 justify-between mx-auto overflow-hidden">
+    <nav class="rounded-full border border-border my-6 p-2 flex items-center gap-2 justify-between mx-auto">
       <div class="flex items-center gap-2 ml-4">
         <Logo class="select-none w-6 h-6 md:w-8 md:h-8" :font-controlled="false" />
         <NuxtLink
@@ -80,6 +82,11 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
         >
           Chaotic
         </NuxtLink>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="hidden md:block">
+        <SearchBar />
       </div>
 
       <div class="flex items-center gap-3 md:gap-6">
@@ -118,6 +125,11 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
   >
     <template #body>
       <div class="space-y-4">
+        <!-- Search Bar -->
+        <div class="px-4">
+          <SearchBar />
+        </div>
+
         <!-- Navigation Items -->
         <div class="space-y-2">
           <UButton

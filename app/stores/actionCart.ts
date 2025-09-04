@@ -7,6 +7,7 @@ export type BaseActionCartItem = {
   collection: {
     id: number
     name: string
+    floor?: number
   }
   price?: number
   currentOwner: string

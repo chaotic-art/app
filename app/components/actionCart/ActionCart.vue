@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LazyBurnModal } from '#components'
+import { LazyBurnModal, LazyTransferModal } from '#components'
 import { useActionCartStore } from '@/stores/actionCart'
 
 const { onDisconnect } = useWalletManager()
@@ -23,7 +23,6 @@ function transferToListingCart() {
         ...item,
         collection: {
           ...item.collection,
-          floor: undefined,
         },
       })
     })
@@ -47,9 +46,14 @@ useModalIsOpenTracker({
 
 const overlay = useOverlay()
 const burnModal = overlay.create(LazyBurnModal)
+const transferModal = overlay.create(LazyTransferModal)
 
 function openBurnModal() {
   burnModal.open()
+}
+
+function openTransferModal() {
+  transferModal.open()
 }
 </script>
 
@@ -92,6 +96,15 @@ function openBurnModal() {
               Burn
               <UIcon
                 name="i-lucide-trash"
+              />
+            </UButton>
+            <UButton
+              variant="outline"
+              @click="openTransferModal"
+            >
+              Transfer
+              <UIcon
+                name="i-lucide-send"
               />
             </UButton>
             <UButton

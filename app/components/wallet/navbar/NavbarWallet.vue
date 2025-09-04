@@ -1,8 +1,6 @@
 <script setup lang="ts">
-const {
-  walletConnectModalOpen,
-  walletAccountModalOpen,
-} = storeToRefs(usePreferencesStore())
+const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
+const { walletAssetModal } = useWalletSidebar()
 </script>
 
 <template>
@@ -10,7 +8,7 @@ const {
     <client-only>
       <WalletDropdown
         @open-wallet="walletConnectModalOpen = true"
-        @open-asset="walletAccountModalOpen = true"
+        @open-asset="walletAssetModal.open"
       />
       <template #fallback>
         <div class="flex items-center justify-center">
@@ -18,11 +16,6 @@ const {
         </div>
       </template>
     </client-only>
-
-    <!-- Wallet Asset Modal -->
-    <WalletAssetModal
-      v-model="walletAccountModalOpen"
-    />
 
     <!-- Wallet Connect Modal -->
     <LazyWalletConnectModal

@@ -7,7 +7,7 @@ export function formatAddress({
   prefix,
 }: {
   address: string
-  prefix: Prefix
+  prefix: Prefix | SupportedChain
 }) {
   return encodeAddress(address, chainSpec[prefix as SupportedChain].ss58Format)
 }
