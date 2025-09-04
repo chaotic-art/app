@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { TabsItem } from '@nuxt/ui'
 import { formatDetailedTimeToNow } from '~/utils/format/time'
 
 const { drop, amountToMint } = storeToRefs(useDropStore())
@@ -61,6 +62,27 @@ const dropStartRelativeTime = computed(() => {
 
   return formatDetailedTimeToNow(targetDate)
 })
+
+// Tabs configuration
+const activeTab = ref('items')
+
+const tabItems = ref<TabsItem[]>([
+  {
+    label: 'Items',
+    value: 'items',
+    icon: 'i-lucide-grid-3x3',
+  },
+  {
+    label: 'Collectors',
+    value: 'collectors',
+    icon: 'i-lucide-users',
+  },
+  {
+    label: 'About',
+    value: 'about',
+    icon: 'i-lucide-info',
+  },
+])
 </script>
 
 <template>
@@ -320,11 +342,35 @@ const dropStartRelativeTime = computed(() => {
 
     <USeparator class="my-12 md:my-20" />
 
-    <DropItemsGrid
-      v-if="drop.collection"
-      :key="drop.collection"
-      :collection-id="drop.collection"
-    />
+    <!-- Tabs Section -->
+    <UTabs
+      v-model="activeTab"
+      :items="tabItems"
+      color="neutral"
+      variant="pill"
+      class="w-full mb-20"
+    >
+      <template #content="{ item }">
+        <!-- Items Tab -->
+        <div v-if="item.value === 'items'" class="mt-8">
+          <DropItemsGrid
+            v-if="drop.collection"
+            :key="drop.collection"
+            :collection-id="drop.collection"
+          />
+        </div>
+
+        <!-- Collectors Tab -->
+        <div v-else-if="item.value === 'collectors'" class="mt-8">
+          <DropCollectors :drop="drop" />
+        </div>
+
+        <!-- About Tab -->
+        <div v-else-if="item.value === 'about'" class="mt-8">
+          <DropAbout :drop="drop" :formatted-token-price="formattedTokenPrice" />
+        </div>
+      </template>
+    </UTabs>
   </UContainer>
 
   <DropMintModal />
