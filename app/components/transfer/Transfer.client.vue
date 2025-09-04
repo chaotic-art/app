@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { useClipboard, whenever } from '@vueuse/core'
 import { useBalancesPallets } from '@/composables/onchain/useBalancePallets'
+import { isValidAddress } from '~/utils/format/address'
 
 export interface TargetAddress {
   address: string
@@ -17,10 +19,13 @@ const { chainSymbol, decimals } = useChain()
 const { accountId } = useAuth()
 const { prefix } = usePrefix()
 const { getCurrentTokenValue } = useFiatStore()
+const router = useRouter()
+const route = useRoute()
 const { usd: balanceUsd, formatted: balanceFormatted } = useAmount(balance, decimals, chainSymbol)
 const { transfer } = useBalancesPallets()
 const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
 const currentTokenValue = computed(() => Number(getCurrentTokenValue(chainSymbol.value as any)))
+const { copy } = useClipboard()
 
 const isConfirmModalOpen = ref(false)
 const sendSameAmount = ref(false)
@@ -182,6 +187,63 @@ async function handleTransfer() {
   }
 }
 
+function generatePaymentLink(targets: TargetAddress[]): string {
+  const url = new URL(`${location.origin}${location.pathname}`)
+
+  targets.forEach((addr, i) => {
+    const suffix = i === 0 ? '' : i
+
+    url.searchParams.append(`target${suffix}`, addr.address)
+
+    if (displayUnit.value === 'usd') {
+      url.searchParams.append(`usdamount${suffix}`, String(addr.usd))
+    }
+    else {
+      url.searchParams.append(`amount${suffix}`, String(addr.token))
+    }
+  })
+
+  return url.toString()
+}
+
+function getPaymentQueryValues(queryKey: string, validate: ({ key, value }: { key: string, value: any }) => boolean) {
+  return Object.entries(route.query)
+    .filter(([key]) => key.startsWith(queryKey))
+    .filter(([key, value]) => validate({ key, value }))
+    .map(([, value]) => value as string)
+}
+
+const moreActions = computed(() => ([
+  {
+    label: 'Pay me link',
+    icon: 'heroicons:currency-dollar',
+    onClick: () => {
+      successMessage(t('general.copyToClipboard'))
+      copy(generatePaymentLink([targetAddresses.value[0]] as TargetAddress[]))
+    },
+  },
+  {
+    label: 'Recurring payment link',
+    icon: 'heroicons:arrow-path-rounded-square-16-solid',
+    onClick: () => {
+      successMessage(t('general.copyToClipboard'))
+      copy(generatePaymentLink(targetAddresses.value))
+    },
+  },
+]))
+
+watch(sendSameAmount, (value) => {
+  if (value) {
+    const tokenAmount = targetAddresses.value[0]?.token as number
+    const usdAmount = targetAddresses.value[0]?.usd as number
+    targetAddresses.value = targetAddresses.value.map(address => ({
+      ...address,
+      token: tokenAmount,
+      usd: usdAmount,
+    }))
+  }
+})
+
 watch(() => targetAddresses.value.length, async () => {
   try {
     txFee.native = 0
@@ -202,28 +264,62 @@ watch(() => targetAddresses.value.length, async () => {
   }
 }, { immediate: true })
 
-// watchDebounced(
-//   targetAddresses,
-//   () => {
-//     targetAddresses.value.forEach((address) => {
-//       if (!address.address) {
-//         address.isInvalid = false
-//         return
-//       }
+whenever(() => Boolean(currentTokenValue.value), () => {
+  const targets = getPaymentQueryValues('target', ({ value: address }) => isValidAddress(address))
+  const amounts = getPaymentQueryValues('amount', ({ value }) => Boolean(Number(value)))
+  const usdamount = getPaymentQueryValues('usdamount', ({ value }) => Boolean(Number(value)))
 
-//       address.isInvalid = !isValidAddress(address.address)
-//     })
-//   },
-//   { debounce: 200, deep: true },
-// )
+  if (targets.length === 0) {
+    router.replace({ query: undefined })
+    return
+  }
+
+  targetAddresses.value = targets.map((address, index) => {
+    let token = Number(amounts[index] || '')
+    let usd = Number(usdamount[index] || '')
+
+    if (token) {
+      usd = calculateUsdFromToken(token, currentTokenValue.value)
+    }
+    else if (usd) {
+      token = calculateTokenFromUsd(currentTokenValue.value, usd)
+    }
+
+    return {
+      address,
+      usd,
+      token,
+    } as TargetAddress
+  })
+
+  displayUnit.value = amounts[0] ? 'token' : 'usd'
+
+  if (targetAddresses.value.length > 1) {
+    sendSameAmount.value = targetAddresses.value.map(({ token }) => token).every(Boolean)
+  }
+}, { once: true })
 </script>
 
 <template>
   <UContainer class="max-w-3xl px-4 md:px-6 py-10">
     <div class="border border-gray-300 rounded-xl p-5">
-      <h1 class="font-bold text-4xl mb-5">
-        {{ t('transfer.title') }}
-      </h1>
+      <div class="flex items-center justify-between mb-5">
+        <h1 class="font-bold text-4xl">
+          {{ t('transfer.title') }}
+        </h1>
+
+        <UDropdownMenu
+          :items="moreActions"
+          :content="{ align: 'end', side: 'bottom', sideOffset: 8 }"
+        >
+          <UButton
+            color="neutral"
+            size="sm"
+            class="h-7 w-7"
+            icon="i-heroicons-ellipsis-horizontal"
+          />
+        </UDropdownMenu>
+      </div>
 
       <div class="flex justify-between">
         <div class="flex flex-col">
