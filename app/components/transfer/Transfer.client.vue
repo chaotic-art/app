@@ -232,7 +232,7 @@ const moreActions = computed(() => ([
   },
 ]))
 
-watch(sendSameAmount, (value) => {
+watch([sendSameAmount, () => targetAddresses.value.length], ([value]) => {
   if (value) {
     const tokenAmount = targetAddresses.value[0]?.token as number
     const usdAmount = targetAddresses.value[0]?.usd as number
