@@ -242,13 +242,10 @@ const dropStartRelativeTime = computed(() => {
 
         <!-- Mint Section -->
         <div class="bg-card border border-border rounded-xl p-6">
-          <div class="flex items-center justify-between mb-4">
+          <div class="mb-4">
             <h3 class="text-lg font-semibold text-card-foreground">
               Mint {{ drop?.collectionName || 'ENIGRAMS' }}
             </h3>
-            <p class="text-sm text-muted-foreground">
-              Max 5 per wallet
-            </p>
           </div>
 
           <div class="mb-4">
@@ -283,7 +280,7 @@ const dropStartRelativeTime = computed(() => {
                 variant="outline"
                 size="sm"
                 class="w-8 h-8"
-                @click="amountToMint = Math.min(5, amountToMint + 1)"
+                @click="amountToMint = amountToMint + 1"
               />
             </div>
           </div>
