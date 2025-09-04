@@ -4,7 +4,40 @@ import { formatDetailedTimeToNow } from '~/utils/format/time'
 const { drop, amountToMint } = storeToRefs(useDropStore())
 
 const { decimals, chainSymbol } = useChain()
+const dropPreviewRef = ref()
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
+
+// Share functionality
+function shareVariant() {
+  if (navigator.share) {
+    navigator.share({
+      title: `${drop.value?.collectionName || 'ENIGRAMS'} - Generative Art`,
+      text: `Check out this generative art collection: ${drop.value?.collectionName || 'ENIGRAMS'}`,
+      url: window.location.href,
+    })
+  }
+  else {
+    // Fallback: copy to clipboard
+    navigator.clipboard.writeText(window.location.href)
+    // You might want to show a toast notification here
+  }
+}
+
+// Preview variant in new tab
+function previewVariantInNewTab() {
+  const previewItem = dropPreviewRef.value?.previewItem
+  if (previewItem?.image) {
+    const sanitizedUrl = sanitizeIpfsUrl(previewItem.image, 'nftStorage')
+    window.open(sanitizedUrl, '_blank')
+  }
+}
+
+// Calculate minting percentage
+const mintingPercentage = computed(() => {
+  if (!drop.value?.max || !drop.value?.minted)
+    return 0
+  return Math.round((Number(drop.value.minted) / Number(drop.value.max)) * 100)
+})
 
 const dropStartRelativeTime = computed(() => {
   let targetDate: Date | null = null
@@ -35,37 +68,63 @@ const dropStartRelativeTime = computed(() => {
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
       <!-- Left side - Preview -->
       <div class="order-2 lg:order-1">
-        <div class="relative group">
-          <!-- Live Drop Badge -->
-          <div class="absolute top-4 left-4 z-10">
-            <UBadge class="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-medium" icon="i-heroicons-bolt">
-              Live Drop
-            </UBadge>
-          </div>
-
-          <!-- Action Icons - shows on hover -->
-          <div class="absolute top-4 right-4 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <UButton
-              icon="i-heroicons-heart"
-              variant="ghost"
-              class="bg-background/20 backdrop-blur-sm w-10 h-10"
-            />
-            <UButton
-              icon="i-heroicons-share"
-              variant="ghost"
-              class="bg-background/20 backdrop-blur-sm w-10 h-10"
-            />
-            <UButton
-              icon="i-heroicons-arrow-top-right-on-square"
-              variant="ghost"
-              class="bg-background/20 backdrop-blur-sm w-10 h-10"
-            />
-          </div>
-
+        <div class="relative">
           <!-- Preview Item -->
           <ClientOnly>
-            <DropPreviewItem />
+            <DropPreviewItem ref="dropPreviewRef" />
           </ClientOnly>
+        </div>
+
+        <!-- Actions & Minting Progress -->
+        <div class="mt-6 bg-card border border-border rounded-xl p-4">
+          <!-- Actions Section -->
+          <div class="flex items-center justify-between mb-4">
+            <UButton
+              variant="soft"
+              trailing-icon="i-lucide-refresh-cw"
+              :loading="dropPreviewRef?.isCapturingImage"
+              class="text-xs md:text-sm"
+              @click="dropPreviewRef?.generateNft()"
+            >
+              Preview Variation
+            </UButton>
+
+            <div class="flex gap-2">
+              <!-- Love button hidden for now -->
+              <!-- <UButton
+                icon="i-heroicons-heart"
+                variant="ghost"
+                class="size-8"
+              /> -->
+              <UButton
+                icon="i-heroicons-share"
+                variant="ghost"
+                class="size-8"
+                @click="shareVariant"
+              />
+              <UButton
+                icon="i-heroicons-arrow-top-right-on-square"
+                variant="ghost"
+                class="size-8"
+                @click="previewVariantInNewTab"
+              />
+            </div>
+          </div>
+
+          <!-- Separator -->
+          <div class="border-t border-border mb-4" />
+
+          <!-- Minting Progress -->
+          <div class="flex items-center justify-between text-sm mb-3 text-card-foreground">
+            <span>{{ drop?.minted || 0 }} / {{ drop?.max || 10000 }} minted</span>
+            <span>{{ mintingPercentage }}%</span>
+          </div>
+          <div class="w-full bg-secondary rounded-full h-2">
+            <div
+              class="bg-primary rounded-full h-2 transition-all duration-300"
+              :style="{ width: `${mintingPercentage}%` }"
+            />
+          </div>
         </div>
 
         <!-- drop start at section -->
@@ -136,8 +195,8 @@ const dropStartRelativeTime = computed(() => {
         <!-- Stats Grid -->
         <div class="grid grid-cols-4 gap-6 mb-8">
           <div class="text-center">
-            <div class="w-8 h-8 mx-auto mb-2 flex items-center justify-center">
-              <UIcon name="i-heroicons-squares-2x2" class="text-muted-foreground" />
+            <div class="size-10 mx-auto mb-2 flex items-center justify-center bg-muted rounded">
+              <UIcon name="i-heroicons-squares-2x2" class="text-muted-foreground size-6" />
             </div>
             <p class="text-2xl font-bold text-foreground">
               {{ drop?.max || '10,000' }}
@@ -147,8 +206,8 @@ const dropStartRelativeTime = computed(() => {
             </p>
           </div>
           <div class="text-center">
-            <div class="w-8 h-8 mx-auto mb-2 flex items-center justify-center">
-              <UIcon name="i-heroicons-users" class="text-muted-foreground" />
+            <div class="size-10 mx-auto mb-2 flex items-center justify-center bg-muted rounded">
+              <UIcon name="i-heroicons-users" class="text-muted-foreground size-6" />
             </div>
             <p class="text-2xl font-bold text-foreground">
               1,234
@@ -158,25 +217,25 @@ const dropStartRelativeTime = computed(() => {
             </p>
           </div>
           <div class="text-center">
-            <div class="w-8 h-8 mx-auto mb-2 flex items-center justify-center">
-              <UIcon name="i-heroicons-chart-bar" class="text-muted-foreground" />
+            <div class="size-10 mx-auto mb-2 flex items-center justify-center bg-muted rounded">
+              <UIcon name="i-heroicons-chart-bar" class="text-muted-foreground size-6" />
             </div>
             <p class="text-2xl font-bold text-foreground">
               854 DOT
             </p>
             <p class="text-sm text-muted-foreground">
-              Volume
+              Floor Price
             </p>
           </div>
           <div class="text-center">
-            <div class="w-8 h-8 mx-auto mb-2 flex items-center justify-center">
-              <UIcon name="i-heroicons-clock" class="text-muted-foreground" />
+            <div class="size-10 mx-auto mb-2 flex items-center justify-center bg-muted rounded">
+              <UIcon name="i-heroicons-clock" class="text-muted-foreground size-6" />
             </div>
             <p class="text-2xl font-bold text-foreground">
               28.47%
             </p>
             <p class="text-sm text-muted-foreground">
-              Minted
+              Listed
             </p>
           </div>
         </div>
