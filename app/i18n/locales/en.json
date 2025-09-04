@@ -240,7 +240,9 @@
     "recipientCount": "Recipient {count}",
     "polkadotHub": "PolkadotHub",
     "totalAmount": "Total Amount",
-    "enterWalletAddress": "Enter a wallet address"
+    "enterWalletAddress": "Enter a wallet address",
+    "payMeLink": "Pay me link",
+    "recurringPaymentLink": "Recurring payment link"
   },
   "addressChecker": {
     "error": {

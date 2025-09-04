@@ -215,7 +215,7 @@ function getPaymentQueryValues(queryKey: string, validate: ({ key, value }: { ke
 
 const moreActions = computed(() => ([
   {
-    label: 'Pay me link',
+    label: t('transfer.payMeLink'),
     icon: 'heroicons:currency-dollar',
     onClick: () => {
       successMessage(t('general.copyToClipboard'))
@@ -223,7 +223,7 @@ const moreActions = computed(() => ([
     },
   },
   {
-    label: 'Recurring payment link',
+    label: t('transfer.recurringPaymentLink'),
     icon: 'heroicons:arrow-path-rounded-square-16-solid',
     onClick: () => {
       successMessage(t('general.copyToClipboard'))
