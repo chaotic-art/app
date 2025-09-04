@@ -239,7 +239,8 @@
     "recipients": "{count} Recipients",
     "recipientCount": "Recipient {count}",
     "polkadotHub": "PolkadotHub",
-    "totalAmount": "Total Amount"
+    "totalAmount": "Total Amount",
+    "enterWalletAddress": "Enter a wallet address"
   },
   "addressChecker": {
     "error": {

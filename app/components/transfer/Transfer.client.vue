@@ -127,7 +127,7 @@ function addRecipient() {
   targetAddresses.value.push(getDefaultAddress())
 }
 
-function onAmountChnage(target: TargetAddress) {
+function onAmountChange(target: TargetAddress) {
   target.usd = target.token ? calculateUsdFromToken(target.token, currentTokenValue.value) : 0
 
   if (sendSameAmount.value) {
@@ -135,7 +135,7 @@ function onAmountChnage(target: TargetAddress) {
   }
 }
 
-function onUsdChnage(target: TargetAddress) {
+function onUsdChange(target: TargetAddress) {
   target.token = target.usd ? calculateTokenFromUsd(target.usd, currentTokenValue.value) : 0
 
   if (sendSameAmount.value) {
@@ -155,6 +155,14 @@ function unifyAddressAmount(target: TargetAddress) {
     token: target.token,
     usd: target.usd,
   }))
+}
+
+function onAddressCheck(target: TargetAddress, valid: boolean) {
+  target.isInvalid = !valid
+}
+
+function onAddressFormatChange(target: TargetAddress, address: string) {
+  target.address = address
 }
 
 async function handleTransfer() {
@@ -251,7 +259,7 @@ watch(() => targetAddresses.value.length, async () => {
 
       <!-- Recipient -->
       <div class="flex flex-col gap-2 mb-5">
-        <div class="flex justify-between">
+        <div class="flex justify-between max-md:hidden">
           <span class="font-bold">{{ t('transfer.recipient') }}</span>
           <span class="font-bold">{{ t('transfer.amount') }}</span>
         </div>
@@ -262,10 +270,20 @@ watch(() => targetAddresses.value.length, async () => {
             v-for="(targetAddress, index) in targetAddresses" :key="index"
             class="flex flex-col gap-2"
           >
-            <div class="flex gap-2">
+            <div class="flex items-center justify-between md:hidden">
+              <span class="font-bold">{{ t('transfer.recipient') }} {{ index + 1 }}</span>
+              <UButton
+                v-if="targetAddresses.length > 1"
+                variant="ghost"
+                trailing-icon="i-lucide-trash"
+                @click="targetAddresses.splice(index, 1)"
+              />
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-2">
               <UInput
                 v-model="targetAddress.address"
-                :placeholder="t('airdrop.enterOneWalletAddressPerLine')"
+                :placeholder="t('transfer.enterWalletAddress')"
                 class="w-full"
                 size="xl"
                 :color="targetAddress.isInvalid ? 'error' : 'primary'"
@@ -273,14 +291,22 @@ watch(() => targetAddresses.value.length, async () => {
                 :ui="{ base: targetAddress.isInvalid ? 'ring-2 ring-error' : undefined }"
               />
 
+              <AddressChecker
+                class="md:hidden"
+                :address="targetAddress.address"
+                @check="valid => onAddressCheck(targetAddress, valid)"
+                @change="address => onAddressFormatChange(targetAddress, address)"
+              />
+
               <div class="flex items-center gap-2">
                 <UInput
                   v-if="displayUnit === 'token'"
                   v-model.number="targetAddress.token"
+                  class="w-full"
                   type="number"
                   size="xl"
                   :min="0"
-                  @update:model-value="() => onAmountChnage(targetAddress)"
+                  @update:model-value="onAmountChange(targetAddress)"
                 >
                   <template #trailing>
                     <div class="text-gray-400 flex items-center">
@@ -293,14 +319,16 @@ watch(() => targetAddresses.value.length, async () => {
                   v-else
                   v-model.number="targetAddress.usd"
                   type="number"
+                  class="w-full"
                   trailing-icon="i-material-symbols-attach-money"
                   size="xl"
                   :min="0"
-                  @update:model-value="() => onUsdChnage(targetAddress)"
+                  @update:model-value="onUsdChange(targetAddress)"
                 />
 
                 <UButton
                   v-if="targetAddresses.length > 1"
+                  class="max-md:hidden"
                   variant="ghost"
                   trailing-icon="i-lucide-trash"
                   @click="targetAddresses.splice(index, 1)"
@@ -309,9 +337,10 @@ watch(() => targetAddresses.value.length, async () => {
             </div>
 
             <AddressChecker
+              class="max-md:hidden"
               :address="targetAddress.address"
-              @check="valid => targetAddress.isInvalid = !valid"
-              @change="address => targetAddress.address = address"
+              @check="valid => onAddressCheck(targetAddress, valid)"
+              @change="address => onAddressFormatChange(targetAddress, address)"
             />
           </div>
 
