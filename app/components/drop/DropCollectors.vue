@@ -30,8 +30,7 @@ const allCollectors = computed<Collector[]>(() => {
 
 const topCollectors = computed<Collector[]>(() => {
   return allCollectors.value
-    .filter(collector => collector.items >= 3) // Define "whale" as having 3+ NFTs
-    .slice(0, 3)
+    .slice(0, 3) // Show top 3 collectors regardless of NFT count
 })
 
 const earlyCollectors = computed<Collector[]>(() => {
@@ -104,7 +103,7 @@ function isEarlyCollector(collector: Collector): boolean {
           </h3>
         </div>
         <p class="text-sm text-muted-foreground mb-4">
-          Top Collectors
+          Top Collectors by NFT Count
         </p>
 
         <div class="space-y-3">

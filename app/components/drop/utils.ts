@@ -112,7 +112,7 @@ export async function getDropAttributes(alias: string): Promise<DropItem | undef
 export const isTBA = (price: unknown) => price === null || price === ''
 
 export async function dropStats(collection?: string) {
-  if (!collection) {
+  if (!collection || import.meta.server) {
     return {
       floorPrice: 0,
       listedPercentage: '0%',
