@@ -1,6 +1,6 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
-import { LazyBurnModal } from '#components'
+import { LazyBurnModal, LazyTransferModal } from '#components'
 
 interface UseCartActionsParams {
   tokenId: number
@@ -31,9 +31,11 @@ export function useCartActions({ collection, price, chain, owner, token, collect
   const canBuy = computed(() => Boolean(price.value) && Boolean(owner.value && !isCurrentAccount(owner.value)))
   const canList = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)))
   const canBurn = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)) && !mimeType?.value?.includes('html'))
+  const canTransfer = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)))
 
   const overlay = useOverlay()
   const burnModal = overlay.create(LazyBurnModal)
+  const transferModal = overlay.create(LazyTransferModal)
 
   function createActionCartItem({ token, owner, mimeType }: { token: OdaToken, owner: string, mimeType?: string }): BaseActionCartItem {
     return {
@@ -123,6 +125,17 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     }
   }
 
+  function transferNow() {
+    if (!token.value || !owner.value) {
+      return
+    }
+
+    if (canTransfer.value) {
+      actionCartStore.setItem(createActionCartItem({ token: token.value, owner: owner.value, mimeType: mimeType?.value || '' }))
+      transferModal.open()
+    }
+  }
+
   return {
     // actions
     addToActionCart,
@@ -130,6 +143,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     buyNow,
     listNow,
     burnNow,
+    transferNow,
     createActionCartItem,
 
     // computed
@@ -139,5 +153,6 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     canBuy,
     canList,
     canBurn,
+    canTransfer,
   }
 }
