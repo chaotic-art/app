@@ -292,16 +292,5 @@ function isEarlyCollector(collector: Collector): boolean {
         </div>
       </div>
     </div>
-
-    <!-- No Data State -->
-    <div v-if="!props.isLoading && (!props.collectionStats || allCollectors.length === 0)" class="text-center py-12">
-      <UIcon name="i-lucide-users" class="size-12 text-muted-foreground mx-auto mb-4" />
-      <h3 class="text-lg font-semibold text-card-foreground mb-2">
-        No Collectors Yet
-      </h3>
-      <p class="text-muted-foreground max-w-md mx-auto">
-        This collection doesn't have any collectors yet. Be the first to mint from this drop!
-      </p>
-    </div>
   </div>
 </template>

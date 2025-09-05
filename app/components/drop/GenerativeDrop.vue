@@ -4,6 +4,7 @@ import type { SocialLink } from '~/services/profile'
 import { formatBalance } from 'dedot/utils'
 import { fetchFollowersOf, fetchProfileByAddress } from '~/services/profile'
 import { formatDetailedTimeToNow } from '~/utils/format/time'
+import { unlimited } from '~/utils/math'
 import { dropStats } from './utils'
 
 const { drop, amountToMint } = storeToRefs(useDropStore())
@@ -179,7 +180,7 @@ watchEffect(async () => {
 
           <!-- Minting Progress -->
           <div class="flex items-center justify-between text-sm mb-3 text-card-foreground">
-            <span>{{ drop?.minted || 0 }} / {{ drop?.max || 10000 }} minted</span>
+            <span>{{ drop?.minted || 0 }} / {{ unlimited(drop?.max?.toString()) ? '∞' : (drop?.max || 10000) }} minted</span>
             <div class="flex items-center gap-2">
               <span>{{ mintingPercentage }}%</span>
               <UBadge v-if="isMintedOut" variant="outline" class="text-xs bg-muted text-muted-foreground">
@@ -275,7 +276,7 @@ watchEffect(async () => {
               <UIcon name="i-heroicons-squares-2x2" class="text-muted-foreground size-6" />
             </div>
             <p class="text-2xl font-bold text-foreground">
-              {{ drop?.max || '10,000' }}
+              {{ unlimited(drop?.max?.toString()) ? '∞' : (drop?.max || '10,000') }}
             </p>
             <p class="text-sm text-muted-foreground">
               Total Supply
@@ -339,40 +340,63 @@ watchEffect(async () => {
             </div>
           </div>
 
-          <div class="mb-4">
+          <!-- Mint Price and Quantity Side by Side -->
+          <div v-if="!isMintedOut" class="mb-4">
+            <!-- Mint Price Row -->
+            <div class="flex items-center justify-between mb-4">
+              <p class="text-sm text-muted-foreground">
+                Mint Price
+              </p>
+              <div class="flex flex-col items-end">
+                <p class="text-2xl font-bold text-card-foreground">
+                  {{ formattedTokenPrice || '0 DOT' }}
+                </p>
+                <p class="text-muted-foreground">
+                  {{ usdPrice || '$0' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Quantity Row -->
+            <div class="flex items-center justify-between">
+              <p class="text-sm text-muted-foreground">
+                Quantity
+              </p>
+              <UButtonGroup orientation="horizontal">
+                <UButton
+                  icon="i-heroicons-minus"
+                  variant="outline"
+                  @click="amountToMint = Math.max(1, amountToMint - 1)"
+                />
+                <UInput
+                  v-model="amountToMint"
+                  type="number"
+                  min="1"
+                  variant="outline"
+                  class="w-16 text-center *:h-9 *:ring-ring"
+                  :ui="{ base: 'text-center' }"
+                />
+                <UButton
+                  icon="i-heroicons-plus"
+                  variant="outline"
+                  @click="amountToMint = amountToMint + 1"
+                />
+              </UButtonGroup>
+            </div>
+          </div>
+
+          <!-- Mint Price Only (when minted out) -->
+          <div v-else class="mb-4">
             <p class="text-sm text-muted-foreground mb-1">
               Mint Price
             </p>
             <div class="flex items-baseline gap-2">
               <p class="text-2xl font-bold text-card-foreground">
-                {{ formattedTokenPrice || '0.3 DOT' }}
+                {{ formattedTokenPrice || '0 DOT' }}
               </p>
               <p class="text-muted-foreground">
-                ${{ usdPrice || '38.40' }}
+                {{ usdPrice || '$0' }}
               </p>
-            </div>
-          </div>
-
-          <div v-if="!isMintedOut" class="flex items-center justify-between mb-4">
-            <p class="text-sm text-muted-foreground">
-              Quantity
-            </p>
-            <div class="flex items-center gap-3">
-              <UButton
-                icon="i-heroicons-minus"
-                variant="outline"
-                size="sm"
-                class="w-8 h-8"
-                @click="amountToMint = Math.max(1, amountToMint - 1)"
-              />
-              <span class="text-lg font-medium w-8 text-center text-card-foreground">{{ amountToMint }}</span>
-              <UButton
-                icon="i-heroicons-plus"
-                variant="outline"
-                size="sm"
-                class="w-8 h-8"
-                @click="amountToMint = amountToMint + 1"
-              />
             </div>
           </div>
 

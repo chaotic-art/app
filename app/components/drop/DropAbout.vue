@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SocialLink } from '~/services/profile'
 import type { DropItem } from '~/types'
+import { unlimited } from '~/utils/math'
 import { getSocialPlatform, getSocialUrl } from '~/utils/social'
 
 interface Props {
@@ -22,7 +23,7 @@ const technicalDetails = computed(() => [
     left: [
       { label: 'Blockchain', value: 'Polkadot' },
       { label: 'Token Standard', value: 'PSP-34' },
-      { label: 'Total Supply', value: props.drop?.max?.toString() || '10,000' },
+      { label: 'Total Supply', value: unlimited(props.drop?.max?.toString()) ? '∞' : (props.drop?.max?.toString() || '10,000') },
 
     ],
     right: [
