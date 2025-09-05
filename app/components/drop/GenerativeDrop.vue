@@ -44,6 +44,11 @@ const mintingPercentage = computed(() => {
   return Math.round((Number(drop.value.minted) / Number(drop.value.max)) * 100)
 })
 
+// Check if drop is minted out
+const isMintedOut = computed(() => {
+  return drop.value?.isMintedOut || false
+})
+
 const dropStartRelativeTime = computed(() => {
   let targetDate: Date | null = null
 
@@ -175,11 +180,17 @@ watchEffect(async () => {
           <!-- Minting Progress -->
           <div class="flex items-center justify-between text-sm mb-3 text-card-foreground">
             <span>{{ drop?.minted || 0 }} / {{ drop?.max || 10000 }} minted</span>
-            <span>{{ mintingPercentage }}%</span>
+            <div class="flex items-center gap-2">
+              <span>{{ mintingPercentage }}%</span>
+              <UBadge v-if="isMintedOut" variant="outline" class="text-xs bg-muted text-muted-foreground">
+                Sold Out
+              </UBadge>
+            </div>
           </div>
           <div class="w-full bg-secondary rounded-full h-2">
             <div
-              class="bg-primary rounded-full h-2 transition-all duration-300"
+              class="rounded-full h-2 transition-all duration-300"
+              :class="isMintedOut ? 'bg-muted-foreground' : 'bg-primary'"
               :style="{ width: `${mintingPercentage}%` }"
             />
           </div>
@@ -306,11 +317,26 @@ watchEffect(async () => {
         </div>
 
         <!-- Mint Section -->
-        <div class="bg-card border border-border rounded-xl p-6">
+        <div
+          class="border rounded-xl p-6 transition-all duration-200"
+          :class="[
+            isMintedOut
+              ? 'bg-muted border-muted opacity-75'
+              : 'bg-card border-border',
+          ]"
+        >
           <div class="mb-4">
-            <h3 class="text-lg font-semibold text-card-foreground">
-              Mint {{ drop?.collectionName || 'ENIGRAMS' }}
-            </h3>
+            <div class="flex items-center justify-between">
+              <h3
+                class="text-lg font-semibold"
+                :class="isMintedOut ? 'text-muted-foreground' : 'text-card-foreground'"
+              >
+                {{ isMintedOut ? 'Sold Out' : `Mint ${drop?.collectionName || 'ENIGRAMS'}` }}
+              </h3>
+              <UBadge v-if="isMintedOut" variant="outline" class="bg-muted text-muted-foreground">
+                Minted Out
+              </UBadge>
+            </div>
           </div>
 
           <div class="mb-4">
@@ -327,7 +353,7 @@ watchEffect(async () => {
             </div>
           </div>
 
-          <div class="flex items-center justify-between mb-4">
+          <div v-if="!isMintedOut" class="flex items-center justify-between mb-4">
             <p class="text-sm text-muted-foreground">
               Quantity
             </p>
@@ -350,7 +376,7 @@ watchEffect(async () => {
             </div>
           </div>
 
-          <div class="border-t border-border pt-4 mb-6">
+          <div v-if="!isMintedOut" class="border-t border-border pt-4 mb-6">
             <div class="flex items-center justify-between">
               <p class="font-semibold text-card-foreground">
                 Total
@@ -371,6 +397,18 @@ watchEffect(async () => {
                   }}
                 </p>
               </div>
+            </div>
+          </div>
+
+          <!-- Minted Out Message -->
+          <div v-if="isMintedOut" class="border-t border-muted pt-4 mb-6">
+            <div class="text-center">
+              <p class="text-muted-foreground text-sm mb-2">
+                This drop has been completely minted out
+              </p>
+              <p class="text-muted-foreground text-xs">
+                View existing listings in the collection
+              </p>
             </div>
           </div>
 
