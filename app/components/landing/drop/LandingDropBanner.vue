@@ -26,13 +26,13 @@ const subDrops = computed(() => dropItemsFiltered.value.slice(1, 3))
 
 <template>
   <div class="mb-12 xl:mb-[75px]">
-    <!-- Mobile (≤599px): Carousel -->
-    <div class="px-4 xl:px-0 hidden max-[599px]:block">
+    <!-- Mobile: Carousel -->
+    <div class="px-4 xl:px-0 block sm:hidden">
       <LandingDropCarousel :drops="dropItemsFiltered" @click="onDropClick" />
     </div>
 
-    <!-- ≥600px: Existing layout -->
-    <div class="hidden min-[600px]:flex min-[600px]:flex-col px-4 xl:px-0">
+    <!-- Desktop: Existing layout -->
+    <div class="hidden sm:flex sm:flex-col px-4 xl:px-0">
       <LandingHorizontalDropCard
         :drop="dropItemsFiltered[0]"
         @click="onDropClick"
