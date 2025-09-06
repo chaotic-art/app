@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Checker Sandbox</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        #canvas-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="defaultCanvas0"></canvas>
+    </div>
+
+    <script>
+        // Listen for assets from parent window
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'assets') {
+                loadAssets(event.data.assets);
+            }
+        });
+
+        function loadAssets(assets) {
+            // Clear existing assets
+            document.querySelectorAll('script[data-dynamic], link[data-dynamic]').forEach(el => el.remove());
+
+            assets.forEach(asset => {
+                if (asset.type === 'script') {
+                    const script = document.createElement('script');
+                    script.src = asset.src;
+                    script.setAttribute('data-dynamic', 'true');
+                    if (asset.parent === 'head') {
+                        document.head.appendChild(script);
+                    } else {
+                        document.body.appendChild(script);
+                    }
+                } else if (asset.type === 'style') {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = asset.src;
+                    link.setAttribute('data-dynamic', 'true');
+                    if (asset.parent === 'head') {
+                        document.head.appendChild(link);
+                    } else {
+                        document.body.appendChild(link);
+                    }
+                }
+            });
+        }
+
+        // Get hash from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const hash = urlParams.get('hash') || 'default';
+
+        // Make hash available globally
+        window.hash = hash;
+
+        // Basic p5.js setup if not loaded
+        if (typeof p5 === 'undefined') {
+            console.log('p5.js not loaded, using basic canvas setup');
+        }
+    </script>
+</body>
+</html>
