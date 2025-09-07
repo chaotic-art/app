@@ -2,8 +2,7 @@ import type { Prefix } from '@kodadot1/static'
 import type { Abi } from 'viem'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 
-const BASE_URL = isProduction ? 'https://oda.koda.art' : 'https://oda-beta.koda.art'
-const api = $fetch.create({ baseURL: BASE_URL, retry: 3 })
+const api = $fetch.create({ baseURL: 'https://oda.chaotic.art', retry: 3 })
 
 export interface OnchainCollection {
   metadata?: {
