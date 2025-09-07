@@ -1,10 +1,10 @@
 import { LazyWalletAssetModal } from '#components'
 import { createEventHook, whenever } from '@vueuse/core'
 
-export function useWalletSidebar() {
-  const overlay = useOverlay()
-  const walletAssetModal = overlay.create(LazyWalletAssetModal)
+const overlay = useOverlay()
+const walletAssetModal = overlay.create(LazyWalletAssetModal)
 
+export function useWalletSidebar() {
   const route = useRoute()
 
   // Auto-close slide over when navigating to different pages
