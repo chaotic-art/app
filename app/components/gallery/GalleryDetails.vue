@@ -211,18 +211,11 @@ const actionItems = computed(() => [
       </div>
 
       <!-- Owner Card -->
-      <div class="p-6 bg-secondary rounded-md space-y-2">
+      <div v-if="owner" class="p-6 bg-secondary rounded-md space-y-2">
         <p class="font-bold">
           Owner
         </p>
-        <div v-if="!owner" class="flex items-center gap-3">
-          <USkeleton class="h-10 w-10 rounded-full" />
-          <div class="space-y-2 flex-1">
-            <USkeleton class="h-4 w-24" />
-            <USkeleton class="h-3 w-20" />
-          </div>
-        </div>
-        <UserInfo v-else :size="40" :address="owner" transparent-background custom-name>
+        <UserInfo :size="40" :address="owner" transparent-background custom-name>
           <template #name="{ addressName }">
             <div>
               <p class="font-bold">

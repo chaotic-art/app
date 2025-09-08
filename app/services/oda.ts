@@ -12,10 +12,11 @@ export interface OnchainCollection {
     generative_uri?: string
     banner?: string
   }
+  metadata_uri: string | null
   supply?: string
   claimed?: string
   owner?: string
-  floor?: number
+  floor: number | null
 }
 
 export function fetchOdaCollection(chain: AssetHubChain, address: string) {
@@ -49,6 +50,8 @@ export interface NFTMetadata {
 export interface OdaToken {
   metadata: NFTMetadata | null
   metadata_uri?: string
+  price: string | null
+  owner: string | null
 }
 
 export function fetchOdaToken(chain: AssetHubChain, address: string, tokenId: string) {

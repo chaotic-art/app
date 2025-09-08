@@ -15,7 +15,6 @@ const {
   token,
   owner,
   collection,
-  isLoading,
   error,
   mimeType,
   price,
@@ -40,7 +39,7 @@ const {
   token,
   collection,
   owner,
-  price: nativePrice,
+  price: computed(() => BigInt(nativePrice.value ?? '0')),
   mimeType: computed(() => mimeType.value || ''),
 })
 
@@ -171,10 +170,7 @@ watchEffect(() => {
                 Price
               </div>
               <div class="text-right">
-                <div v-if="isLoading" class="flex items-baseline gap-1">
-                  <USkeleton class="h-4 w-16" />
-                </div>
-                <div v-else-if="price" class="flex items-baseline gap-1">
+                <div v-if="price" class="flex items-baseline gap-1">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ price }}</span>
                 </div>
                 <div v-else>
@@ -189,10 +185,7 @@ watchEffect(() => {
                 USD
               </div>
               <div class="text-right">
-                <div v-if="isLoading" class="flex items-baseline gap-1">
-                  <USkeleton class="h-4 w-12" />
-                </div>
-                <div v-else-if="price" class="flex items-baseline gap-1">
+                <div v-if="price" class="flex items-baseline gap-1">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ usdPrice || '$0.00' }}</span>
                 </div>
                 <div v-else>
