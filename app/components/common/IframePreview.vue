@@ -77,7 +77,7 @@ watchEffect(() => {
 <template>
   <div
     ref="wrapper"
-    class="relative w-full h-full aspect-square rounded-lg overflow-hidden"
+    class="relative w-full h-full aspect-square"
   >
     <iframe
       :id="iframeId"
