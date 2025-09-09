@@ -1,6 +1,4 @@
-import type { Prefix } from '@kodadot1/static'
-import type { Abi } from 'viem'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 
 const api = $fetch.create({ baseURL: 'https://oda.chaotic.art', retry: 3 })
 
@@ -12,10 +10,12 @@ export interface OnchainCollection {
     generative_uri?: string
     banner?: string
   }
+  metadata_uri: string | null
   supply?: string
   claimed?: string
   owner?: string
-  floor?: number
+  floor: number | null
+  uniqueOwnersCount?: number
 }
 
 export function fetchOdaCollection(chain: AssetHubChain, address: string) {
@@ -49,6 +49,8 @@ export interface NFTMetadata {
 export interface OdaToken {
   metadata: NFTMetadata | null
   metadata_uri?: string
+  price: string | null
+  owner: string | null
 }
 
 export function fetchOdaToken(chain: AssetHubChain, address: string, tokenId: string) {
@@ -61,7 +63,7 @@ export function refreshOdaTokenMetadata(chain: AssetHubChain, address: string, t
   })
 }
 
-export function refreshOdaCollectionTokensMetadata(chain: Prefix, address: string) {
+export function refreshOdaCollectionTokensMetadata(chain: SupportedChain, address: string) {
   return api(`/v1/${chain}/collection/${address}/tokens`, {
     method: 'DELETE',
   })
@@ -73,8 +75,4 @@ interface OdaMimeType {
 
 export function fetchMimeType(uri: string) {
   return api<OdaMimeType>(`/v1/mime-type/${uri}`)
-}
-
-export function fetchOdaCollectionAbi(chain: Prefix, address: string) {
-  return api<Abi | null>(`/v1/${chain}/collection/${address}/abi`)
 }

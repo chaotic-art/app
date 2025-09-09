@@ -13,10 +13,9 @@ export function useToken(props: {
   // Reactive data
   const token = ref<Awaited<ReturnType<typeof fetchOdaToken>> | null>(null)
   const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
-  const queryPrice = ref<bigint | null>(null)
+  const queryPrice = ref<string | null>(null)
   const owner = ref<string | null>(null)
   const collectionCreator = ref<string | null>(null)
-  const isLoading = ref(true)
   const error = ref<unknown | null>(null)
   const mimeType = ref('image/png')
 
@@ -32,40 +31,30 @@ export function useToken(props: {
 
   // Fetch data on component mount
   onMounted(async () => {
-    const api = $sdk(props.chain).api
-
     try {
-      // TODO: add more oda data
-      // Fetch token metadata, price, and owner in parallel
-      const [tokenData, collectionData, priceData, ownerData, collectionConfig, collectionMetadata, collectionFloor] = await Promise.all([
+      const [tokenData, collectionData] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
         fetchOdaCollection(props.chain, props.collectionId.toString()),
-        api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId).catch(() => null),
-        api.query.Nfts.Item.getValue(props.collectionId, props.tokenId).catch(() => null),
-        api.query.Nfts.Collection.getValue(props.collectionId).catch(() => null),
-        api.query.Nfts.CollectionMetadataOf.getValue(props.collectionId).catch(() => null),
-        api.query.Nfts.ItemPriceOf.getEntries(Number(props.collectionId)).catch(() => null),
       ])
 
       token.value = tokenData
       collection.value = collectionData
-      queryPrice.value = priceData?.[0] || null
-      owner.value = ownerData?.owner || null
-      collectionCreator.value = collectionConfig?.owner || null
 
-      if (collectionFloor?.length) {
-        const floorValues = collectionFloor
-          .filter(item => Number(item.value[0]) > 0)
-          .map(item => Number(item.value[0]))
-        collection.value.floor = Math.min(...floorValues)
-      }
+      owner.value = token.value.owner
+      collectionCreator.value = collection.value?.owner ?? null
+      queryPrice.value = token.value.price
+
+      // fetch real-time price
+      const api = $sdk(props.chain).api
+      const priceData = await api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId)
+      queryPrice.value = priceData?.[0]?.toString() ?? null
 
       if (!tokenData.metadata && collectionData?.metadata) {
         // fallback to collection metadata
         token.value = {
           ...tokenData,
           metadata: collectionData?.metadata,
-          metadata_uri: collectionMetadata?.data.asText(),
+          metadata_uri: collection.value?.metadata_uri ?? undefined,
         }
       }
 
@@ -80,9 +69,6 @@ export function useToken(props: {
     catch (err) {
       console.error('Failed to fetch token data:', err)
       error.value = err
-    }
-    finally {
-      isLoading.value = false
     }
   })
 
@@ -115,7 +101,6 @@ export function useToken(props: {
     collection: computed(() => collection.value),
     owner,
     collectionCreator,
-    isLoading,
     error,
     mimeType,
 
