@@ -26,21 +26,21 @@ onMounted(() => {
       <div
         v-for="item in previewItems"
         :key="item.hash"
-        class="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+        class="border border-border rounded-lg p-4"
       >
-        <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
+        <div class="aspect-square bg-muted rounded flex items-center justify-center">
           <UIcon
             v-if="item.loading"
             name="i-heroicons-arrow-path"
-            class="text-2xl text-gray-400 animate-spin"
+            class="text-2xl text-muted-foreground animate-spin"
           />
           <UIcon
             v-else
             name="i-heroicons-photo"
-            class="text-2xl text-gray-400"
+            class="text-2xl text-muted-foreground"
           />
         </div>
-        <p class="text-xs text-gray-500 mt-2 truncate">
+        <p class="text-xs text-muted-foreground mt-2 truncate">
           {{ item.hash }}
         </p>
       </div>

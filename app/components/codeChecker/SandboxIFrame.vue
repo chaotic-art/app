@@ -39,9 +39,9 @@ function onIframeLoad() {
 </script>
 
 <template>
-  <iframe
-    :id="iframeId"
+  <IframePreview
     :key="count"
+    :iframe-id="iframeId"
     :src="iframeSrc"
     class="sandbox-iframe" :class="[customClass]"
     sandbox="allow-scripts allow-same-origin"
@@ -50,12 +50,3 @@ function onIframeLoad() {
     @load="onIframeLoad"
   />
 </template>
-
-<style scoped>
-.sandbox-iframe {
-  width: 100%;
-  height: 400px;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-}
-</style>

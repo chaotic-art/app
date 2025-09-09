@@ -1,24 +1,30 @@
 <script setup lang="ts">
-const code = `<!DOCTYPE html>
+import CodeBlock from './CodeBlock.vue'
+
+const code = `
+<!DOCTYPE html>
 <html>
-<head>
-  <title>My Awesome Art</title>
-  <!-- Other head elements -->
-</head>
-<body>
-  <!-- Your content -->
+  <head>
+    <title>artwork name goes here</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./style.css">
+    <script src="./p5.min.js"><\/script>
+  </head>
+  <body>
+    <script src="./sketch.js"><\/script>
 </body>
-</html>`
+</html>
+`
 </script>
 
 <template>
-  <div>
-    <p class="text-base mb-4">
-      {{ $t('codeChecker.correctHTMLNameMeans') }}
-    </p>
-    <CodeBlock
-      :code="code"
-      lang="html"
-    />
-  </div>
+  <p class="text-base">
+    {{ $t('codeChecker.correctHTMLNameMeans') }}
+  </p>
+
+  <CodeBlock
+    class="mt-5"
+    :code="code"
+    lang="markup"
+  />
 </template>

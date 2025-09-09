@@ -21,12 +21,15 @@ const fullscreenRef = ref<HTMLElement | null>(null)
 
 const { toggle: toggleFullscreen, isFullscreen } = useFullscreen(fullscreenRef)
 
-const variationOptions = config.varaitionsOptions
+const variationOptions = config.variationOptions.map(option => ({
+  label: `${option}X`,
+  value: option,
+}))
 
 const hash = ref('')
 const count = ref(0)
 const variationCounter = ref(0)
-const selectedVariation = ref(variationOptions[0])
+const selectedVariation = ref(5)
 
 const codeShareLink = computed<string | null>(() =>
   props.indexUrl ? `${props.indexUrl}?hash=${hash.value}` : null,
@@ -87,7 +90,7 @@ watch(hash, emitHashUpdate)
 
 <template>
   <div
-    class="border bg-white dark:bg-gray-900 shadow-lg p-5 pb-6 w-full max-w-[490px] flex flex-col gap-5"
+    class="border bg-card shadow-lg p-5 pb-6 w-full max-w-[490px] flex flex-col gap-5"
   >
     <div ref="fullscreenRef">
       <UButton
@@ -110,16 +113,16 @@ watch(hash, emitHashUpdate)
       />
       <div
         v-else
-        class="border border-gray-200 dark:border-gray-700 rounded-lg h-96 flex items-center justify-center bg-gray-50 dark:bg-gray-800"
+        class="border border-border rounded-lg h-96 flex items-center justify-center bg-muted"
       >
-        <UIcon name="i-heroicons-photo" class="text-4xl text-gray-400" />
+        <UIcon name="i-heroicons-photo" class="text-4xl text-muted-foreground" />
       </div>
     </div>
 
-    <div class="pb-5 flex w-full gap-3 border-b border-gray-200 dark:border-gray-700 flex-wrap">
+    <div class="pb-5 flex w-full gap-3 border-b border-border flex-wrap">
       <UButton
         rounded
-        class="px-5 flex-1 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+        class="px-5 flex-1 border-border"
         icon-right="i-heroicons-arrow-path"
         @click="newHash"
       >
@@ -127,7 +130,7 @@ watch(hash, emitHashUpdate)
       </UButton>
       <UButton
         rounded
-        class="border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 w-28"
+        class="border-border w-28"
         :disabled="!selectedFile"
         @click="replay"
       >
@@ -137,21 +140,21 @@ watch(hash, emitHashUpdate)
         rounded
         :loading="!codeShareLink && !!selectedFile"
         :disabled="!codeShareLink"
-        class="border-gray-300 dark:border-gray-600 px-4 hover:bg-gray-50 dark:hover:bg-gray-800"
+        class="border-border px-4"
         icon="i-heroicons-arrow-top-right-on-square"
         @click="openInNewTab"
       />
       <UButton
         rounded
         :disabled="!render"
-        class="border-gray-300 dark:border-gray-600 px-4 hover:bg-gray-50 dark:hover:bg-gray-800"
+        class="border-border px-4"
         icon="i-heroicons-arrows-pointing-out"
         @click="toggleFullscreen"
       />
     </div>
 
     <div>
-      <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $t('codeChecker.currentHash') }}</span>
+      <span class="text-sm font-medium text-foreground">{{ $t('codeChecker.currentHash') }}</span>
       <UInput
         v-model="hash"
         class="w-full mt-2"
@@ -160,7 +163,7 @@ watch(hash, emitHashUpdate)
     </div>
 
     <div v-if="selectedFile">
-      <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <p class="text-sm font-medium text-foreground mb-2">
         {{ $t('codeChecker.exportVariations') }}
       </p>
       <div class="flex gap-4">
@@ -172,10 +175,13 @@ watch(hash, emitHashUpdate)
           <span>{{ `Export ${fileName} as PNG` }}</span>
         </UButton>
         <USelectMenu
-          v-model="selectedVariation"
-          :options="variationOptions"
+          :model-value="selectedVariation"
+          :items="variationOptions"
+          value-key="value"
           :disabled="!kodaRendererUsed"
           class="w-20"
+          :search-input="false"
+          @update:model-value="selectedVariation = $event"
         />
       </div>
     </div>

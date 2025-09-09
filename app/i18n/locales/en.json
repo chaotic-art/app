@@ -268,6 +268,9 @@
     "upload": "Upload Your Code",
     "uploadInstructions": "Drop your code file here or click to select, and initiate the automated review.",
     "supportedFormats": "Supported Formats: .js",
+    "testOutCapture": "Test out capture service",
+    "uploadingFile": "Uploading file",
+    "failedUploadingIndex": "Failed to upload index",
     "codeValidation": "Code Validation",
     "uploadPrompt": "Upload Code To Continue.",
     "canvasSize": "Canvas Size",
@@ -301,9 +304,12 @@
     "kodaHashCalledOnceMeans": "The postMessageKoda function should be called only once per render cycle, typically at the end of your draw function.",
     "notUsingExternalResourcesMeans": "Your code should not depend on external resources that might not be available. All assets should be included in your ZIP file.",
     "usingParamHashMeans": "Your code should use URL parameters to get the hash value for rendering. This allows for consistent rendering across different sessions.",
-    "validImageMeans": "The image data sent to the Kodahash render system should be valid and properly formatted.",
+    "validImageMeans": "Payload Send to kodahash render is empty or the image field is null. In Order to resolve this issue, you need to make sure that the image field is not null.",
     "consistentArtMeans": "Your art should be consistent - the same hash should always produce the same visual output.",
     "automaticResizeMeans": "Your code should handle different canvas sizes automatically using resizeCanvas or similar functions.",
-    "variationLoadingTimeMeans": "Your art should render within a reasonable time frame to ensure good user experience."
+    "variationLoadingTimeMeans": "Your art should render within a reasonable time frame to ensure good user experience.",
+    "variationLoadingTimeMeans1": "The time between the start of render and message kodahash/render/completed is measured. As we mentioned in the documentation, art should be quick, to make the experience for the user better. Loading time check could fail if:",
+    "variationLoadingTimeMeans2": "Artwork is not rendered in the checker.",
+    "variationLoadingTimeMeans3": "Takes too long to render, no clear way to fix that, the artist needs to find a way to cut down time."
   }
 }
