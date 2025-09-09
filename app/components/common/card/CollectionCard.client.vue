@@ -1,21 +1,18 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { fetchOdaCollection } from '~/services/oda'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 interface Props {
   item: ReturnType<typeof useInfiniteCollections>['collections']['value'][number]
   prefix?: AssetHubChain
-  isLoading?: boolean
   volume?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   prefix: 'ahp',
-  isLoading: false,
   volume: '',
 })
-
-const { $sdk } = useNuxtApp()
 
 const collectionData = reactive({
   items: 0,
@@ -23,49 +20,21 @@ const collectionData = reactive({
   uniqueOwners: 0,
 })
 
-const isLoadingData = ref(false)
 const imageStatus = ref<'normal' | 'placeholder'>('normal')
 
 const isPlaceholder = computed(() => imageStatus.value === 'placeholder' || !props.item.image)
 
-// temporary: fetch onchain data
 onMounted(async () => {
-  if (props.isLoading)
-    return
-
-  isLoadingData.value = true
-  try {
-    const api = $sdk(props.prefix).api
-
-    const [queryItems, queryFloor] = await Promise.all([
-      api.query.Nfts.Item.getEntries(Number(props.item.id)),
-      api.query.Nfts.ItemPriceOf.getEntries(Number(props.item.id)),
-    ])
-
-    collectionData.items = queryItems.length
-
-    if (queryFloor.length) {
-      const floorValues = queryFloor
-        .filter(item => Number(item.value[0]) > 0)
-        .map(item => Number(item.value[0]))
-      collectionData.floor = Math.min(...floorValues)
-    }
-
-    if (queryItems.length) {
-      const uniqueOwners = new Set(queryItems.map(item => item.value.owner))
-      collectionData.uniqueOwners = uniqueOwners.size
-    }
-  }
-  finally {
-    isLoadingData.value = false
-  }
+  const odaCollection = await fetchOdaCollection(props.prefix, props.item.id)
+  collectionData.floor = odaCollection.floor ?? 0
+  collectionData.items = Number(odaCollection.claimed)
+  collectionData.uniqueOwners = odaCollection.uniqueOwnersCount ?? 0
 })
 </script>
 
 <template>
   <article
     class="group relative rounded-xl shadow-xs hover:shadow-sm border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1"
-    :class="{ 'animate-pulse': isLoading }"
   >
     <NuxtLink
       :to="`/${prefix}/collection/${item.id}`"
@@ -76,7 +45,7 @@ onMounted(async () => {
         <!-- Banner Background Image -->
         <div class="absolute inset-0">
           <img
-            v-if="item.image && !isLoading && !isPlaceholder"
+            v-if="item.image && !isPlaceholder"
             :src="sanitizeIpfsUrl(item.image)"
             :alt="`${item.name} collection banner`"
             class="w-full h-full object-cover opacity-80 transition-transform duration-300 group-hover:scale-105"
@@ -94,7 +63,7 @@ onMounted(async () => {
             <!-- Collection Thumbnail -->
             <div class="flex-shrink-0 w-16 h-16 rounded-xl bg-white dark:bg-neutral-800 shadow-lg p-1 border-2 border-white/20">
               <img
-                v-if="item.image && !isLoading && !isPlaceholder"
+                v-if="item.image && !isPlaceholder"
                 :src="sanitizeIpfsUrl(item.image)"
                 :alt="`${item.name} collection`"
                 class="w-full h-full rounded-lg object-cover"
@@ -109,22 +78,19 @@ onMounted(async () => {
                 <UIcon
                   name="i-heroicons-photo"
                   class="w-6 h-6 text-gray-400"
-                  :class="{ 'animate-pulse': isLoading }"
                 />
               </div>
             </div>
 
             <!-- Collection Title -->
             <div class="flex-1 min-w-0 pb-1">
-              <h3 v-if="!isLoading" class="font-bold text-lg text-white leading-tight truncate drop-shadow-lg">
+              <h3 class="font-bold text-lg text-white leading-tight truncate drop-shadow-lg">
                 {{ item.name }}
               </h3>
-              <div v-else class="h-6 bg-white/20 rounded w-3/4 animate-pulse" />
 
-              <p v-if="!isLoading" class="text-sm text-white/80 mt-1 truncate">
+              <p class="text-sm text-white/80 mt-1 truncate">
                 Collection #{{ item.id }}
               </p>
-              <div v-else class="h-4 bg-white/20 rounded w-1/2 mt-1 animate-pulse" />
             </div>
           </div>
         </div>
@@ -132,16 +98,8 @@ onMounted(async () => {
 
       <!-- Stats Section -->
       <div class="p-4">
-        <!-- Loading State -->
-        <div v-if="isLoadingData" class="grid grid-cols-3 gap-4">
-          <div v-for="i in 3" :key="i" class="text-center">
-            <div class="h-3 bg-gray-200 dark:bg-neutral-700 rounded w-full mb-2 animate-pulse" />
-            <div class="h-5 bg-gray-300 dark:bg-neutral-600 rounded w-3/4 mx-auto animate-pulse" />
-          </div>
-        </div>
-
         <!-- Stats Data -->
-        <div v-else class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-3 gap-4">
           <!-- Volume or Items -->
           <div class="text-center">
             <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
