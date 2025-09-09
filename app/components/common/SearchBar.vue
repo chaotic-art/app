@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
 import type { Profile } from '@/services/profile'
 import { onClickOutside, useDebounceFn } from '@vueuse/core'
 import { isEvmAddress } from 'dedot/utils'
@@ -109,7 +108,7 @@ const debouncedSearch = useDebounceFn(async (query: string) => {
     // Process users
     users.value = usersResult?.data.filter(user => !isEvmAddress(user.address)).map(user => ({
       ...user,
-      address: getss58AddressByPrefix(user.address, currentChain.value as Prefix),
+      address: getss58AddressByPrefix(user.address, currentChain.value),
     })) || []
   }
   catch (error) {
