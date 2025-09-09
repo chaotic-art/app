@@ -3,5 +3,3 @@
     {{ $t('codeChecker.consistentArtMeans') }}
   </p>
 </template>
-
-<script setup lang="ts"></script>
