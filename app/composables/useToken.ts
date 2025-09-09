@@ -19,6 +19,7 @@ export function useToken(props: {
   const error = ref<unknown | null>(null)
   const mimeType = ref('image/png')
 
+  const { $sdk } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()
 
   // Calculate USD price from DOT price
@@ -39,9 +40,14 @@ export function useToken(props: {
       token.value = tokenData
       collection.value = collectionData
 
-      queryPrice.value = token.value.price
       owner.value = token.value.owner
       collectionCreator.value = collection.value?.owner ?? null
+      queryPrice.value = token.value.price
+
+      // fetch real-time price
+      const api = $sdk(props.chain).api
+      const priceData = await api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId)
+      queryPrice.value = priceData?.[0]?.toString() ?? null
 
       if (!tokenData.metadata && collectionData?.metadata) {
         // fallback to collection metadata
