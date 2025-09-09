@@ -94,10 +94,12 @@ defineOgImageComponent('Frame', {
               <div v-if="data?.drops[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
                 <UserInfo :avatar-size="26" :address="data?.drops[0]?.creator || data?.collection?.owner" custom-name>
                   <template #name="{ addressName }">
-                    <p>Creator:</p>
-                    <p class="font-bold">
-                      {{ addressName }}
-                    </p>
+                    <div class="pr-1 flex">
+                      <p>Creator:</p>
+                      <p class="font-bold">
+                        {{ addressName }}
+                      </p>
+                    </div>
                   </template>
                 </UserInfo>
                 <UButton
