@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import type { ButtonConfig } from '@/components/common/button/FollowButton.client.vue'
+import type { Profile } from '@/services/profile'
 import { computed } from 'vue'
 import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
-import useFetchProfile from '@/composables/useFetchProfile'
 import { fetchFollowersOf, fetchFollowing } from '@/services/profile'
 import { copyAddress, getSubscanAccountUrl, shortenAddress } from '@/utils/format/address'
-import { sanitizeIpfsUrl } from '@/utils/ipfs'
 
-const props = defineProps<{ address: string }>()
+const props = defineProps<{ address: string, profile?: Profile | null, bannerUrl?: string }>()
 const { isCurrentAccount } = useAuth()
-const { profile } = useFetchProfile(computed(() => props.address))
-const bannerUrl = computed(() => sanitizeIpfsUrl(profile?.value?.banner || ''))
 const followButton = ref()
 const followModalTab = ref<'followers' | 'following'>('followers')
 const isFollowModalActive = ref(false)
@@ -56,7 +53,7 @@ const createProfileConfig: ButtonConfig = {
 }
 
 const profileButtonConfig = computed<ButtonConfig>(() =>
-  profile.value ? editProfileConfig : createProfileConfig,
+  props.profile ? editProfileConfig : createProfileConfig,
 )
 
 function onFollowersClick() {
@@ -100,7 +97,9 @@ function onTotalCountChange(slot: string, totalCount: number) {
 
       <div class="relative flex items-center px-8 py-8 z-10">
         <div class="flex flex-col items-center">
-          <ProfileAvatar :address="props.address" :profile-image="profile?.image" :size="140" />
+          <ClientOnly>
+            <ProfileAvatar :address="props.address" :profile-image="profile?.image" :size="140" />
+          </ClientOnly>
         </div>
       </div>
     </div>
