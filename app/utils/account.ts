@@ -22,7 +22,7 @@ export function isValidSubstrateAddress(address: string): boolean {
   }
 }
 
-export function getss58AddressByPrefix(address: string, prefix: Prefix) {
+export function getss58AddressByPrefix(address: string, prefix: Prefix | SupportedChain) {
   try {
     if (isEvmAddress(address)) {
       return address
