@@ -8,11 +8,10 @@ const shoppingCartStore = useShoppingCartStore()
 const { itemsInChain, itemToBuy } = storeToRefs(shoppingCartStore)
 const { accountId } = useAuth()
 const { $i18n } = useNuxtApp()
-const { decimals, chainSymbol } = useChain()
+const { decimals, chainSymbol, currentChain } = useChain()
 const { open: isTransactionModalOpen } = useTransactionModal()
 const { buyNfts, collectionRoyalties } = useNftPallets()
-const { prefix } = usePrefix()
-const { existentialDeposit } = useDeposit(prefix)
+const { existentialDeposit } = useDeposit(currentChain)
 
 const isModalOpen = computed({
   get: () => completePurchaseModal.value.open,
@@ -80,7 +79,7 @@ function buy() {
       metadata_uri: item.metadata_uri,
       metadata: item.metadata,
     })),
-    chain: prefix.value as AssetHubChain,
+    chain: currentChain.value as AssetHubChain,
   })
 }
 </script>

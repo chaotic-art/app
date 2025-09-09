@@ -1,9 +1,8 @@
-import type { Prefix } from '@kodadot1/static'
 import type { SupportedChain } from '~/plugins/sdk.client'
 
 interface GetBalanceParams {
   address: string
-  prefix: Prefix
+  prefix: SupportedChain
 }
 
 interface GetBalanceResult {
@@ -12,7 +11,7 @@ interface GetBalanceResult {
   symbol: string
 }
 
-export type GetBalancesResult = (GetBalanceResult & { prefix: Prefix })[]
+export type GetBalancesResult = (GetBalanceResult & { prefix: SupportedChain })[]
 
 export default function () {
   const getSubstrateBalance = async ({ address, prefix }: GetBalanceParams): Promise<GetBalanceResult> => {

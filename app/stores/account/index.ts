@@ -97,7 +97,7 @@ export const useAccountStore = defineStore('account', () => {
 
     for (const { address, chain, vm, prefix } of accountsToFetch) {
       const { balance } = await getBalance({
-        prefix,
+        prefix: prefix as SupportedChain,
         address,
       })
 
