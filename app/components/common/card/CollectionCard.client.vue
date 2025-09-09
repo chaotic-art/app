@@ -25,10 +25,10 @@ const imageStatus = ref<'normal' | 'placeholder'>('normal')
 const isPlaceholder = computed(() => imageStatus.value === 'placeholder' || !props.item.image)
 
 onMounted(async () => {
-  const odaCollection = await fetchOdaCollection(props.prefix, props.item.id)
-  collectionData.floor = odaCollection.floor ?? 0
-  collectionData.items = Number(odaCollection.claimed)
-  collectionData.uniqueOwners = odaCollection.uniqueOwnersCount ?? 0
+  const collection = await fetchOdaCollection(props.prefix, props.item.id)
+  collectionData.floor = collection.floor ?? 0
+  collectionData.items = Number(collection.claimed)
+  collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
 })
 </script>
 
