@@ -472,7 +472,7 @@ export function useNftPallets() {
     }
 
     return {
-      recipient: encodeAddress(recipient.value.asBytes(), chainSpec[chain].ss58Format),
+      recipient: encodeAddress(recipient.value.asText(), chainSpec[chain].ss58Format),
       amount: Number(royalty.value.asText()),
     }
   }
