@@ -21,7 +21,7 @@ export const useAccountStore = defineStore('account', () => {
 
   const getChainAddress = ({ chain, address }: { chain: Chain, address: string }) => {
     const prefix = getPrefixOfChain(chain)
-    return vmOf(prefix) === 'SUB' ? formatAddress({ address, prefix }) : address
+    return vmOf(prefix) === 'SUB' ? formatAddress({ address, prefix: prefix as SupportedChain }) : address
   }
 
   const address = computed(() => getVmAccount(vm.value)?.address)
