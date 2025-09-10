@@ -288,6 +288,8 @@
     "resolveIssue": "Resolve Issue",
     "newHash": "New Hash",
     "replay": "Replay",
+    "retryTest": "Retry test",
+    "numberOfInputs": "Number Of Inputs",
     "currentHash": "Current Hash",
     "exportVariations": "Export Variations",
     "goBack": "Go Back",
