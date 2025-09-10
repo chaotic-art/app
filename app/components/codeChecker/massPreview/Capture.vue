@@ -3,6 +3,8 @@ import type { AssetMessage, CapturePreviewItem } from '../types'
 import { IFRAME_BLOB_URI } from '@/services/capture'
 import { getObjectUrl, getUpload, uploadFile } from '@/services/playground'
 import { generateRandomHash, getDocumentFromString } from '../utils'
+import CodeCheckerMassPreviewControls from './Controls.vue'
+import CodeCheckerMassPreviewGrid from './Grid.vue'
 import { AssetElementMap, AssetReplaceElement } from './utils'
 
 const props = withDefaults(
@@ -171,7 +173,7 @@ watch(active, (active) => {
             <iframe
               title="preview"
               :src="previewItems[index]?.image"
-              class="w-full h-full border border-black border-solid"
+              class="w-full h-full border border-primary border-solid"
             />
           </template>
         </CodeCheckerMassPreviewGrid>
