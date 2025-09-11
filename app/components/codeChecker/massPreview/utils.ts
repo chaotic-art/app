@@ -1,17 +1,28 @@
-export const AssetElementMap = {
-  script: {
-    tag: 'script',
-    src: 'src',
+import type { AssetType } from '../types'
+
+export interface AssetElement { src: string, tag: string }
+
+export const AssetElementMap: Record<AssetType, AssetElement> = {
+  style: { src: 'href', tag: 'link' },
+  script: { src: 'src', tag: 'script' },
+}
+
+export const AssetReplaceElement: Record<
+  AssetType,
+  (params: { content: string, doc: Document, element: Element }) => void
+> = {
+  style: ({ doc, content, element }) => {
+    const head = doc.querySelector('head')
+    const style = document.createElement('style')
+    style.innerHTML = content
+    head?.appendChild(style)
+    element.remove()
   },
-  link: {
-    tag: 'link',
-    src: 'href',
+  script: ({ content, element }) => {
+    element.removeAttribute(AssetElementMap.script.src)
+    element.innerHTML = content
   },
-  img: {
-    tag: 'img',
-    src: 'src',
-  },
-} as const
+}
 
 export function downloadBase64Image(base64: string, filename: string) {
   const link = document.createElement('a')

@@ -13,35 +13,35 @@ const icon = computed(() => {
   if (props.passed === 'loading') {
     return {
       name: 'i-heroicons-arrow-path',
-      class: 'text-gray-500 animate-spin',
+      class: 'text-muted-foreground animate-spin',
     }
   }
   if (props.passed === 'unknown' || (props.optional && !props.passed)) {
     return {
       name: 'i-heroicons-question-mark-circle',
-      class: 'text-gray-500',
+      class: 'text-muted-foreground',
     }
   }
 
   return {
     name: props.passed ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle',
-    class: props.passed ? 'text-green-500' : 'text-red-500',
+    class: props.passed ? 'text-green-500' : 'text-destructive',
   }
 })
 </script>
 
 <template>
   <div class="flex justify-between">
-    <div>
+    <div class="flex items-center gap-2">
       <UIcon
         :name="icon.name"
         class="text-lg" :class="[icon.class]"
       />
-      <span class="ml-5">{{ description }}</span>
+      <span>{{ description }}</span>
     </div>
     <span
       v-if="props.passed === false"
-      class="text-blue-500 cursor-pointer hover:text-blue-600"
+      class="text-blue-400 cursor-pointer hover:text-primary/80"
       @click="showResolveIssuesModal = true"
     >
       {{ $t('codeChecker.resolveIssue') }}
@@ -51,12 +51,14 @@ const icon = computed(() => {
       v-model:open="showResolveIssuesModal"
       :title="$t('codeChecker.resolveIssue')"
     >
-      <div class="max-w-[380px] px-6 pt-4 pb-5">
-        <p class="text-base font-bold mb-4">
-          {{ description }}
-        </p>
-        <slot name="modalContent" />
-      </div>
+      <template #body>
+        <div class="px-6 py-4">
+          <p class="text-base font-bold mb-4">
+            {{ description }}
+          </p>
+          <slot name="modalContent" />
+        </div>
+      </template>
     </UModal>
   </div>
 </template>

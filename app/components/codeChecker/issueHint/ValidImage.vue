@@ -23,22 +23,9 @@ function postMessageKoda() {
 </script>
 
 <template>
-  <i18n-t
-    tag="p"
-    class="text-base"
-    keypath="codeChecker.usingKodaHashMeans"
-  >
-    <template #link>
-      <a
-        href="https://github.com/vikiival/kodahash"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-k-blue hover:text-k-blue-hover"
-      >
-        {{ $t('codeChecker.kodahashTemplate') }}
-      </a>
-    </template>
-  </i18n-t>
+  <p class="text-base">
+    {{ $t('codeChecker.validImageMeans') }}
+  </p>
 
   <CodeBlock
     class="mt-5"

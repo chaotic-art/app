@@ -2,6 +2,16 @@
 import type { AssetMessage, Validity } from './types'
 import { useEventListener } from '@vueuse/core'
 import config from './codechecker.config'
+import CodeCheckerIssueHintAutomaticResize from './issueHint/AutomaticResize.vue'
+import CodeCheckerIssueHintConsistentArt from './issueHint/ConsistentArt.vue'
+import CodeCheckerIssueHintCorrectHTMLName from './issueHint/CorrectHTMLName.vue'
+import CodeCheckerIssueHintKodaHashCalledOnce from './issueHint/KodaHashCalledOnce.vue'
+import CodeCheckerIssueHintNotUsingExternalResources from './issueHint/NotUsingExternalResources.vue'
+import CodeCheckerIssueHintUsingKodaHash from './issueHint/UsingKodaHash.vue'
+import CodeCheckerIssueHintUsingParamHash from './issueHint/UsingParamHash.vue'
+import CodeCheckerIssueHintValidImage from './issueHint/ValidImage.vue'
+import CodeCheckerIssueHintVariationLoadingTime from './issueHint/VariationLoadingTime.vue'
+import CodeCheckerTestItem from './TestItem.vue'
 import { createSandboxAssets, extractAssetsFromZip } from './utils'
 import { validate } from './validate'
 
@@ -161,11 +171,11 @@ useEventListener('message', async (res: MessageEvent) => {
         </div>
       </div>
 
-      <div class="py-4 px-5 border border-gray-200 dark:border-gray-700 rounded-lg">
+      <div class="py-4 px-5 border border-border rounded-lg">
         <h2 class="mb-3 text-lg font-semibold">
           {{ $t('codeChecker.resources') }}:
         </h2>
-        <div class="pl-3 flex flex-col gap-3">
+        <div class="flex flex-col gap-3">
           <a
             v-for="item in RESOURCES_LIST"
             :key="item.title"
@@ -175,17 +185,13 @@ useEventListener('message', async (res: MessageEvent) => {
             rel="nofollow noopener noreferrer"
           >
             <div
-              class="text-blue-500 hover:text-blue-600 flex items-center mr-2"
+              class="text-primary hover:text-primary/80 flex items-center mr-2"
             >
-              <UIcon
-                name="i-heroicons-circle"
-                class="w-1.5 h-1.5 mr-2"
-              />
               {{ $t(item.title) }}
             </div>
             <UIcon
               name="i-heroicons-arrow-top-right-on-square"
-              class="text-gray-500 text-sm"
+              class="text-muted-foreground text-sm"
             />
           </a>
         </div>
@@ -212,33 +218,33 @@ useEventListener('message', async (res: MessageEvent) => {
         </h2>
         <p
           v-if="!selectedFile"
-          class="text-gray-500"
+          class="text-muted-foreground"
         >
           {{ $t('codeChecker.uploadPrompt') }}
         </p>
         <div v-else>
           <div
             v-if="errorMessage"
-            class="text-red-500"
+            class="text-destructive"
           >
             {{ $t('error') }}: {{ errorMessage }}
           </div>
           <div v-else>
             <div class="flex justify-between items-center">
-              <span class="text-gray-600 dark:text-gray-400">{{
+              <span class="text-muted-foreground">{{
                 $t('codeChecker.canvasSize')
               }}</span>
               <span>{{ fileValidity.canvasSize }}</span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-gray-600 dark:text-gray-400">
+              <span class="text-muted-foreground">
                 {{ $t('codeChecker.artName') }}
               </span>
               <span>{{ fileValidity.title }}</span>
             </div>
 
             <div class="flex justify-between items-center">
-              <span class="text-gray-600 dark:text-gray-400">{{ $t('codeChecker.local') }} p5js</span>
+              <span class="text-muted-foreground">{{ $t('codeChecker.local') }} p5js</span>
               <span>{{ fileValidity.localP5jsUsed ? 'Yes' : 'No' }}</span>
             </div>
           </div>
@@ -246,85 +252,75 @@ useEventListener('message', async (res: MessageEvent) => {
       </div>
       <div
         v-if="selectedFile && !errorMessage"
-        class="border-t border-gray-200 dark:border-gray-700 pt-5 flex flex-col gap-5"
+        class="border-t border-border pt-5 flex flex-col gap-5"
       >
-        <TestItem
+        <CodeCheckerTestItem
           :passed="fileValidity.validTitle"
           :description="$t('codeChecker.correctHTMLName')"
         >
           <template #modalContent>
-            <CorrectHTMLName />
+            <CodeCheckerIssueHintCorrectHTMLName />
           </template>
-        </TestItem>
-        <TestItem
+        </CodeCheckerTestItem>
+        <CodeCheckerTestItem
           :passed="fileValidity.kodaRendererUsed"
           :description="$t('codeChecker.usingKodaHash')"
         >
           <template #modalContent>
-            <UsingKodaHash />
+            <CodeCheckerIssueHintUsingKodaHash />
           </template>
-        </TestItem>
-        <TestItem
+        </CodeCheckerTestItem>
+        <CodeCheckerTestItem
           :passed="fileValidity.kodaRendererCalledOnce"
           :description="$t('codeChecker.kodaHashCalledOnce')"
         >
           <template #modalContent>
-            <KodaHashCalledOnce />
+            <CodeCheckerIssueHintKodaHashCalledOnce />
           </template>
-        </TestItem>
-        <TestItem
+        </CodeCheckerTestItem>
+        <CodeCheckerTestItem
           :passed="fileValidity.externalResourcesNotUsed"
           :description="$t('codeChecker.notUsingExternalResources')"
         >
           <template #modalContent>
-            <div>
-              <p>{{ $t('codeChecker.notUsingExternalResourcesMeans') }}</p>
-            </div>
+            <CodeCheckerIssueHintNotUsingExternalResources />
           </template>
-        </TestItem>
-        <TestItem
+        </CodeCheckerTestItem>
+        <CodeCheckerTestItem
           :passed="fileValidity.usesHashParam"
           :description="$t('codeChecker.usingParamHash')"
         >
           <template #modalContent>
-            <div>
-              <p>{{ $t('codeChecker.usingParamHashMeans') }}</p>
-            </div>
+            <CodeCheckerIssueHintUsingParamHash />
           </template>
-        </TestItem>
+        </CodeCheckerTestItem>
 
-        <TestItem
+        <CodeCheckerTestItem
           :passed="fileValidity.validKodaRenderPayload"
           :description="$t('codeChecker.validImage')"
         >
           <template #modalContent>
-            <div>
-              <p>{{ $t('codeChecker.validImageMeans') }}</p>
-            </div>
+            <CodeCheckerIssueHintValidImage />
           </template>
-        </TestItem>
-        <TestItem
+        </CodeCheckerTestItem>
+        <CodeCheckerTestItem
           :passed="fileValidity.consistent"
           :description="$t('codeChecker.consistentArt')"
         >
           <template #modalContent>
-            <div>
-              <p>{{ $t('codeChecker.consistentArtMeans') }}</p>
-            </div>
+            <CodeCheckerIssueHintConsistentArt />
           </template>
-        </TestItem>
-        <TestItem
+        </CodeCheckerTestItem>
+        <CodeCheckerTestItem
           :passed="fileValidity.resizerUsed"
           :description="$t('codeChecker.automaticResize')"
           optional
         >
           <template #modalContent>
-            <div>
-              <p>{{ $t('codeChecker.automaticResizeMeans') }}</p>
-            </div>
+            <CodeCheckerIssueHintAutomaticResize />
           </template>
-        </TestItem>
-        <TestItem
+        </CodeCheckerTestItem>
+        <CodeCheckerTestItem
           :passed="fileValidity.renderDurationValid"
           :description="
             $t('codeChecker.variationLoadingTime')
@@ -332,11 +328,9 @@ useEventListener('message', async (res: MessageEvent) => {
           optional
         >
           <template #modalContent>
-            <div>
-              <p>{{ $t('codeChecker.variationLoadingTimeMeans') }}</p>
-            </div>
+            <CodeCheckerIssueHintVariationLoadingTime />
           </template>
-        </TestItem>
+        </CodeCheckerTestItem>
       </div>
     </div>
 
@@ -367,18 +361,18 @@ useEventListener('message', async (res: MessageEvent) => {
       <div class="max-w-[490px] mt-11">
         <hr
           v-if="selectedFile"
-          class="my-2 bg-gray-200 dark:bg-gray-700 w-full mb-11"
+          class="my-2 bg-border w-full mb-11"
         >
 
         <div class="flex items-center gap-5">
           <div>
             <UIcon
               name="i-heroicons-shield-check"
-              class="text-gray-500"
+              class="text-muted-foreground"
               size="lg"
             />
           </div>
-          <p class="capitalize text-gray-500">
+          <p class="capitalize text-muted-foreground">
             {{ $t('codeChecker.confidentialCode') }}
           </p>
         </div>

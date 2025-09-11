@@ -2,6 +2,6 @@
 
 <template>
   <p class="text-base">
-    {{ $t('codeChecker.kodaHashCalledOnceMeans') }}
+    {{ $t('codeChecker.consistentArtMeans') }}
   </p>
 </template>

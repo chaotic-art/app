@@ -1,49 +1,86 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import type { AssetMessage, CanvasPreviewItem } from '../types'
+import CodeCheckerSandboxIFrame from '../SandboxIFrame.vue'
+import { generateRandomHash } from '../utils'
+import CodeCheckerMassPreviewControls from './Controls.vue'
+import CodeCheckerMassPreviewGrid from './Grid.vue'
 
-defineProps<{
-  assets: Array<AssetMessage>
-}>()
+const props = withDefaults(
+  defineProps<{
+    assets: Array<AssetMessage>
+    previews?: number
+  }>(),
+  {
+    previews: 12,
+  },
+)
 
-const previewItems = ref<CanvasPreviewItem[]>([])
+const active = ref(false)
+const amount = ref(props.previews)
+const canvasPreviews = ref<CanvasPreviewItem[]>([])
 
-// Initialize with some sample items
-onMounted(() => {
-  previewItems.value = Array.from({ length: 4 }, (_, i) => ({
-    hash: `hash_${i + 1}`,
+function generateMassPreview() {
+  canvasPreviews.value = Array.from({ length: amount.value }).map(() => ({
+    hash: generateRandomHash(),
+    startedAt: performance.now(),
     loading: true,
-    startedAt: Date.now(),
   }))
+}
+
+onKodahashRenderCompleted(({ payload: { hash } }) => {
+  if (canvasPreviews.value.map(p => p.hash).includes(hash)) {
+    canvasPreviews.value = canvasPreviews.value.map(preview =>
+      preview.hash === hash
+        ? { ...preview, renderedAt: performance.now(), loading: false }
+        : preview,
+    )
+  }
+})
+
+watch(active, (active) => {
+  if (active) {
+    generateMassPreview()
+  }
 })
 </script>
 
 <template>
-  <div class="w-full">
-    <h3 class="text-lg font-semibold mb-4">
-      {{ $t('codeChecker.massPreview') }}
-    </h3>
-    <div class="grid grid-cols-2 gap-4">
-      <div
-        v-for="item in previewItems"
-        :key="item.hash"
-        class="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-      >
-        <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center">
-          <UIcon
-            v-if="item.loading"
-            name="i-heroicons-arrow-path"
-            class="text-2xl text-gray-400 animate-spin"
-          />
-          <UIcon
-            v-else
-            name="i-heroicons-photo"
-            class="text-2xl text-gray-400"
-          />
-        </div>
-        <p class="text-xs text-gray-500 mt-2 truncate">
-          {{ item.hash }}
-        </p>
-      </div>
+  <div>
+    <div class="flex justify-between items-center">
+      <p class="font-bold capitalize">
+        {{ $t('codeChecker.testOutPerformance') }}
+      </p>
+
+      <USwitch v-model="active" />
     </div>
+
+    <transition name="slide">
+      <div
+        v-if="active"
+        class="mt-6!"
+      >
+        <CodeCheckerMassPreviewControls
+          v-model="amount"
+          :previews="canvasPreviews"
+          @retry="generateMassPreview"
+        />
+
+        <CodeCheckerMassPreviewGrid
+          :items="canvasPreviews.map((p) => p.loading)"
+          class="mt-4!"
+        >
+          <template #default="{ index }">
+            <CodeCheckerSandboxIFrame
+              v-if="canvasPreviews[index]"
+              :hash="canvasPreviews[index].hash"
+              :assets="assets"
+              :count="1"
+              :iframe-id="canvasPreviews[index].hash"
+              class="border"
+            />
+          </template>
+        </CodeCheckerMassPreviewGrid>
+      </div>
+    </transition>
   </div>
 </template>
