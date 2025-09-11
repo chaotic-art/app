@@ -59,7 +59,6 @@ watch([accountId], () => {
       :src="sanitizeIpfsUrl(generativeImageUrl)"
       sandbox="allow-scripts allow-same-origin allow-modals"
       allow="accelerometer *; camera *; gyroscope *; microphone *; xr-spatial-tracking *;"
-      :base-size="drop.id === 'genweavepatches' ? 128 : 1080"
     />
 
     <div class="flex flex-col sm:flex-row gap-2 mt-4 justify-center">
