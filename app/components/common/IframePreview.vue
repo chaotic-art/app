@@ -10,18 +10,18 @@ const props = withDefaults(
     iframeId?: string
     sandbox?: string
     allow?: string
+    baseSize?: number
   }>(),
   {
     title: 'html-embed',
     sandbox: 'allow-scripts allow-same-origin allow-modals',
     allow:
       'accelerometer *; camera *; gyroscope *; microphone *; xr-spatial-tracking *;',
+    baseSize: 1080,
   },
 )
 
 const emit = defineEmits(['load', 'error'])
-
-const IFRAME_BASE_SIZE = 1080
 
 const wrapper = ref<HTMLDivElement>()
 const iframe = ref<HTMLIFrameElement>()
@@ -31,6 +31,8 @@ const { height: windowHeight, width: windowWidth } = useWindowSize()
 const iframeSrc = ref('')
 const computedSrc = computed(() => props.animationSrc || props.src || '')
 
+const baseSizeStyle = computed(() => ({ width: `${props.baseSize}px`, height: `${props.baseSize}px` }))
+
 function getScale({
   width,
   height,
@@ -38,7 +40,7 @@ function getScale({
   width: number
   height: number
 }): number {
-  return Math.min(width / IFRAME_BASE_SIZE, height / IFRAME_BASE_SIZE)
+  return Math.min(width / props.baseSize, height / props.baseSize)
 }
 
 onMounted(() => {
@@ -62,8 +64,8 @@ watchEffect(() => {
     const scale = isFullscreenMode
       ? getScale({ width: windowWidth.value, height: windowHeight.value })
       : getScale({ width: width.value, height: height.value })
-    const xSpace = windowWidth.value - IFRAME_BASE_SIZE * scale
-    const ySpace = windowHeight.value - IFRAME_BASE_SIZE * scale
+    const xSpace = windowWidth.value - props.baseSize * scale
+    const ySpace = windowHeight.value - props.baseSize * scale
 
     iframe.value.style.transform = `scale(${scale})`
     iframe.value.style.left
@@ -83,7 +85,8 @@ watchEffect(() => {
       :id="iframeId"
       ref="iframe"
       :title="title"
-      class="absolute flex w-[1080px] h-[1080px] aspect-square origin-top-left"
+      class="absolute flex aspect-square origin-top-left"
+      :style="baseSizeStyle"
       :src="iframeSrc"
       :alt="alt"
       :sandbox="sandbox"
