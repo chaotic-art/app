@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
 import { CHAINS } from '@kodadot1/static'
 import { encodeAddress } from 'dedot/utils'
 
@@ -26,11 +25,14 @@ useSeoMeta({
 
 const route = useRoute()
 const { currentChain } = useChain()
+const address = computed(() => getss58AddressByPrefix(String(route.params.id), currentChain.value))
+const { profile } = useFetchProfile(computed(() => address.value))
+const bannerUrl = computed(() => sanitizeIpfsUrl(profile.value?.banner || ''))
 </script>
 
 <template>
   <UContainer class="px-4 md:px-6">
-    <ProfileDetail :address="getss58AddressByPrefix(String(route.params.id), currentChain as Prefix)" />
+    <ProfileDetail :profile="profile" :address="address" :banner-url="bannerUrl" />
 
     <LazyActionCart />
   </UContainer>

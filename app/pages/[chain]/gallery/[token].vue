@@ -88,7 +88,7 @@ const tokenMetadata = computed(() => {
             :collection-creator="collectionCreator || undefined"
             :formatted-price="formattedPrice || undefined"
             :usd-price="usdPrice"
-            :price="price"
+            :price="BigInt(price ?? '0')"
             :mime-type="mimeType"
           />
           <GalleryItemActions
@@ -99,7 +99,7 @@ const tokenMetadata = computed(() => {
             :collection-id="Number(safeCollectionId)"
             :token-id="Number(safeTokenId)"
             :owner="owner"
-            :price="price"
+            :price="BigInt(price ?? '0')"
           />
         </div>
       </div>

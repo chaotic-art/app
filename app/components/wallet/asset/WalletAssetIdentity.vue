@@ -37,8 +37,8 @@ function handleWalletSettings() {
         variant="ghost"
         size="sm"
         square
-        :title="$t('copyAddress')"
-        class="self-center"
+        title="Copy address"
+        class="self-center size-8"
         @click="handleCopyAddress"
       >
         <UIcon name="i-lucide-copy" class="w-4 h-4" />
@@ -48,8 +48,8 @@ function handleWalletSettings() {
         variant="ghost"
         size="sm"
         square
-        :title="$t('wallet.manage')"
-        class="self-center"
+        title="Manage wallet"
+        class="self-center size-8"
         @click="handleWalletSettings"
       >
         <UIcon name="i-lucide-settings" class="w-4 h-4" />

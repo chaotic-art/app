@@ -2,7 +2,7 @@ import { $fetch } from 'ofetch'
 import { URLS } from '@/utils/constants'
 
 export const COINGECKO_BASE_URL = URLS.providers.coingecko
-export const KODAPRICE_BASE_URL = URLS.providers.kodaprice
+export const PRICE_BASE_URL = URLS.workers.price
 
 let status = 0
 const baseApi = {
@@ -26,7 +26,7 @@ const coingeckoApi = $fetch.create({
 
 const kodapriceApi = $fetch.create({
   ...baseApi,
-  baseURL: KODAPRICE_BASE_URL,
+  baseURL: PRICE_BASE_URL,
 })
 
 // types from https://price.kodadot.workers.dev/price/kusama
