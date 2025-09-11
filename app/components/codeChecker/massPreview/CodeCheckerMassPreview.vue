@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AssetMessage } from '../types'
-// import CodeCheckerMassPreviewCanvas from './Canvas.vue'
+import CodeCheckerMassPreviewCanvas from './Canvas.vue'
 import CodeCheckerMassPreviewCapture from './Capture.vue'
 
 defineProps<{
@@ -12,8 +12,7 @@ defineEmits(['upload'])
 
 <template>
   <div class="w-full max-w-[490px] flex flex-col gap-4">
-    <!-- TODO: hidden until implement fully -->
-    <!-- <CodeCheckerMassPreviewCanvas :assets="assets" /> -->
+    <CodeCheckerMassPreviewCanvas :assets="assets" />
     <CodeCheckerMassPreviewCapture
       :assets="assets"
       :index-content="indexContent"

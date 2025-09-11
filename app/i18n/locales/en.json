@@ -290,6 +290,7 @@
     "replay": "Replay",
     "retryTest": "Retry test",
     "numberOfInputs": "Number Of Inputs",
+    "timePerVariation": "Time per variation",
     "currentHash": "Current Hash",
     "exportVariations": "Export Variations",
     "goBack": "Go Back",
