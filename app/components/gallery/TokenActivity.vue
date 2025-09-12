@@ -133,9 +133,17 @@ watchEffect(async () => {
             cell: ({ row }) => {
               const caller = row.getValue('caller')
               const interaction = row.getValue('interaction')
-              if (caller && interaction !== 'MINT') {
+              let fromAddress = caller
+
+              if (interaction === 'BUY') {
+                fromAddress = row.original.currentOwner
+              }
+              else if (interaction === 'MINT') {
+                fromAddress = null
+              }
+              if (fromAddress) {
                 return h(UserInfo, {
-                  address: caller as string,
+                  address: fromAddress as string,
                   avatarSize: 24,
                   transparentBackground: true,
                   class: 'justify-end',

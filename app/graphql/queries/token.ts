@@ -10,6 +10,7 @@ export const tokenActivity = graphql(`
             meta
             timestamp
             caller
+            currentOwner
         }
     }
 `)
