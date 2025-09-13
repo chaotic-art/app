@@ -160,10 +160,9 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
 
         <USeparator />
 
-        <!-- Mobile Wallet with Theme Toggle -->
-        <div class="md:hidden flex items-center justify-between gap-3">
+        <!-- Mobile Wallet -->
+        <div class="md:hidden">
           <NavbarWallet />
-          <ThemeSwitcher />
         </div>
       </div>
     </template>
