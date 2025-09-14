@@ -65,7 +65,6 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      baseUrl: import.meta.env.BASE_URL || 'http://localhost:9090',
       reownProjectId: import.meta.env.REOWN_CONNECT_PROJECT_ID || 'b56e18d47c72ab683b10814fe9495694',
     },
   },
