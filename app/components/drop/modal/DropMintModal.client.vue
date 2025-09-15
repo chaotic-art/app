@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { formatBalance } from 'dedot/utils'
 import useDropMassMintState from '@/composables/drop/massmint/useDropMassMintState'
 import useDropMint from '~/composables/drop/useDropMint'
 import StepOverview from './StepOverview.vue'
@@ -17,12 +16,8 @@ const modalStep = ref<ModalStep>(ModalSteps.Overview)
 const { $i18n } = useNuxtApp()
 const { canMint } = useDropMassMintState()
 const { minimumFunds } = useDropMinimumFunds()
-const { prefix } = usePrefix()
-const { existentialDeposit } = useDeposit(prefix)
 const { toMintNFTs, mintingSession } = storeToRefs(useDropStore())
 const { executeTransaction, isModalOpen, transaction } = useDropMint()
-const { decimals: tokenDecimals, chainSymbol: tokenSymbol } = useChain()
-const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: isModalOpen })
 
 const status = computed(() => mintingSession.value.status)
 
@@ -32,7 +27,7 @@ const { isTransactionSuccessful } = useTransactionSuccessful({
   isLoading: computed(() => mintingSession.value.isLoading),
 })
 
-const loading = computed(() => !canMint.value || isBalanceLoading.value)
+const loading = computed(() => !canMint.value)
 
 const isMintOverviewStep = computed(() => modalStep.value === ModalSteps.Overview)
 const isSigningStep = computed(() => modalStep.value === ModalSteps.Signing)
@@ -42,18 +37,6 @@ const mintButton = computed(() => {
   if (loading.value) {
     return {
       label: 'Loading...',
-      disabled: true,
-    }
-  }
-
-  const deosntHaveEnoughBalance = balance.value < minimumFunds.value
-  const isEdSlash = (balance.value - minimumFunds.value) < existentialDeposit.value
-
-  // TODO add tx calculation
-  if (deosntHaveEnoughBalance || isEdSlash) {
-    return {
-      label: $i18n.t('balance.insufficient'),
-      alert: isEdSlash ? `You need to keep a minimum balance of ${formatBalance(existentialDeposit.value, { decimals: tokenDecimals.value, symbol: tokenSymbol.value })} in your account` : undefined,
       disabled: true,
     }
   }
