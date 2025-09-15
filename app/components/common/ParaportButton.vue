@@ -19,8 +19,8 @@ const { endpoints } = storeToRefs(pingStore)
 const fetched = ref(false)
 
 const paraportEndpoints = computed(() => ({
-  AssetHubPolkadot: endpoints.value.ahp[0]!,
-  Polkadot: endpoints.value.dot[0]!,
+  AssetHubPolkadot: endpoints.value.ahp,
+  Polkadot: endpoints.value.dot,
 }))
 
 const ready = computed(() => chains.every(chain => Boolean(endpoints.value[chain].length)) || fetched.value)
@@ -65,11 +65,11 @@ onBeforeMount(async () => {
     v-else
     :amount="String(amount)"
     :address="accountId"
+    chain="AssetHubPolkadot"
+    asset="DOT"
     :label="label"
     :disabled="disabled"
     :get-signer="getSigner"
-    chain="AssetHubPolkadot"
-    asset="DOT"
     :endpoints="paraportEndpoints"
     @submit="onSubmit"
   />
