@@ -27,7 +27,7 @@ const showFollowing = ref(false)
 const loading = ref(false)
 const buttonRef = ref()
 
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 const { $i18n } = useNuxtApp()
 const { accountId } = useAuth()
 const { getSignaturePair } = useVerifyAccount()
@@ -153,7 +153,7 @@ watch(accountId, () => {
 <template>
   <div ref="buttonRef">
     <UButton
-      v-if="!accountId || getss58AddressByPrefix(accountId, prefix) !== getss58AddressByPrefix(target, prefix)"
+      v-if="!accountId || getss58AddressByPrefix(accountId, currentChain) !== getss58AddressByPrefix(target, currentChain)"
       :loading="loading"
       variant="outline"
       :icon="buttonConfig.icon"

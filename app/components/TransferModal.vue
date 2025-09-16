@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
 import { isAddress } from '@polkadot/util-crypto'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
@@ -16,7 +15,7 @@ const acknowledged = ref(false)
 
 function getChainAddress(value: string) {
   try {
-    return getss58AddressByPrefix(value, currentChain.value as Prefix)
+    return getss58AddressByPrefix(value, currentChain.value)
   }
   catch {
     return null
@@ -52,7 +51,7 @@ function validateAddress() {
     return
   }
 
-  const chainAddress = getss58AddressByPrefix(address.value, currentChain.value as Prefix)
+  const chainAddress = getss58AddressByPrefix(address.value, currentChain.value)
   isAddressValid.value = !!chainAddress && isAddress(chainAddress)
 }
 

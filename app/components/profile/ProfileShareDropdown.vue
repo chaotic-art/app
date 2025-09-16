@@ -2,7 +2,7 @@
 import { useClipboard } from '@vueuse/core'
 
 const { $i18n } = useNuxtApp()
-const { shareOnX, shareOnFarcaster } = useSocialShare()
+const { shareOnX } = useSocialShare()
 const route = useRoute()
 const { copy } = useClipboard()
 
@@ -22,10 +22,6 @@ function handleShareOnX() {
   shareOnX('Share on X', shareURL.value, null)
 }
 
-function handleShareOnFarcaster() {
-  shareOnFarcaster('Share on Farcaster', [shareURL.value])
-}
-
 const shareItems = computed(() => [
   {
     label: 'Copy Link',
@@ -36,11 +32,6 @@ const shareItems = computed(() => [
     label: 'Share on X',
     icon: 'i-simple-icons:x',
     onSelect: handleShareOnX,
-  },
-  {
-    label: 'Share on Farcaster',
-    icon: 'simple-icons:farcaster',
-    onSelect: handleShareOnFarcaster,
   },
 ])
 </script>

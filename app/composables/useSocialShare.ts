@@ -1,6 +1,3 @@
-import type { Prefix } from '@kodadot1/static'
-import { URLS } from '@/utils/constants'
-
 export default function () {
   const route = useRoute()
 
@@ -29,34 +26,8 @@ export default function () {
     open(shareUrl.toString())
   }
 
-  const shareOnFarcaster = (
-    text: string,
-    embeds: string[] = [fullPathShare.value],
-    channel: string = 'chaotic',
-  ) => {
-    const url = new URL('https://warpcast.com/~/compose')
-    url.searchParams.set('text', text)
-    url.searchParams.set('channelKey', channel)
-    embeds.forEach(embed => url.searchParams.append('embeds[]', embed))
-    open(url.toString())
-  }
-
-  const getCollectionFrameUrl = (chain: Prefix, collectionId: string) =>
-    `${URLS.koda.frame}/${chain}/${collectionId}`
-
-  const shareCollectionOnFarcaster = (
-    chain: Prefix,
-    collectionId: string,
-    text: string,
-  ) => {
-    shareOnFarcaster(text, [getCollectionFrameUrl(chain, collectionId)])
-  }
-
   return {
     shareOnX,
     shareOnTelegram,
-    shareOnFarcaster,
-    shareCollectionOnFarcaster,
-    getCollectionFrameUrl,
   }
 }

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { Prefix } from '@kodadot1/static'
 import type { CSSProperties } from 'vue'
-import { chainNames } from '@kodadot1/static'
+import type { SupportedChain } from '~/plugins/sdk.client'
 
 // inherited attrs can mess up the satori parser
 defineOptions({
@@ -21,7 +20,7 @@ const cover: CSSProperties = {
   objectPosition: 'center',
 }
 
-const networkName = chainNames[props.network as Prefix]
+const networkName = chainSpec[props.network as SupportedChain].name
 </script>
 
 <template>
