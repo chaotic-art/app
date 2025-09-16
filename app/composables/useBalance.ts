@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/vue-query'
 export default function ({ enabled = ref(true) }: { enabled?: Ref<boolean> } = {}) {
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
   const { getBalance } = useBalances()
-  const { prefix } = usePrefix()
-  const { existentialDeposit } = useDeposit(prefix)
+  const { currentChain } = useChain()
+  const { existentialDeposit } = useDeposit(currentChain)
 
   const { data, isPending: isLoading } = useQuery({
     queryKey: ['wallet-balance', computed(() => getConnectedSubAccount.value?.address)],
@@ -12,7 +12,7 @@ export default function ({ enabled = ref(true) }: { enabled?: Ref<boolean> } = {
       return getConnectedSubAccount.value
         ? getBalance({
             address: getConnectedSubAccount.value.address,
-            prefix: prefix.value,
+            prefix: currentChain.value,
           })
         : Promise.resolve(null)
     },

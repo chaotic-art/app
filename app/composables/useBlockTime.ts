@@ -1,18 +1,18 @@
-import type { Prefix } from '@kodadot1/static'
+import type { SupportedChain } from '~/plugins/sdk.client'
 
 export default function () {
-  const { prefix } = usePrefix()
+  const { currentChain } = useChain()
 
   const paraChainBlockTime = 12 // seconds
   const relayChainBlockTime = 6 // seconds
 
-  const chainBlockTimes: Partial<Record<Prefix, number>> = {
+  const chainBlockTimes: Partial<Record<SupportedChain, number>> = {
     ksm: relayChainBlockTime,
     dot: relayChainBlockTime,
   }
 
   const blockTime = computed(
-    () => chainBlockTimes[prefix.value] ?? paraChainBlockTime,
+    () => chainBlockTimes[currentChain.value] ?? paraChainBlockTime,
   )
 
   const estimatedTimes = computed(() => ({

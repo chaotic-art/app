@@ -1,7 +1,7 @@
 export function useDropMinimumFunds() {
   const { drop } = useDrop()
-  const { prefix } = usePrefix()
-  const { itemDeposit } = useDeposit(prefix)
+  const { currentChain } = useChain()
+  const { itemDeposit } = useDeposit(currentChain)
   const { amountToMint: amount } = storeToRefs(useDropStore())
 
   const price = computed<number>(() => Number(drop.value?.price) || 0)
