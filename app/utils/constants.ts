@@ -32,8 +32,10 @@ export const URLS = {
   },
   providers: {
     coingecko: 'https://api.coingecko.com/api/v3',
-    kodaprice: 'https://price.kodadot.workers.dev/',
     ramp: 'https://ramp.network/buy/',
     pinata: 'https://api.pinata.cloud/',
+  },
+  workers: {
+    price: 'https://price.chaotic.art',
   },
 }

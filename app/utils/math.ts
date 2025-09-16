@@ -26,3 +26,7 @@ export function between(dateA: Date, dateB: Date) {
 export function unlimited(value = '0') {
   return Number(value) >= Number.MAX_SAFE_INTEGER
 }
+
+export function mean(array: number[]): number {
+  return array.reduce((acc, cur) => acc + cur, 0) / array.length
+}

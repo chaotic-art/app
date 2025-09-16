@@ -90,14 +90,14 @@ defineExpose({
       <!-- Image Media -->
       <img
         v-else-if="imageStatus === 'normal' && tokenData?.metadata?.image"
-        :src="sanitizeIpfsUrl(tokenData?.metadata?.image)"
+        :src="toOriginalContentUrl(sanitizeIpfsUrl(tokenData?.metadata?.image))"
         :alt="tokenData?.metadata?.name || 'NFT'"
         class="aspect-square w-full object-contain"
         @error="imageStatus = 'fallback'"
       >
       <img
         v-else-if="imageStatus === 'fallback' && collectionData?.metadata?.image"
-        :src="sanitizeIpfsUrl(collectionData?.metadata?.image)"
+        :src="toOriginalContentUrl(sanitizeIpfsUrl(collectionData?.metadata?.image))"
         :alt="tokenData?.metadata?.name || 'NFT'"
         class="aspect-square w-full object-contain"
       >

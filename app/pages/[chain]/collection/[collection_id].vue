@@ -29,45 +29,6 @@ const queryVariables = computed(() =>
   createQueryVariables([collection_id?.toString() ?? '']),
 )
 
-// Floor price data
-const { $sdk } = useNuxtApp()
-const floorPrice = ref(0)
-const owner = ref('')
-const isLoadingFloor = ref(false)
-
-// Fetch floor price data
-onMounted(async () => {
-  if (!collection_id)
-    return
-
-  isLoadingFloor.value = true
-  try {
-    const api = $sdk(chain.value).api
-    const [queryFloor, queryCollection] = await Promise.all([
-      api.query.Nfts.ItemPriceOf.getEntries(Number(collection_id)),
-      api.query.Nfts.Collection.getValue(Number(collection_id)),
-    ])
-
-    owner.value = queryCollection?.owner.toString() ?? ''
-
-    if (queryFloor.length) {
-      const floorValues = queryFloor
-        .filter(item => Number(item.value[0]) > 0)
-        .map(item => Number(item.value[0]))
-
-      if (floorValues.length) {
-        floorPrice.value = Math.min(...floorValues)
-      }
-    }
-  }
-  catch (error) {
-    console.error('Error fetching floor price:', error)
-  }
-  finally {
-    isLoadingFloor.value = false
-  }
-})
-
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
@@ -130,17 +91,19 @@ defineOgImageComponent('Frame', {
               <div class="text-2xl font-bold mb-2">
                 {{ data?.collection?.metadata?.name || `Collection #${collection_id}` }}
               </div>
-              <div v-if="owner" class="flex items-center gap-1 text-muted-foreground">
-                <UserInfo :avatar-size="26" :address="data?.drops[0]?.creator || owner" custom-name>
+              <div v-if="data?.drops[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
+                <UserInfo :avatar-size="26" :address="data?.drops[0]?.creator || data?.collection?.owner" custom-name>
                   <template #name="{ addressName }">
-                    <p>Creator:</p>
-                    <p class="font-bold">
-                      {{ addressName }}
-                    </p>
+                    <div class="pr-1 flex">
+                      <p>Creator:</p>
+                      <p class="font-bold">
+                        {{ addressName }}
+                      </p>
+                    </div>
                   </template>
                 </UserInfo>
                 <UButton
-                  :to="getSubscanAccountUrl(owner, chain)"
+                  :to="getSubscanAccountUrl((data?.drops[0]?.creator || data?.collection?.owner) ?? '', chain)"
                   target="_blank"
                 >
                   Subscan
@@ -178,8 +141,7 @@ defineOgImageComponent('Frame', {
             <div class="flex justify-between items-center">
               <span class="text-sm text-gray-500 dark:text-gray-400">Floor Price</span>
               <span class="font-medium text-gray-900 dark:text-white">
-                <UIcon v-if="isLoadingFloor" name="i-heroicons-arrow-path" class="w-4 h-4 animate-spin" />
-                <Money v-else-if="floorPrice" inline :value="floorPrice" />
+                <Money v-if="data?.collection?.floor" inline :value="data?.collection?.floor" />
                 <span v-else class="text-gray-400 dark:text-gray-500">–</span>
               </span>
             </div>
