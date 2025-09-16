@@ -12,9 +12,18 @@ const emit = defineEmits(['confirm'])
 
 const chains = ['ahp', 'dot'] as SupportedChain[]
 
+const SupportedChainMap = {
+  ahp: 'AssetHubPolkadot',
+  dot: 'Polkadot',
+  ksm: 'Kusama',
+  ahk: 'AssetHubKusama',
+  ahpas: 'AssetHubPaseo',
+} as const
+
 const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 const { accountId } = useAuth()
 const pingStore = usePingStore()
+const { currentChain } = useChain()
 const { endpoints } = storeToRefs(pingStore)
 const fetched = ref(false)
 
@@ -65,7 +74,7 @@ onBeforeMount(async () => {
     v-else
     :amount="String(amount)"
     :address="accountId"
-    chain="AssetHubPolkadot"
+    :chain="SupportedChainMap[currentChain]"
     asset="DOT"
     :label="label"
     :disabled="disabled"
