@@ -16,10 +16,10 @@ const buttonRef = ref<HTMLElement>()
 const isHovered = useElementHover(buttonRef)
 const showFollowing = ref(false)
 
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 
 const prefixUserAddress = computed(() =>
-  getss58AddressByPrefix(props.user.address, prefix.value),
+  getss58AddressByPrefix(props.user.address, currentChain.value),
 )
 
 const { data: followersCount, refresh: refreshCount } = useAsyncData(
@@ -42,7 +42,7 @@ watch(isHovered, (newHover, oldHover) => {
   <div class="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-neutral-700 bg-secondary hover:shadow-sm transition-shadow">
     <NuxtLink
       class="flex items-center flex-1 min-w-0 gap-4"
-      :to="`/${prefix}/u/${prefixUserAddress}`"
+      :to="`/${currentChain}/u/${prefixUserAddress}`"
     >
       <ProfileAvatar
         :address="user.address"

@@ -1,4 +1,3 @@
-import type { Prefix } from '@kodadot1/static'
 import type { PolkadotClient, TypedApi } from 'polkadot-api'
 import { createClient } from 'polkadot-api'
 import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
@@ -34,8 +33,8 @@ const config = {
 export type SupportedChain = keyof typeof config
 
 export type AssetHubChain = Extract<SupportedChain, 'ahp' | 'ahk' | 'ahpas'>
-export type UnsupportedChain = Extract<Prefix, 'base' | 'ahw'>
-export type Chain = SupportedChain | UnsupportedChain | Prefix
+export type UnsupportedChain = 'base' | 'ahw'
+export type Chain = SupportedChain | UnsupportedChain
 
 // Mapped type for API return types
 type ApiMap = {
@@ -62,7 +61,7 @@ function getEffectiveChain(chain: Chain): SupportedChain {
 // Generic function for supported chains
 function sdk<T extends SupportedChain>(chain: T): { api: ApiMap[T], client: PolkadotClient }
 // Overload for unsupported chains and default case
-function sdk(chain?: UnsupportedChain | Prefix): { api: ApiMap['ahp'], client: PolkadotClient }
+function sdk(chain?: UnsupportedChain | SupportedChain): { api: ApiMap['ahp'], client: PolkadotClient }
 // Implementation
 function sdk(chain: Chain = DEFAULT_CHAIN) {
   const effectiveChain = getEffectiveChain(chain)

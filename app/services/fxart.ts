@@ -1,6 +1,6 @@
-import type { Prefix } from '@kodadot1/static'
 import type { FetchError } from 'ofetch'
 import type { DropItem } from '@/types'
+import type { SupportedChain } from '~/plugins/sdk.client'
 import { $fetch } from 'ofetch'
 import { isProduction } from '@/utils/env'
 
@@ -97,7 +97,7 @@ export interface DropCalendar {
   location: string | null
   items: CalendarItem[]
   alias: string | null
-  chain: Prefix | null
+  chain: SupportedChain | null
   creator: string | null
 }
 
@@ -106,7 +106,7 @@ export interface CalendarItem {
 }
 
 interface GetCalendarsQuery {
-  chain?: Prefix[]
+  chain?: SupportedChain[]
 }
 
 export async function getDropCalendar(query: GetCalendarsQuery = {}) {
