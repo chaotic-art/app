@@ -105,6 +105,7 @@ function deleteNFT(nft: NFT) {
             help="Select the collection to mass mint"
           >
             <USelectMenu
+              :key="collections.map(collection => collection.value).join(',')"
               v-model="state.collection"
               :items="collections"
               value-key="value"
@@ -117,7 +118,6 @@ function deleteNFT(nft: NFT) {
           </UFormField>
         </div>
       </div>
-      <!-- Upload Pictures Section -->
       <UploadCompressedMedia
         :disabled="!selectedCollection"
         @zip-loaded="onMediaZipLoaded"

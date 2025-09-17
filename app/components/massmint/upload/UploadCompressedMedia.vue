@@ -107,7 +107,7 @@ async function onFileSelected(file?: File) {
         layout="list"
         :icon="loading ? 'i-heroicons-arrow-path' : 'i-heroicons-cloud-arrow-up'"
         label="Compress your Art files into a .ZIP file"
-        description="Supported formats: BMP, GIF, JPG, JPEG, PNG, SVG, TIFF, WEBP, MP4, OGV, MOV, QT, WEBM, GLB, GLTF, FLAC, MP3, JSON, AVIF \n Drop your file here or click to select"
+        description="Supported formats: BMP, GIF, JPG, JPEG, PNG, SVG, TIFF, WEBP, MP4, OGV, MOV, QT, WEBM, GLB, GLTF, FLAC, MP3, JSON, AVIF"
         color="neutral"
         size="lg"
         required

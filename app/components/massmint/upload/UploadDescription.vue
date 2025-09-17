@@ -1,28 +1,47 @@
 <script setup lang="ts">
+import { useParseDescriptionFile } from '~/composables/massmint/useParseDescriptionFile'
+
 interface Props {
   disabled?: boolean
 }
 
-// interface Emits {
-//   (e: 'fileLoaded', entries: Record<string, any>): void
-// }
+interface Emits {
+  (e: 'fileLoaded', entries: Record<string, any>): void
+}
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   disabled: false,
 })
 
-// const emit = defineEmits<Emits>()
+const emit = defineEmits<Emits>()
+
+const file = ref<File>()
 
 const loading = ref(false)
 const showCheckmark = ref(false)
 
-const acceptedMediaFormatsString = '.TXT, .CSV, .JSON'
+watch(file, (newFile) => {
+  onFileSelected(newFile)
+})
+function onFileSelected(file?: File) {
+  showCheckmark.value = false
 
-function handleClick() {
-  if (!props.disabled) {
-    // TODO: Implement file input trigger
-    console.warn('Description file input clicked')
+  if (!file) {
+    emit('fileLoaded', {})
+    return
   }
+
+  loading.value = true
+
+  const { entries, error, loading: isLoading } = useParseDescriptionFile(file!)
+
+  watch(isLoading, (loadingDescFile) => {
+    loading.value = loadingDescFile
+    showCheckmark.value = !loadingDescFile
+    if (!loadingDescFile && !error.value) {
+      emit('fileLoaded', entries.value!)
+    }
+  })
 }
 </script>
 
@@ -40,32 +59,18 @@ function handleClick() {
         />
       </div>
 
-      <div
-        class="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-border/80 transition-colors cursor-pointer"
-        :class="{ 'opacity-50': disabled }"
-        @click="handleClick"
-      >
-        <UIcon
-          v-if="loading"
-          name="i-heroicons-arrow-path"
-          class="w-12 h-12 text-muted-foreground mx-auto mb-4 animate-spin"
-        />
-        <UIcon
-          v-else
-          name="i-heroicons-document-text"
-          class="w-12 h-12 text-muted-foreground mx-auto mb-4"
-        />
-        <p class="text-lg font-medium mb-2">
-          Upload Description File
-        </p>
-        <p class="text-sm text-muted-foreground mb-4">
-          <span class="font-bold">Supported formats:</span>
-          {{ acceptedMediaFormatsString }}
-        </p>
-        <p class="text-sm text-muted-foreground">
-          Drop your file here or click to select
-        </p>
-      </div>
+      <UFileUpload
+        v-model="file"
+        accept=".txt, .csv, .json"
+        layout="list"
+        :icon="loading ? 'i-heroicons-arrow-path' : 'i-heroicons-document-text'"
+        label="Upload Description File"
+        description="Supported formats: .TXT, .CSV, .JSON"
+        color="neutral"
+        size="lg"
+        required
+        :disabled="disabled"
+      />
     </div>
   </div>
 </template>
