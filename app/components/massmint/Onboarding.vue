@@ -4,7 +4,6 @@ import { descriptionTabs } from './descriptionTabs'
 import OnBoardingCard from './OnBoardingCard.vue'
 
 const router = useRouter()
-const { currentChain } = useChain()
 const { $i18n } = useNuxtApp()
 
 const numOfCards = 3
@@ -48,7 +47,7 @@ function prevSlide() {
 function toMassMint() {
   router
     .replace({
-      path: `/${currentChain.value}/massmint`,
+      path: `/massmint`,
     })
     .catch(console.warn)
 }
