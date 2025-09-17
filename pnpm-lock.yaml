@@ -48,8 +48,8 @@ importers:
         specifier: 3.1.0
         version: 3.1.0(@netlify/blobs@9.1.2)(@unhead/vue@2.0.12(vue@3.5.18(typescript@5.8.3)))(db0@0.3.2)(h3@1.15.4)(idb-keyval@6.2.2)(ioredis@5.6.1)(magicast@0.3.5)(rollup@4.46.2)(unstorage@1.16.1(@netlify/blobs@9.1.2)(db0@0.3.2)(idb-keyval@6.2.2)(ioredis@5.6.1))(vite@7.0.6(@types/node@24.3.1)(jiti@2.5.1)(lightningcss@1.30.1)(terser@5.43.1)(yaml@2.8.0))(vue@3.5.18(typescript@5.8.3))
       '@paraport/vue':
-        specifier: 0.1.0-alpha.19
-        version: 0.1.0-alpha.19(bufferutil@4.0.9)(jiti@2.5.1)(postcss@8.5.6)(rxjs@7.8.2)(tailwindcss@4.1.11)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)(zod@3.25.76)
+        specifier: 0.1.0-alpha.24
+        version: 0.1.0-alpha.24(bufferutil@4.0.9)(jiti@2.5.1)(postcss@8.5.6)(rxjs@7.8.2)(tailwindcss@4.1.11)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)(zod@3.25.76)
       '@pinia/nuxt':
         specifier: 0.11.1
         version: 0.11.1(magicast@0.3.5)(pinia@3.0.3(typescript@5.8.3)(vue@3.5.18(typescript@5.8.3)))
@@ -2269,14 +2269,14 @@ packages:
   '@parallel-finance/type-definitions@2.0.1':
     resolution: {integrity: sha512-fC1QfhFFd8oSZqdIh6kmoMNvTxZdQGw1sTAbdYSINyVxyCxKiDg47ZP9bAZFDexL7POqnXnn4pYM7kUAnsT+8Q==}
 
-  '@paraport/core@0.1.0-alpha.9':
-    resolution: {integrity: sha512-mKKzm62yzYkucDyOnRnkjK31CkDhXJ5sBBrjS9ZAr3I5DPCRrrt8WAN3q4mlCzO3jhnixLtpRV4BndF/qDJMzA==}
+  '@paraport/core@0.1.0-alpha.10':
+    resolution: {integrity: sha512-epAHABkN2gj5E2v0COXMB+P1tqbTBSH2CEhfFnWZiDHtFs69y3iorJI0Fbzb63xSOEnrU7pHf4elFnwV/g1a2A==}
 
   '@paraport/static@0.0.2-alpha.2':
     resolution: {integrity: sha512-mMLuhmdLeGttXCYzwg14wfeswnuST62t4Nt9Cg/ch06Co47zh/Xu4Tfj6bvC2Kxr/mITM8BOrysokqb/s3C0jA==}
 
-  '@paraport/vue@0.1.0-alpha.19':
-    resolution: {integrity: sha512-mb/cXs6yjdOX8Sk0hQpcBnrVmKJJt1ggGaP2m5xXkJ5R64cBCwKhck1RgaYH/0XzDORFAdGot/IKoQI6l1dDeQ==}
+  '@paraport/vue@0.1.0-alpha.24':
+    resolution: {integrity: sha512-0KwBZBM8wTcc4HQKQfjA74OQHT177Xhd7R68khFtvy96j2/kQYwI3Kh81p4czxNNCcXbgDrTDk6mzxKNzQkE/Q==}
 
   '@paraspell/assets@11.4.2':
     resolution: {integrity: sha512-R09taJvYwrG8Og0U6CNFhjdqEtY/5NkPRAyWPZmm0ioZJTNtpx6tIMA/WVBMjrkAv3zRGV1ApqZn89yfDqrb+A==}
@@ -2984,10 +2984,6 @@ packages:
 
   '@polkadot/types-support@16.4.4':
     resolution: {integrity: sha512-wntILKwQ+IGK1wOGk9rVmOT6s07wupu47eL56Bt5JiIcxMZPqRfgC2KkC3UCcE5tnxXQ1dKhMPsVWzHYDb2xmw==}
-    engines: {node: '>=18'}
-
-  '@polkadot/types-support@16.4.6':
-    resolution: {integrity: sha512-e83H4MzamzNzxZdxf104xqzsl1YUCF24i2pw19I/6zPVxpt6a9zn4+7VzSVMclaztxxSTITCLbks7/9dLiNhEw==}
     engines: {node: '>=18'}
 
   '@polkadot/types-support@16.4.7':
@@ -10671,7 +10667,7 @@ snapshots:
       '@dedot/codecs': 0.16.0
       '@dedot/codegen': 0.16.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@polkadot-api/wasm-executor': 0.1.2
-      '@polkadot/types-support': 16.4.6
+      '@polkadot/types-support': 16.4.7
       ora: 8.2.0
       yargs: 17.7.2
     transitivePeerDependencies:
@@ -12926,7 +12922,7 @@ snapshots:
     dependencies:
       '@open-web3/orml-type-definitions': 2.0.1
 
-  '@paraport/core@0.1.0-alpha.9(bufferutil@4.0.9)(jiti@2.5.1)(postcss@8.5.6)(rxjs@7.8.2)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)(zod@3.25.76)':
+  '@paraport/core@0.1.0-alpha.10(bufferutil@4.0.9)(jiti@2.5.1)(postcss@8.5.6)(rxjs@7.8.2)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)(zod@3.25.76)':
     dependencies:
       '@paraport/static': 0.0.2-alpha.2
       '@paraspell/sdk': 11.4.2(bufferutil@4.0.9)(polkadot-api@1.17.1(bufferutil@4.0.9)(jiti@2.5.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.0))(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -12951,9 +12947,9 @@ snapshots:
 
   '@paraport/static@0.0.2-alpha.2': {}
 
-  '@paraport/vue@0.1.0-alpha.19(bufferutil@4.0.9)(jiti@2.5.1)(postcss@8.5.6)(rxjs@7.8.2)(tailwindcss@4.1.11)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)(zod@3.25.76)':
+  '@paraport/vue@0.1.0-alpha.24(bufferutil@4.0.9)(jiti@2.5.1)(postcss@8.5.6)(rxjs@7.8.2)(tailwindcss@4.1.11)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)(zod@3.25.76)':
     dependencies:
-      '@paraport/core': 0.1.0-alpha.9(bufferutil@4.0.9)(jiti@2.5.1)(postcss@8.5.6)(rxjs@7.8.2)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)(zod@3.25.76)
+      '@paraport/core': 0.1.0-alpha.10(bufferutil@4.0.9)(jiti@2.5.1)(postcss@8.5.6)(rxjs@7.8.2)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)(zod@3.25.76)
       '@tanstack/vue-table': 8.21.3(vue@3.5.18(typescript@5.8.3))
       '@vue/runtime-dom': 3.5.18
       '@vueuse/core': 13.5.0(vue@3.5.18(typescript@5.8.3))
@@ -14570,11 +14566,6 @@ snapshots:
   '@polkadot/types-support@16.4.4':
     dependencies:
       '@polkadot/util': 13.5.5
-      tslib: 2.8.1
-
-  '@polkadot/types-support@16.4.6':
-    dependencies:
-      '@polkadot/util': 13.5.6
       tslib: 2.8.1
 
   '@polkadot/types-support@16.4.7':

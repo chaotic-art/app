@@ -1,3 +1,6 @@
+@layer base, components, paraport-base, paraport-components, utilities, paraport-utilities;
+@import '@paraport/vue/style' layer(paraport-base);
+
 @import "tailwindcss";
 @import "@nuxt/ui";
 @import "./theme-new-york.css";
