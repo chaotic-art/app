@@ -11,7 +11,13 @@ const { data: dropItems } = await useLazyAsyncData(() => (getDrops({
   limit: 3,
 })), {
   transform: async (data) => {
-    return await Promise.all(data.map(getEnrichedDrop))
+    const now = new Date()
+    const futureDrops = data
+      .filter(drop => drop.start_at && new Date(drop.start_at).getTime() > now.getTime())
+      .sort((a, b) => new Date(a.start_at!).getTime() - new Date(b.start_at!).getTime())
+    const pastDrops = data.filter(drop => drop.start_at && new Date(drop.start_at).getTime() <= now.getTime())
+    const latestDrops = [...futureDrops, ...pastDrops]
+    return await Promise.all(latestDrops.map(getEnrichedDrop))
   },
 })
 
