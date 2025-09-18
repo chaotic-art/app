@@ -75,8 +75,6 @@ onBeforeMount(async () => {
 
   const result = await pingStore.getFastestEndpoints(paraportEndpoints.chains)
 
-  console.log(result)
-
   Object.entries(result).forEach(([chain, chainEndpoints]) => {
     endpoints.value[chain as ChaoticSupportedChain] = chainEndpoints
   })
@@ -86,9 +84,14 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div v-if="!(currentChain === 'ahp' || currentChain === 'ahk')">
-    Unsupported Chain
-  </div>
+  <!-- Unsupported Chain -->
+  <UButton
+    v-if="!(currentChain === 'ahp' || currentChain === 'ahk')"
+    class="w-full inline-flex justify-center"
+    :disabled="disabled"
+    :label="label"
+    @click="$emit('confirm')"
+  />
 
   <USkeleton v-else-if="loading || !ready" class="h-12 w-full rounded" />
 
