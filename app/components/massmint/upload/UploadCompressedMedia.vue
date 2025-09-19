@@ -89,7 +89,7 @@ async function onFileSelected(file?: File) {
 <template>
   <div class="border-b border-border">
     <div class="p-6">
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 pb-4">
         <h3 class="text-lg font-semibold">
           Upload Arts files
         </h3>

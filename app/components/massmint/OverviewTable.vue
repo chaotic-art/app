@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui'
 import type { NFT, NFTS } from './types'
 import { Status } from './types'
 
@@ -38,15 +39,6 @@ function addStatus(nft: NFT): NFT {
     if (!nft.name) {
       return Status.Incomplete
     }
-    if (!nft.description && !nft.price) {
-      return Status.Optional
-    }
-    if (!nft.description) {
-      return Status.Description
-    }
-    if (!nft.price) {
-      return Status.Price
-    }
     return Status.Ok
   }
 
@@ -78,16 +70,182 @@ function statusTranslation(status?: Status) {
       return 'Complete'
     case Status.Incomplete:
       return 'Incomplete'
-    case Status.Description:
-      return 'Missing Description'
-    case Status.Price:
-      return 'Missing Price'
-    case Status.Optional:
-      return 'Optional'
     default:
       return 'Unknown'
   }
 }
+
+// Define table columns
+const columns: TableColumn<NFT>[] = [
+  {
+    accessorKey: 'id',
+    header: '#',
+    cell: ({ row }) => {
+      return h('div', { class: 'p-2' }, row.getValue('id'))
+    },
+  },
+  {
+    accessorKey: 'imageUrl',
+    header: 'Image',
+    cell: ({ row }) => {
+      const nft = row.original
+      return h('div', { class: 'p-2' }, [
+        h('div', { class: 'w-12 h-12 rounded-lg overflow-hidden bg-muted' }, [
+          nft.imageUrl
+            ? h('img', {
+                src: nft.imageUrl,
+                alt: nft.name || `NFT ${nft.id}`,
+                class: 'w-full h-full object-cover',
+              })
+            : h('div', { class: 'w-full h-full flex items-center justify-center' }, [
+                h('svg', {
+                  class: 'w-6 h-6 text-muted-foreground',
+                  fill: 'none',
+                  stroke: 'currentColor',
+                  viewBox: '0 0 24 24',
+                }, [
+                  h('path', {
+                    'stroke-linecap': 'round',
+                    'stroke-linejoin': 'round',
+                    'stroke-width': '2',
+                    'd': 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
+                  }),
+                ]),
+              ]),
+        ]),
+      ])
+    },
+  },
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    cell: ({ row }) => {
+      const nft = row.original
+      return h('div', {
+        class: 'p-2 cursor-pointer hover:text-primary',
+        onClick: () => openSideBarWith(nft),
+      }, [
+        h('div', {
+          class: nft.name ? '' : 'text-red-500',
+        }, nft.name || '*Name Required'),
+      ])
+    },
+  },
+  {
+    accessorKey: 'description',
+    header: 'Description',
+    cell: ({ row }) => {
+      const nft = row.original
+      return h('div', {
+        class: 'p-2 cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px] hover:text-primary',
+        onClick: () => openSideBarWith(nft),
+      }, [
+        h('div', {
+          class: nft.description ? '' : 'text-orange-500',
+        }, nft.description || 'Description Missing'),
+      ])
+    },
+  },
+  {
+    accessorKey: 'attributes',
+    header: 'Properties',
+    cell: ({ row }) => {
+      const nft = row.original
+      return h('div', {
+        class: 'p-2 cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap hover:text-primary',
+        onClick: () => openSideBarWith(nft),
+      }, [
+        nft.attributes?.length
+          ? h('div', nft.attributes.map(attr =>
+              h('div', {
+                key: attr.trait_type,
+                class: 'flex items-center gap-2 text-sm',
+              }, [
+                h('span', `${attr.trait_type}: `),
+                h('span', { class: 'font-bold' }, attr.value),
+              ]),
+            ))
+          : h('div', { class: nft.attributes?.length ? '' : 'text-orange-500' }, 'Attributes Missing'),
+      ])
+    },
+  },
+  {
+    accessorKey: 'price',
+    header: 'Price',
+    cell: ({ row }) => {
+      const nft = row.original
+      return h('div', {
+        class: 'p-2 cursor-pointer hover:text-primary',
+        onClick: () => openSideBarWith(nft),
+      }, [
+        nft.price
+          ? h('div', { class: 'text-sm' }, `${nft.price} DOT`)
+          : h('div', { class: 'text-orange-500 text-sm' }, 'Price Missing'),
+      ])
+    },
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const nft = row.original
+      return h('div', { class: 'p-2' }, [
+        h('div', { class: 'flex items-center' }, [
+          h('div', {
+            class: `border text-xs justify-center py-1 px-2 flex items-center rounded-full ${statusClass(nft.status)}`,
+          }, statusTranslation(nft.status)),
+        ]),
+      ])
+    },
+  },
+  {
+    id: 'actions',
+    header: 'Actions',
+    cell: ({ row }) => {
+      const nft = row.original
+      return h('div', { class: 'p-2' }, [
+        h('div', { class: 'flex items-center gap-2' }, [
+          h('button', {
+            class: 'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3',
+            onClick: () => openSideBarWith(nft),
+          }, [
+            h('svg', {
+              class: 'h-4 w-4',
+              fill: 'none',
+              stroke: 'currentColor',
+              viewBox: '0 0 24 24',
+            }, [
+              h('path', {
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': '2',
+                'd': 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z',
+              }),
+            ]),
+          ]),
+          h('button', {
+            class: 'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-3 text-destructive hover:text-destructive',
+            onClick: () => deleteNFT(nft),
+          }, [
+            h('svg', {
+              class: 'h-4 w-4',
+              fill: 'none',
+              stroke: 'currentColor',
+              viewBox: '0 0 24 24',
+            }, [
+              h('path', {
+                'stroke-linecap': 'round',
+                'stroke-linejoin': 'round',
+                'stroke-width': '2',
+                'd': 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16',
+              }),
+            ]),
+          ]),
+        ]),
+      ])
+    },
+  },
+]
 </script>
 
 <template>
@@ -111,139 +269,12 @@ function statusTranslation(status?: Status) {
       </p>
     </div>
 
-    <div v-else class="overflow-x-auto">
-      <table class="w-full table-auto">
-        <thead>
-          <tr class="border-b border-border">
-            <th class="text-left p-2 font-medium">
-              #
-            </th>
-            <th class="text-left p-2 font-medium">
-              Image
-            </th>
-            <th class="text-left p-2 font-medium">
-              Name
-            </th>
-            <th class="text-left p-2 font-medium">
-              Description
-            </th>
-            <th class="text-left p-2 font-medium">
-              Properties
-            </th>
-            <th class="text-left p-2 font-medium">
-              Price
-            </th>
-            <th class="text-left p-2 font-medium">
-              Status
-            </th>
-            <th class="text-left p-2 font-medium">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="nft in displayedNFTS"
-            :key="nft.id"
-            class="border-b border-border hover:bg-muted/50"
-          >
-            <td class="p-2">
-              {{ nft.id }}
-            </td>
-            <td class="p-2">
-              <div class="w-12 h-12 rounded-lg overflow-hidden bg-muted">
-                <img
-                  v-if="nft.imageUrl"
-                  :src="nft.imageUrl"
-                  :alt="nft.name || `NFT ${nft.id}`"
-                  class="w-full h-full object-cover"
-                >
-                <div v-else class="w-full h-full flex items-center justify-center">
-                  <UIcon name="i-heroicons-photo" class="w-6 h-6 text-muted-foreground" />
-                </div>
-              </div>
-            </td>
-            <td class="p-2">
-              <div
-                class="cursor-pointer hover:text-primary"
-                :class="{ 'text-red-500': !nft.name }"
-                @click="openSideBarWith(nft)"
-              >
-                {{ nft.name || '*Name Required' }}
-              </div>
-            </td>
-            <td class="p-2">
-              <div
-                class="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap max-w-[200px] hover:text-primary"
-                :class="{ 'text-orange-500': !nft.description }"
-                @click="openSideBarWith(nft)"
-              >
-                {{ nft.description || 'Description Missing' }}
-              </div>
-            </td>
-            <td class="p-2">
-              <div
-                class="cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap hover:text-primary"
-                :class="{ 'text-orange-500': !nft.attributes?.length }"
-                @click="openSideBarWith(nft)"
-              >
-                <div v-if="nft.attributes?.length">
-                  <div
-                    v-for="attr in nft.attributes"
-                    :key="attr.trait_type"
-                    class="flex items-center gap-2 text-sm"
-                  >
-                    <span>{{ attr.trait_type }}: <span class="font-bold">{{ attr.value }}</span></span>
-                  </div>
-                </div>
-                <div v-else>
-                  Attributes Missing
-                </div>
-              </div>
-            </td>
-            <td class="p-2">
-              <div
-                class="cursor-pointer hover:text-primary"
-                @click="openSideBarWith(nft)"
-              >
-                <div v-if="nft.price" class="text-sm">
-                  {{ nft.price }} DOT
-                </div>
-                <div v-else class="text-orange-500 text-sm">
-                  Price Missing
-                </div>
-              </div>
-            </td>
-            <td class="p-2">
-              <div class="flex items-center">
-                <div
-                  class="border text-xs justify-center py-1 px-2 flex items-center rounded-full"
-                  :class="statusClass(nft.status)"
-                >
-                  {{ statusTranslation(nft.status) }}
-                </div>
-              </div>
-            </td>
-            <td class="p-2">
-              <div class="flex items-center gap-2">
-                <UButton
-                  icon="i-heroicons-pencil"
-                  size="sm"
-                  variant="ghost"
-                  @click="openSideBarWith(nft)"
-                />
-                <UButton
-                  icon="i-heroicons-trash"
-                  size="sm"
-                  variant="ghost"
-                  color="error"
-                  @click="deleteNFT(nft)"
-                />
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <UTable
+      v-else
+      :data="displayedNFTS"
+      :columns="columns"
+      sticky
+      class="flex-1 h-[600px]"
+    />
   </div>
 </template>

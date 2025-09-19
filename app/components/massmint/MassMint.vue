@@ -13,7 +13,7 @@ const emit = defineEmits<{
 // State
 const NFTS = ref<{ [nftId: string]: NFT }>({})
 const mediaLoaded = ref(false)
-const descriptionLoaded = ref(false)
+// const descriptionLoaded = ref(false)
 // const selectedCollection = ref<string | null>(null)
 const { state, collections, collectionsLoading } = useMassMintForm()
 const selectedCollection = computed(() => state.collection)
@@ -37,9 +37,33 @@ function onMediaZipLoaded(data: { validFiles: any[], areAllFilesValid: boolean }
   mediaLoaded.value = true
 }
 
-function onDescriptionLoaded(_entries: Record<string, any>) {
-  // TODO: Implement description file processing
-  descriptionLoaded.value = true
+function onDescriptionLoaded(entries: Record<string, any>) {
+  const nftFileNameToId: Record<string, string> = Object.values(NFTS.value).reduce(
+    (acc, nft) => ({ ...acc, [nft.file.name]: nft.id }),
+    {},
+  )
+
+  Object.values(entries).forEach((entry, idx) => {
+    if (!entry.valid) {
+      return
+    }
+    const nftId = nftFileNameToId[entry.file]
+    if (!nftId) {
+      return
+    }
+
+    const { file: _, ...restOfEntry } = entry
+    NFTS.value[nftId] = {
+      ...NFTS.value[nftId],
+      ...restOfEntry,
+      sortedIndex: idx,
+    }
+  })
+
+  // sort the NFTS by sortedIndex
+  const sortedNfts = Object.values(NFTS.value).sort((a, b) => (a.sortedIndex || 0) - (b.sortedIndex || 0))
+
+  NFTS.value = convertNftsToMap(sortedNfts)
 }
 
 function toOnboarding() {
@@ -140,7 +164,7 @@ function deleteNFT(nft: NFT) {
     </section>
 
     <!-- Action Button -->
-    <div class="flex justify-center w-full">
+    <div class="flex justify-center w-full pb-8">
       <UButton
         class="w-full max-w-md"
         size="lg"
