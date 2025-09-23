@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
+    "@fal-ai/client": "^1.6.2",
     "@iconify-json/lucide": "^1.2.57",
     "@iconify-json/simple-icons": "^1.2.43",
     "@kodadot1/hyperdata": "0.0.2-rc.1",

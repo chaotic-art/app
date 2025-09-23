@@ -1,0 +1,54 @@
+import { fal } from '@fal-ai/client'
+import { $fetch } from 'ofetch'
+
+const MONICA_GENERATE_URL = 'https://monica.im'
+
+const api = $fetch.create({ baseURL: '', retry: 3 })
+
+export async function generateRoastByXUserId(userId: string) {
+  return await api<{
+    text: {
+      status: 'done'
+      analysis: {
+        description: string
+      }
+    }
+  }>(`${MONICA_GENERATE_URL}/api/roast/generate`, {
+    method: 'POST',
+    body: {
+      locale: 'auto',
+      platform: 'twitter',
+      user_id: userId,
+      client_id: 'lJFoJlbp6ZU0nlI2efJY7',
+    },
+  })
+}
+
+export async function generateImageByFalAi() {
+  fal.config({
+    credentials: useRuntimeConfig().public.falAiApiKey,
+  })
+  const result = await fal.subscribe('fal-ai/qwen-image', {
+    input: {
+      prompt: 'Overlay a generative wireframe mesh across key surfaces of the subject--whether figurative or abstract--using grid lines that dynamically adopt colors from the image itself, prioritizing midtones or highlights for contrast. Introduce a secondary warped mesh element, resembling a topographically distorted layer, floating above or interwoven with the form to create a sense of architectural tension and controlled chaos. Use a deep black or navy background to enhance dimensionality. Preserve clarity in core contours or focal regions, allowing the mesh to define structure without overwhelming identity or form. The result should evoke a futuristic, surreal, and procedurally inspired aesthetic.',
+      image_size: 'landscape_4_3',
+      num_inference_steps: 30,
+      guidance_scale: 2.5,
+      num_images: 1,
+      enable_safety_checker: true,
+      output_format: 'png',
+      negative_prompt: 'blurry, ugly',
+      acceleration: 'none',
+      // loras: [{
+      //   path: 'https://v3.fal.media/files/tiger/J7FD8S9kSSt4iUGiMwDY7_jonny_qwen_lora_v8_1024.safetensors',
+      // }],
+    },
+    logs: true,
+    // onQueueUpdate: (update) => {
+    //   if (update.status === 'IN_PROGRESS') {
+    //     update.logs.map(log => log.message).forEach(console.log)
+    //   }
+    // },
+  })
+  return result
+}

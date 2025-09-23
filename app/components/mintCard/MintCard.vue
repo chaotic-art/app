@@ -1,5 +1,9 @@
 <script setup lang="ts">
-const emit = defineEmits(['claim'])
+defineProps<{
+  minted?: boolean
+}>()
+
+const emit = defineEmits(['claim', 'share', 'viewCard'])
 
 // Refs for card elements
 const cardRef = ref<HTMLElement>()
@@ -98,10 +102,6 @@ function interactEnd() {
   target.o = 0.25
 }
 
-function handleClaimClick() {
-  emit('claim')
-}
-
 // Lifecycle hooks
 onMounted(() => {
   if (rotatorRef.value) {
@@ -159,7 +159,16 @@ onUnmounted(() => {
       </div>
 
       <!-- CTA Button -->
-      <button class="claim-button" @click="handleClaimClick">
+
+      <div v-if="minted" class="flex flex-col gap-4 items-center">
+        <button class="claim-button" @click="emit('viewCard')">
+          View my card
+        </button>
+        <button class="claim-button" @click="emit('share')">
+          Share on <UIcon name="i-simple-icons:x" class="size-5 ml-2" />
+        </button>
+      </div>
+      <button v-else class="claim-button" @click="emit('claim')">
         Claim Now
       </button>
     </div>
@@ -193,8 +202,8 @@ onUnmounted(() => {
   font-family: 'Roboto Serif', serif;
   margin: 0;
   padding: 0;
-  min-height: 1034px;
   position: relative;
+  overflow: hidden;
 }
 
 .background-image {
@@ -217,8 +226,8 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 50px;
-  height: 100vh;
-  padding: 4vh 20px;
+  min-height: 100vh;
+  padding: 20px 20px 80px 20px;
   position: relative;
   z-index: 1;
   box-sizing: border-box;

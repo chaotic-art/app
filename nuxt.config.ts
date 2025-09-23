@@ -66,6 +66,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       reownProjectId: import.meta.env.REOWN_CONNECT_PROJECT_ID || 'b56e18d47c72ab683b10814fe9495694',
+      falAiApiKey: import.meta.env.FAL_AI_API_KEY,
     },
   },
 

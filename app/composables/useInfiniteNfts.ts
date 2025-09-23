@@ -3,7 +3,7 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 import { exploreNfts } from '~/graphql/queries/explore'
 import { getDenyList } from '~/utils/prefix'
 
-type NftEntity = ExploreNftsData['tokenEntities'][0]
+export type NftEntity = ExploreNftsData['tokenEntities'][0]
 
 interface UseInfiniteNftsOptions {
   pageSize?: number
