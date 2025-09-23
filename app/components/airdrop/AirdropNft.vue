@@ -441,7 +441,7 @@ onBeforeUnmount(() => {
             variant="outline"
             @click="goBack"
           >
-            {{ $t('cancel') }}
+            {{ $t('general.cancel') }}
           </UButton>
           <UButton
             variant="solid"
