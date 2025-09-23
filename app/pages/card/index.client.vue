@@ -42,7 +42,11 @@ async function checkExistingCard() {
 
 function handleClaimClick() {
   doAfterLogin({
-    onLoginSuccess: () => {
+    onLoginSuccess: async () => {
+      await checkExistingCard()
+      if (existingCard.value) {
+        return
+      }
       isLoading.value = true
 
       setTimeout(() => {
