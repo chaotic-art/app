@@ -5,6 +5,7 @@ import { encodeAddress } from 'dedot/utils'
 import { Binary } from 'polkadot-api'
 import { generateAirdropTxs } from '@/components/airdrop/utils'
 import { MultiAddress } from '~/descriptors/dist'
+import { refreshOdaTokenMetadata } from '~/services/oda'
 
 export type TxType = 'submit' | 'estimate'
 
@@ -680,6 +681,10 @@ export function useNftPallets() {
       const estimatedFees = await transaction.getEstimatedFees(address)
       return estimatedFees
     }
+
+    // purge metadata
+    const purgeMetadata = items.map(item => (refreshOdaTokenMetadata(chain, item.collection.id.toString(), item.sn.toString())))
+    await Promise.all(purgeMetadata)
 
     open.value = true
 
