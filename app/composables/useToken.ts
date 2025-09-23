@@ -44,10 +44,16 @@ export function useToken(props: {
       collectionCreator.value = collection.value?.owner ?? null
       queryPrice.value = token.value.price
 
-      // fetch real-time price
+      // fetch real-time price and owner
       const api = $sdk(props.chain).api
-      const priceData = await api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId)
+      const [priceData, tokenItem] = await Promise.all([
+        api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId),
+        api.query.Nfts.Item.getValue(props.collectionId, props.tokenId),
+      ])
       queryPrice.value = priceData?.[0]?.toString() ?? null
+      if (tokenItem?.owner) {
+        owner.value = tokenItem.owner.toString()
+      }
 
       if (!tokenData.metadata && collectionData?.metadata) {
         // fallback to collection metadata
