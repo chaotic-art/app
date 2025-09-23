@@ -24,6 +24,7 @@ const footerLinks: Array<
     type: 'links',
     items: [
       { label: 'Presskit', href: 'https://github.com/chaotic-art/presskit' },
+      { label: 'Code Checker', href: '/code-checker' },
     ],
   },
   {
