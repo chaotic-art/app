@@ -32,9 +32,15 @@ export function useToken(props: {
   // Fetch data on component mount
   onMounted(async () => {
     try {
-      const [tokenData, collectionData] = await Promise.all([
+      const api = $sdk(props.chain).api
+
+      const [tokenData, collectionData, priceData, tokenItem] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
         fetchOdaCollection(props.chain, props.collectionId.toString()),
+
+        // fetch real-time price and owner
+        api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId),
+        api.query.Nfts.Item.getValue(props.collectionId, props.tokenId),
       ])
 
       token.value = tokenData
@@ -44,12 +50,7 @@ export function useToken(props: {
       collectionCreator.value = collection.value?.owner ?? null
       queryPrice.value = token.value.price
 
-      // fetch real-time price and owner
-      const api = $sdk(props.chain).api
-      const [priceData, tokenItem] = await Promise.all([
-        api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId),
-        api.query.Nfts.Item.getValue(props.collectionId, props.tokenId),
-      ])
+      // on-chain price and owner
       queryPrice.value = priceData?.[0]?.toString() ?? null
       if (tokenItem?.owner) {
         owner.value = tokenItem.owner.toString()
