@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import type { DropItem } from '@/types'
+import { parseCETDate } from '@/components/drop/utils'
+import { formatToNow } from '@/utils/format/time'
 
 const props = defineProps<{
   drop?: DropItem
@@ -95,13 +97,19 @@ useHead({
             </template>
           </div>
 
-          <!-- Mint Button -->
           <div v-if="isLoading" class="h-12 bg-muted animate-pulse rounded-lg w-32" />
-          <DropMintButton
-            v-else
-            class="w-fit md:w-auto"
-            :drop="drop" size="sm"
-          />
+
+          <div v-else class="w-full flex items-center justify-between">
+            <div class="hidden sm:block text-muted-foreground text-left text-sm sm:text-base">
+              {{ drop?.start_at ? formatToNow(parseCETDate(drop.start_at || '')) : 'N/A' }}
+            </div>
+
+            <!-- Mint Button -->
+            <DropMintButton
+              class="w-full sm:w-fit"
+              :drop="drop" size="sm"
+            />
+          </div>
         </div>
       </div>
     </UContainer>
