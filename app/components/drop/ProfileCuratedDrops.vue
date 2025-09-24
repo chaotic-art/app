@@ -57,7 +57,9 @@ const { data: drops, pending } = await useAsyncData(`curated-drops-${props.id}`,
         <USkeleton class="w-32 h-4 rounded" />
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-        <DropCard v-for="drop in drops" :key="drop.id" :drop="drop" show-minted />
+        <ClientOnly>
+          <DropCard v-for="drop in drops" :key="drop.alias" :drop="drop" show-minted />
+        </ClientOnly>
       </div>
     </div>
   </div>

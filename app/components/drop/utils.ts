@@ -1,7 +1,8 @@
 import type { DropItem } from '@/types'
-import { getDropById } from '@/services/fxart'
+import type { GenartDropItem } from '@/types/genart'
 import { fetchOdaCollection } from '@/services/oda'
 import { DropStatus } from '@/types'
+import { ONE_DAY_MS } from '@/utils/time'
 
 export function formatCETDate(date: string, time: string): Date {
   return new Date(`${date}T${time}+02:00`)
@@ -12,7 +13,7 @@ export function parseCETDate(datetime: string): Date {
   return formatCETDate(date!, time!)
 }
 
-function getLocalDropStatus(drop: Pick<DropItem, 'dropStartTime' | 'minted' | 'max' | 'disabled'>): DropStatus {
+function getLocalDropStatus(drop: Pick<DropItem, 'dropStartTime' | 'minted' | 'max'>): DropStatus {
   const now = new Date()
 
   if (drop.minted === drop.max) {
@@ -24,9 +25,6 @@ function getLocalDropStatus(drop: Pick<DropItem, 'dropStartTime' | 'minted' | 'm
   }
 
   if (drop.dropStartTime <= now) {
-    if (drop.disabled) {
-      return DropStatus.COMING_SOON
-    }
     return DropStatus.MINTING_LIVE
   }
 
@@ -39,18 +37,14 @@ function getLocalDropStatus(drop: Pick<DropItem, 'dropStartTime' | 'minted' | 'm
 
 export const FALLBACK_DROP_COLLECTION_MAX = 64
 
-export async function getEnrichedDrop(campaign: DropItem): Promise<DropItem | undefined> {
+export async function getEnrichedDrop(campaign: GenartDropItem): Promise<DropItem | undefined> {
   // get some offchain data
   // ----------------------
   const offChainData = {
-    id: campaign.id,
     chain: campaign.chain,
     alias: campaign.alias,
     collection: campaign.collection,
-    type: campaign.type,
-    disabled: campaign.disabled,
     start_at: campaign.start_at,
-    holder_of: campaign.holder_of,
 
     // would be nice if we could get this from the onchain
     price: campaign.price,
@@ -77,7 +71,7 @@ export async function getEnrichedDrop(campaign: DropItem): Promise<DropItem | un
     collectionDescription: metadata?.description || '',
     image: metadata?.image || '',
     banner: metadata?.banner || metadata?.image || '',
-    content: metadata?.generative_uri || campaign.content,
+    content: metadata?.generative_uri || '',
     abi,
   }
 
@@ -104,9 +98,11 @@ export async function getEnrichedDrop(campaign: DropItem): Promise<DropItem | un
 }
 
 export async function getDropAttributes(alias: string): Promise<DropItem | undefined> {
-  const campaign = await getDropById(alias)
+  const response = await $fetch('/api/genart/list', { query: { alias } })
 
-  return getEnrichedDrop(campaign)
+  if (response.data[0]) {
+    return getEnrichedDrop(response.data[0])
+  }
 }
 
 export const isTBA = (price: unknown) => price === null || price === ''

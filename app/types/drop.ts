@@ -15,18 +15,12 @@ export enum DropStatus {
   UNSCHEDULED = 'unscheduled',
 }
 
-type DropType = 'paid' | 'free' | 'holder'
-
 export interface DropItem {
   // offchain (database)
-  id: string
-  chain: AssetHubChain
   alias: string
+  chain: AssetHubChain
   collection: string // collection id
-  type: DropType
-  disabled: number
   start_at?: string
-  holder_of?: string
   price?: string
   creator?: string
 
