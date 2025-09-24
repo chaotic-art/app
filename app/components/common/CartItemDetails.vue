@@ -48,7 +48,7 @@ defineProps<{
         </p>
       </div>
 
-      <slot name="right">
+      <slot v-if="price" name="right">
         <Money :value="price" inline class="mt-auto" />
       </slot>
     </div>
