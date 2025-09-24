@@ -3,7 +3,7 @@ import type { ToMassmintNFT } from '@/composables/drop/massmint/types'
 import type { DropItem, DropStatus } from '@/types'
 
 const DEFAULT_DROP: Omit<DropItem, 'chain'> = {
-  id: '',
+  active: 1,
   collection: '',
   collectionName: '',
   collectionDescription: '',
@@ -13,8 +13,6 @@ const DEFAULT_DROP: Omit<DropItem, 'chain'> = {
   name: '',
   content: '',
   alias: '',
-  type: 'paid',
-  disabled: 0,
   dropStartTime: undefined,
   isMintedOut: false,
   isFree: false,
