@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import type { DropItem } from '@/types/drop'
 import { getEnrichedDrop } from '@/components/drop/utils'
-import { getDrops } from '@/services/fxart'
 
-const { prefix } = usePrefix()
-
-const { data: dropItems } = await useLazyAsyncData(() => (getDrops({
-  active: [true],
-  chain: [isProduction ? 'ahp' : prefix.value],
-  limit: 3,
-})), {
+const { data: dropItems } = await useFetch('/api/genart/list', {
+  query: {
+    limit: 3,
+  },
   transform: async (data) => {
     const now = new Date()
-    const futureDrops = data
+    const futureDrops = data.data
       .filter(drop => drop.start_at && new Date(drop.start_at).getTime() > now.getTime())
       .sort((a, b) => new Date(a.start_at!).getTime() - new Date(b.start_at!).getTime())
-    const pastDrops = data.filter(drop => drop.start_at && new Date(drop.start_at).getTime() <= now.getTime())
+    const pastDrops = data.data.filter(drop => drop.start_at && new Date(drop.start_at).getTime() <= now.getTime())
     const latestDrops = [...futureDrops, ...pastDrops]
     return await Promise.all(latestDrops.map(getEnrichedDrop))
   },
@@ -38,7 +34,7 @@ const subDrops = computed(() => dropItems.value?.slice(1, 3))
     <div v-if="subDrops" class="flex flex-col xl:flex-row gap-4 xl:gap-6 mt-6 xl:mt-8">
       <LandingSubDropCard
         v-for="subDrop in subDrops"
-        :key="subDrop?.id"
+        :key="subDrop?.alias"
         :drop="subDrop"
         @click="onDropClick"
       />

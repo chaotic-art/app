@@ -1,22 +1,3 @@
-import type { DoResult } from '@/services/fxart'
-
-export type DropMintedNft = DoResult & {
-  id: string
-  collectionName: string
-  name: string
-  max: number
-}
-
-export interface DropCollectionById {
-  collectionEntity: {
-    meta: { description: string }
-    name: string
-    max: number
-    nftCount: number
-    nfts: { sn: string }[]
-  }
-}
-
 export function updateGenartMetadata() {
   const { drop } = useDrop()
   const { toMintNFTs, mintingSession } = storeToRefs(useDropStore())

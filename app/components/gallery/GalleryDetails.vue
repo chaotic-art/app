@@ -2,7 +2,6 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { t } from 'try'
-import { getDrops } from '~/services/fxart'
 import { refreshOdaTokenMetadata } from '~/services/oda'
 
 interface Props {
@@ -27,9 +26,9 @@ const toast = useToast()
 const genartCreator = ref('')
 const creator = computed(() => genartCreator.value || props.collectionCreator)
 onMounted(async () => {
-  const [ok, _, drop] = await t(getDrops({ collection: props.collectionId }))
-  if (ok && drop[0]?.creator) {
-    genartCreator.value = drop[0].creator
+  const [ok, _, drop] = await t($fetch('/api/genart/list', { query: { collection: props.collectionId } }))
+  if (ok && drop.data[0]?.creator) {
+    genartCreator.value = drop.data[0].creator
   }
 })
 

@@ -42,6 +42,7 @@ export async function getEnrichedDrop(campaign: GenartDropItem): Promise<DropIte
   // ----------------------
   const offChainData = {
     chain: campaign.chain,
+    active: campaign.active,
     alias: campaign.alias,
     collection: campaign.collection,
     start_at: campaign.start_at,

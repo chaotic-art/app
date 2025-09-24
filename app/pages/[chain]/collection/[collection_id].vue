@@ -2,7 +2,6 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 import { useSortOptions } from '~/composables/useSortOptions'
-import { getDrops } from '~/services/fxart'
 import { fetchOdaCollection } from '~/services/oda'
 import { getSubscanAccountUrl } from '~/utils/format/address'
 
@@ -16,7 +15,7 @@ const { data } = await useLazyAsyncData(
   async () => {
     const [collection, drops] = await Promise.all([
       fetchOdaCollection(chain.value, collection_id?.toString() ?? ''),
-      getDrops({ collection: collection_id?.toString() ?? '' }),
+      $fetch('/api/genart/list', { query: { collection: collection_id?.toString() ?? '' } }),
     ])
 
     return { collection, drops }
@@ -91,8 +90,8 @@ defineOgImageComponent('Frame', {
               <div class="text-2xl font-bold mb-2">
                 {{ data?.collection?.metadata?.name || `Collection #${collection_id}` }}
               </div>
-              <div v-if="data?.drops[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
-                <UserInfo :avatar-size="26" :address="data?.drops[0]?.creator || data?.collection?.owner" custom-name>
+              <div v-if="data?.drops?.data[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
+                <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" custom-name>
                   <template #name="{ addressName }">
                     <div class="pr-1 flex">
                       <p>Creator:</p>
@@ -103,14 +102,14 @@ defineOgImageComponent('Frame', {
                   </template>
                 </UserInfo>
                 <UButton
-                  :to="getSubscanAccountUrl((data?.drops[0]?.creator || data?.collection?.owner) ?? '', chain)"
+                  :to="getSubscanAccountUrl((data?.drops?.data[0]?.creator || data?.collection?.owner) ?? '', chain)"
                   target="_blank"
                 >
                   Subscan
                 </UButton>
                 <UButton
-                  v-if="data?.drops?.[0]?.alias"
-                  :to="`/${chain}/drops/${data.drops[0].alias}`"
+                  v-if="data?.drops?.data[0]?.alias"
+                  :to="`/${chain}/drops/${data.drops.data[0].alias}`"
                   icon="i-heroicons-sparkles"
                   variant="outline"
                 >

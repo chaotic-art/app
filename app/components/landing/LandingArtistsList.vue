@@ -1,20 +1,12 @@
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query'
-import { getDrops } from '@/services/fxart'
-
 // TODO: need to be updated or fetch artists from backend
-
-const { prefix } = usePrefix()
-const { data: dropItems } = useQuery({
-  queryKey: ['landing-drop-artists', 'ahp'],
-  queryFn: () => getDrops({
-    active: [true],
-    chain: ['ahp'],
+const { data: dropItems } = useFetch('/api/genart/list', {
+  query: {
     limit: 50,
-  }),
+  },
 })
 
-const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.creator).filter(Boolean))])
+const allArtists = computed(() => [...new Set(dropItems.value?.data.map(drop => drop.creator).filter(Boolean))])
 const randomSixArtist = computed(() => allArtists.value?.slice().sort(() => Math.random() - 0.5).slice(0, 6))
 </script>
 
@@ -48,7 +40,7 @@ const randomSixArtist = computed(() => allArtists.value?.slice().sort(() => Math
         </div>
       </div>
       <div class="flex justify-center mt-6 md:mt-8">
-        <UButton variant="outline" class="rounded-full" :to="`/${prefix}/artists`">
+        <UButton variant="outline" class="rounded-full" to="/ahp/artists">
           {{ $t('collection.viewMore') }}
         </UButton>
       </div>

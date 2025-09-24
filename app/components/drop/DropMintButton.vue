@@ -57,7 +57,7 @@ const enabled = computed(() => {
   if (
     !drop.value // drop not loaded
     || !amountToMint.value // number of drop to be mint is 0
-    || Boolean(drop.value.disabled) // drop is disabled
+    || !drop.value.active // drop is disabled
     || isMintNotLive.value // drop start time is greater than now
     || (props.isDropPage ? !previewItem.value : false) // no image
     // || loading.value // still loading
@@ -70,7 +70,7 @@ const enabled = computed(() => {
 
 function openMintModal() {
   // open modal from landing page
-  if (props.drop && storeDrop.value.id !== props.drop.id && !props.isDropPage) {
+  if (props.drop && storeDrop.value.alias !== props.drop.alias && !props.isDropPage) {
     storeDrop.value = props.drop
   }
 

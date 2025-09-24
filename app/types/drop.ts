@@ -18,6 +18,7 @@ export enum DropStatus {
 export interface DropItem {
   // offchain (database)
   alias: string
+  active: number
   chain: AssetHubChain
   collection: string // collection id
   start_at?: string
