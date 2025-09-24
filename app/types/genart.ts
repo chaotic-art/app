@@ -3,11 +3,11 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 export interface GenartDropItem {
   alias: string
   active: number
-  created_at: string
+  created_at?: string
   start_at: string
   chain: AssetHubChain
   collection: string
-  creator: string
+  creator?: string
   price: string
 }
 

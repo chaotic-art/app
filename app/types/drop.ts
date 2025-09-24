@@ -1,10 +1,5 @@
 import type { Abi } from 'viem'
-import type { AssetHubChain } from '~/plugins/sdk.client'
-
-export interface Unit {
-  name: string
-  value: number
-}
+import type { GenartDropItem } from './genart'
 
 export enum DropStatus {
   MINTING_ENDED = 'minting_ended',
@@ -15,16 +10,7 @@ export enum DropStatus {
   UNSCHEDULED = 'unscheduled',
 }
 
-export interface DropItem {
-  // offchain (database)
-  alias: string
-  active: number
-  chain: AssetHubChain
-  collection: string // collection id
-  start_at?: string
-  price?: string
-  creator?: string
-
+export interface DropItem extends GenartDropItem {
   // onchain
   max?: number
   minted: number

@@ -13,6 +13,8 @@ const DEFAULT_DROP: Omit<DropItem, 'chain'> = {
   name: '',
   content: '',
   alias: '',
+  start_at: '',
+  price: '',
   dropStartTime: undefined,
   isMintedOut: false,
   isFree: false,
