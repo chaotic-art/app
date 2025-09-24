@@ -1,14 +1,11 @@
 import type { FetchError } from 'ofetch'
 import type { DropItem } from '@/types'
-import type { SupportedChain } from '~/plugins/sdk.client'
 import { $fetch } from 'ofetch'
 import { isProduction } from '@/utils/env'
 
 const BASE_URL = isProduction
   ? 'https://fxart.kodadot.workers.dev/'
   : 'https://fxart-beta.kodadot.workers.dev/'
-
-export const DYNAMIC_METADATA = 'fxart-beta.kodadot.workers.dev/metadata/'
 
 const api = $fetch.create({
   baseURL: BASE_URL,
@@ -55,12 +52,6 @@ export function getDropById(id: string) {
   return api<DropItem>(`/drops/${id}`)
 }
 
-export async function getDropMintedStatus(alias: string, accountId: string) {
-  return await api<DropMintedStatus>(`/drops/${alias}/accounts/${accountId}`, {
-    method: 'GET',
-  })
-}
-
 export async function updateMetadata({ chain, collection, nft }: any) {
   try {
     const response = await api('/metadata/v1/dyndata/update', {
@@ -79,39 +70,4 @@ export async function updateMetadata({ chain, collection, nft }: any) {
       `[FXART::UPDATE_METADATA] ERROR: ${(error as FetchError).data}`,
     )
   }
-}
-
-export interface DropCalendar {
-  id: number
-  name: string
-  description: string
-  twitter_handle: string
-  date: string | null
-  time: string | null
-  address: string | null
-  content: string | null
-  supply: number | null
-  royalty: number | null
-  price: string | null
-  holder_of: string | null
-  location: string | null
-  items: CalendarItem[]
-  alias: string | null
-  chain: SupportedChain | null
-  creator: string | null
-}
-
-export interface CalendarItem {
-  image: string
-}
-
-interface GetCalendarsQuery {
-  chain?: SupportedChain[]
-}
-
-export async function getDropCalendar(query: GetCalendarsQuery = {}) {
-  return await api<DropCalendar[]>('/calendars', {
-    method: 'GET',
-    query,
-  })
 }
