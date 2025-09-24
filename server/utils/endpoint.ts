@@ -4,7 +4,7 @@ import { safeParse } from 'valibot'
 export const GENART_WORKERS_URL = 'https://genart.chaotic.art'
 
 // Generic validation function for request bodies using Valibot
-export async function readValidatedBody<T>(
+export async function vValidateBody<T>(
   event: any,
   schema: BaseSchema<any, T, any>,
 ): Promise<T> {

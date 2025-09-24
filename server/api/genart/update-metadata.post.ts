@@ -1,5 +1,5 @@
 import { object, string } from 'valibot'
-import { GENART_WORKERS_URL, readValidatedBody } from '~~/server/utils/endpoint'
+import { GENART_WORKERS_URL, vValidateBody } from '~~/server/utils/endpoint'
 
 // Valibot schema for updateMetadata request body
 const UpdateMetadataSchema = object({
@@ -9,7 +9,7 @@ const UpdateMetadataSchema = object({
 })
 
 export default defineEventHandler(async (event) => {
-  const validatedBody = await readValidatedBody(event, UpdateMetadataSchema)
+  const validatedBody = await vValidateBody(event, UpdateMetadataSchema)
 
   const response = await $fetch(`${GENART_WORKERS_URL}/drops/update-metadata`, {
     method: 'POST',
