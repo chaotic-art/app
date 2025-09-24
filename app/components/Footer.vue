@@ -4,6 +4,7 @@ import Logo from '@/assets/svg/navbar-logo.svg'
 interface FooterLinkItem {
   label: string
   href: string
+  icon?: string
 }
 
 const footerLinks: Array<
@@ -32,8 +33,8 @@ const footerLinks: Array<
     title: 'Social',
     type: 'buttons',
     items: [
-      { label: 'Twitter', href: 'https://x.com/ChaoticApp' },
-      { label: 'Telegram', href: 'https://t.me/+A3xwht0aOIMxMjQ0' },
+      { label: 'Twitter', href: 'https://x.com/ChaoticApp', icon: 'i-simple-icons:x' },
+      { label: 'Telegram', href: 'https://t.me/+A3xwht0aOIMxMjQ0', icon: 'i-simple-icons:telegram' },
     ],
   },
 ]
@@ -74,6 +75,7 @@ const footerLinks: Array<
                     :key="item.label"
                     :label="item.label"
                     :href="item.href"
+                    :icon="item.icon"
                     target="_blank"
                     variant="outline"
                     class="rounded-full w-fit"
