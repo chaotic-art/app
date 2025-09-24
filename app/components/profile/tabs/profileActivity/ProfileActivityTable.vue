@@ -7,7 +7,7 @@ import { interactionNameMap } from './utils'
 
 const props = defineProps<{
   events: EventInteraction[]
-  issuer: string
+  address: string
   loading?: boolean
 }>()
 
@@ -104,7 +104,7 @@ function createTable(): void {
         event.to = ''
         break
       case Interaction.BUY:
-        if (newEvent.caller !== props.issuer) {
+        if (newEvent.caller !== props.address) {
           event.type = 'SELL'
         }
         event.from = newEvent.currentOwner

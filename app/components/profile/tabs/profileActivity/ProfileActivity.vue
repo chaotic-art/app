@@ -4,7 +4,7 @@ import { sortBy } from 'lodash'
 import { allEventsByProfile } from '~/graphql/queries/profiles'
 
 const props = defineProps<{
-  issuer: string
+  address: string
 }>()
 const emit = defineEmits(['totalCountChange'])
 
@@ -12,7 +12,6 @@ const filters = ['sale', 'buy', 'mint', 'transfer', 'list']
 
 const route = useRoute()
 const router = useRouter()
-const { accountId } = useAuth()
 const { $apolloClient } = useNuxtApp()
 const loading = ref(true)
 const events = ref<EventInteraction[]>([])
@@ -31,7 +30,7 @@ const interactionToFilterMap = {
 const filteredEvents = computed(() =>
   events.value.filter(({ interaction, caller }) => {
     if (interaction === 'BUY') {
-      return activeFilters.value.includes(caller === props.issuer ? 'buy' : 'sale')
+      return activeFilters.value.includes(caller === props.address ? 'buy' : 'sale')
     }
     return activeFilters.value.includes(interactionToFilterMap[interaction as keyof typeof interactionToFilterMap])
   }),
@@ -53,7 +52,7 @@ async function fetchProfileActivity() {
   const response = await $apolloClient.query({
     query: allEventsByProfile,
     variables: {
-      id: accountId.value,
+      id: props.address,
     },
   })
 
@@ -77,7 +76,7 @@ onMounted(async () => {
 
 <template>
   <div class="my-4">
-    <ProfileActivityTable :loading="loading" :events="filteredEvents" :issuer>
+    <ProfileActivityTable :loading="loading" :events="filteredEvents" :address>
       <div class="flex gap-3">
         <UButton
           variant="ghost"

@@ -210,7 +210,7 @@ function onTotalCountChange(slot: string, totalCount: number) {
         <ProfileCollectionsList :issuer="address" @total-count-change="onTotalCountChange('collections', $event)" />
       </template>
       <template #activity>
-        <ProfileActivity :issuer="address" @total-count-change="onTotalCountChange('activity', $event)" />
+        <ProfileActivity :address="address" @total-count-change="onTotalCountChange('activity', $event)" />
       </template>
     </UTabs>
   </div>
