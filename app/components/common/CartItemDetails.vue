@@ -31,7 +31,7 @@ defineProps<{
     <div class="flex flex-1 justify-between">
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2">
-          <h2 class="font-bold text-gray-900 dark:text-white truncate">
+          <h2 class="flex-1 w-0 font-bold text-gray-900 dark:text-white truncate">
             {{ name || '--' }}
           </h2>
           <div
