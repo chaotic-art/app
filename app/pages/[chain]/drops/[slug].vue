@@ -35,5 +35,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <GenerativeDrop />
+  <ClientOnly>
+    <GenerativeDrop />
+  </ClientOnly>
 </template>
