@@ -15,7 +15,7 @@ const airdropStore = useAirdropStore()
 const { currentChain } = useChain()
 const ss58Format = computed(() => chainSpec[currentChain.value].ss58Format)
 const { airdropNfts } = useNftPallets()
-const { open: isTransactionModalOpen, close: closeTransactionModal, isSuccess: isTransactionSuccess } = useTransactionModal()
+const { open: isTransactionModalOpen, close: closeTransactionModal } = useTransactionModal()
 
 const batchAddressesInput = ref('')
 const airdropItems = computed(() => airdropStore.itemsInChain)
@@ -27,7 +27,6 @@ const isAirdropModalOpen = ref<boolean>(false)
 const distributionMode = ref<DistributionMode>(DistributionMode.ONE_PER_ADDRESS)
 const fileInput = ref<HTMLInputElement | null>(null)
 const addressPairNeedToBeFixed = ref<[string, string][]>([])
-const { accountId } = useAuth()
 
 const DISTRIBUTION_MODES = computed(() => [
   {
@@ -173,15 +172,11 @@ function handleConfirm() {
   airdropNfts({
     items: {
       addresses: validAddressList.value,
-      nfts: airdropItems.value.map(item => ({
-        sn: item.sn,
-        collectionId: item.collection.id,
-      })),
+      nfts: airdropItems.value,
       distributionMode: distributionMode.value,
     },
     chain: currentChain.value,
     type: 'submit',
-
   })
 }
 
@@ -219,17 +214,8 @@ async function handleFileSelect(event: Event) {
   }
 }
 
-watch(isTransactionSuccess, (isSuccess) => {
-  if (isSuccess) {
-    closeTransactionModal()
-    successMessage('Airdrop successful! There is a 1 minute indexer and worker delay for this action to appear in the website.')
-    setTimeout(() => {
-      router.push(`/${currentChain.value}/u/${accountId.value}`)
-    }, 5000)
-  }
-})
-
 onBeforeUnmount(() => {
+  closeTransactionModal()
   airdropStore.clear()
 })
 </script>

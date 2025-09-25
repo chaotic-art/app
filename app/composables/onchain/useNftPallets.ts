@@ -589,7 +589,14 @@ export function useNftPallets() {
           type: 'airdrop',
           hash: hash.value,
           prefix: chain,
-
+          items: items.nfts.map(nft => ({
+            id: nft.id,
+            sn: nft.sn,
+            price: Number(nft.price),
+            collection: nft.collection,
+            metadata_uri: nft.metadata_uri,
+            metadata: nft.metadata,
+          })),
         }
       },
       error: (err) => {
