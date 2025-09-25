@@ -8,7 +8,7 @@ definePageMeta({
   layout: 'empty',
 })
 
-const CHAOTIC_CARD_COLLECTION_ID = '578'
+// const CHAOTIC_CARD_COLLECTION_ID = '578'
 
 const { setColorMode, currentMode } = useTheme()
 const { doAfterLogin } = useDoAfterlogin()
@@ -22,7 +22,7 @@ const urlParams = new URLSearchParams(window.location.search)
 
 const hasXAuthInfo = computed(() => urlParams.get('username') && urlParams.get('profile_image_url') && urlParams.get('magic'))
 
-const collectionIdForTesting = ref(window.location.search.includes('test') ? '9999' : CHAOTIC_CARD_COLLECTION_ID)
+const collectionIdForTesting = ref('9999')
 const existingCard = ref<NftEntity | null>(null)
 const isMinted = computed(() => !!existingCard.value)
 
