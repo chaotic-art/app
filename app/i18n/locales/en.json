@@ -112,7 +112,8 @@
     "viewNft": "View NFT | View NFTs",
     "copyToClipboard": "Copied to clipboard",
     "connectWallet": "Connect Wallet",
-    "learnMore": "Learn More"
+    "learnMore": "Learn More",
+    "cancel": "Cancel"
   },
   "signing": {
     "transaction": "Sign Transaction",
@@ -181,7 +182,7 @@
     "duplicateAddressError": "Duplicate wallet address",
     "emptyLineError": "Empty line",
     "enterMultipleAddresses": "Enter multiple addresses separated by commas (address1, address2, address3)",
-    "enterOneWalletAddressPerLine": "Enter one wallet address per line",
+    "enterOneWalletAddressPerLine": "Enter one Polkadot wallet address per line",
     "error": "Error",
     "errorReadingCsvFile": "Error reading CSV file",
     "errors": "Errors",

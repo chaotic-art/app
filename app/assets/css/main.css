@@ -1,3 +1,17 @@
+/*
+    ParaPort SDK CSS ordering note
+
+    Problem: Importing '@paraport/vue/style' from a plugin loads it after our Tailwind
+    utilities. Tailwind’s universal vars rule (,:before,:after { --tw-translate-:0 })
+    from the SDK can then reset translate and break centering (-translate-1/2).
+
+    Fix: Import the SDK CSS here in an earlier layer so our utilities win.
+
+    Keep existing order
+*/
+@layer base, components, paraport-base, paraport-components, utilities, paraport-utilities;
+@import '@paraport/vue/style' layer(paraport-base);
+
 @import "tailwindcss";
 @import "@nuxt/ui";
 @import "./theme-new-york.css";

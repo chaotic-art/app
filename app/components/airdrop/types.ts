@@ -5,9 +5,6 @@ export enum DistributionMode {
 
 export interface ActionAirdrop {
   addresses: string[]
-  nfts: {
-    sn: number
-    collectionId: number
-  }[]
+  nfts: BaseActionCartItem[]
   distributionMode: DistributionMode
 }

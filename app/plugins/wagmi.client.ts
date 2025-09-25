@@ -1,7 +1,7 @@
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
+import { westendAssetHub } from '@reown/appkit/networks'
 import { reconnect } from '@wagmi/core'
 import { WagmiPlugin } from '@wagmi/vue'
-import { westendAssetHub } from '@wagmi/vue/chains'
 
 const networks = [westendAssetHub]
 

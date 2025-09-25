@@ -8,7 +8,7 @@ const props = defineProps<{
   mintButton: { label: string, disabled: boolean, loading?: boolean, alert?: string }
 }>()
 
-const emits = defineEmits(['confirm'])
+defineEmits(['confirm'])
 
 const { chainSymbol, decimals } = useChain()
 
@@ -17,10 +17,6 @@ const { usd: priceUSD } = useAmount(
   decimals,
   chainSymbol,
 )
-
-function onSubmit() {
-  emits('confirm')
-}
 </script>
 
 <template>
@@ -57,15 +53,14 @@ function onSubmit() {
       </template>
     </div>
 
-    <UButton
-      class="rounded-full px-4 md:px-6 py-2 md:py-3 w-full mt-10 justify-center"
-      :disabled="mintButton.disabled"
-      :label="mintButton.label"
-      @click="onSubmit"
-    />
-
-    <div v-if="mintButton.alert" class="mt-2 text-center text-xs text-error-500 dark:text-error-400">
-      {{ mintButton.alert }}
+    <div class="mt-8">
+      <ParaportButton
+        :loading="loading"
+        :amount="minimumFunds"
+        :disabled="mintButton.disabled"
+        :label="mintButton.label"
+        @confirm="$emit('confirm')"
+      />
     </div>
   </div>
 </template>

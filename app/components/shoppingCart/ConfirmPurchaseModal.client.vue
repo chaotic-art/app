@@ -7,11 +7,9 @@ const { completePurchaseModal } = storeToRefs(usePreferencesStore())
 const shoppingCartStore = useShoppingCartStore()
 const { itemsInChain, itemToBuy } = storeToRefs(shoppingCartStore)
 const { accountId } = useAuth()
-const { $i18n } = useNuxtApp()
 const { decimals, chainSymbol, currentChain } = useChain()
 const { open: isTransactionModalOpen } = useTransactionModal()
 const { buyNfts, collectionRoyalties } = useNftPallets()
-const { existentialDeposit } = useDeposit(currentChain)
 
 const isModalOpen = computed({
   get: () => completePurchaseModal.value.open,
@@ -20,7 +18,6 @@ const isModalOpen = computed({
   },
 })
 
-const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: isModalOpen })
 const items = computed(() => completePurchaseModal.value.mode === 'shopping-cart' ? itemsInChain.value : [itemToBuy.value].filter(Boolean) as ShoppingCartItem[])
 
 const nftPrice = computed(() => sum(items.value.map(nft => Number(nft.price || 0))))
@@ -49,22 +46,17 @@ const totalRoyalties = computed(() => {
   return total
 })
 
-const loading = computed(() => isRoyaltiesLoading.value || isBalanceLoading.value)
-const hasEnoughFunds = computed(() => (balance.value - existentialDeposit.value) > total.value)
+const loading = computed(() => isRoyaltiesLoading.value)
 
 const label = computed(() => {
   if (loading.value) {
     return 'Loading...'
   }
 
-  if (!hasEnoughFunds.value) {
-    return $i18n.t('balance.insufficient')
-  }
-
   return 'Confirm'
 })
 
-const isDisabled = computed(() => loading.value || !hasEnoughFunds.value)
+const isDisabled = computed(() => loading.value)
 
 function buy() {
   isTransactionModalOpen.value = true
@@ -143,12 +135,14 @@ function buy() {
           </div>
         </div>
 
-        <UButton
-          class="w-full mt-7 inline-flex justify-center"
-          :disabled="isDisabled"
-          :label="label"
-          @click="buy"
-        />
+        <div class="mt-7">
+          <ParaportButton
+            :amount="total"
+            :disabled="isDisabled"
+            :label="label"
+            @confirm="buy"
+          />
+        </div>
       </div>
     </template>
   </UModal>
