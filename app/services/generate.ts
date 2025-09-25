@@ -5,7 +5,7 @@ const MONICA_GENERATE_URL = 'https://monica.im'
 
 const api = $fetch.create({ baseURL: '', retry: 3 })
 
-export async function generateRoastByXUserId(userId: string) {
+export async function generateRoastByXUserName(userId: string) {
   return await api<{
     text: {
       status: 'done'
@@ -22,6 +22,35 @@ export async function generateRoastByXUserId(userId: string) {
       client_id: 'lJFoJlbp6ZU0nlI2efJY7',
     },
   })
+}
+
+export async function waitForXRoastGenerationComplete(username: string) {
+  const maxAttempts = 30 // Maximum number of polling attempts
+  const pollInterval = 3000 // Poll every 2 seconds
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      const response = await generateRoastByXUserName(username)
+
+      if (response.text.status === 'done') {
+        return response
+      }
+
+      // If not done, wait before next attempt
+      if (attempt < maxAttempts - 1) {
+        await new Promise(resolve => setTimeout(resolve, pollInterval))
+      }
+    }
+    catch (error) {
+      console.error('Error polling generation status:', error)
+      if (attempt === maxAttempts - 1) {
+        throw error
+      }
+      await new Promise(resolve => setTimeout(resolve, pollInterval))
+    }
+  }
+
+  throw new Error('Generation did not complete within the expected time')
 }
 
 export async function generateImageByFalAi() {

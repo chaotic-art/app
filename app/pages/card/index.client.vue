@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NftEntity } from '@/composables/useInfiniteNfts'
 import { exploreNfts } from '@/graphql/queries/explore'
+import { waitForXRoastGenerationComplete } from '@/services/generate'
 
 definePageMeta({
   title: 'Chaotic Card',
@@ -16,6 +17,10 @@ const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 const { $i18n } = useNuxtApp()
 const isLoading = ref(false)
 const isSuccessModalOpen = ref(false)
+
+const urlParams = new URLSearchParams(window.location.search)
+
+const hasXAuthInfo = computed(() => urlParams.get('username') && urlParams.get('profile_image_url') && urlParams.get('magic'))
 
 const collectionIdForTesting = ref(window.location.search.includes('test') ? '9999' : CHAOTIC_CARD_COLLECTION_ID)
 const existingCard = ref<NftEntity | null>(null)
@@ -49,12 +54,25 @@ function handleClaimClick() {
       }
       isLoading.value = true
 
-      setTimeout(() => {
-        isLoading.value = false
-        collectionIdForTesting.value = CHAOTIC_CARD_COLLECTION_ID
-        checkExistingCard()
-        isSuccessModalOpen.value = true
-      }, 3000)
+      if (!hasXAuthInfo.value) {
+        window.open(`https://sign-in-with-x.dotlab.workers.dev/auth/x`, '_self')
+        return
+      }
+
+      // eslint-disable-next-line no-console
+      console.log('X Auth Info:', urlParams)
+      const username = urlParams.get('username')!
+
+      const { text } = await waitForXRoastGenerationComplete(username)
+      // eslint-disable-next-line no-console
+      console.log('text generate result:', text)
+
+      // setTimeout(() => {
+      //   isLoading.value = false
+      //   collectionIdForTesting.value = CHAOTIC_CARD_COLLECTION_ID
+      //   checkExistingCard()
+      //   isSuccessModalOpen.value = true
+      // }, 3000)
       // TODO: Implement claim functionality
     },
   })
@@ -79,6 +97,12 @@ watch(getConnectedSubAccount, () => {
   checkExistingCard()
 }, {
   immediate: true,
+})
+
+onMounted(() => {
+  if (hasXAuthInfo.value) {
+    handleClaimClick()
+  }
 })
 
 onUnmounted(() => {
