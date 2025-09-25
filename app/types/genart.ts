@@ -9,6 +9,7 @@ export interface GenartDropItem {
   collection: string
   creator?: string
   price: string
+  content?: string
 }
 
 export interface GenartListResponse {

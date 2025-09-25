@@ -72,7 +72,7 @@ export async function getEnrichedDrop(campaign: GenartDropItem): Promise<DropIte
     collectionDescription: metadata?.description || '',
     image: metadata?.image || '',
     banner: metadata?.banner || metadata?.image || '',
-    content: metadata?.generative_uri || '',
+    content: metadata?.generative_uri || campaign.content || '',
     abi,
   }
 
