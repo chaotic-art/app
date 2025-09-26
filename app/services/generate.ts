@@ -5,22 +5,24 @@ const MONICA_GENERATE_URL = 'https://monica.im'
 
 const api = $fetch.create({ baseURL: '', retry: 3 })
 
-export async function generateRoastByXUserName(userId: string) {
-  return await api<{
-    text: {
-      status: 'done'
-      analysis: {
-        description: string
-      }
+interface GenerateRoastResponse {
+  status: 'done' | 'streaming'
+  data: {
+    analysis: {
+      description: string
     }
-  }>(`${MONICA_GENERATE_URL}/api/roast/generate`, {
+  }
+}
+export async function generateRoastByXUserName(userId: string) {
+  return await api<string>(`${MONICA_GENERATE_URL}/api/roast/generate`, {
     method: 'POST',
     body: {
       locale: 'auto',
       platform: 'twitter',
       user_id: userId,
-      client_id: 'lJFoJlbp6ZU0nlI2efJY7',
     },
+  }).then((res) => {
+    return JSON.parse((JSON.parse(res?.split('data: ')[1] || '{}').text)) as GenerateRoastResponse
   })
 }
 
@@ -32,7 +34,7 @@ export async function waitForXRoastGenerationComplete(username: string) {
     try {
       const response = await generateRoastByXUserName(username)
 
-      if (response.text.status === 'done') {
+      if (response.status === 'done') {
         return response
       }
 

@@ -20,7 +20,7 @@ const isSuccessModalOpen = ref(false)
 
 const urlParams = new URLSearchParams(window.location.search)
 
-const hasXAuthInfo = computed(() => urlParams.get('username') && urlParams.get('profile_image_url') && urlParams.get('magic'))
+const hasXAuthInfo = computed(() => Boolean(urlParams.get('username') && urlParams.get('profile_image_url') && urlParams.get('magic')))
 
 const collectionIdForTesting = ref('9999')
 const existingCard = ref<NftEntity | null>(null)
@@ -63,9 +63,9 @@ function handleClaimClick() {
       console.log('X Auth Info:', urlParams)
       const username = urlParams.get('username')!
 
-      const { text } = await waitForXRoastGenerationComplete(username)
+      const generateTextResult = await waitForXRoastGenerationComplete(username)
       // eslint-disable-next-line no-console
-      console.log('text generate result:', text)
+      console.log('text generate result:', generateTextResult)
 
       // setTimeout(() => {
       //   isLoading.value = false
