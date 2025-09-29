@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { NftEntity } from '@/composables/useInfiniteNfts'
 import { exploreNfts } from '@/graphql/queries/explore'
-import { waitForXRoastGenerationComplete } from '@/services/generate'
+import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
 
 definePageMeta({
   title: 'Chaotic Card',
@@ -62,10 +62,15 @@ function handleClaimClick() {
       // eslint-disable-next-line no-console
       console.log('X Auth Info:', urlParams)
       const username = urlParams.get('username')!
+      const profileImageUrl = urlParams.get('profile_image_url')!
 
-      const generateTextResult = await waitForXRoastGenerationComplete(username)
+      const [textResult, imageResult] = await Promise.all([
+        waitForXRoastGenerationComplete(username),
+        generateMixedImageByFalAi(profileImageUrl),
+      ])
+
       // eslint-disable-next-line no-console
-      console.log('text generate result:', generateTextResult)
+      console.log('text generate result:', textResult, imageResult)
 
       // setTimeout(() => {
       //   isLoading.value = false

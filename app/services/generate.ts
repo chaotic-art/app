@@ -55,24 +55,21 @@ export async function waitForXRoastGenerationComplete(username: string) {
   throw new Error('Generation did not complete within the expected time')
 }
 
-export async function generateImageByFalAi() {
+export async function generateMixedImageByFalAi(imageUrl: string) {
   fal.config({
-    credentials: useRuntimeConfig().public.falAiApiKey,
+    // credentials: useRuntimeConfig().public.falAiApiKey,
   })
-  const result = await fal.subscribe('fal-ai/qwen-image', {
+
+  const result: {
+    data: {
+      image_urls: string[]
+    }
+  } = await fal.subscribe('fal-ai/nano-banana/edit', {
     input: {
       prompt: 'Overlay a generative wireframe mesh across key surfaces of the subject--whether figurative or abstract--using grid lines that dynamically adopt colors from the image itself, prioritizing midtones or highlights for contrast. Introduce a secondary warped mesh element, resembling a topographically distorted layer, floating above or interwoven with the form to create a sense of architectural tension and controlled chaos. Use a deep black or navy background to enhance dimensionality. Preserve clarity in core contours or focal regions, allowing the mesh to define structure without overwhelming identity or form. The result should evoke a futuristic, surreal, and procedurally inspired aesthetic.',
-      image_size: 'landscape_4_3',
-      num_inference_steps: 30,
-      guidance_scale: 2.5,
+      image_urls: [`${window.location.origin}/card/card_generate_bg.png`, imageUrl],
       num_images: 1,
-      enable_safety_checker: true,
-      output_format: 'png',
-      negative_prompt: 'blurry, ugly',
-      acceleration: 'none',
-      // loras: [{
-      //   path: 'https://v3.fal.media/files/tiger/J7FD8S9kSSt4iUGiMwDY7_jonny_qwen_lora_v8_1024.safetensors',
-      // }],
+      output_format: 'jpeg',
     },
     logs: true,
     // onQueueUpdate: (update) => {
