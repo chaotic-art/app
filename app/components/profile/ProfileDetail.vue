@@ -9,6 +9,9 @@ import { copyAddress, getSubscanAccountUrl, shortenAddress } from '@/utils/forma
 
 const props = defineProps<{ address: string, profile?: Profile | null, bannerUrl?: string }>()
 const { isCurrentAccount } = useAuth()
+const route = useRoute()
+const router = useRouter()
+
 const followButton = ref()
 const followModalTab = ref<'followers' | 'following'>('followers')
 const isFollowModalActive = ref(false)
@@ -19,16 +22,25 @@ const tabsItems = ref([
     label: 'Owned',
     name: 'Owned',
     slot: 'owned',
+    value: 'owned',
   },
   {
     label: 'Created',
     name: 'Created',
     slot: 'created',
+    value: 'created',
   },
   {
     label: 'Collections',
     name: 'Collections',
     slot: 'collections',
+    value: 'collections',
+  },
+  {
+    label: 'Activity',
+    name: 'Activity',
+    slot: 'activity',
+    value: 'activity',
   },
 ])
 
@@ -51,6 +63,17 @@ const createProfileConfig: ButtonConfig = {
   icon: 'i-heroicons-sparkles',
   onClick: () => isEditProfileModalActive.value = true,
 }
+
+const activeTab = computed({
+  get() {
+    return (route.query.tab as string) || 'owned'
+  },
+  set(tab) {
+    router.replace({
+      query: { ...route.query, tab },
+    })
+  },
+})
 
 const profileButtonConfig = computed<ButtonConfig>(() =>
   props.profile ? editProfileConfig : createProfileConfig,
@@ -194,7 +217,7 @@ function onTotalCountChange(slot: string, totalCount: number) {
       />
     </div>
 
-    <UTabs color="neutral" :items="tabsItems" class="w-full my-4">
+    <UTabs v-model="activeTab" color="neutral" :items="tabsItems" class="w-full my-4">
       <template #owned>
         <ProfileNftsList :extra-variables="{ owner: address }" @total-count-change="onTotalCountChange('owned', $event)" />
       </template>
@@ -203,6 +226,9 @@ function onTotalCountChange(slot: string, totalCount: number) {
       </template>
       <template #collections>
         <ProfileCollectionsList :issuer="address" @total-count-change="onTotalCountChange('collections', $event)" />
+      </template>
+      <template #activity>
+        <ProfileActivity :address="address" @total-count-change="onTotalCountChange('activity', $event)" />
       </template>
     </UTabs>
   </div>

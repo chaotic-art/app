@@ -179,7 +179,7 @@ const actionItems = computed(() => [
     </div>
 
     <!-- Description -->
-    <div v-if="tokenData?.metadata?.description" class="space-y-2 line-clamp-6">
+    <div v-if="tokenData?.metadata?.description" class="space-y-2">
       <MarkdownPreview :source="tokenData.metadata.description" />
     </div>
 
