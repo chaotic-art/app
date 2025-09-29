@@ -107,7 +107,7 @@ const tokenMetadata = computed(() => {
 
     <!-- Additional Content -->
     <GalleryAdditionalContent
-      :token-data="tokenData"
+      :token-data="tokenMetadata"
       :collection="collection"
       :chain="chainPrefix"
       :collection-id="safeCollectionId"
