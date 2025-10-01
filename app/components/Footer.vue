@@ -27,6 +27,7 @@ const footerLinks: Array<
       { label: 'Presskit', href: 'https://github.com/chaotic-art/presskit' },
       { label: 'Code Checker', href: '/code-checker' },
       { label: 'Medium', href: 'https://medium.com/chaoticart' },
+      { label: 'Docs', href: 'https://docs.chaotic.art/start-here' },
     ],
   },
   {
