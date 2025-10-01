@@ -55,12 +55,12 @@ export async function waitForXRoastGenerationComplete(username: string) {
 }
 
 export async function generateMixedImageByFalAi(imageUrl: string) {
-  // todo: remove mock data
-  return Promise.resolve({
-    data: {
-      images: [{ url: 'https://v3b.fal.media/files/b/rabbit/4WvJUsR4th4xS-0yV8EzM.jpg' }],
-    },
-  })
+  // mock data
+  // return Promise.resolve({
+  //   data: {
+  //     images: [{ url: 'https://v3b.fal.media/files/b/rabbit/4WvJUsR4th4xS-0yV8EzM.jpg' }],
+  //   },
+  // })
   fal.config({
     credentials: useRuntimeConfig().public.falAiApiKey,
   })
