@@ -7,11 +7,10 @@ const api = $fetch.create({ baseURL: '', retry: 3 })
 
 interface GenerateRoastResponse {
   status: 'done' | 'streaming'
-  data: {
-    analysis: {
-      description: string
-    }
+  analysis: {
+    description: string
   }
+
 }
 export async function generateRoastByXUserName(userId: string) {
   return await api<string>(`${MONICA_GENERATE_URL}/api/roast/generate`, {
@@ -56,13 +55,19 @@ export async function waitForXRoastGenerationComplete(username: string) {
 }
 
 export async function generateMixedImageByFalAi(imageUrl: string) {
+  // todo: remove mock data
+  return Promise.resolve({
+    data: {
+      images: [{ url: 'https://v3b.fal.media/files/b/rabbit/4WvJUsR4th4xS-0yV8EzM.jpg' }],
+    },
+  })
   fal.config({
-    // credentials: useRuntimeConfig().public.falAiApiKey,
+    credentials: useRuntimeConfig().public.falAiApiKey,
   })
 
   const result: {
     data: {
-      image_urls: string[]
+      images: { url: string }[]
     }
   } = await fal.subscribe('fal-ai/nano-banana/edit', {
     input: {
@@ -72,11 +77,6 @@ export async function generateMixedImageByFalAi(imageUrl: string) {
       output_format: 'jpeg',
     },
     logs: true,
-    // onQueueUpdate: (update) => {
-    //   if (update.status === 'IN_PROGRESS') {
-    //     update.logs.map(log => log.message).forEach(console.log)
-    //   }
-    // },
   })
   return result
 }

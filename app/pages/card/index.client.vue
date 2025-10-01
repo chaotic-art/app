@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NftEntity } from '@/composables/useInfiniteNfts'
 import { exploreNfts } from '@/graphql/queries/explore'
+import { mintXCard } from '@/services/card'
 import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
 
 definePageMeta({
@@ -8,7 +9,8 @@ definePageMeta({
   layout: 'empty',
 })
 
-// const CHAOTIC_CARD_COLLECTION_ID = '578'
+const CHAOTIC_CARD_COLLECTION_ID = '625'
+const CHAOTIC_CARD_PREFIX = 'ahk'
 
 const { setColorMode, currentMode } = useTheme()
 const { doAfterLogin } = useDoAfterlogin()
@@ -22,11 +24,10 @@ const urlParams = new URLSearchParams(window.location.search)
 
 const hasXAuthInfo = computed(() => Boolean(urlParams.get('username') && urlParams.get('profile_image_url') && urlParams.get('magic')))
 
-const collectionIdForTesting = ref('9999')
 const existingCard = ref<NftEntity | null>(null)
 const isMinted = computed(() => !!existingCard.value)
 
-async function checkExistingCard() {
+async function fetchExistingCard() {
   if (!getConnectedSubAccount.value?.address) {
     existingCard.value = null
     return
@@ -38,8 +39,11 @@ async function checkExistingCard() {
     variables: {
       first: 1,
       offset: 0,
-      owner: getss58AddressByPrefix(getConnectedSubAccount.value?.address, 'ahp'),
-      collections: [collectionIdForTesting.value],
+      owner: getss58AddressByPrefix(getConnectedSubAccount.value?.address, CHAOTIC_CARD_PREFIX),
+      collections: [CHAOTIC_CARD_COLLECTION_ID],
+    },
+    context: {
+      endpoint: CHAOTIC_CARD_PREFIX,
     },
   })
   existingCard.value = data?.tokenEntities[0] || null
@@ -48,37 +52,55 @@ async function checkExistingCard() {
 function handleClaimClick() {
   doAfterLogin({
     onLoginSuccess: async () => {
-      await checkExistingCard()
+      await fetchExistingCard()
       if (existingCard.value) {
         return
       }
       isLoading.value = true
+      try {
+        const address = formatAddress ({ address: getConnectedSubAccount.value?.address as string, prefix: CHAOTIC_CARD_PREFIX })
 
-      if (!hasXAuthInfo.value) {
-        window.open(`https://sign-in-with-x.dotlab.workers.dev/auth/x`, '_self')
-        return
+        window.history.replaceState({}, '', window.location.pathname)
+
+        if (!hasXAuthInfo.value) {
+          window.open(`https://sign-in-with-x.dotlab.workers.dev/auth/x`, '_self')
+          return
+        }
+
+        // eslint-disable-next-line no-console
+        console.log('X Auth Info:', urlParams)
+        const username = urlParams.get('username')!
+        const magic = urlParams.get('magic')!
+        const profileImageUrl = urlParams.get('profile_image_url')!
+
+        const [textResult, imageResult] = await Promise.all([
+          waitForXRoastGenerationComplete(username),
+          generateMixedImageByFalAi(profileImageUrl),
+        ])
+
+        const imageUrl = imageResult.data.images[0]?.url
+        const description = textResult.analysis.description
+
+        if (!imageUrl || !description) {
+          throw new Error('Image or description not found')
+        }
+
+        // eslint-disable-next-line no-console
+        console.log('generate card result:', textResult, imageResult, { description, imageUrl, username, magic, address })
+        const mintedResult = await mintXCard({ description, imageUrl, magic, address })
+
+        if (mintedResult?.mintContext) {
+          await fetchExistingCard()
+          isSuccessModalOpen.value = true
+        }
       }
-
-      // eslint-disable-next-line no-console
-      console.log('X Auth Info:', urlParams)
-      const username = urlParams.get('username')!
-      const profileImageUrl = urlParams.get('profile_image_url')!
-
-      const [textResult, imageResult] = await Promise.all([
-        waitForXRoastGenerationComplete(username),
-        generateMixedImageByFalAi(profileImageUrl),
-      ])
-
-      // eslint-disable-next-line no-console
-      console.log('text generate result:', textResult, imageResult)
-
-      // setTimeout(() => {
-      //   isLoading.value = false
-      //   collectionIdForTesting.value = CHAOTIC_CARD_COLLECTION_ID
-      //   checkExistingCard()
-      //   isSuccessModalOpen.value = true
-      // }, 3000)
-      // TODO: Implement claim functionality
+      catch (error) {
+        console.error('Error:', error)
+        errorMessage(`Something went wrong. Please try again later. ERROR: ${JSON.stringify(error)}`)
+      }
+      finally {
+        isLoading.value = false
+      }
     },
   })
 }
@@ -99,7 +121,7 @@ watch(currentMode, () => {
 }, { immediate: true })
 
 watch(getConnectedSubAccount, () => {
-  checkExistingCard()
+  fetchExistingCard()
 }, {
   immediate: true,
 })
