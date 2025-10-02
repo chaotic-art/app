@@ -25,6 +25,11 @@ const urlParams = new URLSearchParams(window.location.search)
 const hasXAuthInfo = computed(() => Boolean(urlParams.get('username') && urlParams.get('profile_image_url') && urlParams.get('magic')))
 
 const existingCard = ref<NftEntity | null>(null)
+const mintedCard = ref<{
+  id: string
+  name: string
+  image: string
+} | null>(null)
 const isMinted = computed(() => !!existingCard.value)
 
 async function fetchExistingCard() {
@@ -46,7 +51,9 @@ async function fetchExistingCard() {
       endpoint: CHAOTIC_CARD_PREFIX,
     },
   })
-  existingCard.value = data?.tokenEntities[0] || null
+  if (data?.tokenEntities[0]?.id) {
+    existingCard.value = data?.tokenEntities[0] || null
+  }
 }
 
 function handleClaimClick() {
@@ -90,8 +97,22 @@ function handleClaimClick() {
         const mintedResult = await mintXCard({ description, imageUrl, magic, address })
 
         if (mintedResult?.mintContext) {
-          await fetchExistingCard()
+          const { metadata, sn, collection } = mintedResult?.mintContext
+
+          const metadataData = await $fetch<{
+            name?: string
+            description?: string
+            image?: string
+          }>(sanitizeIpfsUrl(metadata))
+
+          mintedCard.value = {
+            id: `${collection}-${sn}`,
+            name: metadataData?.name || '',
+            image: metadataData?.image || '',
+          }
+
           isSuccessModalOpen.value = true
+          pollRequestMintedCard()
         }
       }
       catch (error) {
@@ -105,14 +126,24 @@ function handleClaimClick() {
   })
 }
 
+function pollRequestMintedCard() {
+  setTimeout(() => {
+    fetchExistingCard()
+    if (existingCard.value) {
+      return
+    }
+    pollRequestMintedCard()
+  }, 5000)
+}
+
 function handleViewCardClick() {
   if (existingCard.value) {
-    window.open(`/ahp/gallery/${existingCard.value.id}`, '_blank')
+    window.open(`/${CHAOTIC_CARD_PREFIX}/gallery/${existingCard.value.id}`, '_blank')
   }
 }
 
 function handleShareClick() {
-  shareOnX($i18n.t('card.mintSuccess', [existingCard.value?.id]), window.location.href, null)
+  shareOnX($i18n.t('card.mintSuccess', [mintedCard.value?.id || existingCard.value?.id]), `${window.location.origin}${window.location.pathname}`, null)
 }
 
 // only dark mode for this page
@@ -142,7 +173,7 @@ onUnmounted(() => {
     <LazyNavbar />
     <MintCard :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" />
     <MintCardLoadingModal v-model:open="isLoading" />
-    <MintCardSuccessModal :id="existingCard?.id || ''" v-model:open="isSuccessModalOpen" :image-url="sanitizeIpfsUrl(existingCard?.image || '')" :name="existingCard?.name || ''" />
+    <MintCardSuccessModal :id="existingCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :minted-card="mintedCard" :image-url="sanitizeIpfsUrl(existingCard?.image || mintedCard?.image || '')" :name="existingCard?.name || mintedCard?.name || ''" @share="handleShareClick" />
     <LazyFooter />
   </div>
 </template>

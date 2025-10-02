@@ -1,43 +1,104 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
+  isOnChain?: boolean
   imageUrl?: string
   name?: string
   id?: string
+  prefix?: string
 }>()
 
+const emit = defineEmits(['share'])
 const open = defineModel<boolean>('open')
-const currentUrl = computed(() => window.location.href)
+const router = useRouter()
+
+function handleViewInGallery() {
+  if (props.id) {
+    router.push(`/${props.prefix}/gallery/${props.id}`)
+  }
+  open.value = false
+}
+
+function handleShareOnX() {
+  emit('share')
+}
 </script>
 
 <template>
   <UModal
     v-model:open="open"
-    title="Success"
-    :dismissible="!open"
-    :close="true"
+    :dismissible="false"
+    :close="isOnChain"
     :ui="{
-      content: 'max-w-md w-full',
+      content: 'max-w-2xs w-full',
     }"
   >
+    <template #header>
+      <div class="w-full flex justify-center gap-2 items-center relative">
+        <UIcon
+          name="i-mdi:stars"
+          class="w-5 h-5"
+        />
+        <span class="text-xl italic font-serif">It's Yours.</span>
+        <UButton
+          v-if="props.isOnChain"
+          variant="ghost"
+          color="neutral"
+          class="absolute right-0"
+          icon="i-heroicons-x-mark"
+          size="sm"
+          @click="open = false"
+        />
+      </div>
+    </template>
     <template #body>
-      <div class="flex flex-col items-center">
-        <img
-          class="border rounded-xl border-gray-200 dark:border-gray-700 w-[200px] h-[200px]"
-          :src="imageUrl"
-        >
+      <!-- Header -->
 
-        <p class="text-base capitalize font-bold text-center mt-5">
-          {{ name }}
+      <!-- Main Content -->
+      <div class="px-6 flex flex-col items-center">
+        <!-- Success Message -->
+        <p class="text-muted-foreground text-center text-sm mb-4 w-[200px]">
+          Your Chaotic Card Has Been Minted And Delivered.
         </p>
 
-        <USeparator class="my-5" />
+        <img
+          class="w-[180px] h-[180px]"
+          :src="imageUrl"
+        >
+        <div class="space-y-3 mt-4">
+          <UButton
+            v-if="isOnChain"
+            class="w-full"
+            variant="soft"
+            @click="handleViewInGallery"
+          >
+            View In Gallery
+          </UButton>
+          <UTooltip
+            v-else
+            text="Finalizing on-chain ~60s" :content="{
+              side: 'top',
+            }"
+          >
+            <UButton
+              class="w-full"
+              variant="soft"
+            >
+              <UIcon
+                name="i-mdi:loading"
+                class="animate-spin"
+              />
+              View In Gallery
+            </UButton>
+          </UTooltip>
 
-        <ShareSocialsSection
-          class="!my-0"
-          :text="$t('card.mintSuccess', [id])"
-          :url="currentUrl"
-          with-copy
-        />
+          <UButton
+            class="w-[244px]"
+            variant="solid"
+            @click="handleShareOnX"
+          >
+            Share On X
+          </UButton>
+        </div>
       </div>
     </template>
   </UModal>
