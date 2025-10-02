@@ -48,6 +48,7 @@ async function fetchExistingCard() {
       collections: [CHAOTIC_CARD_COLLECTION_ID],
     },
     context: {
+      fetchPolicy: 'no-cache',
       endpoint: CHAOTIC_CARD_PREFIX,
     },
   })
@@ -86,8 +87,7 @@ function handleClaimClick() {
         ])
 
         const imageUrl = imageResult.data.images[0]?.url
-        const description = textResult.analysis.description
-
+        const description = textResult.analysis.lifeMotto?.replace(/\*/g, '')
         if (!imageUrl || !description) {
           throw new Error('Image or description not found')
         }

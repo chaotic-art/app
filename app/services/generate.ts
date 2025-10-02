@@ -9,6 +9,7 @@ interface GenerateRoastResponse {
   status: 'done' | 'streaming'
   analysis: {
     description: string
+    lifeMotto: string
   }
 
 }
