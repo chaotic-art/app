@@ -75,7 +75,7 @@ function handleShareOnX() {
           </UButton>
           <UTooltip
             v-else
-            text="Finalizing on-chain ~60s" :content="{
+            text="Finalizing on-chain ~ few minutes" :content="{
               side: 'top',
             }"
           >

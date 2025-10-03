@@ -136,7 +136,7 @@ function pollRequestMintedCard() {
       return
     }
     pollRequestMintedCard()
-  }, 5000)
+  }, 10000)
 }
 
 function handleViewCardClick() {
