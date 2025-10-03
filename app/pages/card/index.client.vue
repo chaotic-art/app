@@ -52,6 +52,8 @@ async function fetchExistingCard() {
       endpoint: CHAOTIC_CARD_PREFIX,
     },
   })
+  // eslint-disable-next-line no-console
+  console.log('fetching existing card data:', data)
   if (data?.tokenEntities[0]?.id) {
     existingCard.value = data?.tokenEntities[0] || null
   }
