@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   isOnChain?: boolean
-  imageUrl?: string
+  previewUrl?: string
   name?: string
   id?: string
   prefix?: string
@@ -29,7 +29,7 @@ function handleShareOnX() {
     :dismissible="false"
     :close="isOnChain"
     :ui="{
-      content: 'max-w-2xs w-full',
+      content: 'max-w-2xs w-full bg-black',
     }"
   >
     <template #header>
@@ -54,16 +54,16 @@ function handleShareOnX() {
       <!-- Header -->
 
       <!-- Main Content -->
-      <div class="px-6 flex flex-col items-center">
+      <div class="px-2 flex flex-col items-center">
         <!-- Success Message -->
-        <p class="text-muted-foreground text-center text-sm mb-4 w-[200px]">
+        <p class="text-muted-foreground text-center text-sm mb-4 w-full">
           Your Chaotic Card Has Been Minted And Delivered.
         </p>
 
-        <img
-          class="w-[180px] h-[180px]"
-          :src="imageUrl"
-        >
+        <IframePreview
+          :src="previewUrl"
+          class="w-[200px] h-[200px]"
+        />
         <div class="space-y-3 mt-4">
           <UButton
             v-if="isOnChain"

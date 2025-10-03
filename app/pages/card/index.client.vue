@@ -48,9 +48,9 @@ async function fetchExistingCard() {
       collections: [CHAOTIC_CARD_COLLECTION_ID],
     },
     context: {
-      fetchPolicy: 'no-cache',
       endpoint: CHAOTIC_CARD_PREFIX,
     },
+    fetchPolicy: 'no-cache',
   })
   // eslint-disable-next-line no-console
   console.log('fetching existing card data:', data)
@@ -105,12 +105,13 @@ function handleClaimClick() {
             name?: string
             description?: string
             image?: string
+            animation_url?: string
           }>(sanitizeIpfsUrl(metadata))
 
           mintedCard.value = {
             id: `${collection}-${sn}`,
             name: metadataData?.name || '',
-            image: metadataData?.image || '',
+            image: metadataData?.animation_url || '',
           }
 
           isSuccessModalOpen.value = true
@@ -175,7 +176,7 @@ onUnmounted(() => {
     <LazyNavbar />
     <MintCard :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" />
     <MintCardLoadingModal v-model:open="isLoading" />
-    <MintCardSuccessModal :id="existingCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :minted-card="mintedCard" :image-url="sanitizeIpfsUrl(existingCard?.image || mintedCard?.image || '')" :name="existingCard?.name || mintedCard?.name || ''" @share="handleShareClick" />
+    <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" />
     <LazyFooter />
   </div>
 </template>
