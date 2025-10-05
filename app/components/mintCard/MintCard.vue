@@ -1,6 +1,7 @@
 <script setup lang="ts">
 defineProps<{
   minted?: boolean
+  previewUrl?: string | null
 }>()
 
 const emit = defineEmits(['claim', 'share', 'viewCard'])
@@ -143,8 +144,16 @@ onUnmounted(() => {
         </p>
       </header>
 
+      <div v-if="minted && previewUrl" class="w-full flex justify-center">
+        <div class="w-[500px]">
+          <IframePreview
+            :src="previewUrl"
+          />
+        </div>
+      </div>
+
       <!-- Card Container -->
-      <div class="card-container">
+      <div v-else class="card-container">
         <div ref="cardRef" class="card" data-rarity="rare v-full-art">
           <div class="card__translater">
             <button ref="rotatorRef" class="card__rotator">

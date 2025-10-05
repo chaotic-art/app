@@ -29,7 +29,7 @@ function handleShareOnX() {
     :dismissible="false"
     :close="isOnChain"
     :ui="{
-      content: 'max-w-2xs w-full bg-black',
+      content: 'max-w-2xs md:max-w-xl w-full bg-black',
     }"
   >
     <template #header>
@@ -56,13 +56,12 @@ function handleShareOnX() {
       <!-- Main Content -->
       <div class="px-2 flex flex-col items-center">
         <!-- Success Message -->
-        <p class="text-muted-foreground text-center text-sm mb-4 w-full">
+        <p class="text-muted-foreground text-center text-sm md:text-base mb-4 w-full">
           Your Chaotic Card Has Been Minted And Delivered.
         </p>
 
         <IframePreview
           :src="previewUrl"
-          class="w-[200px] h-[200px]"
         />
         <div class="space-y-3 mt-4">
           <UButton
@@ -92,7 +91,7 @@ function handleShareOnX() {
           </UTooltip>
 
           <UButton
-            class="w-[244px]"
+            class="w-full"
             variant="solid"
             @click="handleShareOnX"
           >

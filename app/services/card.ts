@@ -25,8 +25,8 @@ export async function mintXCard(
       imageUrl,
       address,
     },
-  }).catch((error) => {
-    throw error
+  }).catch(() => {
+    throw new Error('you can only claim once per account.')
   })
   return response
 }

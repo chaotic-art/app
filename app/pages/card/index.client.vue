@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { NftEntity } from '@/composables/useInfiniteNfts'
-import { exploreNfts } from '@/graphql/queries/explore'
 import { mintXCard } from '@/services/card'
 import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
+import { accountTokenEntries } from '~/utils/api/substrate.nft-pallets'
 
 definePageMeta({
   title: 'Chaotic Card',
@@ -24,38 +23,47 @@ const urlParams = new URLSearchParams(window.location.search)
 
 const hasXAuthInfo = computed(() => Boolean(urlParams.get('username') && urlParams.get('profile_image_url') && urlParams.get('magic')))
 
-const existingCard = ref<NftEntity | null>(null)
-const mintedCard = ref<{
+interface ExistingCard {
   id: string
   name: string
   image: string
-} | null>(null)
+}
+const existingCard = ref<ExistingCard | null>(null)
+const mintedCard = ref<ExistingCard | null>(null)
 const isMinted = computed(() => !!existingCard.value)
+
+async function fetchOwnedCardNft() {
+  const owner = getss58AddressByPrefix(getConnectedSubAccount.value?.address as string, CHAOTIC_CARD_PREFIX)
+
+  const ownedCardNfts = await accountTokenEntries({
+    prefix: CHAOTIC_CARD_PREFIX,
+    account: owner,
+    collectionId: Number(CHAOTIC_CARD_COLLECTION_ID),
+  })
+
+  const cardNft = ownedCardNfts[0]
+  // eslint-disable-next-line no-console
+  console.log('fetching owned card nft:', cardNft)
+  return cardNft
+    ? {
+        id: `${cardNft.keyArgs[1]}-${cardNft.keyArgs[2]}`,
+        name: cardNft.metadata?.name || '',
+        image: cardNft.metadata?.animation_url || '',
+      }
+    : null
+}
 
 async function fetchExistingCard() {
   if (!getConnectedSubAccount.value?.address) {
     existingCard.value = null
+    mintedCard.value = null
     return
   }
-  const { $apolloClient } = useNuxtApp()
 
-  const { data } = await $apolloClient.query({
-    query: exploreNfts,
-    variables: {
-      first: 1,
-      offset: 0,
-      owner: getss58AddressByPrefix(getConnectedSubAccount.value?.address, CHAOTIC_CARD_PREFIX),
-      collections: [CHAOTIC_CARD_COLLECTION_ID],
-    },
-    context: {
-      endpoint: CHAOTIC_CARD_PREFIX,
-    },
-    fetchPolicy: 'no-cache',
-  })
-  // eslint-disable-next-line no-console
-  console.log('fetching existing card data:', data)
-  if (data?.tokenEntities[0]?.id) {
-    existingCard.value = data?.tokenEntities[0] || null
+  const nft = await fetchOwnedCardNft()
+
+  if (nft) {
+    existingCard.value = nft
   }
 }
 
@@ -120,7 +128,7 @@ function handleClaimClick() {
       }
       catch (error) {
         console.error('Error:', error)
-        errorMessage(`Something went wrong. Please try again later. ERROR: ${JSON.stringify(error)}`)
+        errorMessage(`Something went wrong. ERROR: ${(error as Error)?.message}`)
       }
       finally {
         isLoading.value = false
@@ -174,7 +182,7 @@ onUnmounted(() => {
 <template>
   <div class="min-h-full flex flex-col overflow-hidden bg-black">
     <LazyNavbar />
-    <MintCard :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" />
+    <MintCard :minted="isMinted" :preview-url="existingCard?.image" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" />
     <MintCardLoadingModal v-model:open="isLoading" />
     <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" />
     <LazyFooter />
