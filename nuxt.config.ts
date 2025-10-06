@@ -61,7 +61,15 @@ export default defineNuxtConfig({
     '@wagmi/vue/nuxt',
     '@nuxtjs/seo',
     'nuxt-svgo',
+    '@nuxtjs/supabase',
   ],
+
+  supabase: {
+    redirectOptions: {
+      login: '/twitter-auth', // change with card page
+      callback: '/confirm',
+    },
+  },
 
   runtimeConfig: {
     public: {
