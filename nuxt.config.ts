@@ -65,6 +65,7 @@ export default defineNuxtConfig({
   ],
 
   supabase: {
+    redirect: false,
     redirectOptions: {
       login: '/twitter-auth', // change with card page
       callback: '/confirm',
