@@ -26,6 +26,8 @@ export interface Validity {
   validKodaRenderPayload: Passed
   // same hash should create same art, otherwise this will be false
   consistent: Passed
+  fpsValid: Passed
+  fpsValue: number
 }
 
 export type AssetType = 'script' | 'style'
