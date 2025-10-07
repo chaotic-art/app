@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { createLogger } from 'vite'
 
 export default defineNuxtConfig({
@@ -70,6 +71,8 @@ export default defineNuxtConfig({
       login: '/twitter-auth', // change with card page
       callback: '/confirm',
     },
+    url: process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
+    key: process.env.SUPABASE_KEY || 'placeholder-key',
   },
 
   runtimeConfig: {
