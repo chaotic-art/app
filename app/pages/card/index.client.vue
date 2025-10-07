@@ -176,7 +176,7 @@ watch(existingCard, async () => {
     const blob = await makeCardScreenshot(existingCard.value.image)
     screenshotUrl.value = URL.createObjectURL(blob)
   }
-})
+}, { immediate: true })
 
 onMounted(() => {
   if (hasXAuthInfo.value) {
