@@ -29,6 +29,8 @@ interface ExistingCard {
   name: string
   image: string
 }
+
+const isInitialLoading = ref(true)
 const existingCard = ref<ExistingCard | null>(null)
 const mintedCard = ref<ExistingCard | null>(null)
 const isMinted = computed(() => !!existingCard.value)
@@ -58,6 +60,7 @@ async function fetchExistingCard() {
   if (!getConnectedSubAccount.value?.address) {
     existingCard.value = null
     mintedCard.value = null
+    isInitialLoading.value = false
     return
   }
 
@@ -66,6 +69,7 @@ async function fetchExistingCard() {
   if (nft) {
     existingCard.value = nft
   }
+  isInitialLoading.value = false
 }
 
 function handleClaimClick() {
@@ -181,7 +185,7 @@ onUnmounted(() => {
 <template>
   <div class="min-h-full flex flex-col overflow-hidden bg-black">
     <LazyNavbar />
-    <MintCard :minted="isMinted" :preview-url="existingCard?.image" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" />
+    <MintCard :loading="isInitialLoading" :minted="isMinted" :preview-url="existingCard?.image" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" />
     <MintCardLoadingModal v-model:open="isLoading" />
     <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" />
     <LazyFooter />

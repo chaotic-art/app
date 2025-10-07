@@ -1,5 +1,6 @@
 <script setup lang="ts">
 defineProps<{
+  loading?: boolean
   minted?: boolean
   previewUrl?: string | null
 }>()
@@ -168,8 +169,10 @@ onUnmounted(() => {
       </div>
 
       <!-- CTA Button -->
-
-      <div v-if="minted" class="flex flex-col gap-4 items-center">
+      <div v-if="loading">
+        <UIcon name="i-mdi:loading" class="animate-spin h-8 w-8 my-8" />
+      </div>
+      <div v-else-if="minted" class="flex flex-col gap-4 items-center">
         <button class="claim-button" @click="emit('viewCard')">
           View my card
         </button>
