@@ -11,11 +11,11 @@ const props = withDefaults(
     previews?: number
   }>(),
   {
-    previews: 12,
+    previews: 3,
   },
 )
 
-const active = ref(false)
+const active = ref(true)
 const amount = ref(props.previews)
 const canvasPreviews = ref<CanvasPreviewItem[]>([])
 
@@ -40,6 +40,15 @@ onKodahashRenderCompleted(({ payload: { hash } }) => {
 watch(active, (active) => {
   if (active) {
     generateMassPreview()
+  }
+})
+
+watchEffect(() => {
+  if (active.value) {
+    // delat 1 second
+    setTimeout(() => {
+      generateMassPreview()
+    }, 1000)
   }
 })
 </script>

@@ -5,6 +5,7 @@ import config from './codechecker.config'
 import CodeCheckerIssueHintAutomaticResize from './issueHint/AutomaticResize.vue'
 import CodeCheckerIssueHintConsistentArt from './issueHint/ConsistentArt.vue'
 import CodeCheckerIssueHintCorrectHTMLName from './issueHint/CorrectHTMLName.vue'
+import CodeCheckerIssueHintFpsValid from './issueHint/FpsValid.vue'
 import CodeCheckerIssueHintKodaHashCalledOnce from './issueHint/KodaHashCalledOnce.vue'
 import CodeCheckerIssueHintNotUsingExternalResources from './issueHint/NotUsingExternalResources.vue'
 import CodeCheckerIssueHintUsingKodaHash from './issueHint/UsingKodaHash.vue'
@@ -43,6 +44,8 @@ const validtyDefault: Validity = {
   validKodaRenderPayload: 'loading',
   consistent: 'loading',
   externalResourcesNotUsed: 'unknown',
+  fpsValid: 'loading',
+  fpsValue: 0,
 }
 
 const selectedFile = ref<File | null>(null)
@@ -123,6 +126,14 @@ function hasImage(dataURL: string): boolean {
 function consistencyField(payload: any) {
   const version: number = Number.parseFloat(payload?.version ?? '0')
   return version >= 1.0 ? payload.base64Details : payload.image
+}
+
+function handleFpsCheck(fpsValid: boolean) {
+  fileValidity.fpsValid = fpsValid
+}
+
+function handleFpsValue(fps: number) {
+  fileValidity.fpsValue = fps
 }
 
 useEventListener('message', async (res: MessageEvent) => {
@@ -331,6 +342,15 @@ useEventListener('message', async (res: MessageEvent) => {
             <CodeCheckerIssueHintVariationLoadingTime />
           </template>
         </CodeCheckerTestItem>
+        <CodeCheckerTestItem
+          :passed="fileValidity.fpsValid"
+          :description="`Performance: ${fileValidity.fpsValue > 0 ? fileValidity.fpsValue : '--'} FPS (60+ required)`"
+          optional
+        >
+          <template #modalContent>
+            <CodeCheckerIssueHintFpsValid />
+          </template>
+        </CodeCheckerTestItem>
       </div>
     </div>
 
@@ -348,6 +368,8 @@ useEventListener('message', async (res: MessageEvent) => {
         :index-url="indexUrl ?? ''"
         @reload="startClock"
         @hash="(hash) => (previewHash = hash)"
+        @fps-check="handleFpsCheck"
+        @fps-value="handleFpsValue"
       />
 
       <CodeCheckerMassPreview
