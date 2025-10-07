@@ -30,3 +30,13 @@ export async function mintXCard(
   })
   return response
 }
+
+export async function makeCardScreenshot(image: string) {
+  const response = await $fetch<Blob>('https://vercelgl-gamma.vercel.app/api/screenshot', {
+    method: 'POST',
+    body: {
+      url: image,
+    },
+  })
+  return response
+}

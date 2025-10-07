@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { makeCardScreenshot } from '@/services/card'
+
 const props = defineProps<{
   isOnChain?: boolean
   previewUrl?: string
@@ -10,6 +12,7 @@ const props = defineProps<{
 const emit = defineEmits(['share'])
 const open = defineModel<boolean>('open')
 const router = useRouter()
+const isScreenshotLoading = ref(false)
 
 function handleViewInGallery() {
   if (props.id) {
@@ -20,6 +23,13 @@ function handleViewInGallery() {
 
 function handleShareOnX() {
   emit('share')
+}
+
+async function handleDownloadCard() {
+  isScreenshotLoading.value = true
+  const blob = await makeCardScreenshot(props.previewUrl!)
+  downloadImage(URL.createObjectURL(blob))
+  isScreenshotLoading.value = false
 }
 </script>
 
@@ -90,6 +100,14 @@ function handleShareOnX() {
             </UButton>
           </UTooltip>
 
+          <UButton
+            class="w-full"
+            variant="soft"
+            :loading="isScreenshotLoading"
+            @click="handleDownloadCard"
+          >
+            Download Card
+          </UButton>
           <UButton
             class="w-full"
             variant="solid"
