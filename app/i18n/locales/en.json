@@ -263,7 +263,7 @@
     "changeTo": "Change to {chainSymbol} address"
   },
   "card": {
-    "mintSuccess": "I just minted a Chaotic Card #{0}. Connect your X profile and we will generate a unique card for you."
+    "mintSuccess": "Got my Chaotic Card #{0} and i'm questioning everything\n\nDiscover your chaos level → {1} \n\n(The algorithm sees all) 🌀"
   },
   "codeChecker": {
     "title": "Code Checker",

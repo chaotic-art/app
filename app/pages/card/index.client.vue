@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { watchDebounced } from '@vueuse/core'
 import { mintXCard } from '@/services/card'
 import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
 import { accountTokenEntries } from '~/utils/api/substrate.nft-pallets'
@@ -154,7 +155,7 @@ function handleViewCardClick() {
 }
 
 function handleShareClick() {
-  shareOnX($i18n.t('card.mintSuccess', [mintedCard.value?.id || existingCard.value?.id]), `${window.location.origin}${window.location.pathname}`, null)
+  shareOnX($i18n.t('card.mintSuccess', [mintedCard.value?.id || existingCard.value?.id, `${window.location.origin}${window.location.pathname}`]), '', null)
 }
 
 // only dark mode for this page
@@ -162,11 +163,9 @@ watch(currentMode, () => {
   setColorMode('dark')
 }, { immediate: true })
 
-watch(getConnectedSubAccount, () => {
+watchDebounced(getConnectedSubAccount, () => {
   fetchExistingCard()
-}, {
-  immediate: true,
-})
+}, { debounce: 1000, maxWait: 5000, immediate: true })
 
 onMounted(() => {
   if (hasXAuthInfo.value) {
