@@ -1,11 +1,13 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   loading?: boolean
   minted?: boolean
-  previewUrl?: string | null
+  screenshotUrl?: string | null
 }>()
 
 const emit = defineEmits(['claim', 'share', 'viewCard'])
+
+const cardImageUrl = computed(() => props.minted && props.screenshotUrl ? props.screenshotUrl : '/card/final_card.png')
 
 // Refs for card elements
 const cardRef = ref<HTMLElement>()
@@ -145,21 +147,13 @@ onUnmounted(() => {
         </p>
       </header>
 
-      <div v-if="minted && previewUrl" class="w-full flex justify-center">
-        <div class="w-[500px]">
-          <IframePreview
-            :src="previewUrl"
-          />
-        </div>
-      </div>
-
       <!-- Card Container -->
-      <div v-else class="card-container">
+      <div class="card-container">
         <div ref="cardRef" class="card" data-rarity="rare v-full-art">
           <div class="card__translater">
             <button ref="rotatorRef" class="card__rotator">
               <div class="card__front">
-                <img src="/card/final_card.png" alt="Chaotic Card" loading="lazy">
+                <img :src="cardImageUrl" alt="Chaotic Card" loading="lazy">
               </div>
               <div class="card__shine" />
               <div class="card__glare" />

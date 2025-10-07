@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
-import { mintXCard } from '@/services/card'
+import { makeCardScreenshot, mintXCard } from '@/services/card'
 import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
 import { accountTokenEntries } from '~/utils/api/substrate.nft-pallets'
 
@@ -34,7 +34,7 @@ const isInitialLoading = ref(true)
 const existingCard = ref<ExistingCard | null>(null)
 const mintedCard = ref<ExistingCard | null>(null)
 const isMinted = computed(() => !!existingCard.value)
-
+const screenshotUrl = ref<string | null>(null)
 async function fetchOwnedCardNft() {
   const owner = getss58AddressByPrefix(getConnectedSubAccount.value?.address as string, CHAOTIC_CARD_PREFIX)
 
@@ -171,6 +171,13 @@ watchDebounced(getConnectedSubAccount, () => {
   fetchExistingCard()
 }, { debounce: 1000, maxWait: 5000, immediate: true })
 
+watch(existingCard, async () => {
+  if (existingCard.value?.image) {
+    const blob = await makeCardScreenshot(existingCard.value.image)
+    screenshotUrl.value = URL.createObjectURL(blob)
+  }
+})
+
 onMounted(() => {
   if (hasXAuthInfo.value) {
     handleClaimClick()
@@ -185,7 +192,7 @@ onUnmounted(() => {
 <template>
   <div class="min-h-full flex flex-col overflow-hidden bg-black">
     <LazyNavbar />
-    <MintCard :loading="isInitialLoading" :minted="isMinted" :preview-url="existingCard?.image" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" />
+    <MintCard :screenshot-url="screenshotUrl" :loading="isInitialLoading" :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" />
     <MintCardLoadingModal v-model:open="isLoading" />
     <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" />
     <LazyFooter />
