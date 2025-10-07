@@ -31,7 +31,7 @@ export function useToken(props: {
   }), decimals, chainSymbol)
 
   const fetchTokenMetadata = async (metadataUri: string) => {
-    const [ok, _, metadataData] = await t(fetch(sanitizeIpfsUrl(metadataUri)).then(r => r.json()))
+    const [ok, _, metadataData] = await t($fetch(sanitizeIpfsUrl(metadataUri)))
     if (ok) {
       return metadataData as NFTMetadata
     }
