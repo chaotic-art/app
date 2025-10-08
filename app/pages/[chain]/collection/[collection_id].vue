@@ -10,7 +10,6 @@ const route = useRoute()
 const { chain: chainPrefix, collection_id } = route.params
 
 const chain = computed(() => chainPrefix as AssetHubChain)
-
 const { data } = await useLazyAsyncData(
   `collection:${chain.value}:${collection_id}`,
   async () => {
@@ -22,6 +21,7 @@ const { data } = await useLazyAsyncData(
     return { collection, drops }
   },
 )
+const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.collection?.metadata?.banner || data.value?.collection?.metadata?.image)))
 
 const { selectedSort, createQueryVariables } = useSortOptions()
 
@@ -57,8 +57,8 @@ defineOgImageComponent('Frame', {
       <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">
         <div
           class="absolute inset-0 w-full h-full bg-muted"
-          :style="data?.collection?.metadata?.image ? {
-            backgroundImage: `url('${sanitizeIpfsUrl(data.collection.metadata.image)}')`,
+          :style="bannerUrl ? {
+            backgroundImage: `url('${bannerUrl}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           } : {}"
