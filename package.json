@@ -16,7 +16,7 @@
     "typecheck": "papi --whitelist .papi/whitelist.ts && nuxi typecheck"
   },
   "dependencies": {
-    "@apollo/client": "^3.13.8",
+    "@apollo/client": "^4.0.7",
     "@fal-ai/client": "^1.6.2",
     "@iconify-json/lucide": "^1.2.57",
     "@iconify-json/simple-icons": "^1.2.43",
