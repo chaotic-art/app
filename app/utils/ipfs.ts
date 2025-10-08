@@ -44,7 +44,10 @@ export function sanitizeIpfsUrl(ipfsUrl = '', provider?: ProviderKeyType): strin
     return ''
   }
 
-  if (kodaImage && ipfsUrl.includes(kodaImage)) {
+  const isChaoticUrl = isHTTP(ipfsUrl) && ipfsUrl.includes('chaotic.art')
+  const isKodaImageUrl = kodaImage && ipfsUrl.includes(kodaImage)
+
+  if (isChaoticUrl || isKodaImageUrl) {
     return ipfsUrl
   }
 

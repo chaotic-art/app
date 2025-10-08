@@ -44,6 +44,24 @@ export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }
   return items
 }
 
+export async function accountTokenEntries({ prefix, account, collectionId }: { prefix: AssetHubChain, account: string, collectionId: number }) {
+  const api = getApi(prefix).api
+  const entries = await api.query.Nfts.Account.getEntries(account)
+
+  const query = entries.filter(entry => entry.keyArgs[1] === collectionId)
+  const items = await Promise.all(query.map(async (entry) => {
+    const [,collectionId, tokenId] = entry.keyArgs
+    const [ok, err, metadata] = await t(fetchOdaToken(prefix, collectionId.toString(), tokenId.toString()))
+    if (!ok) {
+      console.error('Error fetching token', err)
+    }
+
+    return { ...entry, ...metadata }
+  }))
+
+  return items
+}
+
 /**
  * Get the last item ID used on a collection
  * @param params - The parameters object

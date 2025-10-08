@@ -2,6 +2,7 @@
   "name": "nuxt-app",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad",
   "scripts": {
     "build": "papi --whitelist .papi/whitelist.ts && nuxt build",
     "dev": "nuxt dev",
@@ -16,6 +17,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
+    "@fal-ai/client": "^1.6.2",
     "@iconify-json/lucide": "^1.2.57",
     "@iconify-json/simple-icons": "^1.2.43",
     "@kodadot1/hyperdata": "0.0.2-rc.1",

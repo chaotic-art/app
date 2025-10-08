@@ -18,6 +18,11 @@ const routePrefix = computed(() => isProduction ? 'ahp' : prefix.value)
 
 const navItems = computed<NavigationMenuItem[][]>(() => [
   [
+    // {
+    //   icon: 'i-mdi:stars',
+    //   label: 'Chaotic Card',
+    //   to: '/card',
+    // },
     {
       label: 'Home',
       to: '/',
@@ -142,6 +147,11 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
             @click="handleNavClick(item)"
           >
             <div class="flex items-center gap-3">
+              <UIcon
+                v-if="item.icon"
+                :name="item.icon"
+                class="w-4 h-4"
+              />
               <span>{{ item.label }}</span>
               <UIcon
                 v-if="item.active"
