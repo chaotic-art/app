@@ -263,7 +263,7 @@
     "changeTo": "Change to {chainSymbol} address"
   },
   "card": {
-    "mintSuccess": "Got my Chaotic Card #{0} and i'm questioning everything\n\nDiscover your chaos level → {1} \n\n(The algorithm sees all) 🌀"
+    "mintSuccess": "Got my Chaotic Card #{0} and now I am questioning everything\n\nDiscover your chaos level → {1} \n\n(The algorithm sees all) 🌀"
   },
   "codeChecker": {
     "title": "Code Checker",
