@@ -18,11 +18,11 @@ const routePrefix = computed(() => isProduction ? 'ahp' : prefix.value)
 
 const navItems = computed<NavigationMenuItem[][]>(() => [
   [
-    {
-      icon: 'i-mdi:stars',
-      label: 'Chaotic Card',
-      to: '/card',
-    },
+    // {
+    //   icon: 'i-mdi:stars',
+    //   label: 'Chaotic Card',
+    //   to: '/card',
+    // },
     {
       label: 'Home',
       to: '/',

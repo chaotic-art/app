@@ -9,8 +9,8 @@ definePageMeta({
   layout: 'empty',
 })
 
-const CHAOTIC_CARD_COLLECTION_ID = '625'
-const CHAOTIC_CARD_PREFIX = 'ahk'
+const CHAOTIC_CARD_COLLECTION_ID = '646'
+const CHAOTIC_CARD_PREFIX = 'ahp'
 
 const { setColorMode, currentMode } = useTheme()
 const { doAfterLogin } = useDoAfterlogin()
