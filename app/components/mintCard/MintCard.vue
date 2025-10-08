@@ -5,7 +5,7 @@ const props = defineProps<{
   screenshotUrl?: string | null
 }>()
 
-const emit = defineEmits(['claim', 'share', 'viewCard'])
+const emit = defineEmits(['claim', 'share', 'viewCard', 'download'])
 
 const cardImageUrl = computed(() => props.minted && props.screenshotUrl ? props.screenshotUrl : '/card/final_card.png')
 
@@ -172,6 +172,9 @@ onUnmounted(() => {
         </button>
         <button class="claim-button" @click="emit('share')">
           Share on <UIcon name="i-simple-icons:x" class="size-5 ml-2" />
+        </button>
+        <button v-if="screenshotUrl" class="claim-button" @click="emit('download')">
+          Download my card
         </button>
       </div>
       <button v-else class="claim-button" @click="emit('claim')">

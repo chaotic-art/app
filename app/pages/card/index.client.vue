@@ -162,12 +162,23 @@ function handleShareClick() {
   shareOnX($i18n.t('card.mintSuccess', [mintedCard.value?.id || existingCard.value?.id, `${window.location.origin}${window.location.pathname}`]), '', null)
 }
 
+function handleDownloadCard() {
+  if (screenshotUrl.value) {
+    downloadImage(screenshotUrl.value, 'Chaotic Card')
+  }
+}
+
 // only dark mode for this page
 watch(currentMode, () => {
   setColorMode('dark')
 }, { immediate: true })
 
-watchDebounced(getConnectedSubAccount, () => {
+watchDebounced(computed(() => getConnectedSubAccount.value?.address), (oldValue, newValue) => {
+  if (oldValue !== newValue) {
+    existingCard.value = null
+    mintedCard.value = null
+    isInitialLoading.value = true
+  }
   fetchExistingCard()
 }, { debounce: 1000, maxWait: 5000, immediate: true })
 
@@ -192,7 +203,7 @@ onUnmounted(() => {
 <template>
   <div class="min-h-full flex flex-col overflow-hidden bg-black">
     <LazyNavbar />
-    <MintCard :screenshot-url="screenshotUrl" :loading="isInitialLoading" :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" />
+    <MintCard :screenshot-url="screenshotUrl" :loading="isInitialLoading" :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" @download="handleDownloadCard" />
     <MintCardLoadingModal v-model:open="isLoading" />
     <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" />
     <LazyFooter />
