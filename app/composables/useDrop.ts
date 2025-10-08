@@ -40,7 +40,8 @@ export function useDrop(alias?: string) {
   watchEffect(() => {
     const dropAlias = alias ?? params.slug?.toString()
 
-    dropAlias && fetchDrop(dropAlias)
+    if (dropAlias)
+      fetchDrop(dropAlias)
   })
 
   return {
