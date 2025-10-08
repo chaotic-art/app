@@ -28,7 +28,7 @@ function handleShareOnX() {
 async function handleDownloadCard() {
   isScreenshotLoading.value = true
   const blob = await makeCardScreenshot(props.previewUrl!)
-  downloadImage(URL.createObjectURL(blob))
+  downloadImage(URL.createObjectURL(blob), props.name || 'Chaotic Card')
   isScreenshotLoading.value = false
 }
 </script>
