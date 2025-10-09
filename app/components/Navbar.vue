@@ -20,7 +20,7 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
   [
     {
       icon: 'i-mdi:stars',
-      label: 'Chaotic Card',
+      label: 'Chaotic Cards',
       to: '/card',
     },
     {
