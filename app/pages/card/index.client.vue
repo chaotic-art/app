@@ -205,7 +205,7 @@ onUnmounted(() => {
     <LazyNavbar />
     <MintCard :screenshot-url="screenshotUrl" :loading="isInitialLoading" :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" @download="handleDownloadCard" />
     <MintCardLoadingModal v-model:open="isLoading" />
-    <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" />
+    <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" @view-card="handleViewCardClick" />
     <LazyFooter />
   </div>
 </template>

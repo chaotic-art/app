@@ -9,16 +9,12 @@ const props = defineProps<{
   prefix?: string
 }>()
 
-const emit = defineEmits(['share'])
+const emit = defineEmits(['share', 'viewCard'])
 const open = defineModel<boolean>('open')
-const router = useRouter()
 const isScreenshotLoading = ref(false)
 
 function handleViewInGallery() {
-  if (props.id) {
-    router.push(`/${props.prefix}/gallery/${props.id}`)
-  }
-  open.value = false
+  emit('viewCard')
 }
 
 function handleShareOnX() {
@@ -74,31 +70,17 @@ async function handleDownloadCard() {
           :src="previewUrl"
         />
         <div class="space-y-3 mt-4">
+          <p v-if="!isOnChain" class="flex justify-center text-sm">
+            Be patient, this chaos can take up to 3 mins...
+          </p>
           <UButton
-            v-if="isOnChain"
             class="w-full"
             variant="soft"
+            :loading="!isOnChain"
             @click="handleViewInGallery"
           >
             View In Gallery
           </UButton>
-          <UTooltip
-            v-else
-            text="Finalizing on-chain ~ few minutes" :content="{
-              side: 'top',
-            }"
-          >
-            <UButton
-              class="w-full"
-              variant="soft"
-            >
-              <UIcon
-                name="i-mdi:loading"
-                class="animate-spin"
-              />
-              View In Gallery
-            </UButton>
-          </UTooltip>
 
           <UButton
             class="w-full"
