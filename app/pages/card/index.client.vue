@@ -5,7 +5,7 @@ import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/se
 import { accountTokenEntries } from '~/utils/api/substrate.nft-pallets'
 
 definePageMeta({
-  title: 'Chaotic Card',
+  title: 'Chaotic Cards',
   layout: 'empty',
 })
 
