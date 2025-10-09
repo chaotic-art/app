@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { OdaToken } from '@/services/oda'
+import { CARD_COLLECTION_IDS } from '@/components/mintCard/constants'
+import { makeCardScreenshot } from '@/services/card'
 import { downloadImage } from '@/utils/download'
 import { isMobileDevice } from '@/utils/environment'
 import { sanitizeIpfsUrl, toOriginalContentUrl } from '@/utils/ipfs'
@@ -8,6 +10,7 @@ import { onKodahashRenderCompleted } from '@/utils/kodahash'
 const props = defineProps<{
   containerId: string
   nft: OdaToken
+  collectionId: string
   mimeType?: string
 }>()
 
@@ -32,8 +35,14 @@ const isDownloadEnabled = computed(() => {
 
 async function downloadMedia() {
   let imageUrl = sanitizeIpfsUrl(nftImageUrl.value)
-
   if (!imageUrl) {
+    return
+  }
+
+  if (CARD_COLLECTION_IDS.includes(String(props.collectionId))) {
+    toast.add({ title: 'Downloading image...' })
+    const blob = await makeCardScreenshot(nftAnimation.value)
+    downloadImage(URL.createObjectURL(blob), props.nft.metadata?.name ?? '')
     return
   }
 

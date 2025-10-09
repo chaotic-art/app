@@ -1,0 +1,4 @@
+export const CHAOTIC_CARD_COLLECTION_ID = '646'
+export const CHAOTIC_CARD_PREFIX = 'ahp'
+
+export const CARD_COLLECTION_IDS = [CHAOTIC_CARD_COLLECTION_ID]
