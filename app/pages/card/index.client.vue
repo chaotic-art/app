@@ -9,6 +9,11 @@ definePageMeta({
   layout: 'empty',
 })
 
+useSeoMeta({
+  title: 'Chaotic Cards',
+  ogImage: () => 'https://image-beta.w.kodadot.xyz/ipfs/QmTUB5xvkGqHKK6Ew6Hbhs4YpgV29wt8FmZqmccEG5sMpg',
+})
+
 const CHAOTIC_CARD_COLLECTION_ID = '646'
 const CHAOTIC_CARD_PREFIX = 'ahp'
 
