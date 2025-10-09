@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
+import { CHAOTIC_CARD_COLLECTION_ID, CHAOTIC_CARD_PREFIX } from '@/components/mintCard/constants'
 import { makeCardScreenshot, mintXCard } from '@/services/card'
 import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
 import { accountTokenEntries } from '~/utils/api/substrate.nft-pallets'
@@ -13,9 +14,6 @@ useSeoMeta({
   title: 'Chaotic Cards',
   ogImage: () => 'https://image-beta.w.kodadot.xyz/ipfs/QmTUB5xvkGqHKK6Ew6Hbhs4YpgV29wt8FmZqmccEG5sMpg',
 })
-
-const CHAOTIC_CARD_COLLECTION_ID = '646'
-const CHAOTIC_CARD_PREFIX = 'ahp'
 
 const { setColorMode, currentMode } = useTheme()
 const { doAfterLogin } = useDoAfterlogin()
