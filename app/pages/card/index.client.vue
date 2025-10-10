@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
+import { isEvmAddress } from 'dedot/utils'
 import { CHAOTIC_CARD_COLLECTION_ID, CHAOTIC_CARD_PREFIX } from '@/components/mintCard/constants'
 import { makeCardScreenshot, mintXCard } from '@/services/card'
 import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
@@ -84,6 +85,9 @@ function handleClaimClick() {
       }
       isLoading.value = true
       try {
+        if (isEvmAddress(getConnectedSubAccount.value?.address as string)) {
+          throw new Error('Only Substrate address is supported')
+        }
         const address = formatAddress ({ address: getConnectedSubAccount.value?.address as string, prefix: CHAOTIC_CARD_PREFIX })
 
         window.history.replaceState({}, '', window.location.pathname)
@@ -105,9 +109,9 @@ function handleClaimClick() {
         ])
 
         const imageUrl = imageResult.data.images[0]?.url
-        const description = textResult.analysis.lifeMotto?.replace(/\*/g, '')
-        if (!imageUrl || !description) {
-          throw new Error('Image or description not found')
+        const description: string = textResult.analysis.lifeMotto?.replace(/\*/g, '') || `‘Having no life motto is a pure form of chaos.’`
+        if (!imageUrl) {
+          throw new Error('Image not found')
         }
 
         // eslint-disable-next-line no-console
