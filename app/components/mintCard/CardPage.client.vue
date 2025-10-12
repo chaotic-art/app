@@ -6,16 +6,6 @@ import { makeCardScreenshot, mintXCard } from '@/services/card'
 import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
 import { accountTokenEntries } from '~/utils/api/substrate.nft-pallets'
 
-definePageMeta({
-  title: 'Chaotic Cards',
-  layout: 'empty',
-})
-
-useSeoMeta({
-  title: 'Chaotic Cards',
-  ogImage: () => 'https://image-beta.w.kodadot.xyz/ipfs/QmTUB5xvkGqHKK6Ew6Hbhs4YpgV29wt8FmZqmccEG5sMpg',
-})
-
 const { setColorMode, currentMode } = useTheme()
 const { doAfterLogin } = useDoAfterlogin()
 const { shareOnX } = useSocialShare()
