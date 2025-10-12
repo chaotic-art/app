@@ -20,7 +20,7 @@ definePageMeta({
 useSeoMeta({
   title,
   description: () => data.value?.metadata?.description?.slice(0, 150),
-  ogImage: () => data.value?.metadata?.banner || data.value?.metadata?.image,
+  ogImage: () => sanitizeIpfsUrl(data.value?.metadata?.banner || data.value?.metadata?.image),
 })
 </script>
 
