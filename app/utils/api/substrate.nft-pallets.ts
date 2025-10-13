@@ -44,6 +44,19 @@ export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }
   return items
 }
 
+/**
+ * Get the number of minted tokens on a collection
+ * @param params - The parameters object
+ * @param params.prefix - The prefix of the chain
+ * @param params.collectionId - The ID of the collection
+ * @returns The number of minted tokens on the collection
+ */
+export async function mintedTokens({ prefix, collectionId }: { prefix: AssetHubChain, collectionId: number }) {
+  const api = getApi(prefix).api
+  const entries = await api.query.Nfts.Item.getEntries(collectionId)
+  return entries.length
+}
+
 export async function accountTokenEntries({ prefix, account, collectionId }: { prefix: AssetHubChain, account: string, collectionId: number }) {
   const api = getApi(prefix).api
   const entries = await api.query.Nfts.Account.getEntries(account)

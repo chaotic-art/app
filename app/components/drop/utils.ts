@@ -2,6 +2,7 @@ import type { DropItem } from '@/types'
 import { getDropById } from '@/services/fxart'
 import { fetchOdaCollection } from '@/services/oda'
 import { DropStatus } from '@/types'
+import { mintedTokens } from '~/utils/api/substrate.nft-pallets'
 
 export function formatCETDate(date: string, time: string): Date {
   return new Date(`${date}T${time}+02:00`)
@@ -64,14 +65,15 @@ export async function getEnrichedDrop(campaign: DropItem): Promise<DropItem | un
 
   // get some onchain data
   // ----------------------
-  const [{ supply, claimed: minted, metadata }, abi] = await Promise.all([
+  const [{ supply, claimed: minted, metadata }, totalMinted, abi] = await Promise.all([
     fetchOdaCollection(campaign.chain, address),
+    mintedTokens({ prefix: campaign.chain, collectionId: Number(address) }),
     Promise.resolve(null), // TODO: handle evm
   ])
 
   const onChainData = {
     max: Number(supply) || FALLBACK_DROP_COLLECTION_MAX,
-    minted: Number(minted),
+    minted: Number(totalMinted || minted),
     name: metadata?.name || '',
     collectionName: metadata?.name || '',
     collectionDescription: metadata?.description || '',
