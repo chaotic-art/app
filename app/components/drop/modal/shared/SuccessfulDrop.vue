@@ -32,7 +32,7 @@ const items = ref<ItemMedia[]>(itemMedias)
 const isLoading = ref(true)
 
 onMounted(async () => {
-  toast({ title: 'Successfully minted token. There is a 1 minute indexer and worker delay for this action to appear in the website.', duration: 15000 })
+  toast({ title: 'NFT minted successfully! It may take a minute to appear on the website.', duration: 15000 })
 
   // update serial number in nft.name asynchronously
   const metadatas = await Promise.all(
