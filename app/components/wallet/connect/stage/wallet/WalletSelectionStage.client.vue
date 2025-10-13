@@ -18,10 +18,10 @@ const {
 const activeTab = ref('All')
 
 const filteredInstalledWallets = computed(() => {
-  if (activeTab.value === 'All') {
-    return installedWallets.value
-  }
-  return installedWallets.value.filter(wallet => wallet.vm === ACTIVE_TAB_VM_MAP[activeTab.value])
+  // if (activeTab.value === 'All') {
+  //   return installedWallets.value
+  // }
+  return installedWallets.value.filter(wallet => wallet.vm === ACTIVE_TAB_VM_MAP.Polkadot)
 })
 
 async function processWalletExtensions(extensions: WalletExtension[], connectOnly: boolean): Promise<boolean> {
@@ -84,7 +84,7 @@ function onSelectUnistalledWallet(wallet: WalletExtension) {
 
 <template>
   <div class="space-y-6">
-    <WalletSelectionTabs v-model="activeTab" />
+    <!-- <WalletSelectionTabs v-model="activeTab" /> -->
 
     <InstalledWallets
       :extensions="filteredInstalledWallets"
