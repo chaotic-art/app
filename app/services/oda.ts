@@ -19,7 +19,9 @@ export interface OnchainCollection {
 }
 
 export function fetchOdaCollection(chain: AssetHubChain, address: string) {
-  return api<OnchainCollection>(`/v1/${chain}/collection/${address}`)
+  return api<OnchainCollection>(`/v1/${chain}/collection/${address}`, {
+    timeout: 5000,
+  })
 }
 
 export function refreshOdaCollection(chain: AssetHubChain, address: string) {
@@ -54,7 +56,9 @@ export interface OdaToken {
 }
 
 export function fetchOdaToken(chain: AssetHubChain, address: string, tokenId: string) {
-  return api<OdaToken>(`/v1/${chain}/collection/${address}/token/${tokenId}`)
+  return api<OdaToken>(`/v1/${chain}/collection/${address}/token/${tokenId}`, {
+    timeout: 5000,
+  })
 }
 
 export function refreshOdaTokenMetadata(chain: AssetHubChain, address: string, tokenId: string) {

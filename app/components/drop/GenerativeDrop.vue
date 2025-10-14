@@ -84,6 +84,18 @@ const dropStartRelativeTime = computed(() => {
           <MarkdownPreview :source="drop?.collectionDescription ?? '---'" />
         </div>
 
+        <div v-if="drop.collection" class="flex w-full justify-end my-4">
+          <UButton
+            :to="`/${currentChain}/collection/${drop.collection}`"
+            variant="outline"
+          >
+            View Collection
+            <template #trailing>
+              <UIcon name="i-heroicons-arrow-right" />
+            </template>
+          </UButton>
+        </div>
+
         <!-- drop start at section -->
         <div v-if="dropStartRelativeTime" class="mt-6 p-4 bg-muted rounded-lg border border-border">
           <h3 class="text-lg font-semibold text-foreground mb-2">

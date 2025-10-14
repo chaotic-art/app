@@ -262,6 +262,9 @@
     },
     "changeTo": "Change to {chainSymbol} address"
   },
+  "card": {
+    "mintSuccess": "Got my Chaotic Card #{0} and now I am questioning everything\n\nDiscover your chaos level → {1} \n\n(The algorithm sees all) 🌀"
+  },
   "codeChecker": {
     "title": "Code Checker",
     "description": "Effortlessly validate your generative art code. Drop your file, check for essentials, and optimize. Preview, iterate, and finalize with confidence. Start now.",

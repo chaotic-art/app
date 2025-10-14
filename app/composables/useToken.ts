@@ -1,4 +1,5 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { NFTMetadata } from '~/services/oda'
 import { formatBalance } from 'dedot/utils'
 import { t } from 'try'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
@@ -29,38 +30,68 @@ export function useToken(props: {
     return queryPrice.value.toString()
   }), decimals, chainSymbol)
 
+  const fetchTokenMetadata = async (metadataUri: string) => {
+    const [ok, _, metadataData] = await t($fetch(sanitizeIpfsUrl(metadataUri), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }))
+    if (ok) {
+      return metadataData as NFTMetadata
+    }
+    return null
+  }
+
   // Fetch data on component mount
   onMounted(async () => {
     try {
       const [tokenData, collectionData] = await Promise.all([
-        fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()),
-        fetchOdaCollection(props.chain, props.collectionId.toString()),
+        fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()).catch(() => null),
+        fetchOdaCollection(props.chain, props.collectionId.toString()).catch(() => null),
       ])
 
       token.value = tokenData
       collection.value = collectionData
 
-      owner.value = token.value.owner
+      owner.value = token.value?.owner ?? null
       collectionCreator.value = collection.value?.owner ?? null
-      queryPrice.value = token.value.price
+      queryPrice.value = token.value?.price ?? null
 
       // fetch real-time price and owner
-      const api = $sdk(props.chain).api
-      const [priceData, tokenItem] = await Promise.all([
+      const { api } = $sdk(props.chain)
+      const [tokenMetadata, priceData, tokenItem] = await Promise.all([
+        api.query.Nfts.ItemMetadataOf.getValue(props.collectionId, props.tokenId),
         api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId),
         api.query.Nfts.Item.getValue(props.collectionId, props.tokenId),
       ])
       queryPrice.value = priceData?.[0]?.toString() ?? null
+
       if (tokenItem?.owner) {
         owner.value = tokenItem.owner.toString()
       }
 
-      if (!tokenData.metadata && collectionData?.metadata) {
+      // re-check token metadata if token.value is null
+      const metadataUri = tokenMetadata?.data.asText()
+      if (!token.value && metadataUri) {
+        const metadata = await fetchTokenMetadata(metadataUri)
+        if (metadata) {
+          token.value = {
+            ...tokenData,
+            metadata,
+            price: tokenData?.price ?? null,
+            owner: tokenData?.owner ?? null,
+          }
+        }
+      }
+
+      if (!token.value?.metadata && collectionData?.metadata) {
         // fallback to collection metadata
         token.value = {
-          ...tokenData,
+          ...token.value,
           metadata: collectionData?.metadata,
           metadata_uri: collection.value?.metadata_uri ?? undefined,
+          price: tokenData?.price ?? null,
+          owner: tokenData?.owner ?? null,
         }
       }
 

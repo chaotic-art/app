@@ -1,6 +1,7 @@
 import type { ActionAirdrop } from '~/components/airdrop/types'
 import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
+import { cryptoWaitReady } from '@polkadot/util-crypto'
 import { encodeAddress } from 'dedot/utils'
 import { Binary } from 'polkadot-api'
 import { generateAirdropTxs } from '@/components/airdrop/utils'
@@ -668,6 +669,7 @@ export function useNftPallets() {
     targetAddress,
     type = 'submit',
   }: TransferNftsParams) {
+    await cryptoWaitReady()
     const { signer, address } = await getAccountSigner()
     const api = $sdk(chain).api
     await api.compatibilityToken

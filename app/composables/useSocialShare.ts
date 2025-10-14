@@ -14,7 +14,8 @@ export default function () {
   ) => {
     const shareUrl = new URL('https://twitter.com/intent/tweet')
     shareUrl.searchParams.set('text', text)
-    via && shareUrl.searchParams.set('via', via)
+    if (via)
+      shareUrl.searchParams.set('via', via)
     shareUrl.searchParams.set('url', url)
     open(shareUrl.toString())
   }

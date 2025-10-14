@@ -70,6 +70,7 @@ const tokenMetadata = computed(() => {
           <GalleryMediaViewer
             :token-data="tokenMetadata"
             :collection-data="collection"
+            :collection-id="safeCollectionId"
             :mime-type="mimeType || undefined"
             :media-icon="mediaIcon"
             :container-id="CONTAINER_ID"
