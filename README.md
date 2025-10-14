@@ -2,18 +2,16 @@
 
 [beta.chaotic.art](https://beta.chaotic.art) · [Design system](https://www.figma.com/design/XTcZsQREdo9574lTzqkMDL/Chaotic)
 
-
 ![](https://github.com/user-attachments/assets/b2777451-c789-470e-bf9e-45445455204e)
 
 ## Table of Contents
-- [Features](#features-of-chaotic)
+- [Live Product](#live-product)
 - [Product Highlights](#product-highlights)
 - [Tech Stack](#tech-stack)
 - [Architecture Overview](#architecture-overview)
 - [Repository Tour](#repository-tour)
 - [Getting Started](#getting-started)
 - [Project Scripts](#project-scripts)
-
 
 ### Features of Chaotic
 - Home for your Polkadot NFTs
@@ -80,4 +78,3 @@ pnpm run preview
 - `pnpm run generate:providers` – Refresh `app/config/providers.ts` from `@polkadot/apps-config`
 - `pnpm run lint` / `pnpm run lint:fix` – ESLint in check or autofix mode
 - `pnpm run typecheck` – Nuxt type checker gated by `papi`
-
