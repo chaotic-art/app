@@ -8,20 +8,12 @@ updates:
   - package-ecosystem: npm # See documentation for possible values
     directory: / # Location of package manifests
     schedule:
-      interval: monthly
+      interval: weekly
     groups:
-      # Group all minor and patch updates together
-      minor-updates:
-        applies-to: version-updates
+      all-dependencies:
         patterns:
           - '*'
         update-types:
-          - minor
           - patch
-      # Group all major updates together
-      major-updates:
-        applies-to: version-updates
-        patterns:
-          - '*'
-        update-types:
+          - minor
           - major
