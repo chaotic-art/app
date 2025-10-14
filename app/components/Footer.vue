@@ -36,6 +36,7 @@ const footerLinks: Array<
     items: [
       { label: 'Twitter', href: 'https://x.com/ChaoticApp', icon: 'i-simple-icons:x' },
       { label: 'Telegram', href: 'https://t.me/+A3xwht0aOIMxMjQ0', icon: 'i-simple-icons:telegram' },
+      { label: 'GitHub', href: 'https://github.com/chaotic-art/app', icon: 'i-simple-icons:github' },
     ],
   },
 ]
