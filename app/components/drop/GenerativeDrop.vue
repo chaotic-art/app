@@ -122,51 +122,52 @@ const dropStartRelativeTime = computed(() => {
       </div>
 
       <!-- right side -->
-      <div class="order-1 lg:order-2">
-        <!-- preview section -->
-        <ClientOnly>
+      <ClientOnly>
+        <div class="order-1 lg:order-2">
+          <!-- preview section -->
           <DropPreviewItem />
-        </ClientOnly>
 
-        <!-- stats section -->
-        <div class="border p-6 rounded-2xl border-border mt-4">
-          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex flex-col gap-1">
-              <div v-if="drop.isFree" class="flex items-center gap-1">
-                <div class="flex items-end gap-3">
+          <!-- stats section -->
+          <div class="border p-6 rounded-2xl border-border mt-4">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div class="flex flex-col gap-1">
+                <div v-if="drop.isFree" class="flex items-center gap-1">
+                  <div class="flex items-end gap-3">
+                    <p class="font-serif font-medium text-2xl md:text-3xl italic">
+                      Free
+                    </p>
+                    <DropMintedCounter :drop="drop" />
+                  </div>
+                </div>
+                <div v-else class="text-center md:text-left">
                   <p class="font-serif font-medium text-2xl md:text-3xl italic">
-                    Free
+                    {{ formattedTokenPrice }}
                   </p>
-                  <DropMintedCounter :drop="drop" />
+                  <div class="flex items-center gap-2 text-sm text-gray-500">
+                    <span>{{ usdPrice }} USD</span>
+                    <span class="font-medium text-muted-foreground">·</span>
+                    <DropMintedCounter :drop="drop" />
+                  </div>
                 </div>
               </div>
-              <div v-else class="text-center md:text-left">
-                <p class="font-serif font-medium text-2xl md:text-3xl italic">
-                  {{ formattedTokenPrice }}
-                </p>
-                <div class="flex items-center gap-2 text-sm text-gray-500">
-                  <span>{{ usdPrice }} USD</span>
-                  <span class="font-medium text-muted-foreground">·</span>
-                  <DropMintedCounter :drop="drop" />
-                </div>
+
+              <div class="flex flex-col sm:flex-row gap-2 md:gap-4 w-full md:w-auto">
+                <UInputNumber
+                  v-if="!drop?.isMintedOut"
+                  v-model="amountToMint"
+                  class="w-full sm:w-24" :min="1" :ui="{
+                    base: 'rounded-full px-4 md:px-6 py-2 md:py-3',
+                  }"
+                />
+                <DropMintButton
+                  :drop="drop"
+                  is-drop-page
+                />
               </div>
-            </div>
-            <div class="flex flex-col sm:flex-row gap-2 md:gap-4 w-full md:w-auto">
-              <UInputNumber
-                v-if="!drop?.isMintedOut"
-                v-model="amountToMint"
-                class="w-full sm:w-24" :min="1" :ui="{
-                  base: 'rounded-full px-4 md:px-6 py-2 md:py-3',
-                }"
-              />
-              <DropMintButton
-                :drop="drop"
-                is-drop-page
-              />
             </div>
           </div>
         </div>
-      </div>
+      </ClientOnly>
     </div>
 
     <USeparator class="my-12 md:my-20" />

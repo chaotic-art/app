@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { getDrops } from '@/services/fxart'
 import { useMintedDropsStore } from '@/stores/dropsMinted'
-import { isEvm } from '@/utils/network'
 
-const { prefix } = usePrefix()
 const mintedDrops = useMintedDropsStore()
-const sortedMintedDrops = computed(() => isEvm(prefix.value) ? mintedDrops.getMintedDrops : mintedDrops.sortedMintedDrops)
+const sortedMintedDrops = computed(() => mintedDrops.sortedMintedDrops)
 
-const { data: drops } = await useAsyncData('drops', () => getDrops({
-  active: [true],
-  chain: [isProduction ? 'ahp' : prefix.value],
-  limit: 200,
-}))
+const { data: drops } = await useFetch('/api/genart/list', {
+  query: {
+    limit: 200,
+  },
+})
 </script>
 
 <template>
@@ -21,7 +18,7 @@ const { data: drops } = await useAsyncData('drops', () => getDrops({
     </h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 px-4 md:px-0">
-      <DropCard v-for="drop in drops" :key="drop.id" :drop="drop" />
+      <DropCard v-for="drop in drops?.data" :key="drop?.alias" :drop="drop" />
     </div>
 
     <div v-if="sortedMintedDrops.length">
@@ -32,7 +29,7 @@ const { data: drops } = await useAsyncData('drops', () => getDrops({
       </h1>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xxl:grid-cols-6 gap-3 md:gap-4 px-4 md:px-0">
-        <DropCard v-for="drop in sortedMintedDrops" :key="drop.id" :drop="drop" show-minted />
+        <DropCard v-for="drop in sortedMintedDrops" :key="drop.alias" :drop="drop" show-minted />
       </div>
     </div>
   </UContainer>

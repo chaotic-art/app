@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { DropItem } from '@/types'
+import type { GenartDropItem } from '~/types/genart'
 import { useMintedDropsStore } from '@/stores/dropsMinted'
 import { getDropAttributes, isTBA } from './utils'
 
 const props = defineProps<{
-  drop: DropItem
+  drop: GenartDropItem | DropItem
   showMinted?: boolean
 }>()
 
@@ -41,11 +42,11 @@ onBeforeMount(async () => {
       </div>
     </div>
 
-    <img :src="sanitizeIpfsUrl(drop.image)" :alt="drop.name" class="aspect-square w-full object-cover">
+    <img :src="sanitizeIpfsUrl(formattedDrop?.image)" :alt="formattedDrop?.name" class="aspect-square w-full object-cover">
 
     <div class="p-3 md:p-4">
       <p class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
-        {{ drop.name }}
+        {{ formattedDrop?.name }}
       </p>
 
       <div class="flex items-center justify-between mt-3">

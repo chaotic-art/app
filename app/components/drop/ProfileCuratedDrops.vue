@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import DropCard from '@/components/drop/DropCard.vue'
-import { getDrops } from '@/services/fxart'
 
 const props = defineProps<{
   id: string
@@ -8,16 +7,17 @@ const props = defineProps<{
 
 const { prefix } = usePrefix()
 
-const { data: drops, pending } = await useAsyncData(`curated-drops-${props.id}`, () => getDrops({
-  active: [true, false],
-  chain: [prefix.value],
-  creator: props.id,
-}))
+const { data: drops, pending } = await useFetch('/api/genart/list', {
+  query: {
+    chain: [prefix.value],
+    creator: props.id,
+  },
+})
 </script>
 
 <template>
   <div
-    v-if="drops?.length"
+    v-if="drops?.data?.length"
     class="py-6 px-4"
   >
     <div class="flex flex-col gap-6 w-full">
@@ -57,7 +57,9 @@ const { data: drops, pending } = await useAsyncData(`curated-drops-${props.id}`,
         <USkeleton class="w-32 h-4 rounded" />
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
-        <DropCard v-for="drop in drops" :key="drop.id" :drop="drop" show-minted />
+        <ClientOnly>
+          <DropCard v-for="drop in drops.data" :key="drop.alias" :drop="drop" show-minted />
+        </ClientOnly>
       </div>
     </div>
   </div>
