@@ -9,6 +9,7 @@ interface Props {
   mimeType?: string
   mediaIcon: string
   containerId: string
+  collectionId: string
 }
 
 const props = defineProps<Props>()
@@ -123,6 +124,7 @@ defineExpose({
         v-if="tokenData"
         :nft="tokenData"
         :container-id="containerId"
+        :collection-id="collectionId"
         :mime-type="mimeType"
         class="
           md:absolute md:bottom-4 md:left-1/2 md:transform md:-translate-x-1/2

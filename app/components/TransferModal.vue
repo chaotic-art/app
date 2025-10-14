@@ -12,6 +12,7 @@ const { transferNfts } = useNftPallets()
 const address = ref('')
 const isAddressValid = ref(false)
 const acknowledged = ref(false)
+const txFee = ref(0)
 
 function getChainAddress(value: string) {
   try {
@@ -76,6 +77,17 @@ function transfer() {
 }
 
 watch(address, validateAddress)
+
+onMounted(async () => {
+  const fee = await transferNfts({
+    items,
+    chain: currentChain.value,
+    targetAddress: getss58AddressByPrefix(CHAOTIC_MINTER, currentChain.value),
+    type: 'estimate',
+  })
+
+  txFee.value = Number(fee || 0)
+})
 </script>
 
 <template>
@@ -141,16 +153,13 @@ watch(address, validateAddress)
           </span>
         </div>
 
-        <UButton
-          class="w-full"
+        <ParaportButton
+          :loading="!txFee"
+          :amount="txFee"
           :disabled="disabled"
-          variant="outline"
-          color="primary"
-          size="lg"
-          @click="transfer"
-        >
-          {{ label }}
-        </UButton>
+          :label="label"
+          @confirm="transfer"
+        />
       </div>
     </template>
   </UModal>

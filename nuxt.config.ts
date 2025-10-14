@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { createLogger } from 'vite'
 
 export default defineNuxtConfig({
@@ -61,11 +62,23 @@ export default defineNuxtConfig({
     '@wagmi/vue/nuxt',
     '@nuxtjs/seo',
     'nuxt-svgo',
+    '@nuxtjs/supabase',
   ],
+
+  supabase: {
+    redirect: false,
+    redirectOptions: {
+      login: '/twitter-auth', // change with card page
+      callback: '/confirm',
+    },
+    url: process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
+    key: process.env.SUPABASE_KEY || 'placeholder-key',
+  },
 
   runtimeConfig: {
     public: {
       reownProjectId: import.meta.env.REOWN_CONNECT_PROJECT_ID || 'b56e18d47c72ab683b10814fe9495694',
+      falAiApiKey: import.meta.env.FAL_AI_API_KEY,
     },
   },
 

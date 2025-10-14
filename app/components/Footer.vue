@@ -4,6 +4,7 @@ import Logo from '@/assets/svg/navbar-logo.svg'
 interface FooterLinkItem {
   label: string
   href: string
+  icon?: string
 }
 
 const footerLinks: Array<
@@ -24,14 +25,17 @@ const footerLinks: Array<
     type: 'links',
     items: [
       { label: 'Presskit', href: 'https://github.com/chaotic-art/presskit' },
+      { label: 'Code Checker', href: '/code-checker' },
+      { label: 'Medium', href: 'https://medium.com/chaoticart' },
+      { label: 'Docs', href: 'https://docs.chaotic.art/start-here' },
     ],
   },
   {
     title: 'Social',
     type: 'buttons',
     items: [
-      { label: 'Twitter', href: 'https://x.com/ChaoticApp' },
-      { label: 'Telegram', href: 'https://t.me/+A3xwht0aOIMxMjQ0' },
+      { label: 'Twitter', href: 'https://x.com/ChaoticApp', icon: 'i-simple-icons:x' },
+      { label: 'Telegram', href: 'https://t.me/+A3xwht0aOIMxMjQ0', icon: 'i-simple-icons:telegram' },
     ],
   },
 ]
@@ -72,6 +76,7 @@ const footerLinks: Array<
                     :key="item.label"
                     :label="item.label"
                     :href="item.href"
+                    :icon="item.icon"
                     target="_blank"
                     variant="outline"
                     class="rounded-full w-fit"

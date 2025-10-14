@@ -2,7 +2,6 @@
   "name": "nuxt-app",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad",
   "scripts": {
     "build": "papi --whitelist .papi/whitelist.ts && nuxt build",
     "dev": "nuxt dev",
@@ -17,6 +16,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
+    "@fal-ai/client": "^1.6.2",
     "@iconify-json/lucide": "^1.2.57",
     "@iconify-json/simple-icons": "^1.2.43",
     "@kodadot1/hyperdata": "0.0.2-rc.1",
@@ -29,6 +29,8 @@
     "@nuxt/ui": "^3.3.0",
     "@nuxtjs/i18n": "^9.5.6",
     "@nuxtjs/seo": "3.1.0",
+    "@nuxtjs/supabase": "2.0.0",
+    "@paraport/vue": "0.1.0-alpha.35",
     "@pinia/nuxt": "0.11.1",
     "@polkadot/util-crypto": "13.5.6",
     "@reown/appkit": "1.7.15",
@@ -48,8 +50,10 @@
     "pinia-plugin-persistedstate": "^4.4.1",
     "polkadot-api": "^1.15.1",
     "prismjs": "^1.30.0",
+    "stats.js": "^0.17.0",
     "try": "1.0.0-beta.10",
     "unzipit": "^1.4.3",
+    "valibot": "^1.1.0",
     "vue": "^3.5.18",
     "vue-dompurify-html": "^5.3.0"
   },
@@ -58,6 +62,7 @@
     "@gql.tada/vue-support": "^1.0.1",
     "@nuxt/eslint": "^1.7.1",
     "@polkadot/apps-config": "^0.163.1",
+    "@types/lodash": "^4.17.20",
     "@types/markdown-it": "^14.1.2",
     "@types/prismjs": "^1.26.5",
     "eslint": "^9.32.0",

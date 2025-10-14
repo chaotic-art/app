@@ -1,33 +1,15 @@
-import type { DoResult } from '@/services/fxart'
-import { updateMetadata } from '@/services/fxart'
-
-export type DropMintedNft = DoResult & {
-  id: string
-  collectionName: string
-  name: string
-  max: number
-}
-
-export interface DropCollectionById {
-  collectionEntity: {
-    meta: { description: string }
-    name: string
-    max: number
-    nftCount: number
-    nfts: { sn: string }[]
-  }
-}
-
 export function updateGenartMetadata() {
   const { drop } = useDrop()
   const { toMintNFTs, mintingSession } = storeToRefs(useDropStore())
 
   mintingSession.value.items = toMintNFTs.value.map((item) => {
-    // trigger update metadata
-    updateMetadata({
-      chain: drop.value.chain,
-      collection: drop.value.collection,
-      nft: item.nft,
+    $fetch('/api/genart/update-metadata', {
+      method: 'POST',
+      body: {
+        chain: drop.value.chain,
+        collection: drop.value.collection,
+        nft: item.nft.toString(),
+      },
     })
 
     return {

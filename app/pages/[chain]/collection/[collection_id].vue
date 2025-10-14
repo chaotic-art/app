@@ -2,7 +2,6 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 import { useSortOptions } from '~/composables/useSortOptions'
-import { getDrops } from '~/services/fxart'
 import { fetchOdaCollection } from '~/services/oda'
 import { getSubscanAccountUrl } from '~/utils/format/address'
 
@@ -10,18 +9,18 @@ const route = useRoute()
 const { chain: chainPrefix, collection_id } = route.params
 
 const chain = computed(() => chainPrefix as AssetHubChain)
-
 const { data } = await useLazyAsyncData(
   `collection:${chain.value}:${collection_id}`,
   async () => {
     const [collection, drops] = await Promise.all([
       fetchOdaCollection(chain.value, collection_id?.toString() ?? ''),
-      getDrops({ collection: collection_id?.toString() ?? '' }),
+      $fetch('/api/genart/list', { query: { collection: collection_id?.toString() ?? '' } }),
     ])
 
     return { collection, drops }
   },
 )
+const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.collection?.metadata?.banner || data.value?.collection?.metadata?.image)))
 
 const { selectedSort, createQueryVariables } = useSortOptions()
 
@@ -57,8 +56,8 @@ defineOgImageComponent('Frame', {
       <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">
         <div
           class="absolute inset-0 w-full h-full bg-muted"
-          :style="data?.collection?.metadata?.image ? {
-            backgroundImage: `url('${sanitizeIpfsUrl(data.collection.metadata.image)}')`,
+          :style="bannerUrl ? {
+            backgroundImage: `url('${bannerUrl}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           } : {}"
@@ -91,8 +90,8 @@ defineOgImageComponent('Frame', {
               <div class="text-2xl font-bold mb-2">
                 {{ data?.collection?.metadata?.name || `Collection #${collection_id}` }}
               </div>
-              <div v-if="data?.drops[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
-                <UserInfo :avatar-size="26" :address="data?.drops[0]?.creator || data?.collection?.owner" custom-name>
+              <div v-if="data?.drops?.data[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
+                <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" custom-name>
                   <template #name="{ addressName }">
                     <div class="pr-1 flex">
                       <p>Creator:</p>
@@ -103,14 +102,14 @@ defineOgImageComponent('Frame', {
                   </template>
                 </UserInfo>
                 <UButton
-                  :to="getSubscanAccountUrl((data?.drops[0]?.creator || data?.collection?.owner) ?? '', chain)"
+                  :to="getSubscanAccountUrl((data?.drops?.data[0]?.creator || data?.collection?.owner) ?? '', chain)"
                   target="_blank"
                 >
                   Subscan
                 </UButton>
                 <UButton
-                  v-if="data?.drops?.[0]?.alias"
-                  :to="`/${chain}/drops/${data.drops[0].alias}`"
+                  v-if="data?.drops?.data[0]?.alias"
+                  :to="`/${chain}/drops/${data.drops.data[0].alias}`"
                   icon="i-heroicons-sparkles"
                   variant="outline"
                 >
