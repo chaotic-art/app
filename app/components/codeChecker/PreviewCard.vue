@@ -17,7 +17,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['reload', 'hash', 'fpsCheck', 'fpsValue'])
 
-const fullscreenRef = ref<HTMLElement | null>(null)
+const fullscreenRef = ref<HTMLElement>()
 
 const { toggle: toggleFullscreen, isFullscreen } = useFullscreen(fullscreenRef)
 
