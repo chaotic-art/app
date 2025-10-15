@@ -6,7 +6,8 @@ const api = $fetch.create({
 })
 
 export async function generateIdAssethub(collectionId: number, prefix?: AssetHubChain) {
-  return (await api(`/generate-id/${prefix}/${collectionId}`)) as string
+  const id = await api(`/generate-id/${prefix}/${collectionId}`)
+  return Number(id) + 1
 }
 
 export function setDyndataUrl({ chain, collection, nft }: { chain: string, collection: string | number, nft: number | string }) {
