@@ -75,7 +75,7 @@ const carouselStyle = computed(() => {
 })
 
 function downloadTemplate() {
-  downloadFile(`/massmint/template.${activeDescriptionTab.value.toLowerCase()}`, 'template.json')
+  downloadFile(`/massmint/template.${activeDescriptionTab.value.toLowerCase()}`, 'template')
 }
 </script>
 

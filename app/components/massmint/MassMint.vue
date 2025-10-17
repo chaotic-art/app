@@ -3,6 +3,7 @@ import type { NFT } from './types'
 import { blockchains } from '~/composables/create/useCollectionForm'
 import { useMassMintForm } from '~/composables/massmint/useMassMintForm'
 import OverviewTable from './OverviewTable.vue'
+import EditPanel from './EditPanel.vue'
 import UploadCompressedMedia from './upload/UploadCompressedMedia.vue'
 import UploadDescription from './upload/UploadDescription.vue'
 // Props and emits
@@ -13,6 +14,8 @@ const emit = defineEmits<{
 // State
 const NFTS = ref<{ [nftId: string]: NFT }>({})
 const mediaLoaded = ref(false)
+const isEditPanelOpen = ref(false)
+const selectedNft = ref<NFT | undefined>(undefined)
 // const descriptionLoaded = ref(false)
 // const selectedCollection = ref<string | null>(null)
 const { state, collections, collectionsLoading } = useMassMintForm()
@@ -23,7 +26,7 @@ const hasEnoughBalance = computed(() => {
   return true
 })
 
-const numOfValidNFTs = computed(() => Object.values(NFTS.value).length)
+const numOfValidNFTs = computed(() => (Object.values(NFTS.value) as NFT[]).length)
 
 // Helper function
 function convertNftsToMap(nfts: any[]) {
@@ -38,7 +41,7 @@ function onMediaZipLoaded(data: { validFiles: any[], areAllFilesValid: boolean }
 }
 
 function onDescriptionLoaded(entries: Record<string, any>) {
-  const nftFileNameToId: Record<string, string> = Object.values(NFTS.value).reduce(
+  const nftFileNameToId: Record<string, number> = (Object.values(NFTS.value) as NFT[]).reduce<Record<string, number>>(
     (acc, nft) => ({ ...acc, [nft.file.name]: nft.id }),
     {},
   )
@@ -54,16 +57,16 @@ function onDescriptionLoaded(entries: Record<string, any>) {
 
     const { file: _, ...restOfEntry } = entry
     NFTS.value[nftId] = {
-      ...NFTS.value[nftId],
+      ...(NFTS.value[nftId] as NFT),
       ...restOfEntry,
       sortedIndex: idx,
     }
   })
 
   // sort the NFTS by sortedIndex
-  const sortedNfts = Object.values(NFTS.value).sort((a, b) => (a.sortedIndex || 0) - (b.sortedIndex || 0))
+  const sortedNfts = (Object.values(NFTS.value) as NFT[]).sort((a: NFT, b: NFT) => (a.sortedIndex || 0) - (b.sortedIndex || 0))
 
-  NFTS.value = convertNftsToMap(sortedNfts)
+  NFTS.value = convertNftsToMap(sortedNfts as any[])
 }
 
 function toOnboarding() {
@@ -76,13 +79,41 @@ function openReviewModal() {
 }
 
 function openSideBarWith(nft: NFT) {
-  // TODO: Implement edit panel
-  console.warn('Opening edit panel for NFT:', nft)
+  selectedNft.value = nft
+  isEditPanelOpen.value = true
 }
 
-function deleteNFT(nft: NFT) {
-  // TODO: Implement delete confirmation
-  console.warn('Deleting NFT:', nft)
+function closeEditPanel() {
+  isEditPanelOpen.value = false
+  selectedNft.value = undefined
+}
+
+function saveEditedNft(nft: NFT) {
+  // ensure reactive update by replacing the object reference
+  const current = NFTS.value[nft.id]
+  if (!current) {
+    closeEditPanel()
+    return
+  }
+  NFTS.value = {
+    ...NFTS.value,
+    [nft.id]: { ...(current as NFT), ...nft },
+  }
+  closeEditPanel()
+}
+
+const deleteNFT = (nft?: NFT) => {
+  if (!nft) {
+    return
+  }
+
+  successMessage(`NFT ${nft.name || ''} removed`)
+
+  NFTS.value = (Object.values(NFTS.value) as NFT[])
+    .filter((n: NFT) => n.id !== nft.id)
+    .map((nft: NFT, i: number) => ({ ...nft, id: i + 1 }))
+    .reduce((acc: { [id: string]: NFT }, nft: NFT) => ({ ...acc, [nft.id]: nft }), {})
+
 }
 </script>
 
@@ -129,7 +160,7 @@ function deleteNFT(nft: NFT) {
             help="Select the collection to mass mint"
           >
             <USelectMenu
-              :key="collections.map(collection => collection.value).join(',')"
+              :key="collections.map((collection: { value: string }) => collection.value).join(',')"
               v-model="state.collection"
               :items="collections"
               value-key="value"
@@ -160,6 +191,12 @@ function deleteNFT(nft: NFT) {
         :collection-id="selectedCollection || undefined"
         @open-side-bar-with="openSideBarWith"
         @delete="deleteNFT"
+      />
+      <EditPanel
+        :open="isEditPanelOpen"
+        :nft="selectedNft"
+        @close="closeEditPanel"
+        @save="saveEditedNft"
       />
     </section>
 
