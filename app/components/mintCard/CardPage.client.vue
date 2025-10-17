@@ -156,7 +156,7 @@ function handleViewCardClick() {
 }
 
 function handleShareClick() {
-  shareOnX($i18n.t('card.mintSuccess', [(mintedCard.value?.id || existingCard.value?.id)?.split('-')?.[1], `${window.location.origin}${window.location.pathname}?src=app`]), '', null)
+  shareOnX($i18n.t('card.mintSuccess', [(mintedCard.value?.id || existingCard.value?.id)?.split('-')?.[1], `${window.location.origin}${window.location.pathname}`]), '', null)
 }
 
 function handleDownloadCard() {
