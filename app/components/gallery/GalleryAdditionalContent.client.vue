@@ -58,70 +58,65 @@ onMounted(async () => {
             <div class="space-y-4">
               <!-- Properties Card -->
               <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
-                <div class="space-y-3">
+                <div class="space-y-4">
                   <!-- Chain -->
-                  <div class="flex items-center justify-between py-3 border-b border-neutral-100 dark:border-neutral-700 last:border-b-0">
-                    <div class="flex items-center">
-                      <div class="w-8 h-8 bg-neutral-100 dark:bg-neutral-700 rounded-lg flex items-center justify-center mr-3">
-                        <UIcon name="i-heroicons-link" class="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                      </div>
-                      <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Chain</span>
-                    </div>
-                    <span class="text-sm font-semibold text-neutral-900 dark:text-white capitalize bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-md">
-                      {{ chain }}
-                    </span>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-muted-foreground">Chain</span>
+                    <span class="text-sm font-medium capitalize">{{ chainSpec[chain].name }}</span>
                   </div>
 
                   <!-- Token ID -->
-                  <div class="flex items-center justify-between py-3 border-b border-neutral-100 dark:border-neutral-700 last:border-b-0">
-                    <div class="flex items-center">
-                      <div class="w-8 h-8 bg-neutral-100 dark:bg-neutral-700 rounded-lg flex items-center justify-center mr-3">
-                        <UIcon name="i-heroicons-hashtag" class="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                      </div>
-                      <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Token ID</span>
-                    </div>
-                    <span class="text-sm font-mono font-semibold text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-md">
-                      {{ tokenId }}
-                    </span>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-muted-foreground">Token ID</span>
+                    <span class="text-sm font-mono font-medium">{{ tokenId }}</span>
                   </div>
 
                   <!-- Collection -->
-                  <div class="flex items-center justify-between py-3 border-b border-neutral-100 dark:border-neutral-700 last:border-b-0">
-                    <div class="flex items-center">
-                      <div class="w-8 h-8 bg-neutral-100 dark:bg-neutral-700 rounded-lg flex items-center justify-center mr-3">
-                        <UIcon name="i-heroicons-rectangle-stack" class="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                      </div>
-                      <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Collection</span>
-                    </div>
-                    <span class="text-sm font-mono font-semibold text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-md">
-                      {{ collectionId }}
-                    </span>
-                  </div>
-
-                  <!-- Token Standard -->
-                  <div class="flex items-center justify-between py-3 border-b border-neutral-100 dark:border-neutral-700 last:border-b-0">
-                    <div class="flex items-center">
-                      <div class="w-8 h-8 bg-neutral-100 dark:bg-neutral-700 rounded-lg flex items-center justify-center mr-3">
-                        <UIcon name="i-heroicons-shield-check" class="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                      </div>
-                      <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Token Standard</span>
-                    </div>
-                    <span class="text-sm font-semibold text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-md">
-                      NFT
-                    </span>
+                  <div class="flex justify-between items-center">
+                    <span class="text-sm text-muted-foreground">Collection</span>
+                    <span class="text-sm font-mono font-medium">{{ collectionId }}</span>
                   </div>
 
                   <!-- Media Type -->
-                  <div v-if="mimeType" class="flex items-center justify-between py-3">
-                    <div class="flex items-center">
-                      <div class="w-8 h-8 bg-neutral-100 dark:bg-neutral-700 rounded-lg flex items-center justify-center mr-3">
-                        <UIcon name="i-heroicons-document" class="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                      </div>
-                      <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Media Type</span>
-                    </div>
-                    <span class="text-sm font-mono font-semibold text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-700 px-2 py-1 rounded-md">
-                      {{ mimeType }}
-                    </span>
+                  <div v-if="mimeType" class="flex justify-between items-center">
+                    <span class="text-sm text-muted-foreground">Media Type</span>
+                    <span class="text-sm font-mono font-medium">{{ mimeType }}</span>
+                  </div>
+
+                  <!-- Image -->
+                  <div v-if="sanitizeIpfsUrl(tokenData?.metadata?.image)" class="flex justify-between items-center">
+                    <span class="text-sm text-muted-foreground">Image</span>
+                    <NuxtLink
+                      :to="sanitizeIpfsUrl(tokenData?.metadata?.image)" target="_blank"
+                      class="text-sm font-mono font-medium text-foreground hover:text-muted-foreground transition-colors inline-flex items-center gap-1"
+                    >
+                      View
+                      <UIcon name="i-heroicons-arrow-top-right-on-square" class="w-3 h-3" />
+                    </NuxtLink>
+                  </div>
+
+                  <!-- Animation URL -->
+                  <div v-if="sanitizeIpfsUrl(tokenData?.metadata?.animation_url)" class="flex justify-between items-center">
+                    <span class="text-sm text-muted-foreground">Animation</span>
+                    <NuxtLink
+                      :to="sanitizeIpfsUrl(tokenData?.metadata?.animation_url)" target="_blank"
+                      class="text-sm font-mono font-medium text-foreground hover:text-muted-foreground transition-colors inline-flex items-center gap-1"
+                    >
+                      View
+                      <UIcon name="i-heroicons-arrow-top-right-on-square" class="w-3 h-3" />
+                    </NuxtLink>
+                  </div>
+
+                  <!-- Metadata URI -->
+                  <div v-if="sanitizeIpfsUrl(tokenData?.metadata_uri)" class="flex justify-between items-center">
+                    <span class="text-sm text-muted-foreground">Metadata URI</span>
+                    <NuxtLink
+                      :to="sanitizeIpfsUrl(tokenData?.metadata_uri)" target="_blank"
+                      class="text-sm font-mono font-medium text-foreground hover:text-muted-foreground transition-colors inline-flex items-center gap-1"
+                    >
+                      View
+                      <UIcon name="i-heroicons-arrow-top-right-on-square" class="w-3 h-3" />
+                    </NuxtLink>
                   </div>
                 </div>
               </div>

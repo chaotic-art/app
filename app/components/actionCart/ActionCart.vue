@@ -6,6 +6,7 @@ const { onDisconnect } = useWalletManager()
 const actionCartStore = useActionCartStore()
 const listingCartStore = useListingCartStore()
 const preferencesStore = usePreferencesStore()
+const { accountId } = useAuth()
 const router = useRouter()
 const airdropStore = useAirdropStore()
 const { currentChain } = useChain()
@@ -55,6 +56,10 @@ function openBurnModal() {
 function openTransferModal() {
   transferModal.open()
 }
+
+watch(accountId, () => {
+  actionCartStore.clear()
+})
 </script>
 
 <template>

@@ -24,13 +24,13 @@ const { drop: storeDrop, amountToMint, previewItem } = storeToRefs(useDropStore(
 const { $i18n } = useNuxtApp()
 const { mint } = useDropMint()
 const { isLogIn } = useAuth()
-const now = useNow()
+const now = useNow({ interval: 10_000 })
 
 const drop = computed(() => props.isDropPage ? storeDrop.value : props.drop)
 
-const isMintNotLive = computed(() => {
-  const startAt = drop.value?.start_at
-  return startAt ? parseCETDate(startAt) > now.value : false
+const isLive = computed(() => {
+  const startAt = parseCETDate(drop.value?.start_at || '')
+  return startAt < now.value
 })
 
 const label = computed(() => {
@@ -38,7 +38,7 @@ const label = computed(() => {
     return $i18n.t('drop.seeListing')
   }
 
-  if (isMintNotLive.value) {
+  if (!isLive.value) {
     return $i18n.t('drop.mintingNotLive')
   }
 
@@ -57,8 +57,8 @@ const enabled = computed(() => {
   if (
     !drop.value // drop not loaded
     || !amountToMint.value // number of drop to be mint is 0
-    || Boolean(drop.value.disabled) // drop is disabled
-    || isMintNotLive.value // drop start time is greater than now
+    || !drop.value.active // drop is disabled
+    || !isLive.value // drop start time is greater than now
     || (props.isDropPage ? !previewItem.value : false) // no image
     // || loading.value // still loading
   ) {
@@ -70,7 +70,7 @@ const enabled = computed(() => {
 
 function openMintModal() {
   // open modal from landing page
-  if (props.drop && storeDrop.value.id !== props.drop.id && !props.isDropPage) {
+  if (props.drop && storeDrop.value.alias !== props.drop.alias && !props.isDropPage) {
     storeDrop.value = props.drop
   }
 

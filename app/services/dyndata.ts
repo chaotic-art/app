@@ -1,14 +1,9 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { $fetch } from 'ofetch'
 import { lastItemId } from '~/utils/api/substrate.nft-pallets'
-import { isProduction } from '~/utils/env'
-
-const BASE_URL = isProduction
-  ? 'https://dyndata.koda.art'
-  : 'https://dyndata-beta.koda.art'
 
 const api = $fetch.create({
-  baseURL: BASE_URL,
+  baseURL: 'https://dyndata.chaotic.art',
 })
 
 // store latest IDs for each collection
@@ -40,8 +35,8 @@ export async function generateId() {
 }
 
 export function setDyndataUrl({ chain, collection, nft }: { chain: string, collection: string | number, nft: number | string }) {
-  const metadata = `https://dyndata.koda.art/v1/metadata/${chain}/${collection}/${nft}`
-  const image = `https://dyndata.koda.art/v1/image/${chain}/${collection}/${nft}`
+  const metadata = `https://dyndata.chaotic.art/v1/metadata/${chain}/${collection}/${nft}`
+  const image = `https://dyndata.chaotic.art/v1/image/${chain}/${collection}/${nft}`
 
   return {
     metadata,

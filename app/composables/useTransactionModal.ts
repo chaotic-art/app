@@ -25,7 +25,7 @@ export interface NftCategory {
 }
 
 export interface ActionTransactionResult {
-  type: 'listing' | 'buy' | 'burn' | 'token_transfer'
+  type: 'listing' | 'buy' | 'burn' | 'token_transfer' | 'airdrop'
   items: {
     id: string
     sn: number
@@ -41,19 +41,13 @@ export interface ActionTransactionResult {
   prefix: AssetHubChain
 }
 
-export interface AirdropTransactionResult {
-  type: 'airdrop'
-  hash: string
-  prefix: AssetHubChain
-}
-
 export interface TransferTransactionResult {
   type: 'transfer'
   hash: string
   prefix: AssetHubChain
 }
 
-type TransactionResult = CollectionCategory | NftCategory | ActionTransactionResult | AirdropTransactionResult | TransferTransactionResult
+type TransactionResult = CollectionCategory | NftCategory | ActionTransactionResult | TransferTransactionResult
 
 // Transaction status progression:
 // 1. status.value = 'signed'

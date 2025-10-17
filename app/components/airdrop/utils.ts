@@ -57,7 +57,7 @@ export function generateAirdropTxs(item: ActionAirdrop, chain: AssetHubChain) {
 
     return item.addresses.map((address, index) => {
       const nft = randomNfts[index]
-      return generateTransferTx(nft!.collectionId, nft!.sn, address)
+      return generateTransferTx(nft!.collection.id, nft!.sn, address)
     })
   }
 
@@ -76,13 +76,13 @@ export function generateAirdropTxs(item: ActionAirdrop, chain: AssetHubChain) {
       return randomNfts.map((nft, index) => {
         const addressIndex = index % randomAddresses.length
         const targetAddress = randomAddresses[addressIndex]
-        return generateTransferTx(nft!.collectionId, nft!.sn, targetAddress as string)
+        return generateTransferTx(nft!.collection.id, nft!.sn, targetAddress as string)
       })
     }
     else {
       // address count greater than or equal to nfts count
       return randomNfts.map((nft, index) => {
-        return generateTransferTx(nft!.collectionId, nft!.sn, randomAddresses[index] as string)
+        return generateTransferTx(nft!.collection.id, nft!.sn, randomAddresses[index] as string)
       })
     }
   }

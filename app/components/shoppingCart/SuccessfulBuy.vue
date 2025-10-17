@@ -23,7 +23,7 @@ const items = computed<ItemMedia[]>(() =>
 )
 
 const txHash = computed(() => props.result.hash)
-const singleListing = computed(() => props.result.items.length === 1)
+const singleItem = computed(() => props.result.items.length === 1)
 
 const shareText = computed(() => {
   const someNfts = items.value.map(item => item.name)
@@ -37,14 +37,14 @@ const userProfilePath = computed(() => `/${currentChain.value}/u/${accountId.val
 const nftPath = computed(() => `/${currentChain.value}/gallery/${items.value[0]?.id}`)
 
 const shareUrl = computed(() =>
-  singleListing.value
+  singleItem.value
     ? `${url.value}${nftPath.value}`
     : `${url.value}${userProfilePath.value}`,
 )
 
 const share = computed(() => ({
   text: shareText.value,
-  withCopy: singleListing.value,
+  withCopy: singleItem.value,
   url: shareUrl.value,
 }))
 
@@ -53,6 +53,17 @@ function handleViewNft() {
 }
 
 const actionButtons = computed(() => {
+  if (props.result.type === 'airdrop') {
+    return {
+      primary: {
+        label: 'View Profile',
+        onClick: () => {
+          navigateTo(userProfilePath.value)
+        },
+      },
+    }
+  }
+
   if (props.result.type === 'burn') {
     return {
       primary: {
@@ -76,6 +87,12 @@ const headerContent = computed<{ single: string, multiple: string }>(() => {
       return {
         single: $i18n.t('buyModal.purchaseSuccessful'),
         multiple: $i18n.t('buyModal.amountPurchaseSuccessfully'),
+      }
+
+    case 'airdrop':
+      return {
+        single: 'NFT Airdropped',
+        multiple: 'NFTs Airdropped',
       }
 
     case 'token_transfer':

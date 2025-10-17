@@ -15,9 +15,9 @@ const props = defineProps<{
   indexUrl: string
 }>()
 
-const emit = defineEmits(['reload', 'hash'])
+const emit = defineEmits(['reload', 'hash', 'fpsCheck', 'fpsValue'])
 
-const fullscreenRef = ref<HTMLElement | null>(null)
+const fullscreenRef = ref<HTMLElement>()
 
 const { toggle: toggleFullscreen, isFullscreen } = useFullscreen(fullscreenRef)
 
@@ -51,7 +51,95 @@ function replay() {
   emit('reload')
 }
 
+// FPS monitoring - continuous real-time tracking
+const currentFps = ref(0)
+const fpsHistory = ref<number[]>([])
+let fpsCheckTimeout: NodeJS.Timeout | null = null
+let fpsMonitoringActive = false
+let animationFrameId: number | null = null
+let lastFrameTime = 0
+const MAX_FPS_HISTORY = 60 // Keep last 60 frames for smoothing
+
+function startFpsMonitoring() {
+  // Clear any existing monitoring
+  stopFpsMonitoring()
+
+  // Start monitoring after 1 second (wait for art to render)
+  fpsCheckTimeout = setTimeout(() => {
+    fpsMonitoringActive = true
+    lastFrameTime = performance.now()
+    fpsHistory.value = []
+
+    function measureFrame() {
+      if (!fpsMonitoringActive)
+        return
+
+      const currentTime = performance.now()
+      const deltaTime = currentTime - lastFrameTime
+
+      if (deltaTime > 0 && lastFrameTime > 0) {
+        const instantFps = 1000 / deltaTime
+
+        // Add to history for smoothing
+        fpsHistory.value.push(instantFps)
+        if (fpsHistory.value.length > MAX_FPS_HISTORY) {
+          fpsHistory.value.shift()
+        }
+
+        // Calculate smoothed FPS (average of recent frames)
+        const avgFps = fpsHistory.value.reduce((a, b) => a + b, 0) / fpsHistory.value.length
+        const roundedFps = Math.round(avgFps)
+
+        // Update current FPS
+        currentFps.value = roundedFps
+        emit('fpsValue', roundedFps)
+
+        // After collecting enough samples, emit validation result
+        if (fpsHistory.value.length >= 30) {
+          const fpsValid = avgFps >= 60
+          emit('fpsCheck', fpsValid)
+        }
+      }
+
+      lastFrameTime = currentTime
+      animationFrameId = requestAnimationFrame(measureFrame)
+    }
+
+    animationFrameId = requestAnimationFrame(measureFrame)
+  }, 1000)
+}
+
+function stopFpsMonitoring() {
+  fpsMonitoringActive = false
+  currentFps.value = 0
+  fpsHistory.value = []
+
+  if (fpsCheckTimeout) {
+    clearTimeout(fpsCheckTimeout)
+    fpsCheckTimeout = null
+  }
+
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId)
+    animationFrameId = null
+  }
+}
+
+watch(() => props.render, (isRendering) => {
+  if (isRendering && props.selectedFile) {
+    // Start FPS monitoring when render starts
+    startFpsMonitoring()
+  }
+  else {
+    stopFpsMonitoring()
+  }
+})
+
 onMounted(newHash)
+
+onUnmounted(() => {
+  stopFpsMonitoring()
+})
 
 function handleRenderComplete(ev: MessageEvent<{ type: string, payload: { image?: string } }>) {
   if (
@@ -92,7 +180,7 @@ watch(hash, emitHashUpdate)
   <div
     class="border bg-card shadow-lg p-5 pb-6 w-full max-w-[490px] flex flex-col gap-5"
   >
-    <div ref="fullscreenRef">
+    <div ref="fullscreenRef" class="relative">
       <UButton
         v-if="isFullscreen"
         class="fixed top-12 left-12 z-10"
@@ -103,6 +191,17 @@ watch(hash, emitHashUpdate)
           {{ $t('codeChecker.goBack') }}
         </div>
       </UButton>
+
+      <!-- Real-time FPS counter -->
+      <div
+        v-if="render && currentFps > 0"
+        class="absolute top-0 right-full w-24 text-center z-10 px-3 py-1.5 shadow-lg"
+        :class="currentFps >= 60 ? 'bg-green-500/90' : 'bg-red-500/90'"
+      >
+        <span class="text-white font-mono font-semibold text-sm">
+          {{ currentFps }} FPS
+        </span>
+      </div>
 
       <SandboxIFrame
         v-if="render"

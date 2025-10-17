@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from '@nuxt/ui'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { t } from 'try'
-import { getDrops } from '~/services/fxart'
 import { refreshOdaTokenMetadata } from '~/services/oda'
 
 interface Props {
@@ -27,27 +27,11 @@ const toast = useToast()
 const genartCreator = ref('')
 const creator = computed(() => genartCreator.value || props.collectionCreator)
 onMounted(async () => {
-  const [ok, _, drop] = await t(getDrops({ collection: props.collectionId }))
-  if (ok && drop[0]?.creator) {
-    genartCreator.value = drop[0].creator
+  const [ok, _, drop] = await t($fetch('/api/genart/list', { query: { collection: props.collectionId } }))
+  if (ok && drop.data[0]?.creator) {
+    genartCreator.value = drop.data[0].creator
   }
 })
-
-// Action methods
-function shareToken() {
-  if (navigator.share) {
-    navigator.share({
-      title: props.tokenData?.metadata?.name || 'NFT',
-      text: props.tokenData?.metadata?.description || '',
-      url: window.location.href,
-    })
-  }
-  else {
-    // Fallback: copy to clipboard
-    navigator.clipboard.writeText(window.location.href)
-    toast.add({ title: 'Link copied to clipboard' })
-  }
-}
 
 async function handleRefreshMetadata() {
   try {
@@ -86,41 +70,51 @@ const { canBurn, burnNow, canTransfer, transferNow } = useCartActions({
   mimeType: computed(() => props.mimeType),
 })
 
+const { shareOnX } = useSocialShare()
+
 // Action items for dropdown menu
-const actionItems = computed(() => [
-  [
-    {
-      label: 'Share',
-      icon: 'i-heroicons-share',
-      onSelect: shareToken,
-    },
-    {
+const actionItems = computed<DropdownMenuItem[]>(() => {
+  const items: DropdownMenuItem[] = [
+    [
+      {
+        label: 'Share on X',
+        icon: 'i-simple-icons:x',
+        onSelect: () => shareOnX(props.tokenData?.metadata?.name || 'NFT', window.location.href),
+      },
+    ],
+    [
+      {
+        label: 'Refresh Metadata',
+        icon: 'i-heroicons-arrow-path',
+        onSelect: handleRefreshMetadata,
+      },
+      {
+        label: 'Report',
+        icon: 'i-heroicons-flag',
+        onSelect: () => {},
+        disabled: true,
+      },
+    ],
+  ]
+
+  if (canTransfer.value) {
+    items[0]?.push({
       label: 'Transfer',
       icon: 'i-heroicons-paper-airplane',
       onSelect: transferNow,
-      disabled: !canTransfer,
-    },
-    {
+    })
+  }
+
+  if (canBurn.value) {
+    items[0]?.push({
       label: 'Burn',
       icon: 'i-heroicons-fire',
       onSelect: burnNow,
-      disabled: !canBurn,
-    },
-  ],
-  [
-    {
-      label: 'Refresh Metadata',
-      icon: 'i-heroicons-arrow-path',
-      onSelect: handleRefreshMetadata,
-    },
-    {
-      label: 'Report',
-      icon: 'i-heroicons-flag',
-      onSelect: () => {},
-      disabled: true,
-    },
-  ],
-])
+    })
+  }
+
+  return items
+})
 </script>
 
 <template>
@@ -180,7 +174,7 @@ const actionItems = computed(() => [
     </div>
 
     <!-- Description -->
-    <div v-if="tokenData?.metadata?.description" class="space-y-2 line-clamp-6">
+    <div v-if="tokenData?.metadata?.description" class="space-y-2">
       <MarkdownPreview :source="tokenData.metadata.description" />
     </div>
 

@@ -9,12 +9,19 @@ const { items } = useActionCartStore()
 const { burnNfts } = useNftPallets()
 
 const acknowledged = ref(false)
+const txFee = ref(0)
+
 const eligibleToBurn = computed(() => items.filter(item => !item.mimeType?.includes('html')))
 
 function burn() {
   burnNfts({ items, chain: currentChain.value, type: 'submit' })
   emit('close', false)
 }
+
+onMounted(async () => {
+  const fee = await burnNfts({ items, chain: currentChain.value, type: 'estimate' })
+  txFee.value = Number(fee || 0)
+})
 </script>
 
 <template>
@@ -68,17 +75,14 @@ function burn() {
           </span>
         </div>
 
-        <UButton
+        <ParaportButton
           v-if="eligibleToBurn.length"
-          class="w-full"
+          :loading="!txFee"
+          :amount="txFee"
           :disabled="!acknowledged"
-          variant="outline"
-          color="primary"
-          size="lg"
-          @click="burn"
-        >
-          {{ acknowledged ? 'Burn NFT(s)' : 'Acknowledge To Continue' }}
-        </UButton>
+          :label="acknowledged ? 'Burn NFT(s)' : 'Acknowledge To Continue' "
+          @confirm="burn"
+        />
         <UButton
           v-else
           class="w-full"
