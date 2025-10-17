@@ -81,12 +81,11 @@ function removeAttribute(index: number) {
         <div class="mx-auto w-full max-w-3xl space-y-8">
           <!-- Preview -->
           <div class="flex justify-start">
-            <UAvatar
+            <img
               :src="nft?.imageUrl"
-              :alt="nft?.name || String(nft?.id || '')"
-              size="xl"
-              class="rounded-md ring-1 ring-border"
-            />
+              :alt="nft?.name"
+              class="rounded-md w-[200px] h-[200px]"
+            >
           </div>
 
           <!-- Name -->
