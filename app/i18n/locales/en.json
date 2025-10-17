@@ -318,5 +318,31 @@
     "variationLoadingTimeMeans1": "The time between the start of render and message kodahash/render/completed is measured. As we mentioned in the documentation, art should be quick, to make the experience for the user better. Loading time check could fail if:",
     "variationLoadingTimeMeans2": "Artwork is not rendered in the checker.",
     "variationLoadingTimeMeans3": "Takes too long to render, no clear way to fix that, the artist needs to find a way to cut down time."
+  },
+  "massmint": {
+    "onboarding": {
+      "pageTitle": "Mass Mint Onboarding",
+      "skip": "Skip",
+      "next": "Next",
+      "done": "Done",
+      "downloadTemplate": "Download file template",
+      "cards": {
+        "0": {
+          "title": "Prepare All Your Files",
+          "content": "Start your mass minting by compressing all your art files into a .ZIP for upload. Aside from your artwork, each NFT requires a name, description, and price.\n\nTo streamline the process, prepare these details in advance in a separate file. This avoids manually entering information for each NFT. Further guidance on formatting this file will follow in the next step."
+        },
+        "1": {
+          "title": "How To Name Your NFTs",
+          "content": "",
+          "subtitle": "Instructions",
+          "instructions": "Please ensure that the file field corresponds to the image file name (e.g., set \"file\": img1.jpg in the file field if the image has a file name of \"img1.jpg\"). Note that the order of items in the description file determines the order during mass minting.",
+          "codeStructure": "Code Structure"
+        },
+        "2": {
+          "title": "You Need To Have A Collection",
+          "content": "In order to use the Mass Mint feature you need to have an **NFT collection created** to which you will mint all of your NFTs. If you do not have a collection created yet, you can create one in Mass Mint.\n\nDon't have a collection? [Create One](/create/collection)"
+        }
+      }
+    }
   }
 }
