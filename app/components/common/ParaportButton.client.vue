@@ -75,8 +75,6 @@ onBeforeMount(async () => {
 
   const result = await pingStore.getFastestEndpoints(paraportEndpoints.chains)
 
-  console.log(result)
-
   Object.entries(result).forEach(([chain, chainEndpoints]) => {
     endpoints.value[chain as ChaoticSupportedChain] = chainEndpoints
   })
