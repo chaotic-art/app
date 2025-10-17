@@ -18,37 +18,11 @@ const SupportedChainMap = {
   ahk: { chain: 'AssetHubKusama', asset: 'KSM' },
 } as const
 
-const ParaportEndpointMap: Record<Exclude<AssetHubChain, 'ahpas'>, ChaoticSupportedChain[]> = {
-  ahp: ['ahp', 'dot'],
-  ahk: ['ahk', 'ksm'],
-}
-
-type SupportedChain = keyof typeof ParaportEndpointMap
-
 const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 const { accountId } = useAuth()
-const pingStore = usePingStore()
 const { currentChain } = useChain()
-const { endpoints } = storeToRefs(pingStore)
-const fetched = ref(false)
 
-const paraportEndpoints = reactive({
-  chains: computed<ChaoticSupportedChain[]>(() => {
-    if (!Object.keys(ParaportEndpointMap).includes(currentChain.value)) {
-      return []
-    }
-
-    return ParaportEndpointMap[currentChain.value as SupportedChain]
-  }),
-  value: computed(() => ({
-    AssetHubPolkadot: endpoints.value.ahp,
-    Polkadot: endpoints.value.dot,
-    Kusama: endpoints.value.ksm,
-    AssetHubKusama: endpoints.value.ahk,
-  })),
-})
-
-const ready = computed(() => paraportEndpoints.chains.every(chain => Boolean(endpoints.value[chain].length)) || fetched.value)
+const ready = ref(true)
 
 async function getSigner() {
   const signer = await getConnectedSubAccount.value?.signer
@@ -67,22 +41,6 @@ function onSubmit({ completed, autoteleport }: { completed: boolean, autotelepor
     emit('confirm')
   }
 }
-
-onBeforeMount(async () => {
-  if (ready.value) {
-    return
-  }
-
-  const result = await pingStore.getFastestEndpoints(paraportEndpoints.chains)
-
-  Object.entries(result).forEach(([chain, chainEndpoints]) => {
-    endpoints.value[chain as ChaoticSupportedChain] = chainEndpoints
-  })
-
-  console.log(endpoints.value)
-
-  fetched.value = true
-})
 </script>
 
 <template>
@@ -106,7 +64,6 @@ onBeforeMount(async () => {
     :label="label"
     :disabled="disabled"
     :get-signer="getSigner"
-    :endpoints="paraportEndpoints.value"
     @submit="onSubmit"
   />
 </template>
