@@ -2,8 +2,8 @@
 import type { NFT } from './types'
 import { blockchains } from '~/composables/create/useCollectionForm'
 import { useMassMintForm } from '~/composables/massmint/useMassMintForm'
-import OverviewTable from './OverviewTable.vue'
 import EditPanel from './EditPanel.vue'
+import OverviewTable from './OverviewTable.vue'
 import UploadCompressedMedia from './upload/UploadCompressedMedia.vue'
 import UploadDescription from './upload/UploadDescription.vue'
 // Props and emits
@@ -102,7 +102,7 @@ function saveEditedNft(nft: NFT) {
   closeEditPanel()
 }
 
-const deleteNFT = (nft?: NFT) => {
+function deleteNFT(nft?: NFT) {
   if (!nft) {
     return
   }
@@ -113,7 +113,6 @@ const deleteNFT = (nft?: NFT) => {
     .filter((n: NFT) => n.id !== nft.id)
     .map((nft: NFT, i: number) => ({ ...nft, id: i + 1 }))
     .reduce((acc: { [id: string]: NFT }, nft: NFT) => ({ ...acc, [nft.id]: nft }), {})
-
 }
 </script>
 

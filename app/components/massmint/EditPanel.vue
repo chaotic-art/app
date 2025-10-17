@@ -1,3 +1,75 @@
+<script setup lang="ts">
+import type { NFT } from './types'
+
+const props = defineProps<{
+  nft?: NFT
+  open: boolean
+}>()
+
+const emit = defineEmits(['close', 'save'])
+
+const { chainSymbol } = useChain()
+
+const internalNfT = ref<Partial<NFT>>({})
+const dirty = ref({ name: false, description: false, price: false, attributes: false })
+
+function createField(fieldName: keyof NFT, defaultValue: string | unknown = '') {
+  return computed({
+    get: () =>
+      dirty.value[fieldName as keyof typeof dirty.value]
+        ? internalNfT.value[fieldName]
+        : (props.nft?.[fieldName] as any) || defaultValue,
+    set: (value: any) => {
+      internalNfT.value = {
+        ...internalNfT.value,
+        [fieldName]:
+          fieldName === 'price' && value !== '' ? Number(value) : value,
+      }
+      ;(dirty.value as any)[fieldName] = true
+    },
+  })
+}
+
+const name = createField('name')
+const description = createField('description')
+const price = createField('price')
+const attributes = createField('attributes', [])
+
+const panelOpen = computed({
+  get: () => props.open,
+  set: (value: boolean) => {
+    if (!value) {
+      closePanel()
+    }
+  },
+})
+
+function closePanel() {
+  internalNfT.value = {}
+  dirty.value = { name: false, description: false, price: false, attributes: false }
+  emit('close')
+}
+
+function save() {
+  const nft = {
+    ...props.nft,
+    ...internalNfT.value,
+  }
+  emit('save', nft)
+  closePanel()
+}
+
+function addAttribute() {
+  const current = (attributes.value as any[]) || []
+  attributes.value = [...current, { trait_type: '', value: '' }]
+}
+
+function removeAttribute(index: number) {
+  const current = (attributes.value as any[]) || []
+  attributes.value = current.filter((_, i) => i !== index)
+}
+</script>
+
 <template>
   <USlideover
     v-model:open="panelOpen"
@@ -19,7 +91,9 @@
 
           <!-- Name -->
           <div class="space-y-2">
-            <div class="text-lg font-semibold">Name</div>
+            <div class="text-lg font-semibold">
+              Name
+            </div>
             <UFormField name="name">
               <UInput
                 v-model="(name as any)"
@@ -32,7 +106,9 @@
 
           <!-- Description -->
           <div class="space-y-2">
-            <div class="text-lg font-semibold">Description</div>
+            <div class="text-lg font-semibold">
+              Description
+            </div>
             <UFormField name="description">
               <UTextarea
                 v-model="(description as any)"
@@ -46,7 +122,9 @@
 
           <!-- Attributes -->
           <div class="space-y-3">
-            <div class="text-lg font-semibold">Attributes</div>
+            <div class="text-lg font-semibold">
+              Attributes
+            </div>
             <div class="space-y-3">
               <div
                 v-for="(attribute, index) in (attributes as any)"
@@ -92,7 +170,9 @@
 
           <!-- Price -->
           <div class="space-y-2">
-            <div class="text-lg font-semibold">Price</div>
+            <div class="text-lg font-semibold">
+              Price
+            </div>
             <UFormField name="price">
               <div class="relative w-full">
                 <UInput
@@ -125,75 +205,3 @@
     </template>
   </USlideover>
 </template>
-
-<script setup lang="ts">
-import type { NFT } from './types'
-
-const props = defineProps<{
-  nft?: NFT
-  open: boolean
-}>()
-
-const { chainSymbol } = useChain()
-
-const internalNfT = ref<Partial<NFT>>({})
-const dirty = ref({ name: false, description: false, price: false, attributes: false })
-
-const createField = (fieldName: keyof NFT, defaultValue: string | unknown = '') =>
-  computed({
-    get: () =>
-      dirty.value[fieldName as keyof typeof dirty.value]
-        ? internalNfT.value[fieldName]
-        : (props.nft?.[fieldName] as any) || defaultValue,
-    set: (value: any) => {
-      internalNfT.value = {
-        ...internalNfT.value,
-        [fieldName]:
-          fieldName === 'price' && value !== '' ? Number(value) : value,
-      }
-      ;(dirty.value as any)[fieldName] = true
-    },
-  })
-
-const name = createField('name')
-const description = createField('description')
-const price = createField('price')
-const attributes = createField('attributes', [])
-
-const emit = defineEmits(['close', 'save'])
-
-const panelOpen = computed({
-  get: () => props.open,
-  set: (value: boolean) => {
-    if (!value) {
-      closePanel()
-    }
-  },
-})
-
-const closePanel = () => {
-  internalNfT.value = {}
-  dirty.value = { name: false, description: false, price: false, attributes: false }
-  emit('close')
-}
-
-const save = () => {
-  const nft = {
-    ...props.nft,
-    ...internalNfT.value,
-  }
-  emit('save', nft)
-  closePanel()
-}
-
-function addAttribute() {
-  const current = (attributes.value as any[]) || []
-  attributes.value = [...current, { trait_type: '', value: '' }]
-}
-
-function removeAttribute(index: number) {
-  const current = (attributes.value as any[]) || []
-  attributes.value = current.filter((_, i) => i !== index)
-}
-</script>
-
