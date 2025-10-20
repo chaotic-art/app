@@ -19,7 +19,7 @@ function createField(fieldName: keyof NFT, defaultValue: string | unknown = '') 
       dirty.value[fieldName as keyof typeof dirty.value]
         ? internalNfT.value[fieldName]
         : (props.nft?.[fieldName] as any) || defaultValue,
-    set: (value: any) => {
+    set: (value) => {
       internalNfT.value = {
         ...internalNfT.value,
         [fieldName]:
@@ -60,7 +60,7 @@ function save() {
 }
 
 function addAttribute() {
-  const current = (attributes.value as any[]) || []
+  const current = attributes.value || []
   attributes.value = [...current, { trait_type: '', value: '' }]
 }
 
@@ -95,7 +95,7 @@ function removeAttribute(index: number) {
             </div>
             <UFormField name="name">
               <UInput
-                v-model="(name as any)"
+                v-model="name"
                 placeholder="* Required"
                 required
                 class="w-full"
@@ -110,7 +110,7 @@ function removeAttribute(index: number) {
             </div>
             <UFormField name="description">
               <UTextarea
-                v-model="(description as any)"
+                v-model="description"
                 :rows="6"
                 :maxlength="500"
                 autoresize
@@ -126,7 +126,7 @@ function removeAttribute(index: number) {
             </div>
             <div class="space-y-3">
               <div
-                v-for="(attribute, index) in (attributes as any)"
+                v-for="(attribute, index) in attributes"
                 :key="index"
                 class="grid grid-cols-1 md:grid-cols-2 gap-3 items-end"
               >
@@ -175,7 +175,7 @@ function removeAttribute(index: number) {
             <UFormField name="price">
               <div class="relative w-full">
                 <UInput
-                  v-model.number="(price as any)"
+                  v-model.number="price"
                   type="number"
                   placeholder="0"
                   step="any"
