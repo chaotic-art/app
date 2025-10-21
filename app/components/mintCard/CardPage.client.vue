@@ -165,6 +165,10 @@ function handleDownloadCard() {
   }
 }
 
+function handleExploreCollectionClick() {
+  window.open(`/${CHAOTIC_CARD_PREFIX}/collection/${CHAOTIC_CARD_COLLECTION_ID}`, '_blank')
+}
+
 // only dark mode for this page
 watch(currentMode, () => {
   setColorMode('dark')
@@ -200,7 +204,7 @@ onUnmounted(() => {
 <template>
   <div class="min-h-full flex flex-col overflow-hidden bg-black">
     <LazyNavbar />
-    <MintCard :screenshot-url="screenshotUrl" :loading="isInitialLoading" :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" @download="handleDownloadCard" />
+    <MintCard :screenshot-url="screenshotUrl" :loading="isInitialLoading" :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" @download="handleDownloadCard" @explore-collection="handleExploreCollectionClick" />
     <MintCardLoadingModal v-model:open="isLoading" />
     <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" @view-card="handleViewCardClick" />
     <LazyFooter />
