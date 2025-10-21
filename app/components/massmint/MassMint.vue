@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import type { NFT } from './types'
+import type { NFT, NFTToMint } from './types'
+import { LazyReviewMassMintModal } from '#components'
 import { blockchains } from '~/composables/create/useCollectionForm'
+import { useMassMint } from '~/composables/massmint/useMassMint'
 import { useMassMintForm } from '~/composables/massmint/useMassMintForm'
 import EditPanel from './EditPanel.vue'
 import OverviewTable from './OverviewTable.vue'
 import UploadCompressedMedia from './upload/UploadCompressedMedia.vue'
 import UploadDescription from './upload/UploadDescription.vue'
+
 // Props and emits
 const emit = defineEmits<{
   backToOnboarding: []
@@ -15,11 +18,17 @@ const emit = defineEmits<{
 const NFTS = ref<{ [nftId: string]: NFT }>({})
 const mediaLoaded = ref(false)
 const isEditPanelOpen = ref(false)
+
 const selectedNft = ref<NFT | undefined>(undefined)
-// const descriptionLoaded = ref(false)
-// const selectedCollection = ref<string | null>(null)
+const overlay = useOverlay()
+const reviewMassMintModal = overlay.create(LazyReviewMassMintModal)
+
+// Form and minting composables
 const { state, collections, collectionsLoading } = useMassMintForm()
+const { massMint, progress, isLoading: isMinting } = useMassMint()
 const selectedCollection = computed(() => state.collection)
+const selectedCollectionName = computed(() => collections.value.find(collection => collection.value === selectedCollection.value)?.name || '')
+
 // Computed
 const hasEnoughBalance = computed(() => {
   // TODO: Implement balance checking logic
@@ -27,6 +36,14 @@ const hasEnoughBalance = computed(() => {
 })
 
 const numOfValidNFTs = computed(() => (Object.values(NFTS.value) as NFT[]).length)
+
+const numMissingDescriptions = computed(() => {
+  return (Object.values(NFTS.value) as NFT[]).filter(nft => !nft.description || nft.description.trim() === '').length
+})
+
+const numMissingPrices = computed(() => {
+  return (Object.values(NFTS.value) as NFT[]).filter(nft => nft.price === undefined || nft.price === 0).length
+})
 
 // Helper function
 function convertNftsToMap(nfts: any[]) {
@@ -74,8 +91,53 @@ function toOnboarding() {
 }
 
 function openReviewModal() {
-  // TODO: Implement review modal
-  console.warn('Opening review modal')
+  if (numOfValidNFTs.value === 0) {
+    warningMessage('No NFTs to mint')
+    return
+  }
+  reviewMassMintModal.open({
+    modelValue: true,
+    numNfts: numOfValidNFTs.value,
+    numMissingDescriptions: numMissingDescriptions.value,
+    numMissingPrices: numMissingPrices.value,
+    onClose: closeReviewModal,
+    onMint: handleMint,
+  })
+}
+
+function closeReviewModal() {
+  reviewMassMintModal.close()
+}
+
+async function handleMint() {
+  if (!selectedCollection.value) {
+    errorMessage('No collection selected')
+    return
+  }
+
+  closeReviewModal()
+
+  // Convert NFTs to NFTToMint format
+  const nftsToMint: NFTToMint[] = (Object.values(NFTS.value) as NFT[]).map(nft => ({
+    name: nft.name || `NFT #${nft.id}`,
+    file: nft.file,
+    description: nft.description,
+    price: nft.price,
+    attributes: nft.attributes,
+  }))
+
+  try {
+    await massMint({
+      nfts: nftsToMint,
+      collectionId: selectedCollection.value,
+      collectionName: selectedCollectionName.value,
+      blockchain: state.blockchain,
+    })
+  }
+  catch (error) {
+    console.error('Mass mint error:', error)
+    errorMessage(`Failed to mint NFTs: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
 }
 
 function openSideBarWith(nft: NFT) {
@@ -204,17 +266,23 @@ function deleteNFT(nft?: NFT) {
       <UButton
         class="w-full max-w-md"
         size="lg"
-        :disabled="!mediaLoaded || !hasEnoughBalance"
+        :disabled="!mediaLoaded || !hasEnoughBalance || isMinting"
+        :loading="isMinting"
         @click="openReviewModal"
       >
         <span class="text-xl">
-          {{ hasEnoughBalance ? 'Mint NFTs' : 'Not Enough Funds' }}
-          <span
-            v-if="numOfValidNFTs && !hasEnoughBalance"
-            class="font-bold"
-          >
-            ({{ numOfValidNFTs }})
-          </span>
+          <template v-if="isMinting">
+            {{ progress.message }}
+          </template>
+          <template v-else>
+            {{ hasEnoughBalance ? 'Mint NFTs' : 'Not Enough Funds' }}
+            <span
+              v-if="numOfValidNFTs && hasEnoughBalance"
+              class="font-bold"
+            >
+              ({{ numOfValidNFTs }})
+            </span>
+          </template>
         </span>
       </UButton>
     </div>

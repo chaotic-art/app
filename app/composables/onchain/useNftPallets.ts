@@ -37,6 +37,7 @@ interface CreateNftParams {
   chain: AssetHubChain
   type: TxType
   collectionId: number
+  collectionName: string
   metadataUri: string | string[]
   supply: number
   properties: Property[]
@@ -260,6 +261,7 @@ export function useNftPallets() {
     chain,
     type,
     collectionId,
+    collectionName,
     metadataUri,
     supply,
     properties,
@@ -353,11 +355,13 @@ export function useNftPallets() {
           result.value = {
             type: 'nft',
             collectionId: collectionId.toString(),
-            itemIds: Array.from({ length: supply }, (_, i) => (nextItemId + i).toString()),
-            name: nftData.name,
-            description: nftData.description,
-            image: nftData.image,
-            supply: nftData.supply,
+            collectionName,
+            items: Array.from({ length: supply }, (_, i) => ({
+              id: (nextItemId + i).toString(),
+              name: nftData.name,
+              image: nftData.image,
+              price: price ?? 0,
+            })),
             hash: hash.value,
             prefix: chain,
           }
