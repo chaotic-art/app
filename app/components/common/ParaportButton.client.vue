@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { AssetHubChain, SupportedChain as ChaoticSupportedChain } from '~/plugins/sdk.client'
 import { Paraport } from '@paraport/vue'
+import { isProduction } from '@/utils/env'
 
 defineProps<{
   amount: number
@@ -103,6 +104,7 @@ onBeforeMount(async () => {
     :asset="SupportedChainMap[currentChain].asset"
     :label="label"
     :disabled="disabled"
+    :log-level="isProduction ? undefined : 'DEBUG'"
     :get-signer="getSigner"
     :endpoints="paraportEndpoints.value"
     @submit="onSubmit"
