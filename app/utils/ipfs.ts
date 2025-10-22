@@ -20,7 +20,7 @@ export function sanitizeIpfsCid(url: string, provider?: IPFSProviders): string {
   return `${resolveProvider(provider)}ipfs/${url}`
 }
 
-function resolveProvider(key: IPFSProviders = 'image'): string {
+function resolveProvider(key: IPFSProviders = 'ipfs'): string {
   return getIPFSProvider(key)
 }
 
