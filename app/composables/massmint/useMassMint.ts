@@ -20,7 +20,7 @@ interface MassMintProgress {
 }
 
 const BATCH_SIZE = 5
-const BATCH_DELAY_MS = 5000
+const BATCH_DELAY_MS = 3000
 
 export function useMassMint() {
   const { $sdk } = useNuxtApp()
@@ -210,6 +210,7 @@ export function useMassMint() {
                 name: nft.name,
                 image: metadataResults[index]?.imageUrl || '',
                 price: metadataResults[index]?.price || 0,
+                metadata: metadataResults[index]?.metadataUri || '',
                 collection: {
                   id: Number(collectionId),
                 },

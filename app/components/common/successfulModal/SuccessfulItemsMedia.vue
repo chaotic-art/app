@@ -5,6 +5,7 @@ export interface ItemMedia {
   name: string
   collection: string
   collectionName: string
+  metadata: string
   price?: string
   mimeType?: string
 }
