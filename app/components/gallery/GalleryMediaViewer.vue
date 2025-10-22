@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { useFullscreen } from '@vueuse/core'
-import { MediaType, resolveMedia } from '@/utils/gallery/media'
 
 interface Props {
   tokenData: OdaToken | null
@@ -9,13 +8,14 @@ interface Props {
   mimeType?: string
   mediaIcon: string
   containerId: string
+  collectionId: string
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 const imageStatus = ref<'normal' | 'fallback'>('normal')
 const fullScreenDisabled = ref(false)
-const mediaItemRef = ref<HTMLDivElement & { toggleFullscreen: () => void } | null>(null)
+const mediaItemRef = ref<HTMLDivElement>()
 const { toggle, isFullscreen, isSupported } = useFullscreen(mediaItemRef)
 
 function toggleMediaFullscreen() {
@@ -28,18 +28,7 @@ function toggleMediaFullscreen() {
 }
 
 function toggleFullscreen() {
-  if (!props.mimeType) {
-    toggleMediaFullscreen()
-    return
-  }
-
-  const mediaType = resolveMedia(props.mimeType)
-  if ([MediaType.VIDEO].includes(mediaType)) {
-    mediaItemRef.value?.toggleFullscreen()
-  }
-  else {
-    toggleMediaFullscreen()
-  }
+  toggleMediaFullscreen()
 }
 
 defineExpose({
@@ -123,6 +112,7 @@ defineExpose({
         v-if="tokenData"
         :nft="tokenData"
         :container-id="containerId"
+        :collection-id="collectionId"
         :mime-type="mimeType"
         class="
           md:absolute md:bottom-4 md:left-1/2 md:transform md:-translate-x-1/2

@@ -5,7 +5,7 @@ const props = defineProps<{
   screenshotUrl?: string | null
 }>()
 
-const emit = defineEmits(['claim', 'share', 'viewCard', 'download'])
+const emit = defineEmits(['claim', 'share', 'viewCard', 'download', 'exploreCollection'])
 
 const cardImageUrl = computed(() => props.minted && props.screenshotUrl ? props.screenshotUrl : '/card/final_card.png')
 
@@ -166,20 +166,24 @@ onUnmounted(() => {
       <div v-if="loading">
         <UIcon name="i-mdi:loading" class="animate-spin h-8 w-8 my-8" />
       </div>
-      <div v-else-if="minted" class="flex flex-col gap-4 items-center">
-        <button class="claim-button" @click="emit('viewCard')">
+      <div v-else class="flex flex-col gap-4 items-center">
+        <button v-if="minted" class="claim-button" @click="emit('viewCard')">
           View my card
         </button>
-        <button class="claim-button" @click="emit('share')">
+        <button v-if="minted" class="claim-button" @click="emit('share')">
           Share on <UIcon name="i-simple-icons:x" class="size-5 ml-2" />
         </button>
-        <button v-if="screenshotUrl" class="claim-button" @click="emit('download')">
+        <button v-if="minted && screenshotUrl" class="claim-button" @click="emit('download')">
           Download my card
         </button>
+
+        <button v-if="!minted" class="claim-button" @click="emit('claim')">
+          Claim Now
+        </button>
+        <button class="claim-button" @click="emit('exploreCollection')">
+          Explore collection
+        </button>
       </div>
-      <button v-else class="claim-button" @click="emit('claim')">
-        Claim Now
-      </button>
     </div>
   </div>
 </template>

@@ -1,16 +1,10 @@
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
+import { isEvmAddress } from 'dedot/utils'
+import { CHAOTIC_CARD_COLLECTION_ID, CHAOTIC_CARD_PREFIX } from '@/components/mintCard/constants'
 import { makeCardScreenshot, mintXCard } from '@/services/card'
 import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
 import { accountTokenEntries } from '~/utils/api/substrate.nft-pallets'
-
-definePageMeta({
-  title: 'Chaotic Card',
-  layout: 'empty',
-})
-
-const CHAOTIC_CARD_COLLECTION_ID = '646'
-const CHAOTIC_CARD_PREFIX = 'ahp'
 
 const { setColorMode, currentMode } = useTheme()
 const { doAfterLogin } = useDoAfterlogin()
@@ -87,6 +81,9 @@ function handleClaimClick() {
       }
       isLoading.value = true
       try {
+        if (isEvmAddress(getConnectedSubAccount.value?.address as string)) {
+          throw new Error('Only Substrate address is supported')
+        }
         const address = formatAddress ({ address: getConnectedSubAccount.value?.address as string, prefix: CHAOTIC_CARD_PREFIX })
 
         window.history.replaceState({}, '', window.location.pathname)
@@ -108,9 +105,9 @@ function handleClaimClick() {
         ])
 
         const imageUrl = imageResult.data.images[0]?.url
-        const description = textResult.analysis.lifeMotto?.replace(/\*/g, '')
-        if (!imageUrl || !description) {
-          throw new Error('Image or description not found')
+        const description: string = textResult.analysis.lifeMotto?.replace(/\*/g, '') || `‘Having no life motto is a pure form of chaos.’`
+        if (!imageUrl) {
+          throw new Error('Image not found')
         }
 
         // eslint-disable-next-line no-console
@@ -174,6 +171,10 @@ function handleDownloadCard() {
   }
 }
 
+function handleExploreCollectionClick() {
+  window.open(`/${CHAOTIC_CARD_PREFIX}/collection/${CHAOTIC_CARD_COLLECTION_ID}`, '_blank')
+}
+
 // only dark mode for this page
 watch(currentMode, () => {
   setColorMode('dark')
@@ -209,9 +210,9 @@ onUnmounted(() => {
 <template>
   <div class="min-h-full flex flex-col overflow-hidden bg-black">
     <LazyNavbar />
-    <MintCard :screenshot-url="screenshotUrl" :loading="isInitialLoading" :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" @download="handleDownloadCard" />
+    <MintCard :screenshot-url="screenshotUrl" :loading="isInitialLoading" :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" @download="handleDownloadCard" @explore-collection="handleExploreCollectionClick" />
     <MintCardLoadingModal v-model:open="isLoading" />
-    <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" />
+    <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" @view-card="handleViewCardClick" />
     <LazyFooter />
   </div>
 </template>

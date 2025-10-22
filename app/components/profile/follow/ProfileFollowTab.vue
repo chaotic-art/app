@@ -16,7 +16,7 @@ const route = useRoute()
 const vList = ref<Follower[]>([])
 const offset = computed(() => vList.value.length)
 const limit = 10
-const el = ref<HTMLElement | null>(null)
+const el = ref<HTMLElement>()
 const loadingSkeletonItems = computed(() => Math.min(4, props.totalCount))
 const isLoading = ref(false)
 

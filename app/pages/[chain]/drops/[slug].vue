@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import { getDropById } from '~/services/fxart'
 import { fetchOdaCollection } from '~/services/oda'
 
 const dropStore = useDropStore()
@@ -15,8 +14,8 @@ const { params } = useRoute()
 const { data: drop } = useLazyAsyncData(
   `drop-${params.chain}-${params.slug}`,
   async () => {
-    const drop = await getDropById(params.slug?.toString() ?? '')
-    const collection = await fetchOdaCollection(params.chain?.toString() as AssetHubChain, drop.collection)
+    const drop = await $fetch('/api/genart/list', { query: { alias: params.slug?.toString() ?? '' } })
+    const collection = await fetchOdaCollection(params.chain?.toString() as AssetHubChain, drop.data[0]?.collection ?? '')
 
     return {
       ...drop,
@@ -36,5 +35,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <GenerativeDrop />
+  <ClientOnly>
+    <GenerativeDrop />
+  </ClientOnly>
 </template>

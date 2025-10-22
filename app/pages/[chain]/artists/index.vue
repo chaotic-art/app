@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query'
-import { getDrops } from '@/services/fxart'
-
-const { data: dropItems, isPending } = useQuery({
-  queryKey: ['all-drop-artists', 'ahp'],
-  queryFn: () => getDrops({
-    active: [true],
-    chain: ['ahp'],
+const { data: dropItems, pending } = await useFetch('/api/genart/list', {
+  query: {
     limit: 200,
-  }),
+  },
 })
-const allArtists = computed(() => [...new Set(dropItems.value?.map(drop => drop.creator).filter(Boolean))] as string[])
+
+const allArtists = computed(() => [...new Set(dropItems.value?.data.map(drop => drop.creator).filter(Boolean))] as string[])
 
 const refreshKey = ref(0)
 </script>
@@ -26,7 +21,7 @@ const refreshKey = ref(0)
     </div>
 
     <div :key="refreshKey" class="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0 pb-6">
-      <template v-if="isPending">
+      <template v-if="pending">
         <div
           v-for="i in 12"
           :key="i"
