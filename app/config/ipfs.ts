@@ -1,11 +1,7 @@
-import { SERVICES } from '@kodadot1/static'
-import { isProduction } from '@/utils/env'
-
 const DEFAULT_IPFS_PROVIDER = 'https://ipfs.io/'
 export const CF_IMAGE_URL = 'https://imagedelivery.net/jk5b6spi_m_-9qC4VTnjpg/'
 
 export type ProviderKeyType = IPFSProviders
-export type ArweaveProviders = 'permafrost' | 'arweave'
 export type IPFSProviders
   = | 'pinata'
     | 'ipfs'
@@ -14,22 +10,16 @@ export type IPFSProviders
     | 'image'
     | 'nftStorage'
 
-export const kodaImage = isProduction ? SERVICES.image : SERVICES.imageBeta
+export const chaoticBucket = 'https://bucket.chaotic.art/'
 
 const ipfsProviders: Partial<Record<IPFSProviders, string>> = {
   pinata: 'https://kodadot.mypinata.cloud/',
   ipfs: DEFAULT_IPFS_PROVIDER,
   dweb: 'https://dweb.link/',
-  image: kodaImage,
+  image: chaoticBucket,
   nftStorage: 'https://nftstorage.link/',
 }
+
 export function getIPFSProvider(providerName: IPFSProviders): string {
   return ipfsProviders[providerName] || (ipfsProviders.image as string)
-}
-
-export const arweaveProviders: Record<ArweaveProviders, string> = {
-  permafrost: `${import.meta.env.VITE_PERMAFROST_URL}/meta/`,
-  arweave: import.meta.env.VITE_AR_URL
-    ? `${import.meta.env.VITE_AR_URL}/`
-    : 'https://arweave.net/',
 }

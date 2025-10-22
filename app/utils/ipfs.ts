@@ -1,6 +1,6 @@
 import type { ProviderKeyType } from '@/config/ipfs'
 import { IPFS_REGEX, isCID, isHTTP } from '@kodadot1/minipfs'
-import { CF_IMAGE_URL, getIPFSProvider, kodaImage } from '@/config/ipfs'
+import { CF_IMAGE_URL, chaoticBucket, getIPFSProvider } from '@/config/ipfs'
 
 export const ipfsUrlPrefix = 'ipfs://ipfs/'
 
@@ -34,7 +34,7 @@ export function replaceIpfsGateway(url: string, provider?: ProviderKeyType): str
 }
 
 export function assetExternalUrl(url: string) {
-  const kodaUrl = new URL(`/type/endpoint/${url}`, kodaImage)
+  const kodaUrl = new URL(`/type/endpoint/${url}`, chaoticBucket)
 
   return kodaUrl.href.toString()
 }
@@ -45,7 +45,7 @@ export function sanitizeIpfsUrl(ipfsUrl = '', provider?: ProviderKeyType): strin
   }
 
   const isChaoticUrl = isHTTP(ipfsUrl) && ipfsUrl.includes('chaotic.art')
-  const isKodaImageUrl = kodaImage && ipfsUrl.includes(kodaImage)
+  const isKodaImageUrl = chaoticBucket && ipfsUrl.includes(chaoticBucket)
 
   if (isChaoticUrl || isKodaImageUrl) {
     return ipfsUrl
