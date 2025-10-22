@@ -1,25 +1,13 @@
-const DEFAULT_IPFS_PROVIDER = 'https://ipfs.io/'
 export const CF_IMAGE_URL = 'https://imagedelivery.net/Im3azVCMHMp2rDcvZOACIg/'
+export const CHAOTIC_BUCKET_URL = 'https://bucket.chaotic.art/'
 
-export type ProviderKeyType = IPFSProviders
-export type IPFSProviders
-  = | 'pinata'
-    | 'ipfs'
-    | 'dweb'
-    | 'kodadot'
-    | 'image'
-    | 'nftStorage'
-
-export const chaoticBucket = 'https://bucket.chaotic.art/'
+export type IPFSProviders = 'ipfs' | 'image'
 
 const ipfsProviders: Partial<Record<IPFSProviders, string>> = {
-  pinata: 'https://kodadot.mypinata.cloud/',
-  ipfs: DEFAULT_IPFS_PROVIDER,
-  dweb: 'https://dweb.link/',
-  image: chaoticBucket,
-  nftStorage: 'https://nftstorage.link/',
+  ipfs: 'https://ipfs.io/',
+  image: CHAOTIC_BUCKET_URL,
 }
 
 export function getIPFSProvider(providerName: IPFSProviders): string {
-  return ipfsProviders[providerName] || (ipfsProviders.image as string)
+  return ipfsProviders[providerName] || (ipfsProviders.ipfs as string)
 }
