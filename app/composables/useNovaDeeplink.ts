@@ -6,8 +6,8 @@ export default function () {
 
   const isAvailable = computed(() => !isLogIn.value && isMobileDevice && !wallets.value.find(wallet => wallet.id === SubstrateWalletSources.Nova)?.installed)
 
-  const redirect = (url = window.location.href) => {
-    window.open(`https://app.novawallet.io/open/dapp?url=${url}`, '_blank')
+  const redirect = (path = window.location.pathname) => {
+    window.open(`https://app.novawallet.io/open/dapp?url=https://beta.chaotic.art${path}`, '_blank')
   }
 
   return { isAvailable, redirect }
