@@ -19,6 +19,9 @@ interface MassMintProgress {
   message: string
 }
 
+const BATCH_SIZE = 5
+const BATCH_DELAY_MS = 5000
+
 export function useMassMint() {
   const { $sdk } = useNuxtApp()
   const { hash, error, status, result, open } = useTransactionModal()
@@ -36,6 +39,7 @@ export function useMassMint() {
   })
 
   async function prepareNftMetadata(nfts: NFTToMint[]) {
+    error.value = null
     progress.value = {
       total: nfts.length,
       current: 0,
@@ -43,15 +47,11 @@ export function useMassMint() {
       message: 'Uploading media files...',
     }
 
-    // Upload all media files to IPFS
-    const files = nfts.map(nft => nft.file)
-    const imagesCid = await pinDirectory(files)
-
-    progress.value.message = 'Creating metadata...'
-
-    // Create metadata for each NFT
-    const metadataPromises = nfts.map(async (nft, index) => {
-      const imageUrl = `ipfs://${imagesCid}/${nft.file.name}`
+    const processNft = async (nft: NFTToMint, index: number) => {
+      const imagesCid = await pinDirectory([nft.file]).catch((err) => {
+        errorMessage(`Error pinning media files: [${err.message}]. Please try again later.`)
+      })
+      const imageUrl = `ipfs://${imagesCid}`
 
       const metadata = {
         name: nft.name,
@@ -64,6 +64,9 @@ export function useMassMint() {
       }
 
       const metadataCid = await pinJson(metadata)
+        .catch((err) => {
+          errorMessage(`Error pinning metadata:[${err.message}]. Please try again later.`)
+        })
 
       progress.value.current = index + 1
 
@@ -72,9 +75,30 @@ export function useMassMint() {
         price: nft.price,
         imageUrl,
       }
-    })
+    }
 
-    const metadataResults = await Promise.all(metadataPromises)
+    const batches = Array.from(
+      { length: Math.ceil(nfts.length / BATCH_SIZE) },
+      (_, i) => nfts.slice(i * BATCH_SIZE, (i + 1) * BATCH_SIZE),
+    )
+
+    const metadataResults = []
+
+    for (const [batchIndex, batch] of batches.entries()) {
+      const batchPromises = batch.map((nft, i) =>
+        processNft(nft, batchIndex * BATCH_SIZE + i),
+      )
+
+      const batchResults = await Promise.all(batchPromises)
+      metadataResults.push(...batchResults)
+
+      // Add delay between batches
+      if (batchIndex < batches.length - 1) {
+        progress.value.message = `Uploading media files... (${((batchIndex + 1) / batches.length * 100).toFixed(0)}%) `
+
+        await new Promise(resolve => setTimeout(resolve, BATCH_DELAY_MS))
+      }
+    }
 
     return metadataResults
   }
@@ -92,7 +116,6 @@ export function useMassMint() {
     }
 
     try {
-      // Prepare metadata
       const metadataResults = await prepareNftMetadata(nfts)
 
       progress.value = {
