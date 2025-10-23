@@ -22,6 +22,7 @@ export interface NftCategory {
     name: string
     image: string
     price: number
+    metadata: string
   }[]
   prefix: AssetHubChain
 }

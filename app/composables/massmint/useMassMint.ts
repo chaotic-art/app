@@ -211,9 +211,6 @@ export function useMassMint() {
                 image: metadataResults[index]?.imageUrl || '',
                 price: metadataResults[index]?.price || 0,
                 metadata: metadataResults[index]?.metadataUri || '',
-                collection: {
-                  id: Number(collectionId),
-                },
               })),
               hash: hash.value,
               prefix: blockchain,

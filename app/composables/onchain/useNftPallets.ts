@@ -361,7 +361,7 @@ export function useNftPallets() {
               name: nftData.name,
               image: nftData.image,
               price: price ?? 0,
-              metadata: Array.isArray(metadataUri) ? metadataUri[i] : metadataUri,
+              metadata: Array.isArray(metadataUri) ? metadataUri[i]! : metadataUri,
             })),
             hash: hash.value,
             prefix: chain,
