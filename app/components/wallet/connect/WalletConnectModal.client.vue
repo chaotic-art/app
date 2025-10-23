@@ -166,7 +166,7 @@ function watchForAuthorizedSubWallets() {
   }, { immediate: true })
 }
 
-// Disabled
+// Disabled after #559
 // function watchForAuthorizedEvmWallets() {
 //   const { accounts, wallet } = useReown()
 
