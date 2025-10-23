@@ -73,7 +73,7 @@ function initWalletWatchers() {
   watchForSubWalletStoreAccountsChanges()
 
   // evm
-  watchForAuthorizedEvmWallets()
+  // watchForAuthorizedEvmWallets()
 }
 
 function getSubWalletExtensions(): WalletExtension[] {
@@ -168,35 +168,36 @@ function watchForAuthorizedSubWallets() {
   }, { immediate: true })
 }
 
-function watchForAuthorizedEvmWallets() {
-  const { accounts, wallet } = useReown()
+// Disabled
+// function watchForAuthorizedEvmWallets() {
+//   const { accounts, wallet } = useReown()
 
-  watch([
-    accounts,
-    wallet,
-    computed(() => wallets.value.find(wallet => wallet.id === REOWN_WALLET_CONFIG.id)),
-  ], ([accountsState, wallet, extension]) => {
-    if (!accountsState || !extension || !wallet) {
-      return
-    }
+//   watch([
+//     accounts,
+//     wallet,
+//     computed(() => wallets.value.find(wallet => wallet.id === REOWN_WALLET_CONFIG.id)),
+//   ], ([accountsState, wallet, extension]) => {
+//     if (!accountsState || !extension || !wallet) {
+//       return
+//     }
 
-    const accounts = formatEvmAccounts({ extension, wallet, accounts: accountsState })
+//     const accounts = formatEvmAccounts({ extension, wallet, accounts: accountsState })
 
-    const toConnect = extension.state === WalletStates.Authorized
-    const accountsChanged = !areArraysEqual(accounts.map(account => account.id), extension.accounts.map(account => account.id)) && extension.state === WalletStates.Connected
+//     const toConnect = extension.state === WalletStates.Authorized
+//     const accountsChanged = !areArraysEqual(accounts.map(account => account.id), extension.accounts.map(account => account.id)) && extension.state === WalletStates.Connected
 
-    if (!toConnect && !accountsChanged) {
-      return
-    }
+//     if (!toConnect && !accountsChanged) {
+//       return
+//     }
 
-    walletStore.updateWallet(extension.id, {
-      state: WalletStates.Connected,
-      accounts,
-    })
-  }, {
-    immediate: true,
-  })
-}
+//     walletStore.updateWallet(extension.id, {
+//       state: WalletStates.Connected,
+//       accounts,
+//     })
+//   }, {
+//     immediate: true,
+//   })
+// }
 
 whenever(
   () => subWalletStore.injectionStatus !== 'checking',
