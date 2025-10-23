@@ -26,7 +26,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     endpoint = 'ahp',
   } = options
 
-  const orderBy = variables.orderBy
+  const orderBy = Array.isArray(variables.orderBy) ? variables.orderBy : [variables.orderBy]
 
   if (orderBy && orderBy.length === 1) {
     if (orderBy[0] === 'blockNumber_DESC') {
