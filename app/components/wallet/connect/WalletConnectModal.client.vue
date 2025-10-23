@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
 import { whenever } from '@vueuse/core'
-import { formatEvmAccounts, formatSubAccounts } from '@/utils/wallet'
+import { formatSubAccounts } from '@/utils/wallet'
 import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
 
 const emit = defineEmits(['close'])
@@ -144,9 +144,7 @@ async function connectSubWallet(wallet: WalletExtension) {
     }
     catch (error) {
       console.error('Failed to connect wallet', { error, wallet })
-      if (walletStore.isWalletAccountSelected(wallet)) {
-        walletManager.disconnectWallet(wallet)
-      }
+      await walletManager.disconnectWallet(wallet)
       return
     }
   }

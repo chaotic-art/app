@@ -48,7 +48,7 @@ export default function useWalletManager() {
       state: WalletStates.Disconnected,
     })
 
-    if (selectedAccounts.value[vm]?.includes(wallet.id)) {
+    if (walletStore.isWalletAccountSelected(wallet)) {
       selectedAccounts.value[vm] = undefined
       accountStore.clearAuth(vm)
     }
