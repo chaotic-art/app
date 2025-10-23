@@ -20,7 +20,7 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
     <!-- Image container with better mobile sizing -->
     <div class="relative rounded-t-xl sm:rounded-l-xl sm:rounded-t-none overflow-hidden border-b sm:border-b-0 sm:border-r border-border cursor-pointer w-full sm:w-auto sm:aspect-square sm:h-full" @click="emit('click', drop)">
       <img
-        :src="ipfsToCfImageUrl(drop?.banner)"
+        :src="sanitizeIpfsUrl(drop?.banner)"
         :alt="drop?.name"
         class="w-full h-48 sm:h-full object-cover"
       >

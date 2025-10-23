@@ -91,6 +91,10 @@ export const useWalletStore = defineStore('wallet', () => {
     wallets.value = wallets.value.map(wallet => ({ ...wallet, isSelected: false }))
   }
 
+  function isWalletAccountSelected(wallet: WalletExtension) {
+    return selectedAccounts.value[wallet.vm]?.includes(wallet.id)
+  }
+
   return {
     wallets,
     addWallet,
@@ -110,6 +114,7 @@ export const useWalletStore = defineStore('wallet', () => {
     setStage,
     setSelectedAccount,
     clearSelectedWallets,
+    isWalletAccountSelected,
   }
 }, {
   persist: {
