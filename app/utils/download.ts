@@ -29,3 +29,12 @@ export function downloadBase64Image(base64: string, name = 'unnamed') {
   a.click()
   document.body.removeChild(a)
 }
+
+export function downloadFile(url: string, name = 'unnamed') {
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}

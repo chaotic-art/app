@@ -15,12 +15,15 @@ export interface CollectionCategory {
 export interface NftCategory {
   type: 'nft'
   collectionId: string
-  itemIds: string[]
-  name: string
-  description: string
-  image: string
-  supply: number
+  collectionName: string
   hash: string
+  items: {
+    id: string
+    name: string
+    image: string
+    price: number
+    metadata: string
+  }[]
   prefix: AssetHubChain
 }
 

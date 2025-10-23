@@ -291,6 +291,7 @@ export function useNftForm() {
         chain: state.blockchain,
         type,
         collectionId: Number.parseInt(formData.collection),
+        collectionName: selectedCollection.value?.name || '',
         metadataUri: metadataUris,
         supply: formData.supply,
         properties: validProperties,
