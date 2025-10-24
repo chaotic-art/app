@@ -157,7 +157,8 @@ defineOgImageComponent('Frame', {
             Collection Items
           </h2>
 
-          <div class="w-full md:w-auto">
+          <div class="w-full md:w-auto flex items-center gap-2">
+            <ArtViewFilter />
             <SortOptions
               v-model="selectedSort"
               class="w-full md:w-48"
