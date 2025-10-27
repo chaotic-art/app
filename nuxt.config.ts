@@ -1,5 +1,4 @@
 import process from 'node:process'
-import { createLogger } from 'vite'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -54,7 +53,6 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxtjs/i18n',
-    '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@pinia/nuxt',
@@ -92,9 +90,6 @@ export default defineNuxtConfig({
     ],
     defaultLocale: 'en',
     restructureDir: './app/i18n',
-    bundle: {
-      optimizeTranslationDirective: false,
-    },
   },
 
   eslint: {
@@ -112,22 +107,4 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-11-27',
-
-  hooks: {
-    'vite:extendConfig': function (viteConfig) {
-      const logger = createLogger(viteConfig.logLevel)
-      const originalWarning = logger.warn
-
-      logger.warn = (msg, options) => {
-        const isPureCommentWarning = msg.includes('PURE')
-
-        if (isPureCommentWarning)
-          return
-
-        originalWarning(msg, options)
-      }
-
-      viteConfig.customLogger = logger
-    },
-  },
 })
