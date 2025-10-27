@@ -1,5 +1,4 @@
 import process from 'node:process'
-import { createLogger } from 'vite'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
