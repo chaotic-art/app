@@ -1,6 +1,7 @@
 {
   "name": "nuxt-app",
   "type": "module",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "build": "papi --whitelist .papi/whitelist.ts && nuxt build",
