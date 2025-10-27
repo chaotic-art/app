@@ -108,22 +108,4 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-11-27',
-
-  hooks: {
-    'vite:extendConfig': function (viteConfig) {
-      const logger = createLogger(viteConfig.logLevel)
-      const originalWarning = logger.warn
-
-      logger.warn = (msg, options) => {
-        const isPureCommentWarning = msg.includes('PURE')
-
-        if (isPureCommentWarning)
-          return
-
-        originalWarning(msg, options)
-      }
-
-      viteConfig.customLogger = logger
-    },
-  },
 })
