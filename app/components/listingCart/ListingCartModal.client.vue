@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { toNative } from '@/utils/format/balance'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
+import useQueryBalance from '~/composables/useQueryBalance'
 
 const { $i18n } = useNuxtApp()
 const { accountId } = useAuth()
@@ -11,7 +12,7 @@ const { listingCartModalOpen } = storeToRefs(usePreferencesStore())
 const actionCartStore = useActionCartStore()
 const { decimals, chainSymbol, currentChain } = useChain()
 const { open: isTransactionModalOpen } = useTransactionModal()
-const { balance, isLoading: isBalanceLoading } = useBalance({ enabled: listingCartModalOpen })
+const { balance, isLoading: isBalanceLoading } = useQueryBalance({ enabled: listingCartModalOpen })
 const listingFees = ref()
 const { existentialDeposit } = useDeposit(currentChain)
 
