@@ -2,6 +2,7 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { useClipboard, whenever } from '@vueuse/core'
 import { useBalancesPallets } from '@/composables/onchain/useBalancePallets'
+import useQueryBalance from '~/composables/useQueryBalance'
 import { isValidAddress } from '~/utils/format/address'
 
 export interface TargetAddress {
@@ -14,7 +15,7 @@ export interface TargetAddress {
 type DisplayUnit = 'token' | 'usd'
 
 const { t } = useI18n()
-const { balance, transferableBalance, isLoading: isBalanceLoading } = useBalance()
+const { balance, transferableBalance, isLoading: isBalanceLoading } = useQueryBalance()
 const { chainSymbol, decimals } = useChain()
 const { accountId } = useAuth()
 const { prefix } = usePrefix()

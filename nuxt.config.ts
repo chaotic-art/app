@@ -1,5 +1,3 @@
-import process from 'node:process'
-
 export default defineNuxtConfig({
   devtools: { enabled: true },
   sourcemap: true,
@@ -60,18 +58,7 @@ export default defineNuxtConfig({
     '@wagmi/vue/nuxt',
     '@nuxtjs/seo',
     'nuxt-svgo',
-    '@nuxtjs/supabase',
   ],
-
-  supabase: {
-    redirect: false,
-    redirectOptions: {
-      login: '/twitter-auth', // change with card page
-      callback: '/confirm',
-    },
-    url: process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
-    key: process.env.SUPABASE_KEY || 'placeholder-key',
-  },
 
   runtimeConfig: {
     public: {
