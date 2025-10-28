@@ -5,7 +5,7 @@ import { DropStatus } from '@/types'
 import { ONE_DAY_MS } from '@/utils/time'
 
 export function formatCETDate(date: string, time: string): Date {
-  return new Date(`${date}T${time}+02:00`)
+  return new Date(`${date}T${time}+01:00`)
 }
 
 export function parseCETDate(datetime: string): Date {
