@@ -12,7 +12,7 @@ export default () => {
   const tokenIds = ref<number[]>([])
   const populateTokenIds = async () => {
     for (const _ of Array.from({ length: amountToMint.value })) {
-      const tokenId = Number.parseInt(await generateIdAssethub(Number.parseInt(drop.value.collection), currentChain.value))
+      const tokenId = await generateIdAssethub(Number.parseInt(drop.value.collection), currentChain.value)
 
       if (!tokenIds.value.includes(tokenId)) {
         tokenIds.value.push(tokenId)

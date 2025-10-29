@@ -101,22 +101,25 @@ const dropStartRelativeTime = computed(() => {
           <h3 class="text-lg font-semibold text-foreground mb-2">
             Drop Start Time
           </h3>
-          <div class="flex items-center gap-2 text-muted-foreground">
-            <UIcon name="i-heroicons-clock" class="w-4 h-4" />
-            <time
-              v-if="drop?.dropStartTime"
-              :datetime="drop.dropStartTime.toISOString()"
-              class="capitalize"
-            >
-              {{ dropStartRelativeTime }}
-            </time>
-            <time
-              v-else-if="drop?.start_at"
-              :datetime="drop.start_at"
-              class="capitalize"
-            >
-              {{ dropStartRelativeTime }}
-            </time>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 text-muted-foreground">
+              <UIcon name="i-heroicons-clock" class="w-4 h-4" />
+              <time
+                v-if="drop?.dropStartTime"
+                :datetime="drop.dropStartTime.toISOString()"
+                class="capitalize"
+              >
+                {{ dropStartRelativeTime }}
+              </time>
+              <time
+                v-else-if="drop?.start_at"
+                :datetime="drop.start_at"
+                class="capitalize"
+              >
+                {{ dropStartRelativeTime }}
+              </time>
+            </div>
+            <CalendarReminderButton :drop="drop" />
           </div>
         </div>
       </div>
