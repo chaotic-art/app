@@ -1,5 +1,5 @@
 import type { SupportedChain } from '~/plugins/sdk.client'
-import format from '@/utils/format/balance'
+import { formatBalance } from 'dedot/utils'
 
 export default function (prefix: Ref<SupportedChain>) {
   const { $sdk } = useNuxtApp()
@@ -43,18 +43,16 @@ export default function (prefix: Ref<SupportedChain>) {
       existentialDeposit.value = Number(await api.constants.Balances.ExistentialDeposit())
     }
 
-    totalCollectionDeposit.value = format(
+    totalCollectionDeposit.value = formatBalance(
       metadataDeposit.value
       + collectionDeposit.value
       + existentialDeposit.value,
-      chainSpec[prefix.value].tokenDecimals,
-      false,
+      { decimals: chainSpec[prefix.value].tokenDecimals },
     )
 
-    totalItemDeposit.value = format(
+    totalItemDeposit.value = formatBalance(
       metadataDeposit.value + itemDeposit.value + existentialDeposit.value,
-      chainSpec[prefix.value].tokenDecimals,
-      false,
+      { decimals: chainSpec[prefix.value].tokenDecimals },
     )
   })
 
