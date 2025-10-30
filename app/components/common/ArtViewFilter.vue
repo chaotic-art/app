@@ -7,7 +7,7 @@ const { artViewFilter } = storeToRefs(usePreferencesStore())
 const artView = computed({
   get: () => route.query?.art_view?.toString() === 'true' || artViewFilter.value,
   set: (value) => {
-    router.push({ query: { art_view: String(value) } })
+    router.replace({ query: { ...route.query, art_view: String(value) } })
     artViewFilter.value = value
   },
 })
