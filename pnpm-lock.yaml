@@ -48,8 +48,8 @@ importers:
         specifier: 3.2.2
         version: 3.2.2(@netlify/blobs@9.1.2)(@unhead/vue@2.0.12(vue@3.5.22(typescript@5.8.3)))(db0@0.3.4)(h3@1.15.4)(idb-keyval@6.2.2)(ioredis@5.8.2)(magicast@0.5.0)(rollup@4.52.5)(unhead@2.0.19)(unstorage@1.17.1(@netlify/blobs@9.1.2)(db0@0.3.4)(idb-keyval@6.2.2)(ioredis@5.8.2))(vite@7.1.12(@types/node@24.7.2)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.0)(yaml@2.8.1))(vue@3.5.22(typescript@5.8.3))
       '@paraport/vue':
-        specifier: 0.1.7
-        version: 0.1.7(bufferutil@4.0.9)(polkadot-api@1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1))(rxjs@7.8.2)(tailwindcss@4.1.16)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+        specifier: 0.1.8
+        version: 0.1.8(bufferutil@4.0.9)(polkadot-api@1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1))(rxjs@7.8.2)(tailwindcss@4.1.16)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@pinia/nuxt':
         specifier: 0.11.1
         version: 0.11.1(magicast@0.5.0)(pinia@3.0.3(typescript@5.8.3)(vue@3.5.22(typescript@5.8.3)))
@@ -1229,12 +1229,6 @@ packages:
   '@internationalized/date@3.10.0':
     resolution: {integrity: sha512-oxDR/NTEJ1k+UFVQElaNIk65E/Z83HK1z1WI3lQyhTtnNg4R5oVXaPzK3jcpKG8UHKDVuDQHzn+wsxSz8RP3aw==}
 
-  '@internationalized/date@3.8.2':
-    resolution: {integrity: sha512-/wENk7CbvLbkUvX1tu0mwq49CVkkWpkXubGel6birjRPyo6uQ4nQpnq5xZu823zRCwwn82zgHrvgF1vZyvmVgA==}
-
-  '@internationalized/number@3.6.4':
-    resolution: {integrity: sha512-P+/h+RDaiX8EGt3shB9AYM1+QgkvHmJ5rKi4/59k4sg9g58k9rqsRW0WxRO7jCoHyvVbFRRFKmVTdFYdehrxHg==}
-
   '@internationalized/number@3.6.5':
     resolution: {integrity: sha512-6hY4Kl4HPBvtfS62asS/R22JzNNy8vi/Ssev7x6EobfCp+9QIB2hKvI2EtbdJ0VSQacxVNtqhE/NmF/NZ0gm6g==}
 
@@ -2126,16 +2120,16 @@ packages:
   '@parallel-finance/type-definitions@2.0.1':
     resolution: {integrity: sha512-fC1QfhFFd8oSZqdIh6kmoMNvTxZdQGw1sTAbdYSINyVxyCxKiDg47ZP9bAZFDexL7POqnXnn4pYM7kUAnsT+8Q==}
 
-  '@paraport/core@0.1.6':
-    resolution: {integrity: sha512-Jgxi0QERh2JogFgnemL/Ih1U0QSgP25UFS5hVskzqZgpwJqO3zBBbyeIWtMFu+dyBPvjQZ0lD+jh4Z760zNhNg==}
+  '@paraport/core@0.1.7':
+    resolution: {integrity: sha512-6Pkqm/CQeP2ClzrPtXtXqHSejaWQHeUa4bZRrnZE6rxZMz1ESReSua/0Y1TflLA9nrDb0864S+sWGkHXRCZxmA==}
     peerDependencies:
       polkadot-api: 1.20.x
 
-  '@paraport/static@0.0.4':
-    resolution: {integrity: sha512-5w7inKo9cuWt873DSbZll6Y9XfK4VUxmg7hGZ16KoXZF4xBJDttM/uHeXZmfEXrVRPs3StZd1taZtyNuSNAIHg==}
+  '@paraport/static@0.0.5':
+    resolution: {integrity: sha512-B9Jh9Oh+p48VdpMvF4svhtifm4KnJFnOkou051bJQ9bNwvgzJUmX7Ucox5mH0ahPF++udkPpbe4A11LRE4bzgA==}
 
-  '@paraport/vue@0.1.7':
-    resolution: {integrity: sha512-bTWOSqmSd8FbEujKT5LofqHwK3uNM+hUOrXrTe+ArOc5Qi5MfCyU1vYiaYdxRI9icHIXBxS6GTfLm0I8DVbnwg==}
+  '@paraport/vue@0.1.8':
+    resolution: {integrity: sha512-NIzNhBr/lcbRyMEedGFWLYxBq7WcIRcDdgu0LBI81n2vXv8sdhiTe3Pxrise+HtL2BBwHiimhV416SJi+Uar6A==}
     peerDependencies:
       polkadot-api: 1.20.x
 
@@ -8705,11 +8699,6 @@ packages:
       react:
         optional: true
 
-  reka-ui@2.3.2:
-    resolution: {integrity: sha512-lCysSCILH2uqShEnt93/qzlXnB7ySvK7scR0Q5C+a2iXwFVzHhvZQsMaSnbQYueoCihx6yyUZTYECepnmKrbRA==}
-    peerDependencies:
-      vue: '>= 3.2.0'
-
   reka-ui@2.6.0:
     resolution: {integrity: sha512-NrGMKrABD97l890mFS3TNUzB0BLUfbL3hh0NjcJRIUSUljb288bx3Mzo31nOyUcdiiW0HqFGXJwyCBh9cWgb0w==}
     peerDependencies:
@@ -9241,9 +9230,6 @@ packages:
   tagged-tag@1.0.0:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
-
-  tailwind-merge@3.0.2:
-    resolution: {integrity: sha512-l7z+OYZ7mu3DTqrL88RiKrKIqO3NcpEO8V/Od04bNpvk0kiIFndGEoqfuzvj4yuhRkHKjRkII2z+KS2HfPcSxw==}
 
   tailwind-merge@3.3.1:
     resolution: {integrity: sha512-gBXpgUm/3rp1lMZZrM/w7D8GKqshif0zAymAhbCyIt8KMe+0v9DQ7cdYLR4FHH/cKpdTXb+A/tKKU3eolfsI+g==}
@@ -11500,14 +11486,6 @@ snapshots:
     dependencies:
       '@swc/helpers': 0.5.17
 
-  '@internationalized/date@3.8.2':
-    dependencies:
-      '@swc/helpers': 0.5.17
-
-  '@internationalized/number@3.6.4':
-    dependencies:
-      '@swc/helpers': 0.5.17
-
   '@internationalized/number@3.6.5':
     dependencies:
       '@swc/helpers': 0.5.17
@@ -13137,9 +13115,9 @@ snapshots:
     dependencies:
       '@open-web3/orml-type-definitions': 2.0.1
 
-  '@paraport/core@0.1.6(bufferutil@4.0.9)(polkadot-api@1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1))(rxjs@7.8.2)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)':
+  '@paraport/core@0.1.7(bufferutil@4.0.9)(polkadot-api@1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1))(rxjs@7.8.2)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
-      '@paraport/static': 0.0.4
+      '@paraport/static': 0.0.5
       '@paraspell/sdk': 11.12.5(bufferutil@4.0.9)(polkadot-api@1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1))(rxjs@7.8.2)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       dedot: 0.16.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       eventemitter3: 5.0.1
@@ -13153,11 +13131,11 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@paraport/static@0.0.4': {}
+  '@paraport/static@0.0.5': {}
 
-  '@paraport/vue@0.1.7(bufferutil@4.0.9)(polkadot-api@1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1))(rxjs@7.8.2)(tailwindcss@4.1.16)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)':
+  '@paraport/vue@0.1.8(bufferutil@4.0.9)(polkadot-api@1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1))(rxjs@7.8.2)(tailwindcss@4.1.16)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
-      '@paraport/core': 0.1.6(bufferutil@4.0.9)(polkadot-api@1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1))(rxjs@7.8.2)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+      '@paraport/core': 0.1.7(bufferutil@4.0.9)(polkadot-api@1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1))(rxjs@7.8.2)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@tanstack/vue-table': 8.21.3(vue@3.5.22(typescript@5.8.3))
       '@vue/runtime-dom': 3.5.22
       '@vueuse/core': 13.9.0(vue@3.5.22(typescript@5.8.3))
@@ -13167,8 +13145,8 @@ snapshots:
       lucide-vue-next: 0.477.0(vue@3.5.22(typescript@5.8.3))
       mitt: 3.0.1
       polkadot-api: 1.20.0(bufferutil@4.0.9)(jiti@2.6.1)(postcss@8.5.6)(rxjs@7.8.2)(utf-8-validate@5.0.10)(yaml@2.8.1)
-      reka-ui: 2.3.2(typescript@5.8.3)(vue@3.5.22(typescript@5.8.3))
-      tailwind-merge: 3.0.2
+      reka-ui: 2.6.0(typescript@5.8.3)(vue@3.5.22(typescript@5.8.3))
+      tailwind-merge: 3.3.1
       tailwindcss-animate: 1.0.7(tailwindcss@4.1.16)
       vue: 3.5.22(typescript@5.8.3)
     transitivePeerDependencies:
@@ -23442,23 +23420,6 @@ snapshots:
       '@types/react': 19.2.2
       react: 18.3.1
 
-  reka-ui@2.3.2(typescript@5.8.3)(vue@3.5.22(typescript@5.8.3)):
-    dependencies:
-      '@floating-ui/dom': 1.7.2
-      '@floating-ui/vue': 1.1.7(vue@3.5.22(typescript@5.8.3))
-      '@internationalized/date': 3.8.2
-      '@internationalized/number': 3.6.4
-      '@tanstack/vue-virtual': 3.13.12(vue@3.5.22(typescript@5.8.3))
-      '@vueuse/core': 12.8.2(typescript@5.8.3)
-      '@vueuse/shared': 12.8.2(typescript@5.8.3)
-      aria-hidden: 1.2.6
-      defu: 6.1.4
-      ohash: 2.0.11
-      vue: 3.5.22(typescript@5.8.3)
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - typescript
-
   reka-ui@2.6.0(typescript@5.8.3)(vue@3.5.22(typescript@5.8.3)):
     dependencies:
       '@floating-ui/dom': 1.7.2
@@ -24081,8 +24042,6 @@ snapshots:
   system-architecture@0.1.0: {}
 
   tagged-tag@1.0.0: {}
-
-  tailwind-merge@3.0.2: {}
 
   tailwind-merge@3.3.1: {}
 
