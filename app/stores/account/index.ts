@@ -2,7 +2,7 @@ import type { ChainVM, Prefix } from '@kodadot1/static'
 import type { AccountVm, ChainData, TokenDetail, TokenKey } from './types'
 import type { Chain } from '@/types/chain'
 import type { SupportedChain } from '~/plugins/sdk.client'
-import format from '@/utils/format/balance'
+import { formatBalance } from 'dedot/utils'
 import { getDefaultAccount, getVMSupportedAssets, vmChains } from './utils'
 
 export const useAccountStore = defineStore('account', () => {
@@ -55,7 +55,7 @@ export const useAccountStore = defineStore('account', () => {
 
   const getTokenDetailFromBalance = ({ prefix, balance }: { prefix: SupportedChain, balance: bigint | string }): TokenDetail => {
     const nativeBalance = String(balance || '0')
-    const formattedBalance = format(nativeBalance, chainSpec[prefix].tokenDecimals, false)
+    const formattedBalance = formatBalance(nativeBalance, { decimals: chainSpec[prefix].tokenDecimals })
 
     return {
       balance: formattedBalance,
