@@ -50,7 +50,25 @@ export interface TransferTransactionResult {
   prefix: AssetHubChain
 }
 
-type TransactionResult = CollectionCategory | NftCategory | ActionTransactionResult | TransferTransactionResult
+export interface CreateOfferTransactionResult {
+  type: 'create_offer'
+  hash: string
+  prefix: AssetHubChain
+}
+
+export interface AcceptOfferTransactionResult {
+  type: 'accept_offer'
+  hash: string
+  prefix: AssetHubChain
+}
+
+export interface CancelOfferTransactionResult {
+  type: 'cancel_offer'
+  hash: string
+  prefix: AssetHubChain
+}
+
+type TransactionResult = CollectionCategory | NftCategory | ActionTransactionResult | TransferTransactionResult | CreateOfferTransactionResult | AcceptOfferTransactionResult | CancelOfferTransactionResult
 
 // Transaction status progression:
 // 1. status.value = 'signed'

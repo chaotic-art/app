@@ -4,6 +4,18 @@ import { formatBalance } from 'dedot/utils'
 import { t } from 'try'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
+export async function fetchTokenMetadata(metadataUri: string) {
+  const [ok, _, metadataData] = await t($fetch(sanitizeIpfsUrl(metadataUri), {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }))
+  if (ok) {
+    return metadataData as NFTMetadata
+  }
+  return null
+}
+
 export function useToken(props: {
   tokenId: number
   collectionId: number
@@ -29,18 +41,6 @@ export function useToken(props: {
       return undefined
     return queryPrice.value.toString()
   }), decimals, chainSymbol)
-
-  const fetchTokenMetadata = async (metadataUri: string) => {
-    const [ok, _, metadataData] = await t($fetch(sanitizeIpfsUrl(metadataUri), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }))
-    if (ok) {
-      return metadataData as NFTMetadata
-    }
-    return null
-  }
 
   // Fetch data on component mount
   onMounted(async () => {

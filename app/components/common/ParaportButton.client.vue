@@ -56,6 +56,7 @@ function onSubmit({ completed, autoteleport }: { completed: boolean, autotelepor
 
   <Paraport
     v-else
+    :key="String(amount)"
     :amount="String(amount)"
     :address="accountId"
     :get-signer="getSigner"

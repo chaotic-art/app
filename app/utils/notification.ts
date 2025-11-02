@@ -1,6 +1,8 @@
-export function successMessage(message?: string) {
+import type { VNode } from 'vue'
+
+export function successMessage(message?: string | VNode, description?: string | VNode) {
   const toast = useToast()
-  toast.add({ title: message || 'Success', color: 'success' })
+  toast.add({ title: message || 'Success', color: 'success', description })
 }
 
 export function warningMessage(message?: string) {

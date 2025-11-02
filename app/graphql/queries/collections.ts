@@ -44,3 +44,14 @@ export const topCollections = graphql(`
     }
 `)
 export type TopCollectionsData = ResultOf<typeof topCollections>
+
+// collections owners by ids (minimal shape)
+export const collectionsOwnersByIds = graphql(`
+  query collectionsOwnersByIds($ids: [String!]) {
+    collections: collectionEntities(where: { id_in: $ids }) {
+      id
+      nfts { id currentOwner }
+    }
+  }
+`)
+export type CollectionsOwnersByIdsData = ResultOf<typeof collectionsOwnersByIds>
