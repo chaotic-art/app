@@ -78,6 +78,15 @@ const { currentChain } = useChain()
 const { accountId } = useAuth()
 
 const { mode, isIncomingTrade } = useIsTradeOverview(computed(() => props.trade))
+const { data: sendItem } = useQuery({
+  queryKey: ['send-item', selectedSendItemId],
+  queryFn: async () => {
+    if (!selectedSendItemId.value) {
+      return null
+    }
+    return await fetchTradeDetailedToken(selectedSendItemId.value, currentChain.value)
+  },
+})
 
 const trade = computed(() => props.trade)
 const needsToSelectSendItem = computed(() => isIncomingTrade.value && !sendItem.value && Boolean(trade.value?.isAnyTokenInCollectionDesired))
@@ -125,16 +134,6 @@ const { data: nft, isLoading: nftLoading } = useQuery<TradeNFTs | null>({
       offered: offered!,
       desired: desired!,
     }
-  },
-})
-
-const { data: sendItem } = useQuery({
-  queryKey: ['send-item', selectedSendItemId],
-  queryFn: async () => {
-    if (!selectedSendItemId.value) {
-      return null
-    }
-    return await fetchTradeDetailedToken(selectedSendItemId.value, currentChain.value)
   },
 })
 
