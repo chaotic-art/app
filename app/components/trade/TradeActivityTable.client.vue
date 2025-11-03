@@ -18,6 +18,8 @@ const props = defineProps<{
 
 const route = useRoute()
 const router = useRouter()
+const { $i18n } = useNuxtApp()
+
 const dataKey = TRADES_QUERY_MAP[props.type].dataKey
 
 const selectedTrade = ref<TradeNftItem>()
@@ -114,7 +116,7 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
     },
     {
       accessorKey: 'price',
-      header: 'Amount',
+      header: $i18n.t('general.amount'),
       cell: ({ row }) => {
         const trade = row.original
 
@@ -125,7 +127,7 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
       },
     },
     {
-      header: 'From',
+      header: tabTarget.value === 'from' ? $i18n.t('general.from') : $i18n.t('general.to'),
       cell: ({ row }) => {
         const trade = row.original
 
@@ -150,7 +152,7 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
       },
     },
     {
-      header: 'Expiration',
+      header: $i18n.t('general.expiration'),
       cell: ({ row }) => {
         const trade = row.original
 
@@ -186,7 +188,7 @@ watch(activeTab, value => router.replace({ query: { ...route.query, filter: valu
 
 useSubscriptionGraphql<DocumentNode, { incoming: { id: string }[], outgoing: { id: string }[] }>({
   query: graphql(`
-    query Trades {
+    query tabsTradeIds {
       incoming: ${dataKey} (
         where: ${props.query.incoming}
         orderBy: blockNumber_DESC
@@ -238,7 +240,7 @@ useSubscriptionGraphql<DocumentNode, { incoming: { id: string }[], outgoing: { i
       <UTable
         :data="trades"
         :columns="columns"
-        :loading="loadingTrades"
+        :loading="loading"
       />
     </div>
   </div>

@@ -120,7 +120,9 @@
     "expiration": "Expiration",
     "expired": "Expired",
     "active": "Active",
-    "accept": "Accept"
+    "accept": "Accept",
+    "from": "From",
+    "to": "To"
   },
   "signing": {
     "transaction": "Sign Transaction",
