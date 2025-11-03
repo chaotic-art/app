@@ -19,7 +19,7 @@ useHead({
   link: [
     {
       rel: 'preload',
-      href: ipfsToCfImageUrl(props.drop?.banner),
+      href: sanitizeIpfsUrl(props.drop?.banner),
       as: 'image',
     },
   ],
@@ -33,7 +33,7 @@ useHead({
       <div v-if="isLoading" class="w-full h-full bg-muted animate-pulse" />
       <img
         v-else
-        :src="ipfsToCfImageUrl(drop?.banner)"
+        :src="sanitizeIpfsUrl(drop?.banner)"
         :alt="drop?.name"
         class="w-full h-full object-cover cursor-pointer"
         fetchpriority="high"

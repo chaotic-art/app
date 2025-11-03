@@ -32,14 +32,15 @@ export default function useWalletManager() {
   async function disconnectWallet(wallet: WalletExtension) {
     const vm = wallet.vm
 
-    if (vm === 'EVM') {
-      if (import.meta.client) {
-        const { disconnect: disconnectReown } = useReown()
+    if (vm === 'EVM' && import.meta.client) {
+      const { disconnect: disconnectReown } = useReown()
 
-        return disconnectReown()
+      try {
+        await disconnectReown()
       }
-
-      return Promise.resolve()
+      catch (error) {
+        console.error('Error disconnecting reown wallet:', error)
+      }
     }
 
     walletStore.updateWallet(wallet.id, {
@@ -47,7 +48,7 @@ export default function useWalletManager() {
       state: WalletStates.Disconnected,
     })
 
-    if (selectedAccounts.value[vm]?.includes(wallet.id)) {
+    if (walletStore.isWalletAccountSelected(wallet)) {
       selectedAccounts.value[vm] = undefined
       accountStore.clearAuth(vm)
     }

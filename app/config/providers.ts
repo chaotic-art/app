@@ -9,29 +9,16 @@
 export const PROVIDERS = {
   // Polkadot Asset Hub (AHP)
   ahp: [
-    'wss://polkadot-assethub-rpc.blockops.network/ws',
-    'wss://asset-hub-polkadot-rpc.n.dwellir.com',
-    'wss://statemint-rpc-tn.dwellir.com',
     'wss://sys.ibp.network/asset-hub-polkadot',
     'wss://asset-hub-polkadot.dotters.network',
-    'wss://rpc-asset-hub-polkadot.luckyfriday.io',
-    'wss://statemint.api.onfinality.io/public-ws',
     'wss://polkadot-asset-hub-rpc.polkadot.io',
-    'wss://statemint.public.curie.radiumblock.co/ws',
-    'wss://dot-rpc.stakeworld.io/assethub',
   ] as const,
 
   // Kusama Asset Hub (AHK)
   ahk: [
-    'wss://asset-hub-kusama-rpc.n.dwellir.com',
-    'wss://statemine-rpc-tn.dwellir.com',
     'wss://sys.ibp.network/asset-hub-kusama',
     'wss://asset-hub-kusama.dotters.network',
-    'wss://rpc-asset-hub-kusama.luckyfriday.io',
-    'wss://assethub-kusama.api.onfinality.io/public-ws',
     'wss://kusama-asset-hub-rpc.polkadot.io',
-    'wss://statemine.public.curie.radiumblock.co/ws',
-    'wss://ksm-rpc.stakeworld.io/assethub',
   ] as const,
 
   // Polkadot Relay Chain (DOT)
@@ -47,7 +34,7 @@ export const PROVIDERS = {
     'wss://polkadot.api.onfinality.io/public-ws',
     'wss://polkadot.rpc.permanence.io',
     'wss://polkadot.public.curie.radiumblock.co/ws',
-    'wss://spectrum-01.simplystaking.xyz/cG9sa2Fkb3QtMDEtOTFkMmYwZGYtcG9sa2Fkb3Q/uj77qtNEPueW1w/polkadot/mainnet/',
+    'wss://spectrum-03.simplystaking.xyz/cG9sa2Fkb3QtMDMtOTFkMmYwZGYtcG9sa2Fkb3Q/LjwBJpV3dIKyWQ/polkadot/mainnet/',
     'wss://dot-rpc.stakeworld.io',
     'wss://polkadot.rpc.subquery.network/public/ws',
   ] as const,
@@ -55,6 +42,7 @@ export const PROVIDERS = {
   // Kusama Relay Chain (KSM)
   ksm: [
     'wss://kusama-rpc.publicnode.com',
+    'wss://kusama-public-rpc.blockops.network/ws',
     'wss://kusama-rpc.n.dwellir.com',
     'wss://kusama-rpc-tn.dwellir.com',
     'wss://rpc-kusama.helixstreet.io',

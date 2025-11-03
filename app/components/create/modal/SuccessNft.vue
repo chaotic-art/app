@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ItemMedia } from '~/components/common/successfulModal/SuccessfulItemsMedia.vue'
 import type { NftCategory } from '~/composables/useTransactionModal'
 import { getSubscanNftUrl } from '~/utils/format/address'
 
@@ -9,23 +10,21 @@ interface Props {
 
 const props = defineProps<Props>()
 const router = useRouter()
-
+const isSingleItem = computed(() => props.result.items.length <= 1)
 const { close } = useTransactionModal()
 
 const modalData = computed(() => {
-  const items = props.result.itemIds.map(id => ({
-    id,
-    image: props.result.image,
-    name: props.result.name,
+  const items: ItemMedia[] = props.result.items.map(item => ({
+    ...item,
     collection: props.result.collectionId,
-    collectionName: props.result.name,
-    metadata: props.result.description,
+    collectionName: props.result.collectionName,
+    price: String(item.price),
   }))
 
   return {
     share: {
-      text: 'You successfully created an NFT',
-      url: `${window.location.origin}/${props.result?.prefix}/gallery/${props.result.collectionId}-${items[0]?.id}`,
+      text: isSingleItem.value ? 'I successfully created an NFT' : 'I successfully created NFTs',
+      url: isSingleItem.value ? `${window.location.origin}/${props.result?.prefix}/gallery/${props.result.collectionId}-${items[0]?.id}` : `${window.location.origin}/${props.result?.prefix}/collection/${props.result.collectionId}`,
       withCopy: true,
     },
     actionButtons: {
@@ -45,7 +44,7 @@ const modalData = computed(() => {
     },
     header: {
       single: 'You successfully created an NFT',
-      multiple: `You successfully created ${props.result.itemIds.length} NFTs`,
+      multiple: `You successfully created ${props.result.items.length} NFTs`,
     },
     items,
   }

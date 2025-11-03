@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
 import { whenever } from '@vueuse/core'
-import { formatEvmAccounts, formatSubAccounts } from '@/utils/wallet'
+import { formatSubAccounts } from '@/utils/wallet'
 import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
 
 const emit = defineEmits(['close'])
@@ -10,23 +10,39 @@ const isModalOpen = defineModel<boolean>({ required: true })
 const { t } = useI18n()
 const subWalletStore = useSubWalletStore()
 const walletStore = useWalletStore()
+const walletManager = useWalletManager()
 
 const { stage, wallets } = storeToRefs(walletStore)
+
+const walletStates = computed<Record<string, WalletState>>(() => {
+  return wallets.value.reduce((acc, wallet) => {
+    Object.assign(acc, { [wallet.id]: wallet.state })
+    return acc
+  }, {})
+})
+
+const title = computed(() => {
+  if (stage.value === WalletStageTypes.Wallet) {
+    return t('wallet.selectWallet')
+  }
+  else if (stage.value === WalletStageTypes.Account) {
+    return t('wallet.selectAccount')
+  }
+  return ''
+})
 
 async function init() {
   walletStore.setStage(WalletStageTypes.Loading)
 
-  const extensions = getWalletExtensions()
+  wallets.value = getWalletExtensions()
 
-  await initWalletState()
-
-  wallets.value = extensions
+  // start wallet watchers only after updating current wallets
+  initWalletWatchers()
 
   walletStore.setStage(WalletStageTypes.Wallet)
 }
 
-async function initWalletState() {
-  // sub
+function watchForSubWalletStoreAccountsChanges() {
   watch(
     () => subWalletStore.wallets.map(wallet => ({ id: wallet.id, accounts: wallet.accounts })),
     (newWallets, oldWallets) => {
@@ -49,35 +65,15 @@ async function initWalletState() {
     },
     { deep: true },
   )
+}
+
+function initWalletWatchers() {
+  // sub
+  watchForAuthorizedSubWallets()
+  watchForSubWalletStoreAccountsChanges()
 
   // evm
-  const { accounts, wallet } = useReown()
-
-  watch([
-    accounts,
-    wallet,
-    computed(() => wallets.value.find(wallet => wallet.id === REOWN_WALLET_CONFIG.id)),
-  ], ([accountsState, wallet, extension]) => {
-    if (!accountsState || !extension || !wallet) {
-      return
-    }
-
-    const accounts = formatEvmAccounts({ extension, wallet, accounts: accountsState })
-
-    const toConnect = extension.state === WalletStates.Authorized
-    const accountsChanged = !areArraysEqual(accounts.map(account => account.id), extension.accounts.map(account => account.id)) && extension.state === WalletStates.Connected
-
-    if (!toConnect && !accountsChanged) {
-      return
-    }
-
-    walletStore.updateWallet(extension.id, {
-      state: WalletStates.Connected,
-      accounts,
-    })
-  }, {
-    immediate: true,
-  })
+  // watchForAuthorizedEvmWallets()
 }
 
 function getSubWalletExtensions(): WalletExtension[] {
@@ -124,7 +120,8 @@ function getWalletExtensions(): WalletExtension[] {
 
     let state: WalletState = WalletStates.Idle
 
-    if (prevWallet.state === WalletStates.Connected || walletStore.selectedAccounts[wallet.vm]?.includes(wallet.id)) {
+    // if the wallet was previously connected, change the state to authorized to trigger entire connection process
+    if (prevWallet.state === WalletStates.Connected || walletStore.isWalletAccountSelected(wallet)) {
       state = WalletStates.Authorized
     }
 
@@ -136,47 +133,73 @@ function getWalletExtensions(): WalletExtension[] {
   })
 }
 
-const walletStates = computed<Record<string, WalletState>>(() => {
-  return wallets.value.reduce((acc, wallet) => {
-    Object.assign(acc, { [wallet.id]: wallet.state })
-    return acc
-  }, {})
-})
+async function connectSubWallet(wallet: WalletExtension) {
+  walletStore.updateWallet(wallet.id, { state: WalletStates.Connecting })
 
-const title = computed(() => {
-  if (stage.value === WalletStageTypes.Wallet) {
-    return t('wallet.selectWallet')
+  // if the wallet is authorized via authorization stage, it should already be initialized no need to connect
+  // if the page just loaded and the wallet was previously connected, we need to connect again, to fully initialize it
+  if (!subWalletStore.isWalletInitialized(wallet.id)) {
+    try {
+      await subWalletStore.connectWallet(wallet.source as SubstrateWalletSource)
+    }
+    catch (error) {
+      console.error('Failed to connect wallet', { error, wallet })
+      await walletManager.disconnectWallet(wallet)
+      return
+    }
   }
-  else if (stage.value === WalletStageTypes.Account) {
-    return t('wallet.selectAccount')
-  }
-  return ''
-})
+
+  subWalletStore.subscribeAccounts(wallet.id)
+
+  walletStore.updateWallet(wallet.id, { state: WalletStates.Connected })
+}
+
+function watchForAuthorizedSubWallets() {
+  watch(walletStates, async (states, prevState) => {
+    for (const wallet of wallets.value.filter(w => w.vm === 'SUB')) {
+      const freshAuthorizedState = states[wallet.id] === WalletStates.Authorized && prevState?.[wallet.id] !== WalletStates.Authorized
+
+      if (freshAuthorizedState) {
+        await connectSubWallet(wallet)
+      }
+    }
+  }, { immediate: true })
+}
+
+// Disabled after #559
+// function watchForAuthorizedEvmWallets() {
+//   const { accounts, wallet } = useReown()
+
+//   watch([
+//     accounts,
+//     wallet,
+//     computed(() => wallets.value.find(wallet => wallet.id === REOWN_WALLET_CONFIG.id)),
+//   ], ([accountsState, wallet, extension]) => {
+//     if (!accountsState || !extension || !wallet) {
+//       return
+//     }
+
+//     const accounts = formatEvmAccounts({ extension, wallet, accounts: accountsState })
+
+//     const toConnect = extension.state === WalletStates.Authorized
+//     const accountsChanged = !areArraysEqual(accounts.map(account => account.id), extension.accounts.map(account => account.id)) && extension.state === WalletStates.Connected
+
+//     if (!toConnect && !accountsChanged) {
+//       return
+//     }
+
+//     walletStore.updateWallet(extension.id, {
+//       state: WalletStates.Connected,
+//       accounts,
+//     })
+//   }, {
+//     immediate: true,
+//   })
+// }
 
 whenever(
   () => subWalletStore.injectionStatus !== 'checking',
-  () => {
-    init()
-
-    // watch for unsyncedExtensions
-    watch(walletStates, async (_, prevState) => {
-      for (const wallet of wallets.value) {
-        if (wallet.state === WalletStates.Authorized && prevState?.[wallet.id] !== WalletStates.Authorized) {
-          if (wallet.vm === 'SUB') {
-            walletStore.updateWallet(wallet.id, { state: WalletStates.Connecting })
-
-            if (!subWalletStore.isWalletInitialized(wallet.id)) {
-              await subWalletStore.connectWallet(wallet.source as SubstrateWalletSource)
-            }
-
-            subWalletStore.subscribeAccounts(wallet.id)
-
-            walletStore.updateWallet(wallet.id, { state: WalletStates.Connected })
-          }
-        }
-      }
-    }, { immediate: true })
-  },
+  () => init(),
   { once: true, immediate: true },
 )
 </script>
