@@ -55,3 +55,19 @@ export const collectionsOwnersByIds = graphql(`
   }
 `)
 export type CollectionsOwnersByIdsData = ResultOf<typeof collectionsOwnersByIds>
+
+export const collectionIdList = graphql(`
+    query collectionIdList(
+      $search: CollectionEntityWhereInput
+      $orderBy: [CollectionEntityOrderByInput!] = [blockNumber_DESC]
+    ) {
+      collectionEntities(
+        orderBy: $orderBy
+        where: $search
+      ) {
+          id
+      }
+    }
+`)
+
+export type CollectionIdListData = ResultOf<typeof collectionIdList>
