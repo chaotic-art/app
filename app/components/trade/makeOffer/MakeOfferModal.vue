@@ -161,8 +161,9 @@ whenever(() => isSuccess.value && result.value?.type === 'create_offer', () => {
   close()
 
   successMessage(
-    'Transaction Complted',
-    h('div', { class: 'flex justify-center w-fit' }, [
+    $i18n.t('offer.offerCreation'),
+    h('div', { class: 'flex justify-center w-fit gap-2' }, [
+      h('span', {}, 'Completed'),
       h(resolveComponent('ULink'), {
         class: 'flex items-center justify-center',
         to: `/${currentChain.value}/u/${accountId.value}?tab=offers&filter=outgoing`,

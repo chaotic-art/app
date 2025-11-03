@@ -3,6 +3,7 @@ import type { ExecTxParams, OverviewMode, TradeDetailedToken } from './utils'
 import type { TradeNftItem } from '@/components/trade/types'
 import type { OdaToken } from '~/services/oda'
 import { useQuery } from '@tanstack/vue-query'
+import { whenever } from '@vueuse/core'
 import ModalIdentityItem from '@/components/common/ModalIdentityItem.vue'
 import { TradeType } from '@/components/trade/types'
 import TradeOverviewModalContent from './Content.vue'
@@ -28,6 +29,7 @@ const props = defineProps<{
 const emit = defineEmits(['close'])
 
 const { $i18n } = useNuxtApp()
+const { isSuccess, close, result } = useTransactionModal()
 
 const TradeTypeOverviewModeDetails: Record<TradeType, Record<OverviewMode, OverviewModeDetails>> = {
   [TradeType.SWAP]: {
@@ -73,6 +75,7 @@ const selectedSendItemId = ref<string>()
 const session = ref<string>()
 
 const { currentChain } = useChain()
+const { accountId } = useAuth()
 
 const { mode, isIncomingTrade } = useIsTradeOverview(computed(() => props.trade))
 
@@ -164,8 +167,6 @@ function execTransaction() {
     sendItem: trade.value.desired?.sn || sendItem.value?.id as string,
   }
 
-  console.log(mode.value)
-
   TradeTypeTx[trade.value.type][mode.value](params)
 }
 
@@ -179,32 +180,29 @@ useModalIsOpenTracker({
   onOpen: initSession,
 })
 
-// useTransactionNotification({
-//   status,
-//   isError,
-//   sessionId: lastSessionId,
-//   updateSession,
-//   init: () => {
-//     vModel.value = false
-//     return notification(({ isSessionState, notify, session }) => {
-//       return notify({
-//         title: details.value.notificationTitle,
-//         state: computed(() => session.value.state),
-//         action: computed(() => {
-//           if (isSessionState('succeeded')) {
-//             return {
-//               label: details.value.transactionSuccessTitle,
-//               icon: 'arrow-up-right',
-//               url: `/${prefix.value}/u/${accountId.value}?tab=${details.value.transactionSuccessTab}&filter=outgoing`,
-//             }
-//           }
-//           return undefined
-//         }),
-//         showIndexerDelayMessage: true,
-//       })
-//     })
-//   },
-// })
+whenever(() => isSuccess.value
+  && (result.value?.type === 'accept_offer'
+    || result.value?.type === 'cancel_offer'
+  ), () => {
+  close()
+
+  successMessage(
+    details.value.notificationTitle,
+    h('div', { class: 'flex justify-center w-fit gap-2' }, [
+      h('span', {}, 'Completed'),
+      h(resolveComponent('ULink'), {
+        class: 'flex items-center justify-center',
+        to: `/${currentChain.value}/u/${accountId.value}?tab=${details.value.transactionSuccessTab}&filter=outgoing`,
+      }, [
+        h('span', {}, details.value.transactionSuccessTitle),
+        h(resolveComponent('UIcon'), {
+          name: 'tabler:arrow-up-right',
+          size: '16px',
+        }),
+      ]),
+    ]),
+  )
+})
 </script>
 
 <template>
