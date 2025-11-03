@@ -85,6 +85,7 @@ const buttonConfig = computed<ButtonConfig | null>(() => {
       :class="mainClass"
       :label="buttonConfig.label"
       :loading="loading"
+      variant="outline"
       :disabled="buttonConfig.disabled"
       :color="buttonConfig.color"
       @click="buttonConfig.onClick"
