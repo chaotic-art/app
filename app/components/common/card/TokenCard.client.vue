@@ -51,7 +51,8 @@ const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
-const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
+const isAirdropRoute = computed(() => route.name?.toString().includes('airdrop-select'))
+const canAddToActionCart = computed(() => (isProfileRoute.value || isAirdropRoute.value) && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
