@@ -1,3 +1,4 @@
+import { URLS } from '@/utils/constants'
 import { MobileWalletList } from '~/utils/wallet/substrate/config'
 
 export default function () {
@@ -11,7 +12,7 @@ export default function () {
   const isAvailable = computed(() => !isLogIn.value && isMobileDevice && !isInMobileWalletBrowser.value)
 
   const redirect = (path = window.location.pathname) => {
-    window.open(`https://app.novawallet.io/open/dapp?url=https://chaotic.art${path}`, '_blank')
+    window.open(`https://app.novawallet.io/open/dapp?url=${URLS.appDomain}${path}`, '_blank')
   }
 
   return { isAvailable, redirect }
