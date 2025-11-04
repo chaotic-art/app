@@ -12,5 +12,7 @@ export function getOfferCollectionId(chain: AssetHubChain) {
 }
 
 export const OFFER_MINT_PRICE = 5e8
-export const BLOCKS_PER_HOUR = 300
-export const BLOCKS_PER_DAY = BLOCKS_PER_HOUR * 24 // 12sec /block --> 300blocks/hr
+
+// see https://wiki.polkadot.com/learn/learn-async-backing/
+export const BLOCKS_PER_HOUR = 600
+export const BLOCKS_PER_DAY = BLOCKS_PER_HOUR * 24 // 6sec /block --> 600blocks/hr
