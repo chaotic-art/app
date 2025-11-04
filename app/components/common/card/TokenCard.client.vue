@@ -52,8 +52,9 @@ const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
+const isAirdropRoute = computed(() => route.name?.toString().includes('airdrop-select'))
 const isCollectionRoute = computed(() => route.name?.toString().includes('chain-collection-collection_id'))
-const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
+const canAddToActionCart = computed(() => (isProfileRoute.value || isAirdropRoute.value) && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
 
 const hideMediaInfo = computed(() => artViewFilter.value && isCollectionRoute.value)
 
