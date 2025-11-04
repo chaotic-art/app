@@ -79,3 +79,16 @@ export const highestOfferByCollectionId = graphql(`
 `)
 
 export type HighestOfferByCollectionIdData = ResultOf<typeof highestOfferByCollectionId>
+
+export const highestOfferByNftId = graphql(`
+    query highestOfferByNftId($id: String!) {
+      offers(where: {status_eq: ACTIVE, desired: {id_eq: $id}}, orderBy: price_DESC, limit: 1) {
+        expiration
+        status
+        price
+        id
+      }
+    }
+`)
+
+export type HighestOfferByNftIdData = ResultOf<typeof highestOfferByNftId>

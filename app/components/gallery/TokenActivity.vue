@@ -75,11 +75,7 @@ watchEffect(async () => {
 
 <template>
   <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <h2 class="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">
-        Item Activity
-      </h2>
-
+    <div class="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
       <USelect
         v-model="selectedFilters"
         :items="filterOptions"

@@ -44,7 +44,6 @@ function openOfferModal() {
     collection: {
       ...collection.value,
       id: collectionId.value,
-      floorPrice: [{ price: '0' }],
     },
     metadata: collection.value?.metadata_uri || '',
     meta: {
@@ -69,7 +68,7 @@ function onCreateCollectionOfferClick() {
 <template>
   <div>
     <UButton
-      variant="outline"
+      variant="secondary"
       @click="onCreateCollectionOfferClick"
     >
       {{ $t('offer.createCollectionOffer') }}

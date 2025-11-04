@@ -1,4 +1,5 @@
 import type { SwapSurchargeDirection } from '@/composables/onchain/useNftPallets'
+import type { HighestOfferByNftIdData } from '~/graphql/queries/trades'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OnchainCollection } from '~/services/oda'
 
@@ -89,3 +90,5 @@ export type TradeNftItem<T = Trade> = T & {
   targets: TradeTarget[]
   isExpired: boolean
 }
+
+export type HighestNftOffer = HighestOfferByNftIdData['offers'][number]

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
+import type { HighestNftOffer } from '../trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { t } from 'try'
@@ -17,15 +18,24 @@ interface Props {
   formattedPrice?: string
   usdPrice?: string
   mimeType: string
+  highestOffer: HighestNftOffer | null
 }
 
 const props = defineProps<Props>()
 
 const toast = useToast()
+const { decimals, chainSymbol } = useChain()
 
 // collection owner for genart
 const genartCreator = ref('')
 const creator = computed(() => genartCreator.value || props.collectionCreator)
+
+const { usd: highestOfferUsd, formatted: highestOfferFormatted } = useAmount(
+  computed(() => props.highestOffer?.price || 0),
+  decimals,
+  chainSymbol,
+)
+
 onMounted(async () => {
   const [ok, _, drop] = await t($fetch('/api/genart/list', { query: { collection: props.collectionId } }))
   if (ok && drop.data[0]?.creator) {
@@ -220,20 +230,35 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
           </template>
         </UserInfo>
       </div>
-    </div>
 
-    <div class="space-y-3 bg-secondary rounded-md p-6">
+      <!-- Highest Offer Section -->
+      <div class="p-6 bg-secondary rounded-md space-y-2">
+        <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+          Highest Offer
+        </p>
+        <div class="flex items-baseline gap-2">
+          <p class="text-2xl font-bold text-foreground">
+            {{ highestOffer ? highestOfferFormatted : 'No offers' }}
+          </p>
+          <p v-if="highestOffer" class="text-sm text-muted-foreground">
+            ({{ highestOfferUsd }})
+          </p>
+        </div>
+      </div>
+
       <!-- Current Price Section -->
-      <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-        Current Price
-      </p>
-      <div class="flex items-baseline gap-2">
-        <p class="text-2xl font-bold text-foreground">
-          {{ formattedPrice || 'Not for sale' }}
+      <div class="p-6 bg-secondary rounded-md space-y-2">
+        <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+          Current Price
         </p>
-        <p v-if="formattedPrice && usdPrice" class="text-sm text-muted-foreground">
-          ({{ usdPrice }})
-        </p>
+        <div class="flex items-baseline gap-2">
+          <p class="text-2xl font-bold text-foreground">
+            {{ formattedPrice || 'Not for sale' }}
+          </p>
+          <p v-if="formattedPrice && usdPrice" class="text-sm text-muted-foreground">
+            ({{ usdPrice }})
+          </p>
+        </div>
       </div>
     </div>
   </div>
