@@ -168,7 +168,6 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
 
         return h(resolveComponent('TradeOwnerButton'), {
           trade,
-          class: 'mt-5',
           detailed: true,
           onClickMain: () => {
             selectedTrade.value = trade
