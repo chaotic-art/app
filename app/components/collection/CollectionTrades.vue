@@ -39,26 +39,22 @@ const key = computed(() => JSON.stringify(tradeQuery.value))
 </script>
 
 <template>
-  <div class="flex">
-    <div
-      class="w-full my-4!"
+  <div class="w-full">
+    <TradeActivityTable
+      :key="key"
+      :query="tradeQuery"
+      :type="tradeType"
     >
-      <TradeActivityTable
-        :key="key"
-        :query="tradeQuery"
-        :type="tradeType"
+      <template
+        v-if="collectionId"
+        #action
       >
-        <template
-          v-if="collectionId"
-          #action
-        >
-          <CreateCollectionOfferButton
-            v-if="isTradeOffer(tradeType)"
-            :collection-id="collectionId"
-          />
-        </template>
-      </TradeActivityTable>
-    </div>
+        <CreateCollectionOfferButton
+          v-if="isTradeOffer(tradeType)"
+          :collection-id="collectionId"
+        />
+      </template>
+    </TradeActivityTable>
   </div>
 
   <LazyMakeOfferModal />

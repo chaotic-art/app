@@ -178,15 +178,11 @@ defineOgImageComponent('Frame', {
 
       <USeparator class="my-12" />
 
-      <UTabs v-model="activeTab" color="neutral" :items="tabsItems" class="w-full my-4">
+      <UTabs v-model="activeTab" color="neutral" :items="tabsItems" class="w-full" :ui="{ root: 'gap-4' }">
         <template #items>
           <!-- Items Section -->
-          <div class="space-y-6">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-              <h2 class="text-2xl md:text-3xl font-medium font-serif italic text-center md:text-left text-gray-900 dark:text-white">
-                Collection Items
-              </h2>
-
+          <div class="space-y-6 mt-2">
+            <div class="flex flex-col md:flex-row justify-end items-center gap-4">
               <div class="w-full md:w-auto">
                 <SortOptions
                   v-model="selectedSort"

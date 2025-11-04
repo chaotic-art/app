@@ -21,7 +21,7 @@ const tradeQuery = computed<TradeTableQuery | null>(() => {
 </script>
 
 <template>
-  <div>
+  <div class="mt-2">
     <TradeActivityTable
       v-if="tradeQuery"
       :query="tradeQuery"
