@@ -7,9 +7,9 @@ import {
   TradeType,
 } from '@/components/trade/types'
 import { BLOCKS_PER_HOUR } from '@/composables/onchain/utils'
+import useRelayBlock from '@/composables/useRelayBlock'
 import { collectionsOwnersByIds } from '~/graphql/queries/collections'
 import { offersList } from '~/graphql/queries/trades'
-// import swapsList from '@/queries/subsquid/general/swapsList.graphql'
 
 interface CollectionWithTokenOwners {
   id: string
@@ -59,6 +59,7 @@ export default function ({
 
   const { currentChain } = useChain()
   const currentBlock = useCurrentBlock()
+  const { relayBlock: relayHeadNow, refresh: refreshRelay } = useRelayBlock()
   const fetching = ref(true)
   const data = ref<OffersListData>()
 
@@ -93,7 +94,7 @@ export default function ({
   const hasTargetsOfTrades = computed(() => Boolean(targetsOfTrades.value))
   const tradeKeys = computed<string>(() => dataItems.value.map(item => item.id).join('-'))
   const needsToSubscribe = computed(() => minimal ? false : !hasTargetsOfTrades.value)
-  const loading = computed(() => !currentBlock.value || fetching.value || needsToSubscribe.value)
+  const loading = computed(() => !currentBlock.value || fetching.value || needsToSubscribe.value || !relayHeadNow.value)
 
   const subscribeToTargetsOfTrades = (trades: BaseTrade[]) => {
     ownersSubscription.value = useSubscriptionGraphql({
@@ -131,26 +132,43 @@ export default function ({
     })
   }
 
-  watchEffect(() => {
-    if (needsToSubscribe.value || !currentBlock.value) {
+  watchEffect(async () => {
+    if (!needsToSubscribe.value || relayHeadNow.value) {
       return
     }
+
+    await refreshRelay(true)
+  })
+
+  watchEffect(() => {
+    if (needsToSubscribe.value || !currentBlock.value || !relayHeadNow.value) {
+      return
+    }
+
+    const relayHead = relayHeadNow.value!
 
     items.value = dataItems.value.map((trade) => {
       const desiredType = trade.desired ? TradeDesiredTokenType.SPECIFIC : TradeDesiredTokenType.ANY_IN_COLLECTION
 
+      const expirationRelay = Number(trade.expiration) // expiration is in RELAY block number
+      const createdAtPara = Number(trade.blockNumber)
+
+      // tmp: solution till indexer is fixed
+      const etaRelayBlocks = Math.max(0, expirationRelay - relayHead)
+      const ageParaBlocks = Math.max(0, currentBlock.value - createdAtPara)
+
       return {
         ...trade,
-        expirationDate: addSeconds(new Date(), ((Number(trade.expiration) - currentBlock.value) * SECONDS_PER_BLOCK)),
+        expirationDate: addSeconds(new Date(), etaRelayBlocks * SECONDS_PER_BLOCK),
         offered: trade.nft,
         desiredType,
         isAnyTokenInCollectionDesired: desiredType === TradeDesiredTokenType.ANY_IN_COLLECTION,
         // Check block number to handle trades that are expired but not yet updated in indexer
         // @see https://github.com/kodadot/stick/blob/9eac12938c47bf0e66e93760231208e4249d8637/src/mappings/utils/cache.ts#L127
-        isExpired: trade.status === TradeStatus.EXPIRED || currentBlock.value > Number(trade.expiration),
+        isExpired: trade.status === TradeStatus.EXPIRED || relayHead > expirationRelay,
         type,
         targets: targetsOfTrades.value?.get(trade.id) || [],
-        createdAt: subSeconds(new Date(), ((currentBlock.value - Number(trade.blockNumber)) * SECONDS_PER_BLOCK)),
+        createdAt: subSeconds(new Date(), ageParaBlocks * SECONDS_PER_BLOCK),
       } as TradeNftItem
     })
   })
