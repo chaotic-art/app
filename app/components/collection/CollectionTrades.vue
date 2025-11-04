@@ -23,7 +23,7 @@ function getTradeQuery(direction: 'incoming' | 'outgoing') {
     directionQuery,
   ]
 
-  if (tradeCollection.value) {
+  if (tradeCollection.value && direction === 'incoming') {
     where.push(`desired_isNull: true`)
   }
 
@@ -45,6 +45,18 @@ const key = computed(() => JSON.stringify(tradeQuery.value))
       :query="tradeQuery"
       :type="tradeType"
     >
+      <template
+        v-if="collectionId"
+        #filters="{ activeTab }"
+      >
+        <FilterButton
+          class="capitalize"
+          variant="outline"
+          url-param="trade_collection"
+          label="Only Collection Offers"
+          :disabled="activeTab === 'outgoing'"
+        />
+      </template>
       <template
         v-if="collectionId"
         #action

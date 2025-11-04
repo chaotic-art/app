@@ -228,6 +228,8 @@ useSubscriptionGraphql<DocumentNode, { incoming: { id: string }[], outgoing: { i
             </span>
           </div>
         </UButton>
+
+        <slot name="filters" :active-tab="activeTab" />
       </div>
       <slot name="action" />
     </div>
