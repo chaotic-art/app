@@ -1,14 +1,9 @@
 import type { FetchError } from 'ofetch'
 import { encodeAddress, isEvmAddress } from 'dedot/utils'
 import { $fetch } from 'ofetch'
-import { isProduction } from '@/utils/env'
-
-const BASE_URL = isProduction
-  ? 'https://profile.kodadot.workers.dev/'
-  : 'https://profile-beta.kodadot.workers.dev/'
 
 const api = $fetch.create({
-  baseURL: BASE_URL,
+  baseURL: 'https://profile.chaotic.art',
 })
 
 export enum Socials {
