@@ -35,5 +35,6 @@ const bannerUrl = computed(() => sanitizeIpfsUrl(profile.value?.banner || ''))
     <ProfileDetail :profile="profile" :address="address" :banner-url="bannerUrl" />
 
     <LazyActionCart />
+    <ScrollToTop />
   </UContainer>
 </template>
