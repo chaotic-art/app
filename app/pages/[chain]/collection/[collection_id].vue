@@ -175,5 +175,6 @@ defineOgImageComponent('Frame', {
         />
       </div>
     </div>
+    <ScrollToTop />
   </UContainer>
 </template>
