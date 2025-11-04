@@ -109,7 +109,7 @@ export default function ({
         trades.forEach((trade) => {
           const tradeDesired = trade.desired
           map.set(trade.id, tradeDesired
-            ? [collectionMap[tradeDesired.collection.id].find(nft => nft.id === tradeDesired.id)]
+            ? [(collectionMap[tradeDesired?.collection?.id] || []).find(nft => nft.id === tradeDesired.id)]
             : collectionMap[trade.considered.id])
         })
 
