@@ -215,7 +215,6 @@ whenever(() => isSuccess.value
         <template v-if="loading">
           <div class="space-y-4 min-h-[200px]">
             <!-- Header skeleton (identity/info) -->
-
             <div class="space-y-3">
               <div class="flex items-center gap-3 p-3 rounded-full border border-muted">
                 <USkeleton class="h-10 w-10 rounded-full" />
@@ -245,7 +244,7 @@ whenever(() => isSuccess.value
 
             <!-- Footer skeleton (action button) -->
             <div class="pt-4">
-              <USkeleton class="h-10 w-full rounded-md" />
+              <USkeleton class="h-10 w-full rounded-full" />
             </div>
           </div>
         </template>
@@ -264,18 +263,14 @@ whenever(() => isSuccess.value
             @send-item-clear="clearSendItem"
           />
 
-          <div
+          <TradeOwnerButton
             v-if="trade"
-            class="pt-5!"
-          >
-            <TradeOwnerButton
-              main-class="w-full! capitalize"
-              :trade="trade"
-              :label="label"
-              :disabled="disabled"
-              @click-main="execTransaction"
-            />
-          </div>
+            main-class="w-full! capitalize"
+            :trade="trade"
+            :label="label"
+            :disabled="disabled"
+            @click-main="execTransaction"
+          />
         </template>
       </template>
     </UModal>
