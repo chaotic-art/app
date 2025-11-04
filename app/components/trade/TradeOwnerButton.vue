@@ -10,7 +10,6 @@ const props = defineProps<{
   disabled?: boolean
   label?: string
   mainClass?: string
-  detailed?: boolean
 }>()
 const emit = defineEmits(['clickMain'])
 const { accountId } = useAuth()

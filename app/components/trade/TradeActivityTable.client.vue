@@ -168,7 +168,6 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
 
         return h(resolveComponent('TradeOwnerButton'), {
           trade,
-          detailed: true,
           onClickMain: () => {
             selectedTrade.value = trade
             isTradeModalOpen.value = true
