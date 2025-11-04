@@ -13,7 +13,7 @@ interface Props {
   tokenId: string
 }
 
-type ActivityFilter = 'MINT' | 'BUY' | 'LIST' | 'SEND' | 'BURN'
+type ActivityFilter = 'MINT' | 'BUY' | 'LIST' | 'SEND' | 'BURN' | 'SWAP'
 
 interface FilterOption {
   value: ActivityFilter
@@ -31,6 +31,7 @@ const filterOptions: FilterOption[] = [
   { value: 'BUY', label: 'Sales', icon: 'i-heroicons-banknotes' },
   { value: 'LIST', label: 'Listings', icon: 'i-heroicons-tag' },
   { value: 'SEND', label: 'Transfers', icon: 'i-heroicons-arrow-right-circle' },
+  { value: 'SWAP', label: 'Swaps', icon: 'i-heroicons-arrow-path-rounded-square' },
   { value: 'BURN', label: 'Burns', icon: 'i-heroicons-fire' },
 ]
 
@@ -42,6 +43,7 @@ function getEventLabel(interaction: string): string {
     LIST: 'Listed',
     SEND: 'Transferred',
     BURN: 'Burned',
+    SWAP: 'Swapped',
   }
   return labelMap[interaction] || interaction
 }
@@ -156,7 +158,7 @@ watchEffect(async () => {
               const meta = row.getValue('meta')
               const caller = row.getValue('caller')
 
-              if (interaction === 'SEND' && meta) {
+              if ((interaction === 'SEND' || interaction === 'SWAP') && meta) {
                 return h(UserInfo, {
                   address: meta as string,
                   avatarSize: 24,
