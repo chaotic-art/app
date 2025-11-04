@@ -38,8 +38,8 @@ const desiredTitle = computed(() => isSwap.value ? $i18n.t(`${key.value}.receive
         :trade="trade"
         :send-item="sendItem"
         :title="desiredTitle"
-        @send-item:select="$emit('sendItemSelect', $event)"
-        @send-item:clear="$emit('sendItemClear')"
+        @send-item-select="$emit('sendItemSelect', $event)"
+        @send-item-clear="$emit('sendItemClear')"
       />
       <TokenItemDetails
         v-else-if="desired"

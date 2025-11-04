@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { ExecTxParams, OverviewMode, TradeDetailedToken } from './utils'
 import type { TradeNftItem } from '@/components/trade/types'
-import type { OdaToken } from '~/services/oda'
 import { useQuery } from '@tanstack/vue-query'
 import { whenever } from '@vueuse/core'
 import ModalIdentityItem from '@/components/common/ModalIdentityItem.vue'
@@ -139,7 +138,7 @@ const { data: nft, isLoading: nftLoading } = useQuery<TradeNFTs | null>({
 
 const loading = computed(() => nftLoading.value || !nft.value)
 
-const selectSendItem = (item: OdaToken) => selectedSendItemId.value = item.id
+const selectSendItem = (id: string) => selectedSendItemId.value = id
 const clearSendItem = () => selectedSendItemId.value = undefined
 
 function onClose() {
@@ -161,7 +160,7 @@ function execTransaction() {
   const params: ExecTxParams = {
     trade: trade.value,
     chain: currentChain.value,
-    sendItem: trade.value.desired?.sn || sendItem.value?.id as string,
+    sendItem: trade.value.desired?.sn || sendItem.value?.sn as string,
   }
 
   TradeTypeTx[trade.value.type][mode.value](params)

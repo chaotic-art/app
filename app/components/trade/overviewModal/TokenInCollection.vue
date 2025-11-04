@@ -43,6 +43,8 @@ const { isTargetOfTrade } = useIsTrade(computed(() => props.trade), accountId)
 
         <UButton
           v-if="sendItem"
+          variant="link"
+          size="sm"
           @click="() => {
             selected = undefined
             $emit('sendItemClear')
@@ -71,7 +73,7 @@ const { isTargetOfTrade } = useIsTrade(computed(() => props.trade), accountId)
         }"
         @select="sendItem => {
           selected = sendItem
-          $emit('sendItemSelect', sendItem)
+          $emit('sendItemSelect', sendItem.id)
         }"
       />
     </div>

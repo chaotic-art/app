@@ -6,7 +6,9 @@ const props = defineProps<{
   where: Record<string, unknown>
 }>()
 
-defineEmits(['select'])
+defineEmits<{
+  (e: 'select', token: Token['value']): void
+}>()
 
 interface Token {
   label: string
@@ -19,7 +21,7 @@ const { currentChain } = useChain()
 const input = ref<Token>()
 const items = ref<Token[]>([])
 
-async function onSearch(searchKey: string) {
+async function onSearch(searchKey: string = '') {
   const search = {
     name_containsInsensitive: searchKey,
   }
@@ -44,10 +46,24 @@ async function onSearch(searchKey: string) {
     value: token,
   }))
 }
+
+onBeforeMount(onSearch)
 </script>
 
 <template>
-  <UInputMenu v-model="input" :items="items" @update:search-term="onSearch" @change="$emit('select', input?.value)">
+  <UInputMenu
+    v-model="input"
+    :items="items"
+    open-on-focus
+    size="lg"
+    placeholder="Search tokens"
+    @update:search-term="onSearch"
+    @change="() => {
+      if (input?.value) {
+        $emit('select', input.value)
+      }
+    }"
+  >
     <template #item-leading="{ item }">
       <img
         v-if="item.value.image"

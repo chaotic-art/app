@@ -57,5 +57,5 @@ watchEffect(() => {
     </CartItemDetails>
   </div>
 
-  <USkeleton v-else class="h-12 w-full rounded" />
+  <USkeleton v-else class="h-12 w-full rounded-lg" />
 </template>
