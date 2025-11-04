@@ -209,7 +209,7 @@ useSubscriptionGraphql<DocumentNode, { incoming: { id: string }[], outgoing: { i
 
 <template>
   <div>
-    <div class="flex justify-between mb-5 content-center">
+    <div class="flex justify-between mb-5 content-center flex-wrap gap-4">
       <div class="flex gap-4! items-center flex-wrap">
         <UButton
           v-for="filter in tabs"
