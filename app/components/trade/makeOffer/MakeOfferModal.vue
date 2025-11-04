@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { MakingOfferItem } from '../types'
 import type { TxType } from '~/composables/onchain/useNftPallets'
 import { whenever } from '@vueuse/core'
 import { formatBalance } from 'dedot/utils'
@@ -64,9 +65,9 @@ const confirmListingLabel = computed(() => {
 
 const closeMakingOfferModal = () => (makeOfferModalOpen.value = false)
 
-function createOfferTx(type: TxType) {
+function createOfferTx(items: MakingOfferItem[], type: TxType) {
   return createOffer({
-    items: items.value.map(item => ({
+    items: items.map(item => ({
       price: item.offerPrice ? String(Number(toNative(Number(item.offerPrice), decimals.value))) : '',
       desiredItem: Number(item.sn),
       desiredCollectionId: Number(item.collection.id),
@@ -82,9 +83,7 @@ async function confirm() {
   try {
     unusedOfferedItemsSubscription.value()
 
-    await createOfferTx('submit')
-
-    offerStore.clear()
+    createOfferTx([...items.value], 'submit')
 
     closeMakingOfferModal()
   }
@@ -117,7 +116,7 @@ useModalIsOpenTracker({
 useModalIsOpenTracker({
   isOpen: makeOfferModalOpen,
   onOpen: () => {
-    createOfferTx('estimate')
+    createOfferTx(items.value, 'estimate')
       .then((amount) => {
         txFees.value = Number(amount)
       })
