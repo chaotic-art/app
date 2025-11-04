@@ -52,7 +52,7 @@ async function getItem(id: string): Promise<ItemMedia> {
   const metadata = await fetchTokenMetadata(metadataUri)
 
   return {
-    image: metadata?.image || '',
+    image: metadata?.image || '',
     animationUrl: metadata?.animation_url || '',
   }
 }

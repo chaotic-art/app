@@ -12,7 +12,7 @@ export interface MakingOfferItem {
   offerExpiration?: number
   name: string
   currentOwner: string
-  collection: { id: string } & OnchainCollection
+  collection: { id: string } & OnchainCollection
   meta?: { image: string }
   metadata: string
   sn: string | null

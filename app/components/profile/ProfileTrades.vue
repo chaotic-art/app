@@ -6,8 +6,6 @@ const props = defineProps<{
   address: string
 }>()
 
-const emit = defineEmits(['totalCountChange'])
-
 const { data: ownedCollections } = useOwnedCollections(props.address)
 
 const tradeQuery = computed<TradeTableQuery | null>(() => {

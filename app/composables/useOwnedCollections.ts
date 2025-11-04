@@ -20,7 +20,7 @@ export function useOwnedCollections(address: MaybeRef<string>) {
         context: { endpoint: currentChain.value },
       })
 
-      return data?.collectionEntities.map(({ id }) => id) || []
+      return data?.collectionEntities.map(({ id }) => id) || []
     },
   })
 }

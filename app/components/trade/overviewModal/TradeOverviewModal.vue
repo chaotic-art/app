@@ -152,8 +152,6 @@ function reset() {
 }
 
 function execTransaction() {
-  console.log('hi', mode.value)
-
   if (!nft.value || !trade.value) {
     return
   }

@@ -41,7 +41,7 @@ const teleportTransitionTxFees = computed(() =>
 )
 
 const totalOfferAmount = computed(
-  () => toNative(sum(items.value.map(nft => Number(nft.offerPrice || 0))), decimals.value),
+  () => toNative(sum(items.value.map(nft => Number(nft.offerPrice || 0))), decimals.value),
 )
 
 const totalNeededAmount = computed(() => totalOfferAmount.value + (!offeredItem.value ? OFFER_MINT_PRICE : 0))
