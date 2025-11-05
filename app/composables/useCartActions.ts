@@ -15,6 +15,7 @@ interface UseCartActionsParams {
 
 export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId, mimeType }: UseCartActionsParams) {
   const { isCurrentAccount } = useAuth()
+  const { doAfterLogin } = useDoAfterlogin()
 
   const actionCartStore = useActionCartStore()
   const shoppingCartStore = useShoppingCartStore()
@@ -74,6 +75,12 @@ export function useCartActions({ collection, price, chain, owner, token, collect
   }
 
   function addToShoppingCart() {
+    doAfterLogin({
+      onLoginSuccess: handleAddToShoppingCart,
+    })
+  }
+
+  function handleAddToShoppingCart() {
     if (!token.value || !owner.value) {
       return
     }
@@ -87,6 +94,12 @@ export function useCartActions({ collection, price, chain, owner, token, collect
   }
 
   function buyNow() {
+    doAfterLogin({
+      onLoginSuccess: handleBuyNow,
+    })
+  }
+
+  function handleBuyNow() {
     if (!token.value || !owner.value) {
       return
     }
