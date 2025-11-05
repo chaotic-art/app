@@ -68,17 +68,13 @@ onBeforeMount(async () => {
           <div class="text-xs text-gray-500 font-medium">
             Price
           </div>
-          <div class="text-right">
-            <div v-if="isTBA(formattedDrop?.price)" class="px-2 py-1 bg-muted rounded-md">
-              <span class="text-xs font-medium text-muted-foreground">TBA</span>
-            </div>
+          <div class="flex items-center gap-1">
+            <UBadge v-if="isTBA(formattedDrop?.price)" label="TBA" size="sm" color="neutral" variant="soft" />
             <div v-else-if="Number(formattedDrop?.price)" class="flex items-baseline gap-1">
               <span class="text-sm font-semibold text-[var(--text-color)]">{{ usdPrice }}</span>
               <span class="text-xs text-gray-500">USD</span>
             </div>
-            <div v-else class="px-2 py-1 bg-green-50 dark:bg-green-950 rounded-md">
-              <span class="text-xs font-medium text-green-600 dark:text-green-400">Free</span>
-            </div>
+            <UBadge v-else label="Free" size="sm" color="success" variant="soft" />
           </div>
         </div>
       </div>
