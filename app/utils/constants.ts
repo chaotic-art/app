@@ -17,11 +17,11 @@ export const URLS = {
     bucket: 'https://bucket.chaotic.art/',
     dyndata: 'https://dyndata.chaotic.art',
     oda: 'https://oda.chaotic.art',
+    playground: 'https://playground.chaotic.art',
+    playground_bucket: 'https://playground-bucket.chaotic.art',
 
     // TODO: migrate to chaotic
     nftStorage: 'https://ipos.kodadot.workers.dev/',
-    playground: 'https://playground.kodadot.workers.dev/',
-    playground_bucket: 'https://playground-r2.koda.art',
     cors_proxy: 'https://cors-proxy.kodadot.workers.dev/',
   },
   graphql: {
