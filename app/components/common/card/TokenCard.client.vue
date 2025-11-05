@@ -46,13 +46,17 @@ const {
 const actionCartStore = useActionCartStore()
 const route = useRoute()
 const { isCurrentAccount } = useAuth()
+const { artViewFilter } = storeToRefs(usePreferencesStore())
 
 const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
 const isAirdropRoute = computed(() => route.name?.toString().includes('airdrop-select'))
+const isCollectionRoute = computed(() => route.name?.toString().includes('chain-collection-collection_id'))
 const canAddToActionCart = computed(() => (isProfileRoute.value || isAirdropRoute.value) && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
+
+const hideMediaInfo = computed(() => artViewFilter.value && isCollectionRoute.value)
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
@@ -159,7 +163,7 @@ watchEffect(() => {
         </div>
 
         <!-- Card Content -->
-        <div class="p-3 md:p-4">
+        <div v-if="!hideMediaInfo" class="p-3 md:p-4">
           <h3 class="font-bold text-base md:text-lg mb-2 text-gray-900 dark:text-white line-clamp-1" :title="name || token?.metadata?.name || 'Untitled NFT'">
             {{ name || token?.metadata?.name || 'Untitled NFT' }}
           </h3>
