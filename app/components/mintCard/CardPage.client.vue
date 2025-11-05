@@ -10,6 +10,7 @@ const { setColorMode, currentMode } = useTheme()
 const { doAfterLogin } = useDoAfterlogin()
 const { shareOnX } = useSocialShare()
 const { getConnectedSubAccount } = storeToRefs(useWalletStore())
+const { isAvailable: isDeeplinkAvailable, redirect: deeplinkRedirect } = useNovaDeeplink()
 const { $i18n } = useNuxtApp()
 const isLoading = ref(false)
 const isSuccessModalOpen = ref(false)
@@ -29,6 +30,7 @@ const existingCard = ref<ExistingCard | null>(null)
 const mintedCard = ref<ExistingCard | null>(null)
 const isMinted = computed(() => !!existingCard.value)
 const screenshotUrl = ref<string | null>(null)
+
 async function fetchOwnedCardNft() {
   const owner = getss58AddressByPrefix(getConnectedSubAccount.value?.address as string, CHAOTIC_CARD_PREFIX)
 
@@ -67,6 +69,10 @@ async function fetchExistingCard() {
 }
 
 function handleClaimClick() {
+  if (isDeeplinkAvailable.value) {
+    return deeplinkRedirect()
+  }
+
   doAfterLogin({
     onLoginSuccess: async () => {
       await fetchExistingCard()

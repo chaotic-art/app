@@ -10,6 +10,7 @@ export const dotHubDenyList = [
 ]
 
 export const URLS = {
+  appDomain: 'https://chaotic.art',
   koda: {
     pinata: 'https://kodadot.mypinata.cloud/ipfs/',
     directUpload: 'https://direct-upload.kodadot.workers.dev/',
