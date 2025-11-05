@@ -78,6 +78,7 @@ const { canBurn, burnNow, canTransfer, transferNow } = useCartActions({
   owner: computed(() => props.owner || null),
   price: computed(() => props.price || null),
   mimeType: computed(() => props.mimeType),
+  highestOffer: computed(() => props.highestOffer),
 })
 
 const { shareOnX } = useSocialShare()

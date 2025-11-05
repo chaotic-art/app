@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { HighestNftOffer } from '../trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 
@@ -10,6 +11,7 @@ interface Props {
   tokenId: number
   owner: string | null
   price: bigint | null
+  highestOffer: HighestNftOffer | null
 }
 
 const props = defineProps<Props>()
@@ -31,6 +33,7 @@ const {
   collection: computed(() => props.collection),
   owner: computed(() => props.owner),
   price: computed(() => props.price),
+  highestOffer: computed(() => props.highestOffer),
 })
 </script>
 

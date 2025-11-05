@@ -103,6 +103,7 @@ const tokenMetadata = computed(() => {
             :token-id="Number(safeTokenId)"
             :owner="owner"
             :price="BigInt(price ?? '0')"
+            :highest-offer="highestOffer"
           />
         </div>
       </div>

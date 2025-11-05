@@ -1,4 +1,4 @@
-import type { MakingOfferItem } from '~/components/trade/types'
+import type { HighestNftOffer, MakingOfferItem } from '~/components/trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { LazyBurnModal, LazyTransferModal } from '#components'
@@ -12,9 +12,10 @@ interface UseCartActionsParams {
   price: Ref<bigint | null>
   chain: AssetHubChain
   mimeType?: ComputedRef<string>
+  highestOffer?: ComputedRef<HighestNftOffer | null>
 }
 
-export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId, mimeType }: UseCartActionsParams) {
+export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId, mimeType, highestOffer }: UseCartActionsParams) {
   const { isCurrentAccount } = useAuth()
 
   const actionCartStore = useActionCartStore()
@@ -141,7 +142,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
       id: id.value,
       name: token.value.metadata?.name || '',
       sn: tokenId.toString(),
-      highestOffer: '',
+      highestOffer: highestOffer?.value?.price || undefined,
       chain,
       collection: {
         ...collection.value,
