@@ -247,7 +247,7 @@ watchDebounced(
 
               <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
                 <div class="flex items-center gap-3">
-                  <div class="size-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                  <div class="size-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0">
                     <img
                       v-if="selectedCollection.image"
                       :src="sanitizeIpfsUrl(selectedCollection.image)"
@@ -264,7 +264,7 @@ watchDebounced(
                       <h5 class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
                         {{ selectedCollection.name }}
                       </h5>
-                      <span class="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded font-mono flex-shrink-0">
+                      <span class="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded font-mono shrink-0">
                         #{{ selectedCollection.value }}
                       </span>
                     </div>
@@ -391,6 +391,22 @@ watchDebounced(
                   class="mb-0"
                   @click="removeProperty(index)"
                 />
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-center gap-3">
+              <UCheckbox
+                v-model="state.nsfw"
+              />
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Explicit content (NSFW)
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Mark this NFT as containing explicit or sensitive content
+                </p>
               </div>
             </div>
           </div>

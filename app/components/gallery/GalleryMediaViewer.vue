@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { useFullscreen } from '@vueuse/core'
+import { isNsfwNft } from '~/utils/mint'
 
 interface Props {
   tokenData: OdaToken | null
@@ -11,12 +12,19 @@ interface Props {
   collectionId: string
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const imageStatus = ref<'normal' | 'fallback'>('normal')
 const fullScreenDisabled = ref(false)
 const mediaItemRef = ref<HTMLDivElement>()
 const { toggle, isFullscreen, isSupported } = useFullscreen(mediaItemRef)
+
+const isNsfw = computed(() => isNsfwNft(props.tokenData?.metadata?.attributes))
+const isBlurred = ref(true)
+
+function toggleNsfwContent() {
+  isBlurred.value = !isBlurred.value
+}
 
 function toggleMediaFullscreen() {
   if (!isSupported.value || fullScreenDisabled.value) {
@@ -42,6 +50,7 @@ defineExpose({
       :id="containerId"
       ref="mediaItemRef"
       class="relative"
+      :class="{ 'nsfw-container': isNsfw && isBlurred }"
     >
       <!-- Video Media -->
       <video
@@ -57,7 +66,7 @@ defineExpose({
       <!-- Audio Media -->
       <div
         v-else-if="mimeType?.includes('audio') && (tokenData?.metadata?.animation_url || tokenData?.metadata?.image)"
-        class="aspect-square w-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-700 dark:to-gray-900 relative p-4 md:p-6"
+        class="aspect-square w-full flex flex-col items-center justify-center bg-linear-to-br from-gray-50 to-gray-200 dark:from-gray-700 dark:to-gray-900 relative p-4 md:p-6"
       >
         <UIcon name="i-heroicons-musical-note" class="w-12 h-12 md:w-16 md:h-16 text-primary mb-3 md:mb-4" />
         <audio
@@ -97,6 +106,28 @@ defineExpose({
       >
         <UIcon name="i-heroicons-photo" class="w-16 h-16 text-gray-400" />
       </div>
+
+      <div
+        v-if="isNsfw && isBlurred"
+        class="absolute inset-0 backdrop-blur-[60px] bg-black/50 flex flex-col items-center justify-center text-white z-10"
+      >
+        <UIcon name="i-heroicons-eye-slash" class="w-16 h-16 mb-4" />
+        <span class="font-bold text-xl mb-2">Explicit/sensitive content</span>
+        <span class="text-center text-sm max-w-md px-4">
+          Mature audiences only. Please confirm your age and consent to proceed.
+        </span>
+      </div>
+
+      <!-- NSFW Toggle Button -->
+      <UButton
+        v-if="isNsfw"
+        size="md"
+        variant="secondary"
+        class="absolute bottom-20 opacity-0 group-hover:opacity-100  transition-opacity duration-200 left-1/2 transform -translate-x-1/2 z-20"
+        @click="toggleNsfwContent"
+      >
+        {{ isBlurred ? 'Show Content' : 'Hide Content' }}
+      </UButton>
 
       <!-- Fullscreen Back Button -->
       <UButton
