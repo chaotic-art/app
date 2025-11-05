@@ -1,6 +1,6 @@
 import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 
-const api = $fetch.create({ baseURL: 'https://oda.chaotic.art', retry: 3 })
+const api = $fetch.create({ baseURL: URLS.services.oda, retry: 3 })
 
 export interface OnchainCollection {
   metadata?: {

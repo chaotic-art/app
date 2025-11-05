@@ -2,8 +2,8 @@ import type { AssetHubChain } from './sdk.client'
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
 
 export const GRAPHQL_ENDPOINTS: Record<Exclude<AssetHubChain, 'ahpas'>, string> = {
-  ahk: 'https://ahk.gql.api.kodadot.xyz/',
-  ahp: 'https://ahp.gql.api.kodadot.xyz/',
+  ahk: URLS.graphql.ahk,
+  ahp: URLS.graphql.ahp,
 }
 
 export default defineNuxtPlugin(() => {

@@ -1,5 +1,3 @@
-const BASE_URL = 'https://cors-proxy.kodadot.workers.dev/'
-
 export function getCorsProxiedUrl(url: string): string {
-  return `${BASE_URL}/?url=${encodeURIComponent(url)}`
+  return `${URLS.services.cors_proxy}/?url=${encodeURIComponent(url)}`
 }
