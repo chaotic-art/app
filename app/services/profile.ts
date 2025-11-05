@@ -3,7 +3,7 @@ import { encodeAddress, isEvmAddress } from 'dedot/utils'
 import { $fetch } from 'ofetch'
 
 const api = $fetch.create({
-  baseURL: 'https://profile.chaotic.art',
+  baseURL: URLS.services.profile,
 })
 
 export enum Socials {

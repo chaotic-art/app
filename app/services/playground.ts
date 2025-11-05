@@ -1,18 +1,10 @@
 import { $fetch } from 'ofetch'
 
-const BASE_URL = isProduction
-  ? 'https://playground.kodadot.workers.dev/'
-  : 'https://playground-beta.kodadot.workers.dev/'
-
-const PUBLIC_R2_BUCKET_URL = isProduction
-  ? 'https://playground-r2.koda.art'
-  : 'https://pub-adc77a8fecb9405b9573442870905a67.r2.dev'
-
 const api = $fetch.create({
-  baseURL: BASE_URL,
+  baseURL: URLS.services.playground,
 })
 
-export const getObjectUrl = (key: string) => `${PUBLIC_R2_BUCKET_URL}/${key}`
+export const getObjectUrl = (key: string) => `${URLS.services.playground_bucket}/${key}`
 
 interface UploadFilesResponse { key: string }
 
