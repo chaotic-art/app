@@ -99,18 +99,18 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
       header: 'Offered',
       cell: ({ row }) => {
         const trade = row.original
-        const { desired } = getRowConfig(trade)
+        const { offered, desired } = getRowConfig(trade)
 
         if (trade.isAnyTokenInCollectionDesired) {
           return h(TradeActivityTableRowItemCollection, {
             considered: trade.considered,
-            surcharge: trade.surcharge || undefined,
+            surcharge: desired.surcharge,
           })
         }
 
         return h(TradeActivityTableRowItem, {
-          item: desired.item,
-          surcharge: trade.surcharge || undefined,
+          item: offered.item,
+          surcharge: desired.surcharge,
         })
       },
     },

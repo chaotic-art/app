@@ -90,7 +90,7 @@ export default function ({
     await fetch()
   })
 
-  const dataItems = computed<Offer[] | Swap[]>(() => data.value?.[dataKey] || [])
+  const dataItems = computed<Offer[] | Swap[]>(() => ((data.value as any)?.[dataKey] || []))
   const hasTargetsOfTrades = computed(() => Boolean(targetsOfTrades.value))
   const tradeKeys = computed<string>(() => dataItems.value.map(item => item.id).join('-'))
   const needsToSubscribe = computed(() => minimal ? false : !hasTargetsOfTrades.value)
