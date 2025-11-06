@@ -799,7 +799,7 @@ export function useNftPallets() {
         const offer = api.tx.Nfts.create_swap(
           {
             offered_collection: offeredCollectionId,
-            offered_item: offeredItem,
+            offered_item: offeredItem as number,
             desired_collection: desiredCollectionId,
             maybe_desired_item: !desiredItem ? undefined : desiredItem,
             maybe_price: {
