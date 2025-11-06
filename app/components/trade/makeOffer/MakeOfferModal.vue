@@ -71,7 +71,7 @@ function createOfferTx(items: MakingOfferItem[], type: TxType) {
       price: item.offerPrice ? String(Number(toNative(Number(item.offerPrice), decimals.value))) : '',
       desiredItem: Number(item.sn),
       desiredCollectionId: Number(item.collection.id),
-      offeredItem: Number(offeredItem.value),
+      offeredItem: offeredItem.value ? Number(offeredItem.value) : undefined,
       duration: item.offerExpiration || DEFAULT_OFFER_EXPIRATION_DURATION,
     })),
     chain: currentChain.value,

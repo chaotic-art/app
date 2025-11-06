@@ -102,7 +102,7 @@ interface TransferNftsParams {
 interface CreateOfferParams {
   items: {
     price: string
-    offeredItem: number
+    offeredItem: number | undefined
     desiredItem: number | undefined
     desiredCollectionId: number
     duration: number
