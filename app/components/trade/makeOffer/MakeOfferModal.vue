@@ -145,6 +145,8 @@ useModalIsOpenTracker({
       const unusedOfferedItems = shuffle(tokensSn)
 
       offeredItem.value = unusedOfferedItems[0]
+    }).catch((error) => {
+      console.warn('Error fetching unused offered items:', error)
     })
   },
 })
