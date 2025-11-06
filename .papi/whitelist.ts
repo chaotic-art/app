@@ -7,8 +7,7 @@ import type {
 
 // TODO: Add more whitelists for other chains
 const assetHubWhitelist: AhkWhitelistEntry[] | AhpWhitelistEntry[] = [
-  'query.Nfts.*',
-  'query.ParachainInfo.*',
+  'query.*',
   'tx.Nfts.*',
   'tx.System.remark',
   'tx.Utility.*',
