@@ -1,7 +1,6 @@
 import type { DocumentNode } from 'graphql'
 import type { ResultOf, VariablesOf } from '~/graphql/client'
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import consola from 'consola'
 import isEqual from 'lodash/isEqual'
 
 export default function useSubscriptionGraphql<TDoc extends DocumentNode, TData = ResultOf<TDoc>, TVariables = VariablesOf<TDoc>>({
@@ -51,14 +50,13 @@ export default function useSubscriptionGraphql<TDoc extends DocumentNode, TData 
 
       if (!isEqual(newResult, lastQueryResult)) {
         if (!lastQueryResult ? immediate : true) {
-          consola.log('[Graphql Subscription] New changes:', JSON.stringify(newResult))
           onChange({ data: newResult })
         }
         lastQueryResult = newResult
       }
     }
     catch (error) {
-      consola.error('[Graphql Subscription] Polling error:', error)
+      console.error('[Graphql Subscription] Polling error:', error)
       onError && onError(error)
     }
   }
@@ -69,7 +67,6 @@ export default function useSubscriptionGraphql<TDoc extends DocumentNode, TData 
       // fire immediately
       pollData()
       intervalId = setInterval(pollData, pollingInterval) as unknown as number
-      consola.log('[Graphql Subscription] Started polling')
     }
   }
 
@@ -77,7 +74,6 @@ export default function useSubscriptionGraphql<TDoc extends DocumentNode, TData 
     if (isPolling.value && intervalId !== null) {
       clearInterval(intervalId)
       isPolling.value = false
-      consola.log('[Graphql Subscription] Stopped polling')
     }
   }
 
