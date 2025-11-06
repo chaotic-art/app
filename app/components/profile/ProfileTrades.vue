@@ -25,5 +25,6 @@ const tradeQuery = computed<TradeTableQuery | null>(() => {
       :query="tradeQuery"
       :type="TradeType.OFFER"
     />
+    <SkeletonTable v-else />
   </div>
 </template>

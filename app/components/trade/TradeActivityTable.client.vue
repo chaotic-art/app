@@ -236,10 +236,12 @@ useSubscriptionGraphql<DocumentNode, { incoming: { id: string }[], outgoing: { i
 
     <USeparator class="mb-10 mt-0" />
 
+    <SkeletonTable v-if="loading" />
+
     <UTable
+      v-else
       :data="trades"
       :columns="columns"
-      :loading="loading"
     />
   </div>
 

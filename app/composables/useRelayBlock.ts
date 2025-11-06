@@ -2,7 +2,9 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 import { getRelayNow } from '@/composables/onchain/utils'
 
 interface UseRelayBlockOptions {
-  // When true, call refresh on first use automatically. We avoid polling by default.
+  /**
+   * When true, call refresh on first use automatically. We avoid polling by default.
+   */
   auto?: boolean
 }
 
@@ -10,7 +12,6 @@ export default function useRelayBlock(options: UseRelayBlockOptions = {}) {
   const { $sdk } = useNuxtApp()
   const { currentChain } = useChain()
 
-  // Cache per chain across the app lifecycle
   const cache = useState<Partial<Record<AssetHubChain, number | null>>>(
     'relay-block-cache',
     () => ({}),
@@ -47,7 +48,6 @@ export default function useRelayBlock(options: UseRelayBlockOptions = {}) {
   }
 
   if (options.auto) {
-    // Trigger a one-time fetch if not present yet
     watchEffect(() => {
       if (!relayBlock.value) {
         refresh(false)
