@@ -8,7 +8,7 @@ defineProps<{
   surcharge: SwapSurcharge | undefined
 }>()
 
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 </script>
 
 <template>
@@ -16,7 +16,7 @@ const { prefix } = usePrefix()
     <span class="text-gray-600 dark:text-gray-400 capitalize"> {{ $t('trades.anyNftFrom') }} </span>
     <div class="flex items-center gap-2">
       <nuxt-link
-        :to="`/${prefix}/collection/${considered.id}`"
+        :to="`/${currentChain}/collection/${considered.id}`"
         class="font-bold"
       >
         {{ considered.name }}
