@@ -93,5 +93,19 @@ export default defineNuxtConfig({
     },
   },
 
+  nitro: {
+    // preset: 'vercel',
+    commonJS: {
+      dynamicRequireTargets: [
+        'node_modules/@noble/**',
+      ],
+    },
+    esbuild: {
+      options: {
+        target: 'esnext',
+      },
+    },
+  },
+
   compatibilityDate: '2024-11-27',
 })
