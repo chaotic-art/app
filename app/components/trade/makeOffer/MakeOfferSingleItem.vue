@@ -59,12 +59,16 @@ watch(
     <USeparator class="my-4" />
 
     <div class="mb-2 flex justify-between">
-      <div>{{ $t('offer.bestOffer') }}</div>
+      <div class="text-gray-600 dark:text-gray-400">
+        {{ $t('offer.bestOffer') }}
+      </div>
       <div>{{ highestOfferPrice }}</div>
     </div>
 
     <div class="flex justify-between">
-      <div>{{ $t('offer.collectionFloorPrice') }}</div>
+      <div class="text-gray-600 dark:text-gray-400">
+        {{ $t('offer.collectionFloorPrice') }}
+      </div>
       <div>{{ collectionFloorPrice }}</div>
     </div>
 

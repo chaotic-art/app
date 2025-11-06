@@ -204,9 +204,9 @@ onUnmounted(closeMakingOfferModal)
 
         <USeparator class="my-4" />
 
-        <div class="py-2">
+        <div class="mb-4">
           <div
-            class="flex justify-between text-gray-600 dark:text-gray-400 border-b-k-shade"
+            class="flex justify-between text-gray-600 dark:text-gray-400"
           >
             <span>{{ $t('offer.offerFees') }}</span>
             <span class="ml-2">{{ teleportTransitionTxFees }}</span>

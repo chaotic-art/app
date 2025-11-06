@@ -34,7 +34,7 @@ watchEffect(() => {
   >
     <p
       v-if="title"
-      class="text-grey-500 text-sm"
+      class="text-gray-600 dark:text-gray-400 text-sm"
     >
       {{ title }}
     </p>
