@@ -34,17 +34,17 @@ function handleCancel() {
       <!-- Content -->
       <div class="space-y-4">
         <!-- Signing Account -->
-        <div class="bg-gray-50 rounded-lg p-4">
+        <div class="bg-gray-50 dark:bg-neutral-800 rounded-lg p-4">
           <UserInfo
             :address="walletAddress"
             :size="40" transparent-background custom-name
           >
             <template #name="{ addressName }">
               <div class="flex flex-col">
-                <span class="text-sm font-medium text-gray-900">
+                <span class="text-sm font-medium">
                   Signing with <span class="font-bold">{{ addressName }}</span>
                 </span>
-                <span class="text-xs text-gray-500">
+                <span class="text-xs text-gray-600 dark:text-gray-400">
                   <span class="font-bold">{{ walletBalance }}</span> on {{ chain }}
                 </span>
               </div>
@@ -53,8 +53,8 @@ function handleCancel() {
         </div>
 
         <!-- Simulated Result -->
-        <div class="bg-gray-50 rounded-lg p-4 space-y-3">
-          <div class="text-sm font-medium text-gray-700 mb-3">
+        <div class="bg-gray-50 dark:bg-neutral-800 rounded-lg p-4 space-y-3">
+          <div class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
             Simulated Result - {{ title }}
           </div>
 
@@ -134,21 +134,21 @@ function handleCancel() {
           <!-- Chain -->
           <div class="flex items-center justify-between pt-2 border-t border-gray-200">
             <div class="flex items-center gap-2">
-              <UIcon name="i-heroicons-globe-alt" class="w-4 h-4 text-gray-500" />
-              <span class="text-sm text-gray-600">Chain</span>
+              <UIcon name="i-heroicons-globe-alt" class="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              <span class="text-sm text-gray-600 dark:text-gray-400">Chain</span>
             </div>
-            <span class="text-sm text-gray-900">{{ chain }}</span>
+            <span class="text-sm">{{ chain }}</span>
           </div>
         </div>
 
-        <div class="bg-gray-50 rounded-lg p-4">
+        <div class="bg-gray-50 dark:bg-neutral-800 rounded-lg p-4">
           <!-- Estimated Fee -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-600">Fee</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">Fee</span>
             </div>
             <div class="text-right">
-              <div class="text-sm font-medium text-gray-900 font-mono">
+              <div class="text-sm font-medium font-mono">
                 {{ estimatedFee }}
               </div>
             </div>
@@ -157,10 +157,10 @@ function handleCancel() {
           <!-- wallet balance -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-600">Balance</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">Balance</span>
             </div>
             <div class="text-right">
-              <div class="text-sm font-medium text-gray-900 font-mono">
+              <div class="text-sm font-medium font-mono">
                 {{ walletBalance }}
               </div>
             </div>
@@ -171,10 +171,10 @@ function handleCancel() {
           <!-- remains balance -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-600">Remains Balance</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">Remains Balance</span>
             </div>
             <div class="text-right">
-              <div class="text-sm font-medium text-gray-900 font-mono">
+              <div class="text-sm font-medium font-mono">
                 {{ remainsBalance }}
               </div>
             </div>
