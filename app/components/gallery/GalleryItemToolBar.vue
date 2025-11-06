@@ -6,6 +6,18 @@ import { downloadImage } from '@/utils/download'
 import { isMobileDevice } from '@/utils/environment'
 import { sanitizeIpfsUrl, toOriginalContentUrl } from '@/utils/ipfs'
 import { onKodahashRenderCompleted } from '@/utils/kodahash'
+import {
+  determineElementType,
+  MediaType,
+  mediaTypeElementSelectors,
+  resolveMedia,
+} from '@/utils/media'
+
+type ReloadElement
+  = | HTMLIFrameElement
+    | HTMLVideoElement
+    | HTMLImageElement
+    | null
 
 const props = defineProps<{
   containerId: string
@@ -24,6 +36,7 @@ const nftMimeType = computed(() => props.mimeType || props.nft.metadata?.mime_ty
 
 const toast = useToast()
 const imageData = ref()
+const isLoading = ref(false)
 
 const isDownloadEnabled = computed(() => {
   const mimeType = nftMimeType.value
@@ -87,6 +100,48 @@ const isNewTabEnabled = computed(() => {
   return (nftAnimation.value || nftImageUrl.value) && nftMimeType.value
 })
 
+const mediaAndImageType = computed(() => {
+  const animationMediaType = resolveMedia(props.nft.metadata?.animation_mime_type)
+  const imageMediaType = resolveMedia(nftMimeType.value)
+  return { animationMediaType, imageMediaType }
+})
+
+function getElementSelector({ imageMediaType, animationMediaType }: { imageMediaType: MediaType, animationMediaType: MediaType }) {
+  const elementType = determineElementType(animationMediaType, imageMediaType)
+  if (elementType in mediaTypeElementSelectors) {
+    return mediaTypeElementSelectors[elementType as keyof typeof mediaTypeElementSelectors]
+  }
+  return mediaTypeElementSelectors[MediaType.IMAGE]
+}
+
+function reloadElement(selector: string) {
+  setTimeout(() => {
+    isLoading.value = false
+    const element: ReloadElement = document.querySelector(`#${props.containerId} ${selector}`)
+    if (!element) {
+      return
+    }
+    if (mediaTypeElementSelectors[MediaType.IMAGE] === selector) {
+      const timestamp = new Date().getTime()
+      const url = new URL(element.src)
+      url.searchParams.set('t', timestamp.toString())
+      element.src = url.toString()
+    }
+    else {
+      element.src += ''
+    }
+  }, 500)
+}
+
+function handleReloadClick() {
+  isLoading.value = true
+  const { animationMediaType, imageMediaType } = mediaAndImageType.value
+
+  return reloadElement(
+    getElementSelector({ animationMediaType, imageMediaType }),
+  )
+}
+
 onKodahashRenderCompleted(({ payload }) => {
   imageData.value = payload.image
 })
@@ -95,6 +150,22 @@ onKodahashRenderCompleted(({ payload }) => {
 <template>
   <div class="flex justify-center mt-4 md:mt-6">
     <div class="inline-flex items-center gap-1 p-1 bg-card/90 backdrop-blur-sm rounded-xl border border-border shadow-sm">
+      <UTooltip text="Reload" :popper="{ placement: 'top' }">
+        <UButton
+          :icon="isLoading ? 'i-heroicons-arrow-path' : 'i-heroicons-arrow-path'"
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          class="size-8 transition-colors text-muted-foreground "
+          :class="isLoading
+            ? 'animate-spin'
+            : 'hover:text-foreground'"
+          @click="handleReloadClick"
+        />
+      </UTooltip>
+
+      <div class="w-px h-6 bg-border mx-1" />
+
       <!-- Fullscreen Button -->
       <UTooltip text="Fullscreen" :popper="{ placement: 'top' }">
         <UButton
