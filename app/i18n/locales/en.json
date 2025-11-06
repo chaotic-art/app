@@ -388,6 +388,7 @@
     "withdrawAmount": "Withdraw Amount",
     "withdrawOffer": "Withdraw Offer",
     "yourOffer": "Your Offer",
-    "yourOfferAmount": "Your Offer Amount"
+    "yourOfferAmount": "Your Offer Amount",
+    "failed": "Something went wrong creating offer"
   }
 }

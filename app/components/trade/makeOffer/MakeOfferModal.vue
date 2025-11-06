@@ -25,10 +25,9 @@ const { makeOfferModalOpen } = storeToRefs(usePreferencesStore())
 const { itemsInChain: items, hasInvalidOfferPrices, count } = storeToRefs(offerStore)
 
 const { decimals, chainSymbol } = useChain()
-const { $i18n } = useNuxtApp()
+const { $i18n, $apolloClient } = useNuxtApp()
 const { createOffer } = useNftPallets()
 
-const unusedOfferedItemsSubscription = ref(() => {})
 const usedOfferedItems = ref<string[]>([])
 const offeredItem = ref<string>()
 
@@ -63,7 +62,9 @@ const confirmListingLabel = computed(() => {
   return $i18n.t('offer.createOffer')
 })
 
-const closeMakingOfferModal = () => (makeOfferModalOpen.value = false)
+function closeMakingOfferModal() {
+  makeOfferModalOpen.value = false
+}
 
 function createOfferTx(items: MakingOfferItem[], type: TxType) {
   return createOffer({
@@ -81,14 +82,13 @@ function createOfferTx(items: MakingOfferItem[], type: TxType) {
 
 async function confirm() {
   try {
-    unusedOfferedItemsSubscription.value()
-
     createOfferTx([...items.value], 'submit')
 
     closeMakingOfferModal()
   }
   catch (error) {
-    warningMessage(error?.message)
+    console.error(error)
+    warningMessage($i18n.t('offer.failed'))
   }
 }
 
@@ -109,7 +109,6 @@ useModalIsOpenTracker({
   isOpen: makeOfferModalOpen,
   onClose: () => {
     offerStore.clear()
-    unusedOfferedItemsSubscription.value()
   },
 })
 
@@ -124,7 +123,7 @@ useModalIsOpenTracker({
         console.error('Error estimating transaction fees:', error)
       })
 
-    unusedOfferedItemsSubscription.value = useSubscriptionGraphql({
+    $apolloClient.query({
       query: unusedOfferedItems,
       variables: {
         where: {
@@ -138,15 +137,14 @@ useModalIsOpenTracker({
           },
         },
       },
-      onChange: ({ data: { offers: items } }) => {
-        const tokensSn = items
-          .map(({ nft }) => nft.sn)
-          .filter((tokenSn: string) => !usedOfferedItems.value.includes(tokenSn))
+    }).then(({ data: { offers: items } }) => {
+      const tokensSn = items
+        .map(({ nft }) => nft.sn)
+        .filter((tokenSn: string) => !usedOfferedItems.value.includes(tokenSn))
 
-        const unusedOfferedItems = shuffle(tokensSn)
+      const unusedOfferedItems = shuffle(tokensSn)
 
-        offeredItem.value = unusedOfferedItems[0]
-      },
+      offeredItem.value = unusedOfferedItems[0]
     })
   },
 })
