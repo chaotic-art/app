@@ -183,7 +183,8 @@ defineOgImageComponent('Frame', {
           <!-- Items Section -->
           <div class="space-y-6 mt-2">
             <div class="flex flex-col md:flex-row justify-end items-center gap-4">
-              <div class="w-full md:w-auto">
+              <div class="w-full md:w-auto flex items-center gap-2">
+                <ArtViewFilter />
                 <SortOptions
                   v-model="selectedSort"
                   class="w-full md:w-48"
@@ -206,5 +207,6 @@ defineOgImageComponent('Frame', {
         </template>
       </UTabs>
     </div>
+    <ScrollToTop />
   </UContainer>
 </template>

@@ -43,5 +43,6 @@ const queryVariables = ref<Record<string, any>>({})
         :prefix="chain"
       />
     </div>
+    <ScrollToTop />
   </UContainer>
 </template>

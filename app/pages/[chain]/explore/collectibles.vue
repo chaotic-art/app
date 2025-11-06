@@ -92,5 +92,6 @@ const queryVariables = computed(() => ({
         :prefix="chain"
       />
     </div>
+    <ScrollToTop />
   </UContainer>
 </template>

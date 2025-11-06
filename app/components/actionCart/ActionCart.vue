@@ -2,6 +2,22 @@
 import { LazyBurnModal, LazyTransferModal } from '#components'
 import { useActionCartStore } from '@/stores/actionCart'
 
+withDefaults(defineProps<{
+  enableActions?: {
+    burn?: boolean
+    transfer?: boolean
+    airdrop?: boolean
+    list?: boolean
+  }
+}>(), {
+  enableActions: () => ({
+    burn: true,
+    transfer: true,
+    airdrop: true,
+    list: true,
+  }),
+})
+
 const { onDisconnect } = useWalletManager()
 const actionCartStore = useActionCartStore()
 const listingCartStore = useListingCartStore()
@@ -95,6 +111,7 @@ watch(accountId, () => {
 
           <div class="flex gap-4">
             <UButton
+              v-if="enableActions.burn"
               variant="destructive"
               @click="openBurnModal"
             >
@@ -104,6 +121,7 @@ watch(accountId, () => {
               />
             </UButton>
             <UButton
+              v-if="enableActions.transfer"
               variant="outline"
               @click="openTransferModal"
             >
@@ -113,6 +131,7 @@ watch(accountId, () => {
               />
             </UButton>
             <UButton
+              v-if="enableActions.airdrop"
               variant="outline"
               :disabled="actionCartStore.count <= 1"
               @click="onClickAirdrop"
@@ -124,7 +143,7 @@ watch(accountId, () => {
             </UButton>
           </div>
 
-          <div class="flex gap-4">
+          <div v-if="enableActions.list" class="flex gap-4">
             <UTooltip
               class="cursor-pointer"
               text="Unsupported Operation"

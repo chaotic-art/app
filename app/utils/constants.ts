@@ -10,32 +10,28 @@ export const dotHubDenyList = [
 ]
 
 export const URLS = {
-  koda: {
-    pinata: 'https://kodadot.mypinata.cloud/ipfs/',
-    directUpload: 'https://direct-upload.kodadot.workers.dev/',
-    estuary: 'https://pinning.kodadot.workers.dev/',
+  services: {
+    price: 'https://price.chaotic.art',
+    genart: 'https://genart.chaotic.art',
+    profile: 'https://profile.chaotic.art',
+    bucket: 'https://bucket.chaotic.art/',
+    dyndata: 'https://dyndata.chaotic.art',
+    oda: 'https://oda.chaotic.art',
+    playground: 'https://playground.chaotic.art',
+    playground_bucket: 'https://playground-bucket.chaotic.art',
+
+    // TODO: migrate to chaotic
     nftStorage: 'https://ipos.kodadot.workers.dev/',
-    keywise: 'https://keywise.kodadot.workers.dev/',
-    netlify: 'https://beta.kodadot.xyz/.netlify/functions/',
-    seoCard: 'https://og-image-green-seven.vercel.app/',
-    rubick: 'https://squid.subsquid.io/rubick/graphql',
-    marck: 'https://ksm.gql.api.kodadot.xyz/',
-    stick: 'https://ahk.gql.api.kodadot.xyz/',
-    speck: 'https://ahp.gql.api.kodadot.xyz/',
-    polkassembly: 'https://squid.subsquid.io/polkadot-polkassembly/graphql',
-    replicate: 'https://replicate.kodadot.workers.dev/',
-    search: 'https://polysearch.w.kodadot.xyz',
-    baseUrl: 'https://kodadot.xyz',
-    newsletter: 'https://newsletter.w.kodadot.xyz',
-    counter: 'https://counter.kodadot.workers.dev',
-    frame: 'https://frame.kodadot.workers.dev/gallery',
+    cors_proxy: 'https://cors-proxy.kodadot.workers.dev/',
+  },
+  graphql: {
+    ahk: 'https://ahk.gql.api.kodadot.xyz/',
+    ahp: 'https://ahp.gql.api.kodadot.xyz/',
   },
   providers: {
     coingecko: 'https://api.coingecko.com/api/v3',
     ramp: 'https://ramp.network/buy/',
     pinata: 'https://api.pinata.cloud/',
-  },
-  workers: {
-    price: 'https://price.chaotic.art',
+    cf_images: 'https://imagedelivery.net/Im3azVCMHMp2rDcvZOACIg/',
   },
 }

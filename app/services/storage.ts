@@ -1,7 +1,7 @@
 import type { FetchError } from 'ofetch'
 
 const storageApi = $fetch.create({
-  baseURL: URLS.koda.nftStorage,
+  baseURL: URLS.services.nftStorage,
 })
 
 interface StorageApiResponse {

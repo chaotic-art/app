@@ -5,28 +5,32 @@
     "ahp": {
       "chain": "polkadot_asset_hub",
       "metadata": ".papi/metadata/ahp.scale",
-      "genesis": "0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f"
+      "genesis": "0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f",
+      "codeHash": "0x274e1781dc36a23a922f9ec1e04afe0496a503612c4d57aa4fa0c8bf55b1237a"
     },
     "ahk": {
       "chain": "ksmcc3_asset_hub",
       "metadata": ".papi/metadata/ahk.scale",
-      "genesis": "0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a"
+      "genesis": "0x48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a",
+      "codeHash": "0x5a0e93172b7d4f2030a3a31c2f1aff1e170a323373a48f7f2bc44328872616fc"
     },
     "dot": {
       "chain": "polkadot",
       "metadata": ".papi/metadata/dot.scale",
-      "genesis": "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+      "genesis": "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+      "codeHash": "0x625e4190035e51bfaa349c61bc198ed4103658fb4bd5f6716015a4a7f0412bdd"
     },
     "ksm": {
       "chain": "ksmcc3",
       "metadata": ".papi/metadata/ksm.scale",
-      "genesis": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+      "genesis": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+      "codeHash": "0x9bfa95446bff3c013666fd4c421cb0d8ce16b2e905a6589b58981876abf471d9"
     },
     "ahpas": {
       "chain": "paseo_asset_hub",
       "metadata": ".papi/metadata/ahpas.scale",
       "genesis": "0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2",
-      "codeHash": "0xb7f52ff9b4fb5124568a5b8cbfcebba2bc9318bcb5916b69457c10bc6a2d0ac5"
+      "codeHash": "0x58a221d52c863cfe4ad70d5ad1933477bf737fe1e09b24669afbe4b1e2e5bc22"
     }
   },
   "options": {

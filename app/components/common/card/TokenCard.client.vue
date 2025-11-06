@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { isNsfwNft } from '~/utils/mint'
 
 const props = defineProps<{
   tokenId: number
@@ -22,6 +23,13 @@ const {
   mediaIcon,
   nativePrice,
 } = useToken(props)
+
+const isNsfw = computed(() => isNsfwNft(token.value?.metadata?.attributes))
+const isBlurred = ref(true)
+
+function toggleNsfwContent() {
+  isBlurred.value = !isBlurred.value
+}
 
 const {
   addToActionCart,
@@ -46,12 +54,17 @@ const {
 const actionCartStore = useActionCartStore()
 const route = useRoute()
 const { isCurrentAccount } = useAuth()
+const { artViewFilter } = storeToRefs(usePreferencesStore())
 
 const imageStatus = ref<'normal' | 'fallback'>('normal')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
-const canAddToActionCart = computed(() => isProfileRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
+const isAirdropRoute = computed(() => route.name?.toString().includes('airdrop-select'))
+const isCollectionRoute = computed(() => route.name?.toString().includes('chain-collection-collection_id'))
+const canAddToActionCart = computed(() => (isProfileRoute.value || isAirdropRoute.value) && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
+
+const hideMediaInfo = computed(() => artViewFilter.value && isCollectionRoute.value)
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
@@ -64,7 +77,7 @@ watchEffect(() => {
   <div
     class="relative border rounded-xl overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group"
     :class="{
-      '!border-blue-500 dark:!border-blue-400': isItemInCart,
+      'border-blue-500! dark:border-blue-400!': isItemInCart,
       'border-gray-300 dark:border-neutral-700': !isItemInCart,
     }"
   >
@@ -84,7 +97,7 @@ watchEffect(() => {
     <template v-else>
       <NuxtLink :to="`/${chain}/gallery/${collectionId}-${tokenId}`" class="block">
         <!-- NFT Media -->
-        <div class="aspect-square bg-gray-200 dark:bg-neutral-800 overflow-hidden relative">
+        <div class="aspect-square bg-gray-200 dark:bg-neutral-800 overflow-hidden relative group/media">
           <video
             v-if="mimeType?.includes('video') && (token?.metadata?.animation_url || token?.metadata?.image)"
             :src="sanitizeIpfsUrl(token?.metadata?.animation_url || token?.metadata?.image)"
@@ -94,7 +107,7 @@ watchEffect(() => {
           />
           <div
             v-else-if="mimeType?.includes('audio') && (token?.metadata?.animation_url || token?.metadata?.image)"
-            class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-700 dark:to-gray-900 relative"
+            class="w-full h-full flex flex-col items-center justify-center bg-linear-to-br from-gray-50 to-gray-200 dark:from-gray-700 dark:to-gray-900 relative"
           >
             <UIcon name="i-heroicons-musical-note" class="w-16 h-16 text-gray-700 dark:text-gray-200 mb-4" />
             <audio
@@ -132,6 +145,19 @@ watchEffect(() => {
             <UIcon :name="mediaIcon" class="w-3 h-3 text-white" />
           </div>
 
+          <!-- NSFW Blur Overlay -->
+          <div
+            v-if="isNsfw && isBlurred"
+            class="absolute inset-0 backdrop-blur-[60px] bg-black/50 flex flex-col items-center justify-center text-white z-10"
+            @click.prevent.stop="toggleNsfwContent"
+          >
+            <UIcon name="i-heroicons-eye-slash" class="w-10 h-10 mb-2" />
+            <span class="font-bold text-sm mb-1">Explicit content</span>
+            <span class="text-center text-xs max-w-[200px] px-4 mb-3">
+              Click to view
+            </span>
+          </div>
+
           <div v-if="token && (canAddToActionCart || canBuy)" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
             <UButton
               v-if="canAddToActionCart"
@@ -158,7 +184,7 @@ watchEffect(() => {
         </div>
 
         <!-- Card Content -->
-        <div class="p-3 md:p-4">
+        <div v-if="!hideMediaInfo" class="p-3 md:p-4">
           <h3 class="font-bold text-base md:text-lg mb-2 text-gray-900 dark:text-white line-clamp-1" :title="name || token?.metadata?.name || 'Untitled NFT'">
             {{ name || token?.metadata?.name || 'Untitled NFT' }}
           </h3>
@@ -204,7 +230,7 @@ watchEffect(() => {
                 :address="dataOwner || ''"
                 :avatar-size="20"
                 :transparent-background="true"
-                class="!p-0"
+                class="p-0!"
               />
               <span v-else class="text-xs text-gray-600 dark:text-gray-300">N/A</span>
             </div>
