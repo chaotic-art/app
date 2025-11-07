@@ -13,6 +13,7 @@ const props = defineProps<{
 }>()
 
 const { $i18n } = useNuxtApp()
+const { chainSymbol, decimals } = useChain()
 
 const selectedTrade = ref<TradeNftItem>()
 const isTradeModalOpen = ref(false)
@@ -48,10 +49,15 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
       cell: ({ row }) => {
         const trade = row.original
 
-        return h(resolveComponent('Money'), {
-          value: trade.price,
-          inline: true,
-        })
+        const { usd } = useAmount(computed(() => trade.price), decimals, chainSymbol)
+
+        return h('div', { class: 'flex items-center gap-2' }, [
+          h(resolveComponent('Money'), {
+            value: trade.price,
+            inline: true,
+          }),
+          h('div', { class: 'text-xs text-gray-500 dark:text-gray-400' }, `(${usd.value})`),
+        ])
       },
     },
     {
