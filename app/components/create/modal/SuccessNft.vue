@@ -47,6 +47,7 @@ const modalData = computed(() => {
       multiple: `You successfully created ${props.result.items.length} NFTs`,
     },
     items,
+    chain: props.result.prefix,
   }
 })
 </script>
@@ -56,6 +57,7 @@ const modalData = computed(() => {
     v-if="props.result?.type === 'nft'"
     :tx-hash="props.result?.hash"
     :share="modalData.share"
+    :chain="modalData.chain"
     :status="status"
     :action-buttons="modalData.actionButtons"
     :ui="{
