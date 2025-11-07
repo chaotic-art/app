@@ -174,6 +174,10 @@ export default function ({
     })
   })
 
+  onUnmounted(() => {
+    ownersSubscription.value()
+  })
+
   return {
     items,
     loading,
