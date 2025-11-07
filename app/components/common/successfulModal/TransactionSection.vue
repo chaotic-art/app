@@ -7,13 +7,14 @@ import { getSubscanExtrinsicUrl } from '~/utils/format/address'
 const props = defineProps<{
   txHash?: string
   status: TransactionStatus
+  chain?: SupportedChain
 }>()
 
 const { add: toast } = useToast()
 const { currentChain } = useChain()
 
 const txUrl = computed(() =>
-  getSubscanExtrinsicUrl(props.txHash || '', currentChain.value as SupportedChain),
+  getSubscanExtrinsicUrl(props.txHash || '', props.chain || currentChain.value as SupportedChain),
 )
 const { copy } = useClipboard({ source: txUrl })
 
