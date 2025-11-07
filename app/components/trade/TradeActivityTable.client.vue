@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { DocumentNode } from 'graphql'
 import type { TradeConsidered, TradeNftItem, TradeToken, TradeType } from '@/components/trade/types'
-import type { SwapSurcharge } from '~/composables/onchain/useNftPallets'
+import type { SwapSurcharge } from '@/composables/onchain/useNftPallets'
 import TradeActivityTableRowItem from '@/components/trade/ActivityTable/RowItem.vue'
 import TradeActivityTableRowItemCollection from '@/components/trade/ActivityTable/RowItemCollection.vue'
 
@@ -19,6 +19,7 @@ const props = defineProps<{
 const route = useRoute()
 const router = useRouter()
 const { $i18n } = useNuxtApp()
+const { decimals, chainSymbol } = useChain()
 
 const dataKey = TRADES_QUERY_MAP[props.type].dataKey
 
@@ -120,10 +121,15 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
       cell: ({ row }) => {
         const trade = row.original
 
-        return h(resolveComponent('Money'), {
-          value: trade.price,
-          inline: true,
-        })
+        const { usd } = useAmount(computed(() => trade.price), decimals, chainSymbol)
+
+        return h('div', { class: 'flex items-center gap-2' }, [
+          h(resolveComponent('Money'), {
+            value: trade.price,
+            inline: true,
+          }),
+          h('div', { class: 'text-xs text-gray-500 dark:text-gray-400' }, `(${usd.value})`),
+        ])
       },
     },
     {
