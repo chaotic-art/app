@@ -96,11 +96,11 @@ function getTargetAddress(trade: TradeNftItem) {
 const columns = computed<TableColumn<TradeNftItem>[]>(() => {
   return [
     {
-      accessorKey: 'offered',
-      header: 'Offered',
+      accessorKey: 'item',
+      header: 'Item',
       cell: ({ row }) => {
         const trade = row.original
-        const { offered, desired } = getRowConfig(trade)
+        const { desired } = getRowConfig(trade)
 
         if (trade.isAnyTokenInCollectionDesired) {
           return h(TradeActivityTableRowItemCollection, {
@@ -110,7 +110,7 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
         }
 
         return h(TradeActivityTableRowItem, {
-          item: offered.item,
+          item: desired.item,
           surcharge: desired.surcharge,
         })
       },
