@@ -78,7 +78,7 @@ useInfiniteScroll(el, fetchNextPage, { distance: limit })
   </div>
   <div
     v-else
-    class="text-center text-k-grey"
+    class="text-center text-gray-600 dark:text-gray-400"
   >
     <span>Not Following Anyone Yet</span>
   </div>

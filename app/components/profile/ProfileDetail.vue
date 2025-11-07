@@ -42,6 +42,12 @@ const tabsItems = ref([
     slot: 'activity',
     value: 'activity',
   },
+  {
+    label: 'Offers',
+    name: 'Offers',
+    slot: 'offers',
+    value: 'offers',
+  },
 ])
 
 const { data: followers, refresh: refreshFollowers } = useAsyncData(
@@ -229,6 +235,9 @@ function onTotalCountChange(slot: string, totalCount: number) {
       </template>
       <template #activity>
         <ProfileActivity :address="address" @total-count-change="onTotalCountChange('activity', $event)" />
+      </template>
+      <template #offers>
+        <ProfileTrades :address="address" @total-count-change="onTotalCountChange('offers', $event)" />
       </template>
     </UTabs>
   </div>

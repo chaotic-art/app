@@ -13,7 +13,7 @@ interface Props {
   tokenId: string
 }
 
-type ActivityFilter = 'MINT' | 'BUY' | 'LIST' | 'SEND' | 'BURN'
+type ActivityFilter = 'MINT' | 'BUY' | 'LIST' | 'SEND' | 'BURN' | 'SWAP'
 
 interface FilterOption {
   value: ActivityFilter
@@ -31,6 +31,7 @@ const filterOptions: FilterOption[] = [
   { value: 'BUY', label: 'Sales', icon: 'i-heroicons-banknotes' },
   { value: 'LIST', label: 'Listings', icon: 'i-heroicons-tag' },
   { value: 'SEND', label: 'Transfers', icon: 'i-heroicons-arrow-right-circle' },
+  { value: 'SWAP', label: 'Swaps', icon: 'i-heroicons-arrow-path-rounded-square' },
   { value: 'BURN', label: 'Burns', icon: 'i-heroicons-fire' },
 ]
 
@@ -42,6 +43,7 @@ function getEventLabel(interaction: string): string {
     LIST: 'Listed',
     SEND: 'Transferred',
     BURN: 'Burned',
+    SWAP: 'Swapped',
   }
   return labelMap[interaction] || interaction
 }
@@ -75,11 +77,7 @@ watchEffect(async () => {
 
 <template>
   <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <h2 class="text-xl md:text-2xl font-bold text-neutral-900 dark:text-white">
-        Item Activity
-      </h2>
-
+    <div class="flex flex-col sm:flex-row sm:items-center justify-end gap-4">
       <USelect
         v-model="selectedFilters"
         :items="filterOptions"
@@ -160,7 +158,7 @@ watchEffect(async () => {
               const meta = row.getValue('meta')
               const caller = row.getValue('caller')
 
-              if (interaction === 'SEND' && meta) {
+              if ((interaction === 'SEND' || interaction === 'SWAP') && meta) {
                 return h(UserInfo, {
                   address: meta as string,
                   avatarSize: 24,

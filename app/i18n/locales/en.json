@@ -113,7 +113,16 @@
     "copyToClipboard": "Copied to clipboard",
     "connectWallet": "Connect Wallet",
     "learnMore": "Learn More",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "amount": "Amount",
+    "items": "Items",
+    "collection": "Collection",
+    "expiration": "Expiration",
+    "expired": "Expired",
+    "active": "Active",
+    "accept": "Accept",
+    "from": "From",
+    "to": "To"
   },
   "signing": {
     "transaction": "Sign Transaction",
@@ -344,5 +353,42 @@
         }
       }
     }
+  },
+  "trades": {
+    "anyNftFrom": "Any NFT From",
+    "expiresIn": "Expires In",
+    "incoming": { "receive": "They Want", "send": "They Offer" },
+    "incomingTrades": "Incoming Offers/Trades",
+    "outgoing": { "receive": "You Get", "send": "You Offer" },
+    "requests": "Requests {0}",
+    "selectSendItem": "Select NFT First"
+  },
+  "offer": {
+    "anyNftFromCollection": "Any NFT",
+    "bestOffer": "Best Offer",
+    "cancelOffer": "Cancel Offer",
+    "acceptOffer": "Accept Offer",
+    "collectionFloorPrice": "Collection Floor",
+    "createCollectionOffer": "Create Collection Offer",
+    "createOffer": "Create Offer",
+    "emptyInput": "Please enter your offer",
+    "expiration": "Offer Expiration",
+    "floorDifference": "Floor Difference",
+    "highestOffer": "Highest Offer",
+    "incomingOffer": "Incoming Offer",
+    "invalidPrice": "Your offer must greater than 0.0001",
+    "manageOffers": "Manage Offers",
+    "newOffer": "New Offer",
+    "offer": "Offer",
+    "offerAccept": "Accepting Offer",
+    "offerCancellation": "Offer Cancellation",
+    "offerCreation": "Offer Creation",
+    "offerFees": "Offer Fee",
+    "typeOffer": "Type An Offer",
+    "withdrawAmount": "Withdraw Amount",
+    "withdrawOffer": "Withdraw Offer",
+    "yourOffer": "Your Offer",
+    "yourOfferAmount": "Your Offer Amount",
+    "failed": "Something went wrong creating offer"
   }
 }

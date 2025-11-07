@@ -21,6 +21,7 @@ const {
   mediaIcon,
   token: tokenData,
   collection,
+  highestOffer,
 } = useToken({
   tokenId: Number(tokenId),
   collectionId: Number(collectionId),
@@ -89,6 +90,7 @@ const tokenMetadata = computed(() => {
             :collection-creator="collectionCreator || undefined"
             :formatted-price="formattedPrice || undefined"
             :usd-price="usdPrice"
+            :highest-offer="highestOffer"
             :price="BigInt(price ?? '0')"
             :mime-type="mimeType"
           />
@@ -101,6 +103,7 @@ const tokenMetadata = computed(() => {
             :token-id="Number(safeTokenId)"
             :owner="owner"
             :price="BigInt(price ?? '0')"
+            :highest-offer="highestOffer"
           />
         </div>
       </div>
@@ -115,5 +118,7 @@ const tokenMetadata = computed(() => {
       :token-id="safeTokenId"
       :mime-type="mimeType || undefined"
     />
+
+    <LazyMakeOfferModal />
   </div>
 </template>

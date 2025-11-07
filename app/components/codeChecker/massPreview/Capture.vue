@@ -147,7 +147,7 @@ watch(active, (active) => {
 
       <span
         v-if="uploading"
-        class="text-sm text-k-grey capitalize"
+        class="text-sm text-gray-600 dark:text-gray-400 capitalize"
       >
         {{ $t('codeChecker.uploadingFile') }}</span>
       <USwitch

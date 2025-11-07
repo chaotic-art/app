@@ -15,7 +15,36 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const route = useRoute()
+const router = useRouter()
+
 const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
+
+const activeTab = computed({
+  get() {
+    return (route.query.tab as string) || 'activity'
+  },
+  set(tab) {
+    router.replace({
+      query: { ...route.query, tab },
+    })
+  },
+})
+
+const tabsItems = ref([
+  {
+    label: 'Activity',
+    name: 'Activity',
+    slot: 'activity',
+    value: 'activity',
+  },
+  {
+    label: 'Offers',
+    name: 'Offers',
+    slot: 'offers',
+    value: 'offers',
+  },
+])
 
 onMounted(async () => {
   try {
@@ -41,11 +70,22 @@ onMounted(async () => {
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
         <!-- Item Activity (3/5) -->
         <div class="lg:col-span-3">
-          <TokenActivity
-            :chain="chain"
-            :collection-id="collectionId"
-            :token-id="tokenId"
-          />
+          <UTabs v-model="activeTab" :items="tabsItems" :ui="{ root: 'gap-6' }" size="sm">
+            <template #activity>
+              <TokenActivity
+                :chain="chain"
+                :collection-id="collectionId"
+                :token-id="tokenId"
+              />
+            </template>
+            <template #offers>
+              <TokenOffers
+                :chain="chain"
+                :collection-id="collectionId"
+                :token-id="tokenId"
+              />
+            </template>
+          </UTabs>
         </div>
 
         <!-- Token Details (2/5) -->

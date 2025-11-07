@@ -179,10 +179,7 @@ watch(() => props.events, () => {
     </div>
 
     <template v-if="props.loading">
-      <div class="space-y-2">
-        <USkeleton class="h-10 w-full rounded-md" />
-        <USkeleton v-for="n in 6" :key="n" class="h-12 w-full rounded-md" />
-      </div>
+      <SkeletonTable />
     </template>
     <template v-else-if="data.length === 0">
       <div class="flex items-center justify-center text-center py-16">

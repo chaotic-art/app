@@ -41,6 +41,8 @@ type ApiMap = {
   [K in SupportedChain]: TypedApi<typeof config[K]['descriptor']>
 }
 
+export type AssetHubApi = ApiMap[AssetHubChain]
+
 const DEFAULT_CHAIN = 'ahp' as const
 const UNSUPPORTED_CHAINS: UnsupportedChain[] = ['base', 'ahw']
 

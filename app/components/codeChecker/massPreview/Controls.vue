@@ -29,7 +29,7 @@ const average = computed(() => {
 
       <div
         v-if="!hideAverage"
-        class="text-k-grey text-xs flex gap-3"
+        class="text-gray-600 dark:text-gray-400 text-xs flex gap-3"
       >
         <p class="capitalize">
           {{ $t('codeChecker.timePerVariation') }}
