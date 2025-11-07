@@ -116,6 +116,7 @@ export default function ({
 
         targetsOfTrades.value = map
       },
+      pollingInterval: 15000,
     })
   }
 
