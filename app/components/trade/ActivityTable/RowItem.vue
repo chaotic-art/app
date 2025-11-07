@@ -5,25 +5,18 @@ import SurchargeTag from './SurchargeTag.vue'
 
 interface ItemMedia { image: string, animationUrl: string }
 
-const props = withDefaults(
-  defineProps<{
-    item: { id: string, name: string } | undefined
-    surcharge: SwapSurcharge | undefined
-    containerSpacing?: string
-  }>(),
-  {
-    containerSpacing: 'gap-5',
-  },
-)
+const props = defineProps<{
+  item: { id: string, name: string } | undefined
+  surcharge: SwapSurcharge | undefined
+}>()
 
 const { $sdk } = useNuxtApp()
 const image = ref()
 const animationUrl = ref()
 
-const { prefix } = usePrefix()
 const { currentChain } = useChain()
 
-const itemPath = computed(() => `/${prefix.value}/gallery/${props.item?.id}`)
+const itemPath = computed(() => `/${currentChain.value}/gallery/${props.item?.id}`)
 
 async function getItem(id: string): Promise<ItemMedia> {
   const [collectionId = '', tokenId = ''] = id.split('-')
@@ -69,8 +62,7 @@ watch(() => props.item?.id, async (id) => {
 <template>
   <div
     v-if="item"
-    class="flex items-center justify-between w-min"
-    :class="containerSpacing"
+    class="flex items-center justify-between w-min gap-5"
   >
     <nuxt-link
       :to="itemPath"
