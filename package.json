@@ -3,6 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@10.20.0",
   "scripts": {
     "build": "papi --whitelist .papi/whitelist.ts && nuxt build",
     "dev": "nuxt dev",
@@ -69,5 +70,13 @@
     "husky": "^9.1.7",
     "pino-pretty": "^13.1.1",
     "typescript": "^5.8.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@noble/hashes": "1.8.0"
+    }
+  },
+  "overrides": {
+    "@noble/hashes": "1.8.0"
   }
 }
