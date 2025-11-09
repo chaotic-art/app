@@ -5,7 +5,6 @@ import type {
   SubstrateWalletSource,
 } from '@/utils/wallet/substrate/types'
 import { defineStore } from 'pinia'
-import { connectInjectedExtension } from 'polkadot-api/pjs-signer'
 import { isExtensionInstalled } from '@/utils/wallet/substrate'
 import { getAvailableWallets } from '@/utils/wallet/substrate/config'
 
@@ -110,6 +109,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     try {
       isLoading.value = true
 
+      const { connectInjectedExtension } = await importPjsSigner()
       const rawExtension = await connectInjectedExtension(walletSource, DAPP_NAME)
 
       const accounts = rawExtension.getAccounts()
@@ -159,6 +159,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
   }
 
   async function getSigner(source: SubstrateWalletSource, address: string) {
+    const { connectInjectedExtension } = await importPjsSigner()
     const selectedExtension = await connectInjectedExtension(source)
     const account = selectedExtension.getAccounts().find(account => account.address === address)
 
@@ -214,3 +215,9 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     getAccountsBySource,
   }
 })
+async function importPjsSigner() {
+  if (!import.meta.client) {
+    throw new Error('Polkadot signer is only available on the client')
+  }
+  return import('polkadot-api/pjs-signer')
+}

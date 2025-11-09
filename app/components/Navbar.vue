@@ -113,10 +113,9 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
           <NavbarShoppingCart />
         </div>
 
-        <!-- Desktop Wallet -->
-        <div class="hidden md:block">
+        <!-- <div class="hidden md:block">
           <NavbarWallet />
-        </div>
+        </div> -->
 
         <!-- Mobile Menu Button -->
         <UButton
@@ -180,10 +179,9 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
 
         <USeparator />
 
-        <!-- Mobile Wallet -->
-        <div class="md:hidden">
+        <!-- <div class="md:hidden">
           <NavbarWallet />
-        </div>
+        </div> -->
       </div>
     </template>
   </USlideover>
