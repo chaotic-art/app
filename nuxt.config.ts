@@ -60,6 +60,10 @@ export default defineNuxtConfig({
     'nuxt-svgo',
   ],
 
+  alias: {
+    '@noble/hashes/crypto': '@noble/hashes/esm/cryptoNode.js',
+  },
+
   runtimeConfig: {
     public: {
       reownProjectId: import.meta.env.REOWN_CONNECT_PROJECT_ID || 'b56e18d47c72ab683b10814fe9495694',
