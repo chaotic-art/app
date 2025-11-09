@@ -98,5 +98,8 @@ export default defineNuxtConfig({
     externals: {
       inline: ['@noble/hashes'],
     },
+    alias: {
+      '@noble/hashes/crypto': '@noble/hashes/esm/cryptoNode.js',
+    },
   },
 })
