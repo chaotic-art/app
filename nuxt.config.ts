@@ -1,3 +1,7 @@
+import { createResolver } from 'nuxt/kit'
+
+const { resolve } = createResolver(import.meta.url)
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   sourcemap: true,
@@ -61,7 +65,7 @@ export default defineNuxtConfig({
   ],
 
   alias: {
-    '@noble/hashes/crypto': '@noble/hashes/esm/cryptoNode.js',
+    '@noble/hashes/crypto': resolve('./app/shims/noble-hashes-crypto'),
   },
 
   runtimeConfig: {
