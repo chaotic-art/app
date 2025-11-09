@@ -55,7 +55,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
-    '@wagmi/vue/nuxt',
+    // '@wagmi/vue/nuxt',
     '@nuxtjs/seo',
     'nuxt-svgo',
   ],
