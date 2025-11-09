@@ -105,10 +105,10 @@ useHead({
             </div>
 
             <!-- Mint Button -->
-            <DropMintButton
+            <!-- <DropMintButton
               class="w-full sm:w-fit"
               :drop="drop" size="sm"
-            />
+            /> -->
           </div>
         </div>
       </div>

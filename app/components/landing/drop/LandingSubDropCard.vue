@@ -74,11 +74,11 @@ const { usd: usdPrice } = useAmount(computed(() => props.drop?.price), decimals,
           <div class="hidden sm:block text-muted-foreground text-left text-sm sm:text-base">
             {{ drop?.start_at ? formatToNow(parseCETDate(drop.start_at || '')) : 'N/A' }}
           </div>
-          <DropMintButton
+          <!-- <DropMintButton
             class="w-full sm:w-fit"
             :drop="drop"
             size="sm"
-          />
+          /> -->
         </div>
       </div>
     </div>

@@ -23,6 +23,6 @@
       <!-- <LazyArticles :hydrate-on-visible="{ rootMargin: '300px' }" /> -->
     </UContainer>
 
-    <LazyDropMintModal />
+    <!-- <LazyDropMintModal /> -->
   </div>
 </template>
