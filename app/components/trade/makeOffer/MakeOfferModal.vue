@@ -116,8 +116,15 @@ async function fetchUnusedOfferCollectionTokens(collectionId: string): Promise<s
 
     const keys = items.map(({ nft }) => [Number(collectionId), Number(nft.sn)] as [number, number])
 
+    // edge case: if a user quickly creates/accepts multiple offers and
+    // due to indexer delay we need to verify with onchain data the following cases
     const [itemsData, pendingSwapsData] = await Promise.all([
+      // after a offer is accepted the offered item changes ownership
+      // so we need to check the current owner of the item
       api.query.Nfts.Item.getValues(keys, { at: 'best' }),
+      // since offer id follows format `collectionId-tokenId`
+      // is not possible to create multiple offers using the same offered item
+      // doing so will be overridden the previous offer
       api.query.Nfts.PendingSwapOf.getValues(keys, { at: 'best' }),
     ])
 
