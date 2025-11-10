@@ -19,10 +19,10 @@ export const URLS = {
     oda: 'https://oda.chaotic.art',
     playground: 'https://playground.chaotic.art',
     playground_bucket: 'https://playground-bucket.chaotic.art',
+    cors_proxy: 'https://cors-proxy.chaotic.art',
 
     // TODO: migrate to chaotic
     nftStorage: 'https://ipos.kodadot.workers.dev/',
-    cors_proxy: 'https://cors-proxy.kodadot.workers.dev/',
   },
   graphql: {
     ahk: 'https://ahk.gql.api.kodadot.xyz/',
