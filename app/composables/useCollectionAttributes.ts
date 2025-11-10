@@ -39,7 +39,7 @@ export function useCollectionAttributes({ collectionId }: { collectionId: Comput
     }
   }, { immediate: true })
 
-  const attributesList = computed<Attribute[]>(() => {
+  const attributesList = computed<Property[]>(() => {
     return (nftsList.value || []).reduce((acc, nft) => {
       if (nft.meta?.attributes?.length) {
         acc.push(...nft.meta.attributes)
