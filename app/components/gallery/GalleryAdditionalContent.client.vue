@@ -18,6 +18,7 @@ interface Props {
 interface PropertyRow {
   trait_type: string
   value: string
+  rarity: number
 }
 
 const props = defineProps<Props>()
@@ -37,16 +38,22 @@ const activeTab = computed({
   },
 })
 
+const { getAttributeRarity } = useCollectionAttributes({
+  collectionId: computed(() => props.collectionId),
+})
+
 const properties = computed<PropertyRow[]>(() => {
   const attributes = (props.tokenData?.metadata?.attributes || []) as Array<Record<string, string>>
 
   return attributes.map((attr) => {
     const traitType = attr.trait_type || attr.trait || attr.key || ''
     const traitValue = attr.value || ''
+    const rarity = getAttributeRarity(traitType, traitValue)
 
     return {
       trait_type: traitType,
       value: traitValue,
+      rarity,
     }
   })
 })
@@ -54,11 +61,18 @@ const properties = computed<PropertyRow[]>(() => {
 const propertiesColumns: TableColumn<PropertyRow>[] = [
   {
     accessorKey: 'trait_type',
-    header: 'Section',
+    header: 'Trait',
   },
   {
     accessorKey: 'value',
-    header: 'Trait',
+    header: 'Value',
+  },
+  {
+    accessorKey: 'rarity',
+    header: 'Rarity',
+    cell: ({ row }) => {
+      return `${row.original.rarity}%`
+    },
   },
 ]
 

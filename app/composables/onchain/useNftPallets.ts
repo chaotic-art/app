@@ -30,7 +30,7 @@ interface CreateCollectionParams {
   }
 }
 
-interface Property {
+export interface Property {
   trait: string
   value: string
 }
