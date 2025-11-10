@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import TokenCard from '~/components/common/card/TokenCard.client.vue'
@@ -12,6 +13,11 @@ interface Props {
   collectionId: string
   tokenId: string
   mimeType?: string
+}
+
+interface PropertyRow {
+  trait_type: string
+  value: string
 }
 
 const props = defineProps<Props>()
@@ -31,6 +37,31 @@ const activeTab = computed({
   },
 })
 
+const properties = computed<PropertyRow[]>(() => {
+  const attributes = (props.tokenData?.metadata?.attributes || []) as Array<Record<string, string>>
+
+  return attributes.map((attr) => {
+    const traitType = attr.trait_type || attr.trait || attr.key || ''
+    const traitValue = attr.value || ''
+
+    return {
+      trait_type: traitType,
+      value: traitValue,
+    }
+  })
+})
+
+const propertiesColumns: TableColumn<PropertyRow>[] = [
+  {
+    accessorKey: 'trait_type',
+    header: 'Section',
+  },
+  {
+    accessorKey: 'value',
+    header: 'Trait',
+  },
+]
+
 const tabsItems = ref([
   {
     label: 'Activity',
@@ -43,6 +74,12 @@ const tabsItems = ref([
     name: 'Offers',
     slot: 'offers',
     value: 'offers',
+  },
+  {
+    label: 'Properties',
+    name: 'Properties',
+    slot: 'properties',
+    value: 'properties',
   },
 ])
 
@@ -84,6 +121,18 @@ onMounted(async () => {
                 :collection-id="collectionId"
                 :token-id="tokenId"
               />
+            </template>
+            <template #properties>
+              <div class="bg-background rounded-xl border border-border overflow-hidden">
+                <UTable
+                  v-if="properties.length"
+                  :data="properties"
+                  :columns="propertiesColumns"
+                />
+                <div v-else class="p-8 text-center text-muted-foreground">
+                  No properties available for this NFT
+                </div>
+              </div>
             </template>
           </UTabs>
         </div>
