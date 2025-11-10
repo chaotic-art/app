@@ -14,15 +14,13 @@ export const URLS = {
     price: 'https://price.chaotic.art',
     genart: 'https://genart.chaotic.art',
     profile: 'https://profile.chaotic.art',
-    bucket: 'https://bucket.chaotic.art/',
+    bucket: 'https://bucket.chaotic.art',
     dyndata: 'https://dyndata.chaotic.art',
     oda: 'https://oda.chaotic.art',
     playground: 'https://playground.chaotic.art',
     playground_bucket: 'https://playground-bucket.chaotic.art',
     cors_proxy: 'https://cors-proxy.chaotic.art',
-
-    // TODO: migrate to chaotic
-    nftStorage: 'https://ipos.kodadot.workers.dev/',
+    nftStorage: 'https://ipos.chaotic.art',
   },
   graphql: {
     ahk: 'https://ahk.gql.api.kodadot.xyz/',
