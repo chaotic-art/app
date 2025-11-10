@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import type { TableColumn } from '@nuxt/ui'
-import type { DocumentNode } from 'graphql'
 import type { TradeNftItem } from '@/components/trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { TradeType } from '@/components/trade/types'
-import { graphql } from '~/graphql/client'
+import { offerIdsByNftId } from '~/graphql/queries/trades'
 
 const props = defineProps<{
   chain: AssetHubChain
@@ -25,17 +24,9 @@ const { items: trades, loading } = useTrades({
   type: TradeType.OFFER,
 })
 
-useSubscriptionGraphql<DocumentNode, { items: { id: string }[] }>({
-  query: graphql(`
-    query tradeIds {
-        items: offers (
-        where: { status_eq: ACTIVE, desired: { id_eq: "${props.collectionId}-${props.tokenId}" } }
-        orderBy: blockNumber_DESC
-      ) {
-        id
-      }
-    }
-  `),
+useSubscriptionGraphql({
+  query: offerIdsByNftId,
+  variables: { id: `${props.collectionId}-${props.tokenId}` },
   onChange: ({ data }) => {
     tradeIds.value = data.items?.map(trade => trade.id)
   },

@@ -3,7 +3,11 @@ import type { ResultOf, VariablesOf } from '~/graphql/client'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import isEqual from 'lodash/isEqual'
 
-export default function useSubscriptionGraphql<TDoc extends DocumentNode, TData = ResultOf<TDoc>, TVariables = VariablesOf<TDoc>>({
+export default function useSubscriptionGraphql<
+  TDoc extends DocumentNode,
+  TData = ResultOf<TDoc>,
+  TVariables = VariablesOf<TDoc>,
+>({
   chain,
   query,
   variables,
@@ -31,13 +35,13 @@ export default function useSubscriptionGraphql<TDoc extends DocumentNode, TData 
   }
 
   let lastQueryResult: TData | null = null
-  let intervalId: number | null = null
+  let intervalId: NodeJS.Timeout | null = null
 
   const isPolling = ref(false)
 
   async function pollData() {
     try {
-      const { data } = await $apolloClient.query<TData>({
+      const { data } = await $apolloClient.query<TData, any>({
         query,
         variables: variables as any,
         fetchPolicy: 'network-only',
@@ -66,7 +70,7 @@ export default function useSubscriptionGraphql<TDoc extends DocumentNode, TData 
       isPolling.value = true
       // fire immediately
       pollData()
-      intervalId = setInterval(pollData, pollingInterval) as unknown as number
+      intervalId = setInterval(pollData, pollingInterval)
     }
   }
 
