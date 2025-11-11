@@ -39,7 +39,7 @@ export function useCollectionAttributes({ collectionId }: { collectionId: Comput
     }
   }, { immediate: true })
 
-  const attributesList = computed<Attribute[]>(() => {
+  const attributesList = computed<Property[]>(() => {
     return (nftsList.value || []).reduce((acc, nft) => {
       if (nft.meta?.attributes?.length) {
         acc.push(...nft.meta.attributes)
@@ -84,8 +84,28 @@ export function useCollectionAttributes({ collectionId }: { collectionId: Comput
     return attributesRarityMaps.value[trait]?.[value] || 0
   }
 
+  const traitCounts = computed<Record<string, Record<string, number>>>(() => {
+    const counts: Record<string, Record<string, number>> = {}
+
+    attributesList.value.forEach((attr) => {
+      if (!attr.trait)
+        return
+      if (!counts[attr.trait]) {
+        counts[attr.trait] = {}
+      }
+
+      counts[attr.trait]![attr.value]
+        = (counts[attr.trait]?.[attr.value] ?? 0) + 1
+    })
+
+    return counts
+  })
+
   return {
     getAttributeRarity,
     loading,
+    attributesRarityMaps,
+    traitCounts,
+    totalNfts: computed(() => nftsList.value.length),
   }
 }
