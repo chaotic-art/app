@@ -135,7 +135,7 @@ function createTable(): void {
     event.item = newEvent.nft
 
     // amount
-    event.amount = event.amount ?? '-'
+    event.amount = event.amount || ''
 
     // date
     const date = new Date(newEvent.timestamp as string)
