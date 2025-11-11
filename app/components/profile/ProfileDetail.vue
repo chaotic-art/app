@@ -240,7 +240,6 @@ function onTotalCountChange(slot: string, totalCount: number) {
       <template #offers>
         <ProfileTrades :address="address" :type="TradeTypes.Offer" />
       </template>
-      </template>
     </UTabs>
   </div>
 </template>
