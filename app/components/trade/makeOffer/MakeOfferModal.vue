@@ -4,7 +4,7 @@ import type { TxType } from '~/composables/onchain/useNftPallets'
 import { whenever } from '@vueuse/core'
 import { formatBalance } from 'dedot/utils'
 import ModalIdentityItem from '@/components/common/ModalIdentityItem.vue'
-import { getOfferCollectionId, OFFER_MINT_PRICE } from '@/composables/onchain/utils'
+import { getOfferCollectionId, getRelayNow, OFFER_MINT_PRICE } from '@/composables/onchain/utils'
 import { useMakingOfferStore } from '@/stores/makeOffer'
 import { usePreferencesStore } from '@/stores/preferences'
 import { toNative } from '@/utils/format/balance'
@@ -116,16 +116,10 @@ async function fetchUnusedOfferCollectionTokens(collectionId: string): Promise<s
 
     const keys = items.map(({ nft }) => [Number(collectionId), Number(nft.sn)] as [number, number])
 
-    // edge case: if a user quickly creates/accepts multiple offers and
-    // due to indexer delay we need to verify with onchain data the following cases
-    const [itemsData, pendingSwapsData] = await Promise.all([
-      // after a offer is accepted the offered item changes ownership
-      // so we need to check the current owner of the item
+    const [itemsData, pendingSwapsData, relayNow] = await Promise.all([
       api.query.Nfts.Item.getValues(keys, { at: 'best' }),
-      // since offer id follows format `collectionId-tokenId`
-      // is not possible to create multiple offers using the same offered item
-      // doing so will be overridden the previous offer
       api.query.Nfts.PendingSwapOf.getValues(keys, { at: 'best' }),
+      getRelayNow(api),
     ])
 
     const onchainTokenData = items.map(({ nft }, index) => ({
@@ -134,9 +128,17 @@ async function fetchUnusedOfferCollectionTokens(collectionId: string): Promise<s
       sn: nft.sn,
     }))
 
+    // edge case: if a user quickly creates/accepts multiple offers and
+    // due to indexer delay we need to verify with onchain data the following cases
     const unusedOfferItems = onchainTokenData.filter(token =>
+      // after a offer is accepted the offered item changes ownership
+      // so we need to check the current owner of the item
       token.owner && isCurrentAccount(token.owner)
-      && !token.pendingSwap,
+      // since offer id follows format `collectionId-tokenId`
+      // is not possible to create multiple offers using the same offered item
+      // doing so will be overridden the previous offer
+      // keep items with no pending swap or with an expired deadline
+      && (!token.pendingSwap || (relayNow > Number(token.pendingSwap?.deadline ?? Number.NEGATIVE_INFINITY))),
     )
 
     return unusedOfferItems.map(token => token.sn)
