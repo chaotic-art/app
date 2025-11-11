@@ -202,14 +202,14 @@ watch(() => props.events, () => {
         <div class="flex-1 overflow-hidden">
           <div class="flex items-center">
             <nuxt-link
-              :to="`/${prefix}/gallery/${row.getValue<Item>('item').id}`"
+              :to="`/${prefix}/gallery/${row.original.item.id}`"
               class="h-[50px]"
             >
               <CartItemDetails
-                :key="row.getValue<Item>('item').id"
-                :name="row.getValue<Item>('item').name || ''"
-                :image="row.getValue<Item>('item').meta?.image || ''"
-                :collection-name="row.getValue<Item>('item').collection.name || ''"
+                :key="row.original.item.id"
+                :name="row.original.item.name || ''"
+                :image="row.original.item.meta?.image || ''"
+                :collection-name="row.original.item.collection.name || ''"
               />
             </nuxt-link>
           </div>
@@ -218,36 +218,37 @@ watch(() => props.events, () => {
 
       <template #type-cell="{ row }">
         <EventTag
-          :interaction="row.getValue('type')"
-          :interaction-name="(interactionNameMap({ distinguishBuyAndSell: true }) as Record<string, string>)[row.getValue('type') as string] || ''"
+          :interaction="row.original.type"
+          :interaction-name="(interactionNameMap({ distinguishBuyAndSell: true }) as Record<string, string>)[row.original.type] || ''"
           distinguish-buy-and-sell
         />
       </template>
 
       <template #from-cell="{ row }">
         <UserInfo
-          v-if="row.getValue('from')"
-          :address="row.getValue('from') || ''"
+          v-if="row.original.from"
+          :address="row.original.from"
           :avatar-size="20"
           :transparent-background="true"
-          class="!p-0"
+          class="p-0!"
         />
         <span v-else>{{ blank }} </span>
       </template>
 
       <template #to-cell="{ row }">
         <UserInfo
-          v-if="row.getValue('to')"
-          :address="row.getValue('to') || ''"
+          v-if="row.original.to"
+          :address="row.original.to"
           :avatar-size="20"
           :transparent-background="true"
-          class="!p-0"
+          class="p-0!"
         />
         <span v-else>{{ blank }} </span>
       </template>
 
       <template #amount-cell="{ row }">
-        <Money :value="row.getValue('amount')" inline />
+        <Money v-if="row.original.amount" :value="row.original.amount" inline />
+        <span v-else>{{ blank }} </span>
       </template>
     </UTable>
   </div>
