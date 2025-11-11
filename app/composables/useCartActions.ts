@@ -164,6 +164,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
       metadata: token.value?.metadata_uri || '',
       meta: { image: token.value?.metadata?.image || '' },
       currentOwner: collection.value.owner!,
+      price: token.value?.price || undefined,
     }
 
     makingOfferStore.setItem(item)
