@@ -59,11 +59,12 @@ export interface BaseTrade {
   surcharge: SwapSurchargeDirection | null
 }
 
-// TODO to object as const
-export enum TradeDesiredTokenType {
-  SPECIFIC,
-  ANY_IN_COLLECTION,
-}
+export const TradeDesiredTokenTypes = {
+  Specific: 'specific',
+  AnyInCollection: 'any_in_collection',
+} as const
+
+export type TradeDesiredTokenType = typeof TradeDesiredTokenTypes[keyof typeof TradeDesiredTokenTypes]
 
 export const TradeTypes = {
   Swap: 'swap',
