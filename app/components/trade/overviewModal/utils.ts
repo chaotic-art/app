@@ -1,7 +1,7 @@
-import type { TradeNftItem } from '@/components/trade/types'
+import type { TradeNftItem, TradeType } from '@/components/trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
-import { TradeType } from '@/components/trade/types'
+import { TradeTypes } from '@/components/trade/types'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 
@@ -30,11 +30,11 @@ export interface ExecTxParams {
 }
 
 export const TradeTypeTx: Record<TradeType, Record<OverviewMode, (params: ExecTxParams) => void>> = {
-  [TradeType.SWAP]: {
+  [TradeTypes.Swap]: {
     owner: () => {},
     incoming: () => {},
   },
-  [TradeType.OFFER]: {
+  [TradeTypes.Offer]: {
     owner: ({ trade, chain }) => {
       const { cancelOffer } = useNftPallets()
 

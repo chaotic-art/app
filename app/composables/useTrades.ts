@@ -1,10 +1,10 @@
-import type { BaseTrade, Offer, Swap, TradeNftItem, TradeTarget } from '@/components/trade/types'
+import type { BaseTrade, Offer, Swap, TradeNftItem, TradeTarget, TradeType } from '@/components/trade/types'
 import type { OffersListData } from '~/graphql/queries/trades'
 import { addSeconds, subSeconds } from 'date-fns'
 import {
   TradeDesiredTokenType,
   TradeStatus,
-  TradeType,
+  TradeTypes,
 } from '@/components/trade/types'
 import { BLOCKS_PER_HOUR } from '@/composables/onchain/utils'
 import useRelayBlock from '@/composables/useRelayBlock'
@@ -21,11 +21,11 @@ interface CollectionWithTokenOwners {
 }
 
 export const TRADES_QUERY_MAP: Record<TradeType, { queryDocument: typeof offersList, dataKey: string }> = {
-  [TradeType.SWAP]: {
+  [TradeTypes.Swap]: {
     queryDocument: offersList, // TODO change
     dataKey: 'swaps',
   },
-  [TradeType.OFFER]: {
+  [TradeTypes.Offer]: {
     queryDocument: offersList,
     dataKey: 'offers',
   },
@@ -46,7 +46,7 @@ export default function ({
   where = {},
   limit = 100,
   disabled = computed(() => false),
-  type = TradeType.SWAP,
+  type = TradeTypes.Swap,
   minimal = false,
   orderBy = ['blockNumber_DESC'],
 }: UseTradesParams) {

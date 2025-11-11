@@ -4,6 +4,7 @@ import type { Profile } from '@/services/profile'
 import { computed } from 'vue'
 import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
+import { TradeTypes } from '@/components/trade/types'
 import { fetchFollowersOf, fetchFollowing } from '@/services/profile'
 import { copyAddress, getSubscanAccountUrl, shortenAddress } from '@/utils/format/address'
 
@@ -237,7 +238,8 @@ function onTotalCountChange(slot: string, totalCount: number) {
         <ProfileActivity :address="address" @total-count-change="onTotalCountChange('activity', $event)" />
       </template>
       <template #offers>
-        <ProfileTrades :address="address" @total-count-change="onTotalCountChange('offers', $event)" />
+        <ProfileTrades :address="address" :type="TradeTypes.Offer" />
+      </template>
       </template>
     </UTabs>
   </div>

@@ -65,11 +65,12 @@ export enum TradeDesiredTokenType {
   ANY_IN_COLLECTION,
 }
 
-// TODO to object as const
-export enum TradeType {
-  SWAP = 'swap',
-  OFFER = 'offer',
-}
+export const TradeTypes = {
+  Swap: 'swap',
+  Offer: 'offer',
+} as const
+
+export type TradeType = typeof TradeTypes[keyof typeof TradeTypes]
 
 export type Swap = BaseTrade
 
