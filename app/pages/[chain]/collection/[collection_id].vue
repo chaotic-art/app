@@ -23,6 +23,12 @@ const tabsItems = ref([
     slot: 'offers',
     value: 'offers',
   },
+  {
+    label: 'Traits',
+    name: 'Traits',
+    slot: 'traits',
+    value: 'traits',
+  },
 ])
 
 const activeTab = computed({
@@ -204,6 +210,9 @@ defineOgImageComponent('Frame', {
         </template>
         <template #offers>
           <CollectionTrades :trade-type="TradeType.OFFER" />
+        </template>
+        <template #traits>
+          <TraitOverview :collection-id="collection_id?.toString() ?? ''" />
         </template>
       </UTabs>
     </div>
