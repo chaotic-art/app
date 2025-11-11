@@ -18,12 +18,14 @@ export interface MakingOfferItem {
   sn: string | null
 }
 
-export enum TradeStatus {
-  ACTIVE = 'ACTIVE',
-  EXPIRED = 'EXPIRED',
-  WITHDRAWN = 'WITHDRAWN',
-  ACCEPTED = 'ACCEPTED',
-}
+export const TradeStatuses = {
+  Active: 'ACTIVE',
+  Expired: 'EXPIRED',
+  Withdrawn: 'WITHDRAWN',
+  Accepted: 'ACCEPTED',
+} as const
+
+export type TradeStatus = typeof TradeStatuses[keyof typeof TradeStatuses]
 
 export interface TradeToken {
   id: string

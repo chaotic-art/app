@@ -3,7 +3,7 @@ import type { OffersListData } from '~/graphql/queries/trades'
 import { addSeconds, subSeconds } from 'date-fns'
 import {
   TradeDesiredTokenTypes,
-  TradeStatus,
+  TradeStatuses,
   TradeTypes,
 } from '@/components/trade/types'
 import { BLOCKS_PER_HOUR } from '@/composables/onchain/utils'
@@ -166,7 +166,7 @@ export default function ({
         isAnyTokenInCollectionDesired: desiredType === TradeDesiredTokenTypes.AnyInCollection,
         // Check block number to handle trades that are expired but not yet updated in indexer
         // @see https://github.com/kodadot/stick/blob/9eac12938c47bf0e66e93760231208e4249d8637/src/mappings/utils/cache.ts#L127
-        isExpired: trade.status === TradeStatus.EXPIRED || relayHead > expirationRelay,
+        isExpired: trade.status === TradeStatuses.Expired || relayHead > expirationRelay,
         type,
         targets: targetsOfTrades.value?.get(trade.id) || [],
         createdAt: subSeconds(new Date(), ageParaBlocks * SECONDS_PER_BLOCK),
