@@ -1,14 +1,17 @@
 <script lang="ts" setup>
 import type { TableColumn } from '@nuxt/ui'
-import type { TradeNftItem } from '@/components/trade/types'
+import type { TradeNftItem, TradeType } from '@/components/trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import TradeActivityTableRowItem from '@/components/trade/ActivityTable/RowItem.vue'
 import { TradeTypes } from '@/components/trade/types'
-import { offerIdsByNftId } from '~/graphql/queries/trades'
+import { isTradeSwap } from '@/composables/useTradeType'
+import { activeOffersIdsByNftId, activeSwapsIdsByNftId } from '~/graphql/queries/trades'
 
 const props = defineProps<{
   chain: AssetHubChain
   collectionId: string
   tokenId: string
+  type: TradeType
 }>()
 
 const { $i18n } = useNuxtApp()
@@ -21,11 +24,14 @@ const tradeIds = ref()
 const { items: trades, loading } = useTrades({
   where: computed(() => ({ id_in: tradeIds.value })),
   disabled: computed(() => !Array.isArray(tradeIds.value)),
-  type: TradeTypes.Offer,
+  type: props.type,
 })
 
 useSubscriptionGraphql({
-  query: offerIdsByNftId,
+  query: {
+    [TradeTypes.Offer]: activeOffersIdsByNftId,
+    [TradeTypes.Swap]: activeSwapsIdsByNftId,
+  }[props.type],
   variables: { id: `${props.collectionId}-${props.tokenId}` },
   onChange: ({ data }) => {
     tradeIds.value = data.items?.map(trade => trade.id)
@@ -34,25 +40,38 @@ useSubscriptionGraphql({
 
 const columns = computed<TableColumn<TradeNftItem>[]>(() => {
   return [
-    {
-      accessorKey: 'price',
-      header: $i18n.t('general.amount'),
-      cell: ({ row }) => {
-        const trade = row.original
+    ...isTradeSwap(props.type)
+      ? [{
+          accessorKey: 'item',
+          header: $i18n.t('offer.offer'),
+          cell: ({ row: { original: trade } }) => {
+            return h(TradeActivityTableRowItem, {
+              item: trade.offered,
+              surcharge: trade.surcharge ? { amount: trade.price, direction: trade.surcharge } : undefined,
+            })
+          },
+        }] as TableColumn<TradeNftItem>[]
+      : [
+          {
+            accessorKey: 'price',
+            header: $i18n.t('general.amount'),
+            cell: ({ row }) => {
+              const trade = row.original
 
-        const { usd } = useAmount(computed(() => trade.price), decimals, chainSymbol)
+              const { usd } = useAmount(computed(() => trade.price), decimals, chainSymbol)
 
-        return h('div', { class: 'flex items-center gap-2' }, [
-          h(resolveComponent('Money'), {
-            value: trade.price,
-            inline: true,
-          }),
-          h('div', { class: 'text-xs text-gray-500 dark:text-gray-400' }, `(${usd.value})`),
-        ])
-      },
-    },
+              return h('div', { class: 'flex items-center gap-2' }, [
+                h(resolveComponent('Money'), {
+                  value: trade.price,
+                  inline: true,
+                }),
+                h('div', { class: 'text-xs text-gray-500 dark:text-gray-400' }, `(${usd.value})`),
+              ])
+            },
+          },
+        ] as TableColumn<TradeNftItem>[],
     {
-      header: $i18n.t('general.from'),
+      header: isTradeSwap(props.type) ? $i18n.t('swap.counterparty') : $i18n.t('general.from'),
       cell: ({ row }) => {
         const trade = row.original
 

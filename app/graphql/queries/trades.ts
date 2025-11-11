@@ -148,9 +148,20 @@ export const highestOfferByNftId = graphql(`
 
 export type HighestOfferByNftIdData = ResultOf<typeof highestOfferByNftId>
 
-export const offerIdsByNftId = graphql(`
-  query offerIdsByNftId($id: String!) {
+export const activeOffersIdsByNftId = graphql(`
+  query activeOffersIdsByNftId($id: String!) {
     items: offers(
+      where: { status_eq: ACTIVE, desired: { id_eq: $id } }
+      orderBy: blockNumber_DESC
+    ) {
+      id
+    }
+  }
+`)
+
+export const activeSwapsIdsByNftId = graphql(`
+  query activeSwapsIdsByNftId($id: String!) {
+    items: swaps(
       where: { status_eq: ACTIVE, desired: { id_eq: $id } }
       orderBy: blockNumber_DESC
     ) {
