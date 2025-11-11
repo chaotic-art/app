@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
-import { TradeType } from '@/components/trade/types'
+import { TradeTypes } from '@/components/trade/types'
 import { useSortOptions } from '~/composables/useSortOptions'
 import { fetchOdaCollection } from '~/services/oda'
 import { getSubscanAccountUrl } from '~/utils/format/address'
@@ -203,7 +203,7 @@ defineOgImageComponent('Frame', {
           </div>
         </template>
         <template #offers>
-          <CollectionTrades :trade-type="TradeType.OFFER" />
+          <CollectionTrades :trade-type="TradeTypes.Offer" />
         </template>
       </UTabs>
     </div>

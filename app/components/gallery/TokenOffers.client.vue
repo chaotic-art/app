@@ -2,7 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { TradeNftItem } from '@/components/trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import { TradeType } from '@/components/trade/types'
+import { TradeTypes } from '@/components/trade/types'
 import { offerIdsByNftId } from '~/graphql/queries/trades'
 
 const props = defineProps<{
@@ -21,7 +21,7 @@ const tradeIds = ref()
 const { items: trades, loading } = useTrades({
   where: computed(() => ({ id_in: tradeIds.value })),
   disabled: computed(() => !Array.isArray(tradeIds.value)),
-  type: TradeType.OFFER,
+  type: TradeTypes.Offer,
 })
 
 useSubscriptionGraphql({

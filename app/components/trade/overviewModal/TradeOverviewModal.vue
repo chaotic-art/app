@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { ExecTxParams, OverviewMode, TradeDetailedToken } from './utils'
-import type { TradeNftItem } from '@/components/trade/types'
+import type { TradeNftItem, TradeType } from '@/components/trade/types'
 import { useQuery } from '@tanstack/vue-query'
 import { whenever } from '@vueuse/core'
 import ModalIdentityItem from '@/components/common/ModalIdentityItem.vue'
-import { TradeType } from '@/components/trade/types'
+import { TradeTypes } from '@/components/trade/types'
 import TradeOverviewModalContent from './Content.vue'
 import { fetchTradeDetailedToken, TradeTypeTx, useIsTradeOverview } from './utils'
 
@@ -31,7 +31,7 @@ const { $i18n } = useNuxtApp()
 const { isSuccess, close, result } = useTransactionModal()
 
 const TradeTypeOverviewModeDetails: Record<TradeType, Record<OverviewMode, OverviewModeDetails>> = {
-  [TradeType.SWAP]: {
+  [TradeTypes.Swap]: {
     incoming: {
       title: $i18n.t('swap.incomingSwap'),
       signingTitle: $i18n.t('transaction.acceptSwap'),
@@ -43,7 +43,7 @@ const TradeTypeOverviewModeDetails: Record<TradeType, Record<OverviewMode, Overv
       notificationTitle: $i18n.t('swap.swapCancellation'),
     },
   },
-  [TradeType.OFFER]: {
+  [TradeTypes.Offer]: {
     incoming: {
       title: $i18n.t('offer.incomingOffer'),
       signingTitle: $i18n.t('offer.acceptOffer'),
@@ -58,11 +58,11 @@ const TradeTypeOverviewModeDetails: Record<TradeType, Record<OverviewMode, Overv
 }
 
 const TradeTypeDetails: Record<TradeType, Details> = {
-  [TradeType.SWAP]: {
+  [TradeTypes.Swap]: {
     transactionSuccessTitle: $i18n.t('swap.manageSwaps'),
     transactionSuccessTab: 'swaps',
   },
-  [TradeType.OFFER]: {
+  [TradeTypes.Offer]: {
     transactionSuccessTitle: $i18n.t('offer.manageOffers'),
     transactionSuccessTab: 'offers',
   },
