@@ -50,10 +50,12 @@ const desiredTitle = computed(() => isSwap.value ? $i18n.t(`${key.value}.receive
       />
 
       <template v-if="isSwap">
-        <UIcon
-          class="rotate-90 text-gray-900 dark:text-white"
-          name="mdi:swap-horizontal"
-        />
+        <div class="flex w-full justify-center">
+          <UIcon
+            class="rotate-90"
+            name="mdi:swap-horizontal"
+          />
+        </div>
 
         <!-- Offered -->
         <TokenItemDetails

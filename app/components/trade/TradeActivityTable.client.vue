@@ -5,6 +5,7 @@ import type { TradeConsidered, TradeNftItem, TradeToken, TradeType } from '@/com
 import type { SwapSurcharge } from '@/composables/onchain/useNftPallets'
 import TradeActivityTableRowItem from '@/components/trade/ActivityTable/RowItem.vue'
 import TradeActivityTableRowItemCollection from '@/components/trade/ActivityTable/RowItemCollection.vue'
+import { isTradeSwap } from '@/composables/useTradeType'
 
 import { graphql } from '~/graphql/client'
 
@@ -94,10 +95,36 @@ function getTargetAddress(trade: TradeNftItem) {
 }
 
 const columns = computed<TableColumn<TradeNftItem>[]>(() => {
+  let toHeader = ''
+  const isSwap = isTradeSwap(props.type)
+
+  if (isSwap) {
+    toHeader = $i18n.t('swap.counterparty')
+  }
+  else {
+    toHeader = tabTarget.value === 'from' ? $i18n.t('general.from') : $i18n.t('general.to')
+  }
+
   return [
+    ...(isSwap
+      ? [{
+          header: $i18n.t(`trades.${activeTab.value}.send`),
+          cell: ({ row }) => {
+            const { offered } = getRowConfig(row.original)
+
+            return h('div', { class: 'flex items-center justify-between gap-2' }, [
+              h(TradeActivityTableRowItem, {
+                item: offered.item,
+                surcharge: offered.surcharge,
+              }),
+              h(resolveComponent('UIcon'), { name: 'i-mdi:swap-horizontal' }),
+            ])
+          },
+        }] as TableColumn<TradeNftItem>[]
+      : []),
     {
       accessorKey: 'item',
-      header: 'Item',
+      header: isSwap ? $i18n.t(`trades.${activeTab.value}.receive`) : 'item',
       cell: ({ row }) => {
         const trade = row.original
         const { desired } = getRowConfig(trade)
@@ -115,25 +142,29 @@ const columns = computed<TableColumn<TradeNftItem>[]>(() => {
         })
       },
     },
-    {
-      accessorKey: 'price',
-      header: $i18n.t('general.amount'),
-      cell: ({ row }) => {
-        const trade = row.original
+    ...(!isSwap
+      ? [
+          {
+            accessorKey: 'price',
+            header: $i18n.t('general.amount'),
+            cell: ({ row }) => {
+              const trade = row.original
 
-        const { usd } = useAmount(computed(() => trade.price), decimals, chainSymbol)
+              const { usd } = useAmount(computed(() => trade.price), decimals, chainSymbol)
 
-        return h('div', { class: 'flex items-center gap-2' }, [
-          h(resolveComponent('Money'), {
-            value: trade.price,
-            inline: true,
-          }),
-          h('div', { class: 'text-xs text-gray-500 dark:text-gray-400' }, `(${usd.value})`),
-        ])
-      },
-    },
+              return h('div', { class: 'flex items-center gap-2' }, [
+                h(resolveComponent('Money'), {
+                  value: trade.price,
+                  inline: true,
+                }),
+                h('div', { class: 'text-xs text-gray-500 dark:text-gray-400' }, `(${usd.value})`),
+              ])
+            },
+          },
+        ] as TableColumn<TradeNftItem>[]
+      : []),
     {
-      header: tabTarget.value === 'from' ? $i18n.t('general.from') : $i18n.t('general.to'),
+      header: toHeader,
       cell: ({ row }) => {
         const trade = row.original
 

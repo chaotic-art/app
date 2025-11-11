@@ -21,7 +21,7 @@ const onClick = () => emit('clickMain', props.trade)
 
 const details: Record<TradeType, { cancel: string, accept: string, withdraw: string }> = {
   [TradeTypes.Swap]: {
-    cancel: 'transaction.cancelSwap',
+    cancel: 'swap.cancelSwap',
     accept: 'general.accept',
     withdraw: 'swap.withdrawSwap',
   },

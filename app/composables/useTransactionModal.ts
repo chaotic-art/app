@@ -68,7 +68,28 @@ export interface CancelOfferTransactionResult {
   prefix: AssetHubChain
 }
 
-type TransactionResult = CollectionCategory | NftCategory | ActionTransactionResult | TransferTransactionResult | CreateOfferTransactionResult | AcceptOfferTransactionResult | CancelOfferTransactionResult
+export interface AcceptSwapTransactionResult {
+  type: 'accept_swap'
+  hash: string
+  prefix: AssetHubChain
+}
+
+export interface CancelSwapTransactionResult {
+  type: 'cancel_swap'
+  hash: string
+  prefix: AssetHubChain
+}
+
+type TransactionResult
+  = CollectionCategory
+    | NftCategory
+    | ActionTransactionResult
+    | TransferTransactionResult
+    | CreateOfferTransactionResult
+    | AcceptOfferTransactionResult
+    | CancelOfferTransactionResult
+    | AcceptSwapTransactionResult
+    | CancelSwapTransactionResult
 
 // Transaction status progression:
 // 1. status.value = 'signed'

@@ -49,6 +49,12 @@ const tabsItems = ref([
     slot: 'offers',
     value: 'offers',
   },
+  {
+    label: 'Swaps',
+    name: 'Swaps',
+    slot: 'swaps',
+    value: 'swaps',
+  },
 ])
 
 const { data: followers, refresh: refreshFollowers } = useAsyncData(
@@ -239,6 +245,9 @@ function onTotalCountChange(slot: string, totalCount: number) {
       </template>
       <template #offers>
         <ProfileTrades :address="address" :type="TradeTypes.Offer" />
+      </template>
+      <template #swaps>
+        <ProfileTrades :address="address" :type="TradeTypes.Swap" />
       </template>
     </UTabs>
   </div>
