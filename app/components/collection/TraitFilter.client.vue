@@ -99,13 +99,12 @@ function clearSearch() {
 </script>
 
 <template>
-  <UPopover v-model:open="isOpen" :popper="{ placement: 'bottom-start' }">
+  <UPopover v-model:open="isOpen" :popper="{ placement: 'bottom-start' }" :ui="{ content: 'overflow-hidden' }">
     <UButton
       variant="outline"
       color="neutral"
       size="sm"
       icon="i-heroicons-adjustments-horizontal"
-      :badge="totalSelectedCount || undefined"
     >
       Traits
     </UButton>
@@ -133,6 +132,7 @@ function clearSearch() {
               placeholder="Search traits..."
               icon="i-heroicons-magnifying-glass"
               size="sm"
+              class="w-full"
             >
               <template v-if="searchQuery" #trailing>
                 <UButton
