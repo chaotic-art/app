@@ -58,9 +58,26 @@ const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value
 
 const { selectedSort, createQueryVariables } = useSortOptions()
 
-const queryVariables = computed(() =>
-  createQueryVariables([collection_id?.toString() ?? '']),
-)
+const filteredNftIds = ref<string[]>([])
+
+const queryVariables = computed(() => {
+  const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
+
+  if (filteredNftIds.value.length > 0) {
+    return {
+      ...baseVariables,
+      search: [{
+        id_in: filteredNftIds.value,
+      }],
+    }
+  }
+
+  return baseVariables
+})
+
+function handleNftIdsUpdate(nftIds: string[]) {
+  filteredNftIds.value = nftIds
+}
 
 definePageMeta({
   validate: async (route) => {
@@ -191,6 +208,10 @@ defineOgImageComponent('Frame', {
             <div class="flex flex-col md:flex-row justify-end items-center gap-4">
               <div class="w-full md:w-auto flex items-center gap-2">
                 <ArtViewFilter />
+                <TraitFilter
+                  :collection-id="collection_id?.toString() ?? ''"
+                  @update:nft-ids="handleNftIdsUpdate"
+                />
                 <SortOptions
                   v-model="selectedSort"
                   class="w-full md:w-48"
@@ -200,7 +221,7 @@ defineOgImageComponent('Frame', {
 
             <!-- Items Grid -->
             <LazyNftsGrid
-              :key="selectedSort"
+              :key="`${selectedSort}-${filteredNftIds.length}-${filteredNftIds.join(',')}`"
               :variables="queryVariables"
               grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
               no-items-found-message="This collection doesn't have any items yet."
