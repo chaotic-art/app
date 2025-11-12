@@ -298,7 +298,7 @@ whenever(() => Boolean(currentTokenValue.value), () => {
   if (targetAddresses.value.length > 1) {
     sendSameAmount.value = targetAddresses.value.map(({ token }) => token).every(Boolean)
   }
-}, { once: true })
+}, { once: true, immediate: true })
 </script>
 
 <template>

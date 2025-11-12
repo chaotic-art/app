@@ -122,7 +122,8 @@
     "active": "Active",
     "accept": "Accept",
     "from": "From",
-    "to": "To"
+    "to": "To",
+    "transfer": "Transfer"
   },
   "signing": {
     "transaction": "Sign Transaction",
