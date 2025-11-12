@@ -3,7 +3,7 @@ interface Props {
   collectionId: string
 }
 
-interface SelectedTrait {
+export interface SelectedTrait {
   traitType: string
   value: string
 }
@@ -12,6 +12,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   (e: 'update:nft-ids', nftIds: string[]): void
+  (e: 'update:selected-traits', traits: SelectedTrait[]): void
 }>()
 
 const { attributesRarityMaps, traitCounts, loading, getNftIdsByTraits } = useCollectionAttributes({
@@ -80,17 +81,20 @@ function toggleValue(traitType: string, value: string) {
     selectedTraits.value.splice(index, 1)
   }
   else {
+    selectedTraits.value = selectedTraits.value.filter(t => t.traitType !== traitType)
     selectedTraits.value.push({ traitType, value })
   }
 
   const nftIds = getNftIdsByTraits(selectedTraits.value)
 
   emit('update:nft-ids', nftIds)
+  emit('update:selected-traits', selectedTraits.value)
 }
 
 function clearFilters() {
   selectedTraits.value = []
   emit('update:nft-ids', [])
+  emit('update:selected-traits', [])
 }
 
 function clearSearch() {
@@ -105,8 +109,15 @@ function clearSearch() {
       color="neutral"
       size="sm"
       icon="i-heroicons-adjustments-horizontal"
+      class="relative"
     >
       Traits
+      <span
+        v-if="totalSelectedCount > 0"
+        class="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-4 h-4 text-[10px] font-medium rounded-full bg-primary text-primary-foreground"
+      >
+        {{ totalSelectedCount }}
+      </span>
     </UButton>
 
     <template #content>

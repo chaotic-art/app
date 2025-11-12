@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { SelectedTrait } from '~/components/collection/TraitFilter.client.vue'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 import { TradeTypes } from '@/components/trade/types'
@@ -59,11 +60,12 @@ const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value
 const { selectedSort, createQueryVariables } = useSortOptions()
 
 const filteredNftIds = ref<string[]>([])
+const selectedTraits = ref<SelectedTrait[]>([])
 
 const queryVariables = computed(() => {
   const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
 
-  if (filteredNftIds.value.length > 0) {
+  if (selectedTraits.value.length > 0) {
     return {
       ...baseVariables,
       search: [{
@@ -77,6 +79,10 @@ const queryVariables = computed(() => {
 
 function handleNftIdsUpdate(nftIds: string[]) {
   filteredNftIds.value = nftIds
+}
+
+function handleSelectedTraitsUpdate(traits: SelectedTrait[]) {
+  selectedTraits.value = traits
 }
 
 definePageMeta({
@@ -211,6 +217,7 @@ defineOgImageComponent('Frame', {
                 <TraitFilter
                   :collection-id="collection_id?.toString() ?? ''"
                   @update:nft-ids="handleNftIdsUpdate"
+                  @update:selected-traits="handleSelectedTraitsUpdate"
                 />
                 <SortOptions
                   v-model="selectedSort"
