@@ -112,6 +112,7 @@
     "viewNft": "View NFT | View NFTs",
     "copyToClipboard": "Copied to clipboard",
     "connectWallet": "Connect Wallet",
+    "connectWalletFirst": "Connect Wallet First",
     "learnMore": "Learn More",
     "cancel": "Cancel",
     "amount": "Amount",
@@ -122,7 +123,8 @@
     "active": "Active",
     "accept": "Accept",
     "from": "From",
-    "to": "To"
+    "to": "To",
+    "transfer": "Transfer"
   },
   "signing": {
     "transaction": "Sign Transaction",
@@ -240,6 +242,7 @@
     "sendSameAmount": "Send same amount",
     "displayUnits": "Display units",
     "transferable": "Transferable",
+    "selfTransfer": "Cannot transfer to yourself",
     "networkFee": "Network Fee",
     "continue": "Continue",
     "send": "Send",
