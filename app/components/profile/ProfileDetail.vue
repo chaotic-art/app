@@ -12,6 +12,9 @@ const props = defineProps<{ address: string, profile?: Profile | null, bannerUrl
 const { isCurrentAccount } = useAuth()
 const route = useRoute()
 const router = useRouter()
+const { currentChain } = useChain()
+
+const NuxtLink = resolveComponent('NuxtLink')
 
 const followButton = ref()
 const followModalTab = ref<'followers' | 'following'>('followers')
@@ -190,12 +193,15 @@ function onTotalCountChange(slot: string, totalCount: number) {
             />
             <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
 
-            <!-- <UButton
+            <UButton
+              v-if="!isCurrentAccount(address)"
               icon="i-lucide-dollar-sign"
               variant="outline"
+              :as="NuxtLink"
+              :to="`/${currentChain}/transfer?target=${address}`"
             >
-              Transfer
-            </UButton> -->
+              {{ $t('general.transfer') }}
+            </UButton>
 
             <ProfileShareDropdown />
           </div>
