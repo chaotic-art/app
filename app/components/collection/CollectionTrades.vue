@@ -53,7 +53,7 @@ const key = computed(() => JSON.stringify(tradeQuery.value))
           class="capitalize"
           variant="outline"
           url-param="trade_collection"
-          label="Only Collection Offers"
+          :label="`Only Collection ${tradeType}s`"
           :disabled="activeTab === 'outgoing'"
         />
       </template>
