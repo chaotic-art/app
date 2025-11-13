@@ -10,8 +10,10 @@ const props = defineProps<{
   disabled?: boolean
   label?: string
   mainClass?: string
+  detailed?: boolean
 }>()
-const emit = defineEmits(['clickMain'])
+
+const emit = defineEmits(['clickMain', 'clickCounterSwap'])
 const { accountId } = useAuth()
 const { $i18n } = useNuxtApp()
 
@@ -90,6 +92,18 @@ const buttonConfig = computed<ButtonConfig | null>(() => {
       @click="buttonConfig.onClick"
     />
 
-    <!-- Conter swap here -->
+    <template v-if="isTargetOfTrade && detailed && trade.type === TradeTypes.Swap">
+      <UTooltip
+        :text="$t('swap.counterSwap')"
+      >
+        <UButton
+          variant="outline"
+          class="px-3"
+          @click="emit('clickCounterSwap')"
+        >
+          <UIcon name="material-symbols:repeat" />
+        </UButton>
+      </UTooltip>
+    </template>
   </div>
 </template>
