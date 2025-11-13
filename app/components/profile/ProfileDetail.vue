@@ -211,7 +211,7 @@ async function onClickSwaps() {
                 variant="outline"
                 @click="onClickSwaps"
               >
-                {{ $t('swap.swaps') }}
+                {{ $t('general.swaps') }}
               </UButton>
 
               <UButton
