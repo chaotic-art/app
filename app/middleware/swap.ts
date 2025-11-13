@@ -29,16 +29,12 @@ export default defineNuxtRouteMiddleware((to) => {
       return navigateTo({ name: getSwapStepRouteName(SwapStep.COUNTERPARTY, true), params: { id, chain } })
     }
 
-    if (!import.meta.client) {
-      return navigateTo({
-        name: getSwapStepRouteName(SwapStep.DESIRED),
-        params: { id, chain },
-        query: { swapId: swapStore.createSwap(id, chain).id },
-      })
+    // On server, do not create swaps; let client handle creation
+    if (import.meta.server) {
+      return
     }
 
-    // On server, do not create swaps; let client handle creation
-    return
+    return navigateTo({ name: getSwapStepRouteName(SwapStep.COUNTERPARTY) })
   }
 
   const isCollectionSwap = foundSwap.isCollectionSwap
