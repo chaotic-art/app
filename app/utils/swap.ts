@@ -64,16 +64,6 @@ export function navigateToSwap(swap: AtomicSwap) {
   })
 }
 
-// export function nftToSwapItem(nft: NFT): SwapItem {
-//   return {
-//     id: nft.id,
-//     collectionId: nft.collection.id,
-//     sn: nft.sn,
-//     name: nft.name,
-//     meta: nft.meta,
-//   }
-// }
-
 export function tradeToSwapItem(token: TradeToken): SwapItem {
   return {
     id: token.id,

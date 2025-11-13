@@ -18,11 +18,13 @@ interface UseCartActionsParams {
 export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId, mimeType, highestOffer }: UseCartActionsParams) {
   const { isCurrentAccount } = useAuth()
   const { doAfterLogin } = useDoAfterlogin()
+  const { currentChain } = useChain()
 
   const actionCartStore = useActionCartStore()
   const shoppingCartStore = useShoppingCartStore()
   const listingCartStore = useListingCartStore()
   const makingOfferStore = useMakingOfferStore()
+  const swapStore = useAtomicSwapStore()
 
   const { itemToBuy } = storeToRefs(shoppingCartStore)
   const { completePurchaseModal, listingCartModalOpen, makeOfferModalOpen } = storeToRefs(usePreferencesStore())
@@ -37,6 +39,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
   const canBurn = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)) && !mimeType?.value?.includes('html'))
   const canTransfer = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)))
   const canOffer = computed(() => Boolean(owner.value && !isCurrentAccount(owner.value)))
+  const canSwap = computed(() => Boolean(owner.value && !isCurrentAccount(owner.value)))
 
   const overlay = useOverlay()
   const burnModal = overlay.create(LazyBurnModal)
@@ -182,6 +185,30 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     }
   }
 
+  function createSwap() {
+    if (!token.value || !owner.value || !collection.value) {
+      return
+    }
+
+    if (!canSwap.value) {
+      return
+    }
+
+    const swap = swapStore.createSwap(token.value.owner!, currentChain.value, {
+      desired: [{
+        id: id.value,
+        collectionId,
+        sn: tokenId,
+        name: token.value.metadata?.name || '',
+        meta: {
+          image: token.value.metadata?.image || '',
+        },
+      }],
+    })
+
+    navigateToSwap(swap)
+  }
+
   return {
     // actions
     addToActionCart,
@@ -192,6 +219,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     transferNow,
     createActionCartItem,
     createOffer,
+    createSwap,
 
     // computed
     isItemInActionCart,
@@ -202,5 +230,6 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     canBurn,
     canTransfer,
     canOffer,
+    canSwap,
   }
 }
