@@ -19,7 +19,7 @@ const desiredQuery = computed(() => ({ id_in: swap.value?.desired.map(item => it
 function toTokenToSwap(item: SwapItem): TokenToSwap {
   return {
     collectionId: item.collectionId,
-    sn: Number(item.sn),
+    sn: item.sn ? Number(item.sn) : undefined,
   }
 }
 
