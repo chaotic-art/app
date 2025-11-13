@@ -120,7 +120,9 @@ export const useAtomicSwapStore = defineStore('atomicSwap', () => {
     updateStepItems,
     removeStepItem,
   }
-}, { persist: {
+}, {
+  persist: true,
+  // {
   // clear swaps on session start
   // afterHydrate: (context) => {
   //   const recentSwaps = (context.store.items as AtomicSwap[])
@@ -134,4 +136,5 @@ export const useAtomicSwapStore = defineStore('atomicSwap', () => {
   //     .map(items => items.sort((a, b) => a.createdAt - b.createdAt).slice(0, ITEMS_MAX_AMOUNT_PER_CHAIN - 1))
   //     .flat()
   // },
-} })
+  // }
+})
