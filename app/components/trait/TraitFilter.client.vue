@@ -1,11 +1,8 @@
 <script setup lang="ts">
+import type { SelectedTrait } from './types'
+
 interface Props {
   collectionId: string
-}
-
-export interface SelectedTrait {
-  traitType: string
-  value: string
 }
 
 const props = defineProps<Props>()
