@@ -4,15 +4,18 @@ import type { Profile } from '@/services/profile'
 import { computed } from 'vue'
 import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
+import { SwapStep } from '@/components/swap/types'
 import { TradeTypes } from '@/components/trade/types'
 import { fetchFollowersOf, fetchFollowing } from '@/services/profile'
 import { copyAddress, getSubscanAccountUrl, shortenAddress } from '@/utils/format/address'
+import { getSwapStepRouteName } from '@/utils/swap'
 
 const props = defineProps<{ address: string, profile?: Profile | null, bannerUrl?: string }>()
 const { isCurrentAccount } = useAuth()
 const route = useRoute()
 const router = useRouter()
 const { currentChain } = useChain()
+const swapStore = useAtomicSwapStore()
 
 const NuxtLink = resolveComponent('NuxtLink')
 
@@ -124,6 +127,15 @@ function onTotalCountChange(slot: string, totalCount: number) {
     tab.label = totalCount > 0 ? `${tab.name} (${totalCount})` : tab.name
   }
 }
+
+async function onClickSwaps() {
+  const createdId = swapStore.createSwap(props.address, currentChain.value).id
+  await navigateTo({
+    name: getSwapStepRouteName(SwapStep.DESIRED),
+    params: { id: props.address, chain: currentChain.value },
+    query: { swapId: createdId },
+  })
+}
 </script>
 
 <template>
@@ -193,15 +205,24 @@ function onTotalCountChange(slot: string, totalCount: number) {
             />
             <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
 
-            <UButton
-              v-if="!isCurrentAccount(address)"
-              icon="i-lucide-dollar-sign"
-              variant="outline"
-              :as="NuxtLink"
-              :to="`/${currentChain}/transfer?target=${address}`"
-            >
-              {{ $t('general.transfer') }}
-            </UButton>
+            <template v-if="!isCurrentAccount(address)">
+              <UButton
+                icon="mdi:swap-horizontal"
+                variant="outline"
+                @click="onClickSwaps"
+              >
+                {{ $t('swap.swaps') }}
+              </UButton>
+
+              <UButton
+                icon="i-lucide-dollar-sign"
+                variant="outline"
+                :as="NuxtLink"
+                :to="`/${currentChain}/transfer?target=${address}`"
+              >
+                {{ $t('general.transfer') }}
+              </UButton>
+            </template>
 
             <ProfileShareDropdown />
           </div>

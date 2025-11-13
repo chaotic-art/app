@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TradeTableQuery } from '@/components/trade/TradeActivityTable.client.vue'
 import type { TradeType } from '@/components/trade/types'
-import { isTradeOffer } from '@/composables/useTradeType'
+import { isTradeOffer, isTradeSwap } from '@/composables/useTradeType'
 
 defineProps<{
   tradeType: TradeType
@@ -61,8 +61,12 @@ const key = computed(() => JSON.stringify(tradeQuery.value))
         v-if="collectionId"
         #action
       >
+        <SwapCreateCollectionSwapButton
+          v-if="isTradeSwap(tradeType)"
+          :collection-id="collectionId"
+        />
         <CreateCollectionOfferButton
-          v-if="isTradeOffer(tradeType)"
+          v-else-if="isTradeOffer(tradeType)"
           :collection-id="collectionId"
         />
       </template>

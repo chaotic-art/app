@@ -124,7 +124,8 @@
     "accept": "Accept",
     "from": "From",
     "to": "To",
-    "transfer": "Transfer"
+    "transfer": "Transfer",
+    "optional": "Optional"
   },
   "signing": {
     "transaction": "Sign Transaction",
@@ -412,8 +413,8 @@
     "created": "Swap Created",
     "creatingSwap": "Creating Swap",
     "incomingSwap": "Incoming Swap",
-    "landingSubtitle": "Koda Swap facilitates secure and straightforward exchanges of digital assets. Connect directly with traders and confidently navigate your NFT transactions with our reliable platform.",
-    "landingTitle": "Koda Swap",
+    "landingSubtitle": "Chaotic Swap facilitates secure and straightforward exchanges of digital assets. Connect directly with traders and confidently navigate your NFT transactions with our reliable platform.",
+    "landingTitle": "Swap",
     "learnMoreAboutSwaps": "Learn more about swaps",
     "manageSwaps": "Manage Swaps",
     "modifyOffer": "Modify Offer",
@@ -439,5 +440,9 @@
     "yourSwap": "Your Swap",
     "yourSwapList": "Your Swap List",
     "yourSwapOffers": "Your Swap Offers"
+  },
+  "validation": {
+    "inputAddressFirst": "Input address first",
+    "addressIncorrect": "Address Incorrect"
   }
 }

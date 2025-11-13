@@ -1,6 +1,7 @@
 import type { TxEvent } from 'polkadot-api'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
+import { whenever } from '@vueuse/core'
 
 export interface CollectionCategory {
   type: 'collection'
@@ -56,6 +57,13 @@ export interface CreateOfferTransactionResult {
   prefix: AssetHubChain
 }
 
+export interface CreateSwapTransactionResult {
+  type: 'create_swap'
+  hash: string
+  blockNumber: number
+  prefix: AssetHubChain
+}
+
 export interface AcceptOfferTransactionResult {
   type: 'accept_offer'
   hash: string
@@ -90,6 +98,7 @@ type TransactionResult
     | CancelOfferTransactionResult
     | AcceptSwapTransactionResult
     | CancelSwapTransactionResult
+    | CreateSwapTransactionResult
 
 // Transaction status progression:
 // 1. status.value = 'signed'
@@ -114,6 +123,14 @@ export default function useTransactionModal() {
     result.value = null
   }
 
+  function onSuccess<T extends TransactionResult>(type: T['type'], callback: (data: T) => void, { autoClose = true } = {}) {
+    return whenever(() => isSuccess.value && type === result.value?.type, () => {
+      const data = result.value as T
+      autoClose && close()
+      callback(data)
+    })
+  }
+
   return {
     // State
     hash,
@@ -128,5 +145,8 @@ export default function useTransactionModal() {
 
     // Methods
     close,
+
+    // Methods
+    onSuccess,
   }
 }
