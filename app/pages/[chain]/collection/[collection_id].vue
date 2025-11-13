@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SelectedTrait } from '~/components/collection/TraitFilter.client.vue'
+import type { SelectedTrait } from '@/components/trait/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 import { TradeTypes } from '@/components/trade/types'
