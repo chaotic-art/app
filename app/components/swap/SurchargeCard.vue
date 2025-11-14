@@ -15,7 +15,7 @@ const { usd, formatted } = useAmount(
 </script>
 
 <template>
-  <div class="border rounded-xl px-4! py-6! flex flex-col items-center justify-between gap-4">
+  <div class="border border-gray-300 dark:border-neutral-700 rounded-xl px-4! py-6! flex flex-col items-center justify-between gap-4">
     <div class="text-lg text-center font-bold capitalize">
       {{ $t('swap.surchargeTitle') }}
     </div>

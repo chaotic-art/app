@@ -12,7 +12,7 @@ defineProps<{
 
 <template>
   <div
-    class="relative border rounded-xl overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group"
+    class="relative border border-gray-300 dark:border-neutral-700 rounded-xl overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group"
   >
     <NuxtLink :to="to" class="block">
       <!-- NFT Media -->
