@@ -7,6 +7,7 @@ defineProps<{
   image?: string | null
   name?: string | null
   to?: string
+  owner?: string | null
 }>()
 </script>
 
@@ -27,9 +28,26 @@ defineProps<{
 
       <!-- Card Content -->
       <div class="p-3 md:p-4">
-        <h3 class="font-bold text-base md:text-lg mb-2 text-gray-900 dark:text-white line-clamp-1" :title="name || ''">
+        <h3 class="font-bold text-base md:text-lg text-gray-900 dark:text-white" :title="name || ''">
           {{ name }}
         </h3>
+      </div>
+
+      <div class="p-3 md:p-4">
+        <!-- Owner Section -->
+        <div class="mt-3 pt-3 border-t border-gray-100 dark:border-neutral-700">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Owner</span>
+            <UserInfo
+              v-if="owner"
+              :address="owner || ''"
+              :avatar-size="20"
+              :transparent-background="true"
+              class="p-0!"
+            />
+            <span v-else class="text-xs text-gray-600 dark:text-gray-300">N/A</span>
+          </div>
+        </div>
       </div>
     </NuxtLink>
   </div>

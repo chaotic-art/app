@@ -4,6 +4,9 @@ const { swap } = storeToRefs(swapStore)
 const { currentChain } = useChain()
 const surcharge = computed(() => swap.value?.surcharge)
 const desiredNfts = computed(() => swap.value?.desired)
+
+// TODO: get from desiredNft
+const { collection } = useOdaCollection(computed(() => Number(desiredNfts.value[0]?.collectionId)))
 </script>
 
 <template>
@@ -17,6 +20,7 @@ const desiredNfts = computed(() => swap.value?.desired)
         :chain="currentChain"
         :image="nft.meta.image"
         :name="nft.name"
+        :owner="collection?.owner"
       />
 
       <SwapSurchargeCard
