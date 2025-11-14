@@ -51,10 +51,13 @@ export const useAtomicSwapStore = defineStore('atomicSwap', () => {
 
   const { accountId } = useAuth()
 
-  const swap = ref<AtomicSwap>({ ...DEFAULT_SWAP, chain: undefined })
+  const swap = ref<AtomicSwap>({ ...DEFAULT_SWAP, chain: 'ahp' })
   const step = ref(SwapStep.COUNTERPARTY)
 
-  const getStepItems = (step: SwapStep) => swap.value[getStepItemsKey(step) || ''] || []
+  const getStepItems = (step: SwapStep): SwapItem[] => {
+    const key = getStepItemsKey(step)
+    return key ? swap.value[key] : []
+  }
 
   const getItems = computed(() => items.value)
   const stepItems = computed(() => getStepItems(step.value))
@@ -97,7 +100,7 @@ export const useAtomicSwapStore = defineStore('atomicSwap', () => {
   }
 
   const removeStepItem = (id: string) => {
-    updateStepItems(getStepItems(step.value).filter(item => item.id !== id))
+    updateStepItems(getStepItems(step.value).filter((item: SwapItem) => item.id !== id))
   }
 
   return {
