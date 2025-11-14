@@ -17,8 +17,6 @@ const router = useRouter()
 const { currentChain } = useChain()
 const swapStore = useAtomicSwapStore()
 
-const NuxtLink = resolveComponent('NuxtLink')
-
 const followButton = ref()
 const followModalTab = ref<'followers' | 'following'>('followers')
 const isFollowModalActive = ref(false)
@@ -214,14 +212,14 @@ async function onClickSwaps() {
                 {{ $t('general.swaps') }}
               </UButton>
 
-              <UButton
-                icon="i-lucide-dollar-sign"
-                variant="outline"
-                :as="NuxtLink"
-                :to="`/${currentChain}/transfer?target=${address}`"
-              >
-                {{ $t('general.transfer') }}
-              </UButton>
+              <NuxtLink :to="`/${currentChain}/transfer?target=${address}`">
+                <UButton
+                  icon="i-lucide-dollar-sign"
+                  variant="outline"
+                >
+                  {{ $t('general.transfer') }}
+                </UButton>
+              </NuxtLink>
             </template>
 
             <ProfileShareDropdown />
