@@ -70,7 +70,7 @@ export function tradeToSwapItem(token: TradeToken): SwapItem {
     collectionId: Number(token.collection.id),
     sn: Number(token.sn), // todo change type to number
     name: token.name,
-    meta: token.meta,
+    meta: { image: token.image || (token.meta.image as string) || '' },
   }
 }
 
