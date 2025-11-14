@@ -1,4 +1,4 @@
-import type { TradeNftItem, TradeType } from '@/components/trade/types'
+import type { Swap, TradeNftItem, TradeType } from '@/components/trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { TradeTypes } from '@/components/trade/types'
@@ -31,8 +31,24 @@ export interface ExecTxParams {
 
 export const TradeTypeTx: Record<TradeType, Record<OverviewMode, (params: ExecTxParams) => void>> = {
   [TradeTypes.Swap]: {
-    owner: () => {},
-    incoming: () => {},
+    owner: ({ trade, chain }) => {
+      const { cancelSwap } = useNftPallets()
+
+      cancelSwap({ offeredItemId: Number(trade.offered.sn), offeredCollectionId: Number(trade.offered.collection.id), chain })
+    },
+    incoming: ({ chain, trade, sendItem }) => {
+      const { acceptSwap } = useNftPallets()
+
+      acceptSwap({
+        receiveItem: Number(trade.offered.sn),
+        receiveCollection: Number(trade.offered.collection.id),
+        sendCollection: Number(trade.considered.id),
+        sendItem: Number(sendItem),
+        price: Number(trade.price),
+        surcharge: (trade as TradeNftItem<Swap>).surcharge,
+        chain,
+      })
+    },
   },
   [TradeTypes.Offer]: {
     owner: ({ trade, chain }) => {

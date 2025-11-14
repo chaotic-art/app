@@ -7,6 +7,7 @@ interface Props {
   noItemsFoundMessage?: string
   gridClass?: string
   prefix?: AssetHubChain
+  hideHoverAction?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -58,7 +59,10 @@ watch(totalCount, (newCount) => {
         :name="nft.name"
         :price="nft.price"
         :current-owner="nft.currentOwner"
+        :hide-hover-action="hideHoverAction"
       />
+
+      <slot name="additional-item" />
     </div>
 
     <!-- Loading More State -->

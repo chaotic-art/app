@@ -126,6 +126,38 @@ interface AcceptOfferParams {
   type?: TxType
 }
 
+interface CancelSwapParams {
+  offeredCollectionId: number
+  offeredItemId: number
+  chain: AssetHubChain
+  type?: TxType
+}
+
+interface AcceptSwapParams {
+  sendCollection: number
+  sendItem: number
+  receiveCollection: number
+  receiveItem: number
+  price: number
+  surcharge: SwapSurchargeDirection | null
+  chain: AssetHubChain
+  type?: TxType
+}
+
+export interface TokenToSwap {
+  collectionId: number
+  sn: number | undefined
+}
+
+interface CreateSwapParams {
+  offered: TokenToSwap[]
+  desired: TokenToSwap[]
+  chain: AssetHubChain
+  surcharge?: SwapSurcharge
+  duration: number
+  type?: TxType
+}
+
 export type SwapSurchargeDirection = 'Send' | 'Receive'
 
 export interface SwapSurcharge { amount: string, direction: SwapSurchargeDirection }
@@ -941,6 +973,175 @@ export function useNftPallets() {
     })
   }
 
+  async function cancelSwap({
+    offeredCollectionId,
+    offeredItemId,
+    chain,
+    type = 'submit',
+  }: CancelSwapParams) {
+    const { signer, address } = await getAccountSigner()
+    const api = $sdk(chain).api
+
+    const transaction = api.tx.Nfts.cancel_swap({
+      offered_collection: offeredCollectionId,
+      offered_item: offeredItemId,
+    })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    open.value = true
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+
+          result.value = {
+            type: 'cancel_swap',
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
+  async function acceptSwap({
+    sendCollection,
+    sendItem,
+    receiveCollection,
+    receiveItem,
+    price,
+    surcharge,
+    chain,
+    type = 'submit',
+  }: AcceptSwapParams) {
+    const { signer, address } = await getAccountSigner()
+    const api = $sdk(chain).api
+
+    const transaction = api.tx.Nfts.claim_swap({
+      send_collection: sendCollection,
+      send_item: sendItem,
+      receive_collection: receiveCollection,
+      receive_item: receiveItem,
+      witness_price: surcharge
+        ? {
+            amount: BigInt(price),
+            direction: Enum(surcharge),
+          }
+        : undefined,
+    })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    open.value = true
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+
+          result.value = {
+            type: 'accept_swap',
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
+  async function createSwap({
+    offered,
+    desired,
+    duration,
+    surcharge,
+    chain,
+    type = 'submit',
+  }: CreateSwapParams) {
+    const { signer, address } = await getAccountSigner()
+    const api = $sdk(chain).api
+
+    const amountOfSwaps = desired.length
+
+    const amount = Number(surcharge?.amount || 0) / amountOfSwaps
+
+    if (desired.length !== offered.length) {
+      return
+    }
+
+    const calls = Array.from({ length: amountOfSwaps }).map((_, i) => {
+      const { collectionId: desiredCollectionId, sn: desiredItem } = desired[i]!
+      const { collectionId: offeredCollectionId, sn: offeredItem } = offered[i]!
+
+      return api.tx.Nfts.create_swap(
+        {
+          offered_collection: offeredCollectionId,
+          offered_item: offeredItem!,
+          desired_collection: desiredCollectionId,
+          maybe_desired_item: desiredItem,
+          maybe_price: surcharge
+            ? {
+                amount: BigInt(amount),
+                direction: Enum(surcharge.direction),
+              }
+            : undefined,
+          duration: BLOCKS_PER_DAY * duration,
+        },
+      )
+    })
+
+    const transaction = api.tx.Utility.batch_all({
+      calls: calls.map(tx => tx.decodedCall),
+    })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    open.value = true
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+
+          result.value = {
+            type: 'create_swap',
+            hash: hash.value,
+            prefix: chain,
+            blockNumber: event.block.number,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   return {
     createCollection,
     mintNft,
@@ -953,6 +1154,9 @@ export function useNftPallets() {
     createOffer,
     cancelOffer,
     acceptOffer,
+    createSwap,
+    cancelSwap,
+    acceptSwap,
     // TODO move else where
     getAccountSigner,
     airdropNfts,

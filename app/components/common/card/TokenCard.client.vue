@@ -10,6 +10,7 @@ const props = defineProps<{
   name?: string | null
   price?: string | null
   currentOwner?: string | null
+  hideHoverAction?: boolean
 }>()
 
 const {
@@ -51,6 +52,19 @@ const {
   mimeType: computed(() => mimeType.value || ''),
 })
 
+const {
+  onAtomicSwapSelect,
+  showAtomicSwapAction,
+  isItemSelected: isAtomicSwapItemSelected,
+} = useAtomicSwapAction({
+  tokenId: props.tokenId,
+  collectionId: props.collectionId,
+  chain: props.chain,
+  token,
+  collection,
+  owner,
+})
+
 const actionCartStore = useActionCartStore()
 const route = useRoute()
 const { isCurrentAccount } = useAuth()
@@ -77,8 +91,8 @@ watchEffect(() => {
   <div
     class="relative border rounded-xl overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group"
     :class="{
-      'border-blue-500! dark:border-blue-400!': isItemInCart,
-      'border-gray-300 dark:border-neutral-700': !isItemInCart,
+      'border-blue-500! dark:border-blue-400!': isItemInCart || isAtomicSwapItemSelected,
+      'border-gray-300 dark:border-neutral-700': !isItemInCart && !isAtomicSwapItemSelected,
     }"
   >
     <!-- Error State -->
@@ -158,9 +172,17 @@ watchEffect(() => {
             </span>
           </div>
 
-          <div v-if="token && (canAddToActionCart || canBuy)" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
+          <div v-if="token && !hideHoverAction && (canAddToActionCart || canBuy || showAtomicSwapAction)" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
             <UButton
-              v-if="canAddToActionCart"
+              v-if="showAtomicSwapAction"
+              :icon="isAtomicSwapItemSelected ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
+              variant="solid"
+              @click.prevent.stop="onAtomicSwapSelect"
+            >
+              {{ isAtomicSwapItemSelected ? 'Remove' : 'Select' }}
+            </UButton>
+            <UButton
+              v-else-if="canAddToActionCart"
               :icon="isItemInActionCart ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"
               variant="solid"
               @click.prevent.stop="addToActionCart"

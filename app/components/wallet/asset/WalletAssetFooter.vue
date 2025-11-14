@@ -8,6 +8,11 @@ const navigationOptions = computed(() => [
     value: 'transfer',
     route: `/${prefix.value}/transfer`,
   },
+  {
+    label: 'Swap',
+    value: 'swap',
+    route: `/${prefix.value}/swap`,
+  },
 ])
 </script>
 

@@ -41,6 +41,14 @@ export default defineNuxtConfig({
         path: '~/components',
         extensions: ['vue'],
         pathPrefix: false,
+        // Avoid duplicate registrations; swap is handled by the entry below
+        ignore: ['swap/**'],
+      },
+      {
+        path: '~/components/swap',
+        extensions: ['vue'],
+        prefix: 'Swap',
+        pathPrefix: true,
       },
     ],
   },

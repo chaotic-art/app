@@ -224,7 +224,6 @@ onUnmounted(closeMakingOfferModal)
           <MakeOfferSingleItem
             v-if="offerStore.items.length === 1 && offerStore.items[0]"
             :item="offerStore.items[0]"
-            :show-price="Boolean(offerStore.items[0]?.price)"
           />
         </div>
 

@@ -10,7 +10,6 @@ import { fetchTradeDetailedToken, TradeTypeTx, useIsTradeOverview } from './util
 
 interface OverviewModeDetails {
   title: string
-  signingTitle: string
   notificationTitle: string
 }
 
@@ -34,24 +33,20 @@ const TradeTypeOverviewModeDetails: Record<TradeType, Record<OverviewMode, Overv
   [TradeTypes.Swap]: {
     incoming: {
       title: $i18n.t('swap.incomingSwap'),
-      signingTitle: $i18n.t('transaction.acceptSwap'),
       notificationTitle: $i18n.t('swap.acceptSwap'),
     },
     owner: {
       title: $i18n.t('swap.yourSwap'),
-      signingTitle: $i18n.t('transaction.cancelSwap'),
       notificationTitle: $i18n.t('swap.swapCancellation'),
     },
   },
   [TradeTypes.Offer]: {
     incoming: {
       title: $i18n.t('offer.incomingOffer'),
-      signingTitle: $i18n.t('offer.acceptOffer'),
       notificationTitle: $i18n.t('offer.offerAccept'),
     },
     owner: {
       title: $i18n.t('offer.yourOffer'),
-      signingTitle: $i18n.t('offer.cancelOffer'),
       notificationTitle: $i18n.t('offer.offerCancellation'),
     },
   },
@@ -106,7 +101,6 @@ const details = computed<Details & OverviewModeDetails>(() =>
       }
     : {
         title: '',
-        signingTitle: '',
         notificationTitle: '',
         transactionSuccessTitle: '',
         transactionSuccessTab: '',
@@ -179,6 +173,8 @@ useModalIsOpenTracker({
 whenever(() => isSuccess.value
   && (result.value?.type === 'accept_offer'
     || result.value?.type === 'cancel_offer'
+    || result.value?.type === 'accept_swap'
+    || result.value?.type === 'cancel_swap'
   ), () => {
   close()
 

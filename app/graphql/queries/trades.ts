@@ -1,7 +1,6 @@
 import type { ResultOf } from '../client'
 import { graphql } from '../client'
 
-// token activity
 export const offersList = graphql(`
     query offersList($where: OfferWhereInput!, $orderBy: [OfferOrderByInput!] = [blockNumber_DESC]) {
         offers(where: $where, orderBy: $orderBy) {
@@ -56,6 +55,62 @@ export const offersList = graphql(`
 `)
 export type OffersListData = ResultOf<typeof offersList>
 
+export const swapList = graphql(`
+    query swapsList($where: SwapWhereInput!, $orderBy: [SwapOrderByInput!] = [blockNumber_DESC]) {
+        swaps(where: $where, orderBy: $orderBy) {
+        id
+        expiration
+        blockNumber
+        status
+        caller
+        surcharge
+        price
+        nft {
+          id
+          name
+          sn
+          currentOwner
+          image
+          collection {
+            id
+          }
+          meta {
+              id
+              image
+              animationUrl
+              name
+              description
+          }
+        }
+        desired {
+          id
+          name
+          sn
+          currentOwner
+          image
+          collection {
+            id
+          }
+          meta {
+              id
+              image
+              animationUrl
+              name
+              description
+          }
+        }
+        considered {
+          id
+          name
+          currentOwner
+          image
+        }
+      }
+    }
+`)
+
+export type SwapListData = ResultOf<typeof swapList>
+
 // minimal offers for offered NFT sn suggestions
 export const unusedOfferedItems = graphql(`
   query unusedOfferedItems($where: OfferWhereInput!) {
@@ -93,9 +148,20 @@ export const highestOfferByNftId = graphql(`
 
 export type HighestOfferByNftIdData = ResultOf<typeof highestOfferByNftId>
 
-export const offerIdsByNftId = graphql(`
-  query offerIdsByNftId($id: String!) {
+export const activeOffersIdsByNftId = graphql(`
+  query activeOffersIdsByNftId($id: String!) {
     items: offers(
+      where: { status_eq: ACTIVE, desired: { id_eq: $id } }
+      orderBy: blockNumber_DESC
+    ) {
+      id
+    }
+  }
+`)
+
+export const activeSwapsIdsByNftId = graphql(`
+  query activeSwapsIdsByNftId($id: String!) {
+    items: swaps(
       where: { status_eq: ACTIVE, desired: { id_eq: $id } }
       orderBy: blockNumber_DESC
     ) {

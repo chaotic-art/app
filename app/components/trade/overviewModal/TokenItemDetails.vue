@@ -45,9 +45,10 @@ watchEffect(() => {
       :collection-name="nft.collection?.metadata?.name || ''"
     >
       <template #right>
-        <div class="flex items-end shrink-0">
+        <div class="flex items-end ">
           <TradeActivityTableSurchargeTag
             v-if="surcharge"
+            class="w-fit"
             :value="surcharge"
           />
 
