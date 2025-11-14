@@ -3,8 +3,6 @@ import { SwapStep } from '@/components/swap/types'
 import { getSwapStepRouteName } from '@/utils/swap'
 import { graphql } from '~/graphql/client'
 
-const NuxtLink = resolveComponent('NuxtLink')
-
 const { isCurrentAccount, accountId } = useAuth()
 const { $i18n, $apolloClient } = useNuxtApp()
 const { currentChain } = useChain()
@@ -108,18 +106,6 @@ watch([ownedCollections, accountId], async ([ownedCollections, account]) => {
           <p class="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed">
             {{ $t('swap.landingSubtitle') }}
           </p>
-          <UButton
-            class="p-0"
-            color="info"
-            variant="link"
-            href="https://hello.kodadot.xyz/tutorial/swap-nft-for-nft"
-            target="_blank"
-            rel="nofollow noopener noreferrer"
-            size="sm"
-            as="a"
-          >
-            {{ $t('swap.learnMoreAboutSwaps') }}
-          </UButton>
         </div>
 
         <div>
@@ -167,9 +153,8 @@ watch([ownedCollections, accountId], async ([ownedCollections, account]) => {
 
             <UButton
               v-else
-              :as="NuxtLink"
-              :to="`/${currentChain}/u/${accountId}?tab=swaps`"
               variant="outline"
+              @click="navigateTo(`/${currentChain}/u/${accountId}?tab=swaps`)"
             >
               {{ $t('swap.yourSwapOffers') }}
 
