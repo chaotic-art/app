@@ -36,7 +36,7 @@ const emit = defineEmits(['remove'])
     <UButton
       v-if="removable"
       size="sm"
-      icon="mdi:cross-circle"
+      icon="mdi:close"
       variant="link"
       @click="emit('remove')"
     />
