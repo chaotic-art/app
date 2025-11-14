@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { SwapSurchargeDirection } from '~/composables/onchain/useNftPallets'
-import { teleportExistentialDeposit } from '@kodadot1/static'
 import { useQuery } from '@tanstack/vue-query'
 import { useElementVisibility } from '@vueuse/core'
 import { SwapStep } from '@/components/swap/types'
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
+import { toNative } from '~/utils/format/balance'
 
 interface StepDetails {
   title: string
@@ -26,6 +26,7 @@ const { decimals, currentChain } = useChain()
 const { getChainIcon } = useIcon()
 const isCollectionSwap = computed(() => swap.value.isCollectionSwap)
 const { getBalance } = useBalances()
+const { existentialDeposit } = useDeposit(currentChain)
 
 const { data: balance } = useQuery({
   queryKey: ['balance', accountId],
@@ -37,7 +38,9 @@ const { data: balance } = useQuery({
 
     return response.balance
   },
+  retry: 3,
   staleTime: 30000,
+  enabled: computed(() => Boolean(accountId.value)),
   initialData: 0n,
   refetchInterval: 60000,
 })
@@ -74,7 +77,7 @@ const count = computed(() => stepItems.value.length + (stepHasSurcharge.value ? 
 const isOverOneToOneSwap = computed(() => swap.value.offered.length > swap.value.desired.length && props.step === SwapStep.OFFERED)
 const isCollectionSwapDesired = computed(() => isCollectionSwap.value && props.step === SwapStep.DESIRED)
 const isOfferedSwapStep = computed(() => props.step === SwapStep.OFFERED)
-const insufficientBalance = computed(() => isOfferedSwapStep.value && balance.value < Number(amount.value) + teleportExistentialDeposit[currentChain.value] / 10 ** decimals.value)
+const insufficientBalance = computed(() => isOfferedSwapStep.value && Number(balance.value) - existentialDeposit.value < toNative(Number(amount.value), decimals.value))
 
 const disabled = computed(() => {
   if ((!accountId.value && props.step === SwapStep.OFFERED) || isOverOneToOneSwap.value) {
@@ -106,7 +109,7 @@ function clearAll() {
 }
 
 function addSurcharge() {
-  swapStore.updateSwap({ surcharge: { amount: String(Number(amount.value) * 10 ** decimals.value), direction: stepDetails.value.surchargeDirection } })
+  swapStore.updateSwap({ surcharge: { amount: String(toNative(Number(amount.value), decimals.value)), direction: stepDetails.value.surchargeDirection } })
   amount.value = ''
 }
 
@@ -220,7 +223,7 @@ watchEffect(() => {
           <div
             v-if="isOfferedSwapStep"
             class="flex align-center text-xs"
-            :class="{ 'text-k-red': insufficientBalance }"
+            :class="{ 'text-error': insufficientBalance }"
           >
             <div class="flex gap-1">
               {{ $t('general.balance') }}:
