@@ -39,10 +39,8 @@ const { data: balance } = useQuery({
     return response.balance
   },
   retry: 3,
-  staleTime: 30000,
   enabled: computed(() => Boolean(accountId.value)),
   initialData: 0n,
-  refetchInterval: 60000,
 })
 
 const stepDetailsMap: ComputedRef<Partial<Record<SwapStep, StepDetails>>> = computed(() => ({
