@@ -48,6 +48,7 @@ const modalData = computed(() => {
       collectionName: props.result?.name,
       metadata: props.result?.description,
     }],
+    chain: props.result.prefix,
   }
 })
 </script>
@@ -58,6 +59,7 @@ const modalData = computed(() => {
     :tx-hash="props.result?.hash"
     :share="modalData.share"
     :status="status"
+    :chain="modalData.chain"
     :action-buttons="modalData.actionButtons"
   >
     <SuccessfulItemsMedia

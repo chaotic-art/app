@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ActionButton } from './ActionButtons.vue'
 import type { TransactionStatus } from '@/composables/useTransactionStatus'
+import type { SupportedChain } from '~/plugins/sdk.client'
 
 export interface ShareProp {
   disabled?: boolean
@@ -20,6 +21,7 @@ const props = defineProps<{
   txHash?: string
   share: ShareProp
   actionButtons: ActionButtonsProp
+  chain?: SupportedChain
 }>()
 
 function handleSecondaryActionClick() {
@@ -35,6 +37,7 @@ function handleSecondaryActionClick() {
       v-if="txHash"
       :tx-hash="txHash"
       :status="status"
+      :chain="chain"
     />
 
     <div class="mt-5">

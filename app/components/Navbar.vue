@@ -62,6 +62,16 @@ function handleCreateNft() {
   router.push('/create/nft')
 }
 
+function handleMassMint() {
+  isCreateModalOpen.value = false
+  router.push('/massmint/onboarding')
+}
+
+function handleAirdrop() {
+  isCreateModalOpen.value = false
+  router.push(`/${routePrefix.value}/airdrop/select`)
+}
+
 function closeModal() {
   isCreateModalOpen.value = false
 }
@@ -184,5 +194,7 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
     @close="closeModal"
     @create-collection="handleCreateCollection"
     @create-nft="handleCreateNft"
+    @mass-mint="handleMassMint"
+    @airdrop="handleAirdrop"
   />
 </template>

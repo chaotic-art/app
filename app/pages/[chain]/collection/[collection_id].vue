@@ -1,12 +1,47 @@
 <script setup lang="ts">
+import type { SelectedTrait } from '@/components/trait/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
+import { TradeTypes } from '@/components/trade/types'
 import { useSortOptions } from '~/composables/useSortOptions'
 import { fetchOdaCollection } from '~/services/oda'
 import { getSubscanAccountUrl } from '~/utils/format/address'
 
 const route = useRoute()
+const router = useRouter()
 const { chain: chainPrefix, collection_id } = route.params
+
+const tabsItems = ref([
+  {
+    label: 'Items',
+    name: 'Items',
+    slot: 'items',
+    value: 'items',
+  },
+  {
+    label: 'Offers',
+    name: 'Offers',
+    slot: 'offers',
+    value: 'offers',
+  },
+  {
+    label: 'Traits',
+    name: 'Traits',
+    slot: 'traits',
+    value: 'traits',
+  },
+])
+
+const activeTab = computed({
+  get() {
+    return (route.query.tab as string) || 'items'
+  },
+  set(tab) {
+    router.replace({
+      query: { ...route.query, tab },
+    })
+  },
+})
 
 const chain = computed(() => chainPrefix as AssetHubChain)
 const { data } = await useLazyAsyncData(
@@ -24,9 +59,31 @@ const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value
 
 const { selectedSort, createQueryVariables } = useSortOptions()
 
-const queryVariables = computed(() =>
-  createQueryVariables([collection_id?.toString() ?? '']),
-)
+const filteredNftIds = ref<string[]>([])
+const selectedTraits = ref<SelectedTrait[]>([])
+
+const queryVariables = computed(() => {
+  const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
+
+  if (selectedTraits.value.length > 0) {
+    return {
+      ...baseVariables,
+      search: [{
+        id_in: filteredNftIds.value,
+      }],
+    }
+  }
+
+  return baseVariables
+})
+
+function handleNftIdsUpdate(nftIds: string[]) {
+  filteredNftIds.value = nftIds
+}
+
+function handleSelectedTraitsUpdate(traits: SelectedTrait[]) {
+  selectedTraits.value = traits
+}
 
 definePageMeta({
   validate: async (route) => {
@@ -150,30 +207,43 @@ defineOgImageComponent('Frame', {
 
       <USeparator class="my-12" />
 
-      <!-- Items Section -->
-      <div class="space-y-6">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-          <h2 class="text-2xl md:text-3xl font-medium font-serif italic text-center md:text-left text-gray-900 dark:text-white">
-            Collection Items
-          </h2>
+      <UTabs v-model="activeTab" color="neutral" :items="tabsItems" class="w-full" :ui="{ root: 'gap-4' }">
+        <template #items>
+          <!-- Items Section -->
+          <div class="space-y-6 mt-2">
+            <div class="flex flex-col md:flex-row justify-end items-center gap-4">
+              <div class="w-full md:w-auto flex items-center gap-2">
+                <ArtViewFilter />
+                <TraitFilter
+                  :collection-id="collection_id?.toString() ?? ''"
+                  @update:nft-ids="handleNftIdsUpdate"
+                  @update:selected-traits="handleSelectedTraitsUpdate"
+                />
+                <SortOptions
+                  v-model="selectedSort"
+                  class="w-full md:w-48"
+                />
+              </div>
+            </div>
 
-          <div class="w-full md:w-auto">
-            <SortOptions
-              v-model="selectedSort"
-              class="w-full md:w-48"
+            <!-- Items Grid -->
+            <LazyNftsGrid
+              :key="`${selectedSort}-${filteredNftIds.length}-${filteredNftIds.join(',')}`"
+              :variables="queryVariables"
+              grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
+              no-items-found-message="This collection doesn't have any items yet."
+              :prefix="chain"
             />
           </div>
-        </div>
-
-        <!-- Items Grid -->
-        <LazyNftsGrid
-          :key="selectedSort"
-          :variables="queryVariables"
-          grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
-          no-items-found-message="This collection doesn't have any items yet."
-          :prefix="chain"
-        />
-      </div>
+        </template>
+        <template #offers>
+          <CollectionTrades :trade-type="TradeTypes.Offer" />
+        </template>
+        <template #traits>
+          <TraitOverview :collection-id="collection_id?.toString() ?? ''" />
+        </template>
+      </UTabs>
     </div>
+    <ScrollToTop />
   </UContainer>
 </template>

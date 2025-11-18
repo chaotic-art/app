@@ -17,28 +17,16 @@ export const mediaTypeElementSelectors: Record<
   >,
   string
 > = {
-  [MediaType.IMAGE]: 'img',
+  [MediaType.IMAGE]: 'img[data-nuxt-img]',
   [MediaType.VIDEO]: 'video',
   [MediaType.OBJECT]: 'object',
-  [MediaType.IFRAME]: 'iframe',
+  [MediaType.IFRAME]: 'iframe[title="html-embed"]',
 }
 
 export function determineElementType(animationType: MediaType, imageType: MediaType) {
   return [MediaType.IFRAME, MediaType.VIDEO].includes(animationType)
     ? animationType
     : imageType
-}
-
-export async function getMimeType(mediaUrl: string) {
-  try {
-    const { headers } = await $fetch.raw(mediaUrl, {
-      method: mediaUrl.includes('w.kodadot.xyz') ? 'GET' : 'HEAD',
-    })
-    return headers.get('content-type') || ''
-  }
-  catch {
-    return ''
-  }
 }
 
 export const isAudio = (mimeType: string): boolean => mimeType.startsWith('audio')
@@ -89,18 +77,4 @@ export function resolveMedia(mimeType?: string): MediaType {
   })
 
   return result ?? MediaType.UNKNOWN
-}
-
-export const DEFAULT_MEDIA_ICON = 'i-mdi:file-image-box'
-
-export function getMediaIcon(type: string) {
-  if (type.includes('gif'))
-    return 'i-mdi:file-gif-box'
-  if (type.includes('video'))
-    return 'i-mdi:video'
-  if (type.includes('audio'))
-    return 'i-mdi:music'
-  if (type.includes('pdf'))
-    return 'i-mdi:file-pdf-box'
-  return DEFAULT_MEDIA_ICON
 }

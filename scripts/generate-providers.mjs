@@ -10,14 +10,29 @@ const ahk = prodParasKusamaCommon.find(key => key.info === 'KusamaAssetHub')
 const ahpas = testParasPaseoCommon.find(key => key.info === 'PaseoAssetHub')
 
 // Extract providers
-const ahpProviders = Object.values(ahp?.providers || {})
-const ahkProviders = Object.values(ahk?.providers || {})
+// For AHP and AHK, filter by provider key (name) that contains "ibp" or "parity" (lowercase)
+function extractProviders(providersObj) {
+  if (!providersObj)
+    return []
+  return Object.entries(providersObj)
+    .filter(([key]) => {
+      const lowerKey = key.toLowerCase()
+      return lowerKey.includes('ibp') || lowerKey.includes('parity')
+    })
+    .map(([, value]) => value)
+    .filter(provider => !provider.startsWith('light://'))
+}
+
+const ahpProviders = extractProviders(ahp?.providers)
+const ahkProviders = extractProviders(ahk?.providers)
 const dotProviders = Object.values(prodRelayPolkadot?.providers || {})
 const ksmProviders = Object.values(prodRelayKusama?.providers || {})
 const ahpasProviders = Object.values(ahpas?.providers || {})
 
 // Filter out light client providers as they may not work in all environments
-const filterProviders = providers => providers.filter(provider => !provider.startsWith('light://'))
+function filterProviders(providers) {
+  return providers.filter(provider => !provider.startsWith('light://'))
+}
 
 // Generate TypeScript content
 function generateProvidersTs() {
@@ -38,12 +53,12 @@ function generateProvidersTs() {
 export const PROVIDERS = {
   // Polkadot Asset Hub (AHP)
   ahp: [
-${formatProviders(filterProviders(ahpProviders))}
+${formatProviders(ahpProviders)}
   ] as const,
 
   // Kusama Asset Hub (AHK)
   ahk: [
-${formatProviders(filterProviders(ahkProviders))}
+${formatProviders(ahkProviders)}
   ] as const,
 
   // Polkadot Relay Chain (DOT)
@@ -75,8 +90,8 @@ try {
   await writeFile(outputPath, content, 'utf8')
   console.log('✅ Successfully generated providers configuration at:', outputPath)
   console.log('📊 Provider counts:')
-  console.log(`   - AHP (Polkadot Asset Hub): ${filterProviders(ahpProviders).length} providers`)
-  console.log(`   - AHK (Kusama Asset Hub): ${filterProviders(ahkProviders).length} providers`)
+  console.log(`   - AHP (Polkadot Asset Hub): ${ahpProviders.length} providers`)
+  console.log(`   - AHK (Kusama Asset Hub): ${ahkProviders.length} providers`)
   console.log(`   - DOT (Polkadot): ${filterProviders(dotProviders).length} providers`)
   console.log(`   - KSM (Kusama): ${filterProviders(ksmProviders).length} providers`)
   console.log(`   - AHPAS (Paseo Asset Hub): ${filterProviders(ahpasProviders).length} providers`)

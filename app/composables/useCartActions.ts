@@ -1,3 +1,4 @@
+import type { HighestNftOffer, MakingOfferItem } from '~/components/trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import { LazyBurnModal, LazyTransferModal } from '#components'
@@ -11,17 +12,20 @@ interface UseCartActionsParams {
   price: Ref<bigint | null>
   chain: AssetHubChain
   mimeType?: ComputedRef<string>
+  highestOffer?: ComputedRef<HighestNftOffer | null>
 }
 
-export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId, mimeType }: UseCartActionsParams) {
+export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId, mimeType, highestOffer }: UseCartActionsParams) {
   const { isCurrentAccount } = useAuth()
+  const { doAfterLogin } = useDoAfterlogin()
 
   const actionCartStore = useActionCartStore()
   const shoppingCartStore = useShoppingCartStore()
   const listingCartStore = useListingCartStore()
+  const makingOfferStore = useMakingOfferStore()
 
   const { itemToBuy } = storeToRefs(shoppingCartStore)
-  const { completePurchaseModal, listingCartModalOpen } = storeToRefs(usePreferencesStore())
+  const { completePurchaseModal, listingCartModalOpen, makeOfferModalOpen } = storeToRefs(usePreferencesStore())
 
   const id = computed(() => `${collectionId}-${tokenId}`)
   const isItemInActionCart = computed(() => actionCartStore.isItemInCart(id.value))
@@ -32,6 +36,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
   const canList = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)))
   const canBurn = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)) && !mimeType?.value?.includes('html'))
   const canTransfer = computed(() => Boolean(owner.value && isCurrentAccount(owner.value)))
+  const canOffer = computed(() => Boolean(owner.value && !isCurrentAccount(owner.value)))
 
   const overlay = useOverlay()
   const burnModal = overlay.create(LazyBurnModal)
@@ -74,6 +79,12 @@ export function useCartActions({ collection, price, chain, owner, token, collect
   }
 
   function addToShoppingCart() {
+    doAfterLogin({
+      onLoginSuccess: handleAddToShoppingCart,
+    })
+  }
+
+  function handleAddToShoppingCart() {
     if (!token.value || !owner.value) {
       return
     }
@@ -87,6 +98,12 @@ export function useCartActions({ collection, price, chain, owner, token, collect
   }
 
   function buyNow() {
+    doAfterLogin({
+      onLoginSuccess: handleBuyNow,
+    })
+  }
+
+  function handleBuyNow() {
     if (!token.value || !owner.value) {
       return
     }
@@ -125,6 +142,34 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     }
   }
 
+  function createOffer() {
+    if (!token.value || !owner.value || !collection.value) {
+      return
+    }
+
+    if (!canOffer.value) {
+      return
+    }
+
+    const item: MakingOfferItem = {
+      id: id.value,
+      name: token.value.metadata?.name || '',
+      sn: tokenId.toString(),
+      highestOffer: highestOffer?.value?.price || undefined,
+      chain,
+      collection: {
+        ...collection.value,
+        id: collectionId.toString(),
+      },
+      metadata: token.value?.metadata_uri || '',
+      meta: { image: token.value?.metadata?.image || '' },
+      currentOwner: collection.value.owner!,
+    }
+
+    makingOfferStore.setItem(item)
+    makeOfferModalOpen.value = true
+  }
+
   function transferNow() {
     if (!token.value || !owner.value) {
       return
@@ -145,6 +190,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     burnNow,
     transferNow,
     createActionCartItem,
+    createOffer,
 
     // computed
     isItemInActionCart,
@@ -154,5 +200,6 @@ export function useCartActions({ collection, price, chain, owner, token, collect
     canList,
     canBurn,
     canTransfer,
+    canOffer,
   }
 }

@@ -26,6 +26,17 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     endpoint = 'ahp',
   } = options
 
+  const orderBy = Array.isArray(variables.orderBy) ? variables.orderBy : [variables.orderBy]
+
+  if (orderBy && orderBy.length === 1) {
+    if (orderBy[0] === 'blockNumber_DESC') {
+      variables.orderBy = ['blockNumber_DESC', 'sn_DESC']
+    }
+    else if (orderBy[0] === 'blockNumber_ASC') {
+      variables.orderBy = ['blockNumber_ASC', 'sn_ASC']
+    }
+  }
+
   const infiniteQuery = useInfiniteQuery<ExploreNftsData, NftEntity>({
     query: exploreNfts,
     pageSize,

@@ -1,8 +1,22 @@
+import type { HighestNftOffer } from '~/components/trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
 import { formatBalance } from 'dedot/utils'
 import { t } from 'try'
+import { highestOfferByNftId } from '~/graphql/queries/trades'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
+
+export async function fetchTokenMetadata(metadataUri: string) {
+  const [ok, _, metadataData] = await t($fetch(sanitizeIpfsUrl(metadataUri), {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }))
+  if (ok) {
+    return metadataData as NFTMetadata
+  }
+  return null
+}
 
 export function useToken(props: {
   tokenId: number
@@ -14,13 +28,14 @@ export function useToken(props: {
   // Reactive data
   const token = ref<Awaited<ReturnType<typeof fetchOdaToken>> | null>(null)
   const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
+  const highestOffer = ref<HighestNftOffer | null>(null)
   const queryPrice = ref<string | null>(null)
   const owner = ref<string | null>(null)
   const collectionCreator = ref<string | null>(null)
   const error = ref<unknown | null>(null)
   const mimeType = ref('image/png')
 
-  const { $sdk } = useNuxtApp()
+  const { $sdk, $apolloClient } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()
 
   // Calculate USD price from DOT price
@@ -30,28 +45,18 @@ export function useToken(props: {
     return queryPrice.value.toString()
   }), decimals, chainSymbol)
 
-  const fetchTokenMetadata = async (metadataUri: string) => {
-    const [ok, _, metadataData] = await t($fetch(sanitizeIpfsUrl(metadataUri), {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }))
-    if (ok) {
-      return metadataData as NFTMetadata
-    }
-    return null
-  }
-
   // Fetch data on component mount
   onMounted(async () => {
     try {
-      const [tokenData, collectionData] = await Promise.all([
+      const [tokenData, collectionData, highestOfferData] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()).catch(() => null),
         fetchOdaCollection(props.chain, props.collectionId.toString()).catch(() => null),
+        $apolloClient.query({ query: highestOfferByNftId, variables: { id: `${props.collectionId}-${props.tokenId}` } }).catch(() => null),
       ])
 
       token.value = tokenData
       collection.value = collectionData
+      highestOffer.value = highestOfferData?.data.offers[0] as HighestNftOffer | null
 
       owner.value = token.value?.owner ?? null
       collectionCreator.value = collection.value?.owner ?? null
@@ -140,6 +145,7 @@ export function useToken(props: {
     collectionCreator,
     error,
     mimeType,
+    highestOffer,
 
     // Computed properties
     nativePrice: queryPrice,

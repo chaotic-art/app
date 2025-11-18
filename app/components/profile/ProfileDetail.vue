@@ -4,6 +4,7 @@ import type { Profile } from '@/services/profile'
 import { computed } from 'vue'
 import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
+import { TradeTypes } from '@/components/trade/types'
 import { fetchFollowersOf, fetchFollowing } from '@/services/profile'
 import { copyAddress, getSubscanAccountUrl, shortenAddress } from '@/utils/format/address'
 
@@ -11,6 +12,9 @@ const props = defineProps<{ address: string, profile?: Profile | null, bannerUrl
 const { isCurrentAccount } = useAuth()
 const route = useRoute()
 const router = useRouter()
+const { currentChain } = useChain()
+
+const NuxtLink = resolveComponent('NuxtLink')
 
 const followButton = ref()
 const followModalTab = ref<'followers' | 'following'>('followers')
@@ -41,6 +45,12 @@ const tabsItems = ref([
     name: 'Activity',
     slot: 'activity',
     value: 'activity',
+  },
+  {
+    label: 'Offers',
+    name: 'Offers',
+    slot: 'offers',
+    value: 'offers',
   },
 ])
 
@@ -177,12 +187,15 @@ function onTotalCountChange(slot: string, totalCount: number) {
             />
             <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
 
-            <!-- <UButton
+            <UButton
+              v-if="!isCurrentAccount(address)"
               icon="i-lucide-dollar-sign"
               variant="outline"
+              :as="NuxtLink"
+              :to="`/${currentChain}/transfer?target=${address}`"
             >
-              Transfer
-            </UButton> -->
+              {{ $t('general.transfer') }}
+            </UButton>
 
             <ProfileShareDropdown />
           </div>
@@ -229,6 +242,9 @@ function onTotalCountChange(slot: string, totalCount: number) {
       </template>
       <template #activity>
         <ProfileActivity :address="address" @total-count-change="onTotalCountChange('activity', $event)" />
+      </template>
+      <template #offers>
+        <ProfileTrades :address="address" :type="TradeTypes.Offer" />
       </template>
     </UTabs>
   </div>

@@ -44,3 +44,46 @@ export const topCollections = graphql(`
     }
 `)
 export type TopCollectionsData = ResultOf<typeof topCollections>
+
+// collections owners by ids (minimal shape)
+export const collectionsOwnersByIds = graphql(`
+  query collectionsOwnersByIds($ids: [String!]) {
+    collections: collectionEntities(where: { id_in: $ids }) {
+      id
+      nfts { id currentOwner }
+    }
+  }
+`)
+export type CollectionsOwnersByIdsData = ResultOf<typeof collectionsOwnersByIds>
+
+export const collectionIdList = graphql(`
+    query collectionIdList(
+      $search: CollectionEntityWhereInput
+      $orderBy: [CollectionEntityOrderByInput!] = [blockNumber_DESC]
+    ) {
+      collectionEntities(
+        orderBy: $orderBy
+        where: $search
+      ) {
+          id
+      }
+    }
+`)
+
+export type CollectionIdListData = ResultOf<typeof collectionIdList>
+
+export const nftAttributesListByCollection = graphql(`
+  query nftAttributesListByCollection($id: String!) {
+    nfts: nftEntities(where: {collection: {id_eq: $id}, burned_eq: false }) {
+      id
+      meta {
+        attributes {
+          trait
+          value
+        }
+      }
+    }
+  }
+`)
+
+export type NftAttributesListByCollectionData = ResultOf<typeof nftAttributesListByCollection>

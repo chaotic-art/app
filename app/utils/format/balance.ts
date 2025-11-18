@@ -1,29 +1,6 @@
 import type { Prefix } from '@kodadot1/static'
-import type BN from 'bn.js'
-import { formatBalance } from '@polkadot/util'
+import { formatBalance } from 'dedot/utils'
 import { chainToPrecisionMap, prefixToChainMap } from '@/types'
-
-function format(
-  balance: number | string | BN | bigint,
-  decimals = 12,
-  withUnit?: boolean | string,
-  withSi?: boolean,
-) {
-  try {
-    const fixedBalance
-      = typeof balance === 'number' ? balance.toFixed() : balance
-
-    return formatBalance(fixedBalance, {
-      decimals,
-      withUnit,
-      forceUnit: '-',
-      withSi,
-    })
-  }
-  catch {
-    return ''
-  }
-}
 
 export function checkInvalidBalanceFilter(value: number) {
   if (value === Infinity) {
@@ -65,7 +42,7 @@ export function formatAmountWithRound(value: string | number | bigint, tokenDeci
   }
 
   return roundAmount(
-    format(checkInvalidBalanceFilter(Number(value)), tokenDecimals, ''),
+    formatBalance(checkInvalidBalanceFilter(Number(value)), { decimals: tokenDecimals, withAll: true }),
     round === 0 ? round : round || 4,
     roundByPrefix ? false : round === undefined,
   )
@@ -74,5 +51,3 @@ export function formatAmountWithRound(value: string | number | bigint, tokenDeci
 export function toNative(value: number, decimals: number): number {
   return Math.trunc(value * 10 ** decimals)
 }
-
-export default format

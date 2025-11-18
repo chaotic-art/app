@@ -1,6 +1,6 @@
 # Chaotic.art · Your Polkadot NFT Marketplace (Beta)
 
-[beta.chaotic.art](https://beta.chaotic.art) · [Design system](https://www.figma.com/design/XTcZsQREdo9574lTzqkMDL/Chaotic)
+[chaotic.art](https://chaotic.art) · [Design system](https://www.figma.com/design/XTcZsQREdo9574lTzqkMDL/Chaotic)
 
 ![](https://github.com/user-attachments/assets/b2777451-c789-470e-bf9e-45445455204e)
 

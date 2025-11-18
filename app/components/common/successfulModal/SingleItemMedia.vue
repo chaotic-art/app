@@ -38,7 +38,7 @@ const { usd, formatted } = useAmount(
       </p>
       <p
         v-else
-        class="capitalize text-xs text-center mt-2"
+        class="text-xs text-center mt-2"
       >
         {{ $t('drop.artBy', [nftName]) }}
         <nuxt-link

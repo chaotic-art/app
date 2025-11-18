@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
 import TokenCard from '~/components/common/card/TokenCard.client.vue'
@@ -14,8 +15,87 @@ interface Props {
   mimeType?: string
 }
 
+interface PropertyRow {
+  trait_type: string
+  value: string
+  rarity: number
+}
+
 const props = defineProps<Props>()
+const route = useRoute()
+const router = useRouter()
+
 const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
+
+const activeTab = computed({
+  get() {
+    return (route.query.tab as string) || 'activity'
+  },
+  set(tab) {
+    router.replace({
+      query: { ...route.query, tab },
+    })
+  },
+})
+
+const { getAttributeRarity } = useCollectionAttributes({
+  collectionId: computed(() => props.collectionId),
+})
+
+const properties = computed<PropertyRow[]>(() => {
+  const attributes = (props.tokenData?.metadata?.attributes || []) as Array<Record<string, string>>
+
+  return attributes.map((attr) => {
+    const traitType = attr.trait_type || attr.trait || attr.key || ''
+    const traitValue = attr.value || ''
+    const rarity = getAttributeRarity(traitType, traitValue)
+
+    return {
+      trait_type: traitType,
+      value: traitValue,
+      rarity,
+    }
+  })
+})
+
+const propertiesColumns: TableColumn<PropertyRow>[] = [
+  {
+    accessorKey: 'trait_type',
+    header: 'Trait',
+  },
+  {
+    accessorKey: 'value',
+    header: 'Value',
+  },
+  {
+    accessorKey: 'rarity',
+    header: 'Rarity',
+    cell: ({ row }) => {
+      return `${row.original.rarity}%`
+    },
+  },
+]
+
+const tabsItems = ref([
+  {
+    label: 'Activity',
+    name: 'Activity',
+    slot: 'activity',
+    value: 'activity',
+  },
+  {
+    label: 'Offers',
+    name: 'Offers',
+    slot: 'offers',
+    value: 'offers',
+  },
+  {
+    label: 'Properties',
+    name: 'Properties',
+    slot: 'properties',
+    value: 'properties',
+  },
+])
 
 onMounted(async () => {
   try {
@@ -41,11 +121,34 @@ onMounted(async () => {
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
         <!-- Item Activity (3/5) -->
         <div class="lg:col-span-3">
-          <TokenActivity
-            :chain="chain"
-            :collection-id="collectionId"
-            :token-id="tokenId"
-          />
+          <UTabs v-model="activeTab" :items="tabsItems" :ui="{ root: 'gap-6' }" size="sm">
+            <template #activity>
+              <TokenActivity
+                :chain="chain"
+                :collection-id="collectionId"
+                :token-id="tokenId"
+              />
+            </template>
+            <template #offers>
+              <TokenOffers
+                :chain="chain"
+                :collection-id="collectionId"
+                :token-id="tokenId"
+              />
+            </template>
+            <template #properties>
+              <div class="bg-background rounded-xl border border-border overflow-hidden">
+                <UTable
+                  v-if="properties.length"
+                  :data="properties"
+                  :columns="propertiesColumns"
+                />
+                <div v-else class="p-8 text-center text-muted-foreground">
+                  No properties available for this NFT
+                </div>
+              </div>
+            </template>
+          </UTabs>
         </div>
 
         <!-- Token Details (2/5) -->

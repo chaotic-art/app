@@ -31,7 +31,7 @@ const statsRows = computed(() => [
       :class="{ 'cursor-pointer': item.onClick }"
       @click="item.onClick"
     >
-      <span class="text-sm text-k-grey">
+      <span class="text-sm text-gray-600 dark:text-gray-400">
         {{ item.label }}
       </span>
       <div

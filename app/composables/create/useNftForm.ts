@@ -5,6 +5,7 @@ import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 import { toNative } from '~/utils/format/balance'
+import { nsfwAttribute } from '~/utils/mint'
 import { blockchains } from './useCollectionForm'
 
 interface Property {
@@ -35,6 +36,7 @@ export function useNftForm() {
     properties: [{ trait: '', value: '' }] as Property[],
     listDirectly: false,
     price: 0,
+    nsfw: false,
   })
 
   // Fetch user collections dynamically
@@ -222,11 +224,16 @@ export function useNftForm() {
     }
 
     // Add properties as attributes if they exist
-    if (validProperties.length > 0) {
-      metadata.attributes = validProperties.map((prop: Property) => ({
+    const attributes = [
+      ...validProperties.map((prop: Property) => ({
         trait_type: prop.trait,
         value: prop.value,
-      }))
+      })),
+      ...nsfwAttribute(formData.nsfw),
+    ]
+
+    if (attributes.length > 0) {
+      metadata.attributes = attributes
     }
 
     // Create metadata for each NFT
@@ -291,6 +298,7 @@ export function useNftForm() {
         chain: state.blockchain,
         type,
         collectionId: Number.parseInt(formData.collection),
+        collectionName: selectedCollection.value?.name || '',
         metadataUri: metadataUris,
         supply: formData.supply,
         properties: validProperties,
