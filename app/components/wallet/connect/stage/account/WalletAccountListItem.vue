@@ -72,7 +72,7 @@ onMounted(async () => {
         <div class="relative">
           <ProfileAvatar :address="account.address" :size="32" />
         </div>
-        <div class="w-full">
+        <div class="flex-1 min-w-0">
           <div class="flex justify-between items-center">
             <div class="flex items-center space-x-1">
               <div class="w-4 h-4 rounded shadow-lg bg-white flex items-center justify-center relative z-10">
@@ -106,8 +106,10 @@ onMounted(async () => {
           </div>
 
           <div class="flex justify-between items-center space-x-2">
-            <div class="text-xs text-gray-500 dark:text-gray-400">
-              {{ account.address }}
+            <div class="flex-1 min-w-0">
+              <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {{ account.address }}
+              </div>
             </div>
 
             <UButton
@@ -116,7 +118,7 @@ onMounted(async () => {
               color="neutral"
               variant="ghost"
               class="opacity-60 hover:opacity-100 transition-opacity"
-              @click.prevent="copyAddress(account.address)"
+              @click.stop="copyAddress(account.address)"
             />
           </div>
         </div>
