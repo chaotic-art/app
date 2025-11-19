@@ -1,11 +1,16 @@
 <template>
   <UContainer>
     <ClientOnly>
-      <TestPapi class="mt-[100px]" />
+      <div>accounts: {{ accounts }}</div>
 
-      <template #fallback>
-        <p>Loading . . .</p>
-      </template>
+      <USeparator class="my-4" />
+
+      <div> wallets: {{ wallets }}</div>
     </ClientOnly>
   </UContainer>
 </template>
+<script lang="ts" setup>
+const { accounts } = storeToRefs(useAccountStore())
+const { wallets } = storeToRefs(useWalletStore())
+
+</script>
