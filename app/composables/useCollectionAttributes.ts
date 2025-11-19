@@ -9,6 +9,12 @@ interface NftWithAttributes {
   }
 }
 
+interface TraitValueMap {
+  [traitType: string]: {
+    [value: string]: string[]
+  }
+}
+
 export function useCollectionAttributes({ collectionId }: { collectionId: ComputedRef<string | undefined> }) {
   const { $apolloClient } = useNuxtApp()
 
@@ -101,11 +107,67 @@ export function useCollectionAttributes({ collectionId }: { collectionId: Comput
     return counts
   })
 
+  const traitToNftIdsMap = computed<TraitValueMap>(() => {
+    const map: TraitValueMap = {}
+
+    nftsList.value.forEach((nft) => {
+      if (!nft.id || !nft.meta?.attributes)
+        return
+
+      nft.meta.attributes.forEach((attr) => {
+        if (!attr.trait || !attr.value)
+          return
+
+        const traitType = attr.trait
+        const traitValue = attr.value
+        const nftId = nft.id!
+
+        if (!map[traitType]) {
+          map[traitType] = {}
+        }
+
+        if (!map[traitType]![traitValue]) {
+          map[traitType]![traitValue] = []
+        }
+
+        map[traitType]![traitValue]!.push(nftId)
+      })
+    })
+
+    return map
+  })
+
+  const getNftIdsByTraits = (filters: Array<{ traitType: string, value: string }>): string[] => {
+    if (filters.length === 0) {
+      return []
+    }
+
+    const nftIdSets = filters.map((filter) => {
+      const ids = traitToNftIdsMap.value[filter.traitType]?.[filter.value] || []
+      return new Set(ids)
+    })
+
+    if (nftIdSets.length === 0)
+      return []
+
+    const firstSet = nftIdSets[0]
+    if (!firstSet)
+      return []
+
+    const intersection = Array.from(firstSet).filter((nftId) => {
+      return nftIdSets.every(set => set.has(nftId))
+    })
+
+    return intersection
+  }
+
   return {
     getAttributeRarity,
     loading,
     attributesRarityMaps,
     traitCounts,
     totalNfts: computed(() => nftsList.value.length),
+    traitToNftIdsMap,
+    getNftIdsByTraits,
   }
 }

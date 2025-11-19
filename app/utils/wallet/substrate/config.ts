@@ -91,7 +91,7 @@ const WalletProxyMap: Partial<Record<SubstrateWalletSource, SubstrateWalletSourc
   [SubstrateWalletSources.Math]: SubstrateWalletSources.PolkadotJs, // mathwallet
 }
 
-const MobileWalletList = [
+export const MobileWalletList = [
   SubstrateWalletSources.Nova,
   SubstrateWalletSources.SubWallet,
   SubstrateWalletSources.Math,
