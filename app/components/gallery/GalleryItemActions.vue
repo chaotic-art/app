@@ -46,7 +46,7 @@ const {
       @create-swap="createSwap"
     />
 
-    <div v-if="canBuy" class="grid grid-cols-2 gap-4">
+    <div v-if="canBuy" class="grid md:grid-cols-2 gap-4">
       <GalleryItemTradeActions
         variant="secondary"
         @create-offer="createOffer"
