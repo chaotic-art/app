@@ -126,7 +126,8 @@
     "to": "To",
     "transfer": "Transfer",
     "optional": "Optional",
-    "swaps": "Swaps"
+    "swaps": "Swaps",
+    "add": "Add"
   },
   "signing": {
     "transaction": "Sign Transaction",

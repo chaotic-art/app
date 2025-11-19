@@ -213,7 +213,7 @@ watchEffect(() => {
             <UButton
               class="h-10 w-[120px]"
               icon="mdi:plus"
-              :label="$t('add')"
+              :label="$t('general.add')"
               :disabled="surchargeDisabled || !amount || insufficientBalance"
               @click="addSurcharge"
             />
