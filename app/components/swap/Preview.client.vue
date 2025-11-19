@@ -205,7 +205,6 @@ watchEffect(() => {
             <ListingCartPriceInput
               v-model="amount"
               class="w-[200px]"
-              :placeholder="$t('generalamount')"
               :disabled="surchargeDisabled"
               full-width
             />
