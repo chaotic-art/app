@@ -146,6 +146,12 @@ export function useCartActions({ collection, price, chain, owner, token, collect
   }
 
   function createOffer() {
+    doAfterLogin({
+      onLoginSuccess: handleCreateOffer,
+    })
+  }
+
+  function handleCreateOffer() {
     if (!token.value || !owner.value || !collection.value) {
       return
     }
