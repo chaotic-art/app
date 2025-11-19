@@ -116,7 +116,7 @@ onMounted(async () => {
               color="neutral"
               variant="ghost"
               class="opacity-60 hover:opacity-100 transition-opacity"
-              @click.prevent="copyAddress(account.address)"
+              @click.stop="copyAddress(account.address)"
             />
           </div>
         </div>
