@@ -159,11 +159,4 @@ onSuccess<CreateSwapTransactionResult>('create_swap', (data) => {
       </div>
     </UContainer>
   </div>
-
-  <!-- <SigningModal
-    :title="$t('swap.creatingSwap')"
-    :is-loading="isLoading"
-    :status="status"
-    @try-again="submit"
-  /> -->
 </template>
