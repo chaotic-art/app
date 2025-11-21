@@ -25,6 +25,7 @@ const {
   canOffer,
   canList,
   createOffer,
+  createSwap,
 } = useCartActions({
   tokenId: props.tokenId,
   collectionId: props.collectionId,
@@ -39,24 +40,18 @@ const {
 
 <template>
   <div>
-    <UButton
+    <GalleryItemTradeActions
       v-if="canOffer && !canBuy"
-      size="lg"
-      class="w-full"
-      @click="createOffer"
-    >
-      {{ $t('offer.createOffer') }}
-    </UButton>
+      @create-offer="createOffer"
+      @create-swap="createSwap"
+    />
 
-    <div v-if="canBuy" class="grid grid-cols-2 gap-4">
-      <UButton
+    <div v-if="canBuy" class="grid md:grid-cols-2 gap-4">
+      <GalleryItemTradeActions
         variant="secondary"
-        size="lg"
-        class="flex-1"
-        @click="createOffer"
-      >
-        {{ $t('offer.createOffer') }}
-      </UButton>
+        @create-offer="createOffer"
+        @create-swap="createSwap"
+      />
 
       <div class="flex-1 flex gap-3">
         <UButton

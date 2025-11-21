@@ -2,6 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import { TradeTypes } from '@/components/trade/types'
 import TokenCard from '~/components/common/card/TokenCard.client.vue'
 import TokenActivity from '~/components/gallery/TokenActivity.vue'
 import { tokenEntries } from '~/utils/api/substrate.nft-pallets'
@@ -90,6 +91,12 @@ const tabsItems = ref([
     value: 'offers',
   },
   {
+    label: 'Swaps',
+    name: 'Swaps',
+    slot: 'swaps',
+    value: 'swaps',
+  },
+  {
     label: 'Properties',
     name: 'Properties',
     slot: 'properties',
@@ -130,10 +137,19 @@ onMounted(async () => {
               />
             </template>
             <template #offers>
-              <TokenOffers
+              <TokenTrades
                 :chain="chain"
                 :collection-id="collectionId"
                 :token-id="tokenId"
+                :type="TradeTypes.Offer"
+              />
+            </template>
+            <template #swaps>
+              <TokenTrades
+                :chain="chain"
+                :collection-id="collectionId"
+                :token-id="tokenId"
+                :type="TradeTypes.Swap"
               />
             </template>
             <template #properties>
