@@ -7,7 +7,7 @@ export default defineNuxtPlugin(() => {
   const { selectedAccounts } = storeToRefs(walletStore)
 
   // on mobile wallets like nova wallet cookies are cleared when app is closed
-  // soo we cant rely on cookies based store persistence, sync account store from wallet store
+  // so we cant rely on cookies based store persistence, sync account store from wallet store
   // alternatively we can use localStorage to store selected accounts but we loose ssr
   const syncAccountStore = () => {
     Object.keys(selectedAccounts.value).forEach((vm) => {
