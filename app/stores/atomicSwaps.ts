@@ -39,6 +39,9 @@ const DEFAULT_SWAP: Omit<AtomicSwap, 'chain'> = {
 }
 
 export const useAtomicSwapStore = defineStore('atomicSwap', () => {
+  const swap = ref<AtomicSwap>({ ...DEFAULT_SWAP, chain: 'ahp' })
+  const step = ref(SwapStep.COUNTERPARTY)
+
   const {
     items,
     count,
@@ -47,12 +50,9 @@ export const useAtomicSwapStore = defineStore('atomicSwap', () => {
     setItem,
     clear,
     updateItem,
-  } = useCart<AtomicSwap>()
-
-  const { accountId } = useAuth()
-
-  const swap = ref<AtomicSwap>({ ...DEFAULT_SWAP, chain: 'ahp' })
-  const step = ref(SwapStep.COUNTERPARTY)
+  } = useCart<AtomicSwap>({
+    chain: computed(() => swap.value.chain),
+  })
 
   const getStepItems = (step: SwapStep): SwapItem[] => {
     const key = getStepItemsKey(step)
@@ -63,6 +63,8 @@ export const useAtomicSwapStore = defineStore('atomicSwap', () => {
   const stepItems = computed(() => getStepItems(step.value))
 
   const createSwap = (counterparty: string, chain: AssetHubChain, withFields?: CrateSwapWithFields) => {
+    const { accountId } = useAuth()
+
     const newAtomicSwap: AtomicSwap = {
       id: Math.random().toString(16).slice(2, 10),
       counterparty,

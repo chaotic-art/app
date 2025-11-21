@@ -8,14 +8,15 @@ export interface CartItem {
 
 export function useCart<T extends CartItem>({
   items = ref([]),
+  chain: currentChain,
 }: {
   items?: Ref<T[]>
+  chain?: ComputedRef<AssetHubChain>
 } = {}) {
   // Defer useChain() so it doesn't run during middleware execution
-  const allItemsInChain = computed(() => {
-    const { currentChain } = useChain()
-    return items.value.filter(item => item.chain === currentChain.value)
-  })
+  const chain = computed<AssetHubChain>(() => currentChain?.value || useChain().currentChain.value)
+  const decimals = computed<number>(() => chainSpec[chain.value].tokenDecimals)
+  const allItemsInChain = computed(() => items.value.filter(item => item.chain === chain.value))
   const itemsInChain = computed(() => allItemsInChain.value.filter(item => !item.discarded))
   const count = computed(() => itemsInChain.value.length)
 
@@ -69,18 +70,6 @@ export function useCart<T extends CartItem>({
   function clear() {
     items.value = []
   }
-
-  // Defer useChain() so it doesn't run during middleware execution
-  const chain = computed<AssetHubChain>(() => {
-    const { currentChain } = useChain()
-    return currentChain.value
-  })
-
-  // Defer useChain() so it doesn't run during middleware execution
-  const decimals = computed<number>(() => {
-    const { decimals } = useChain()
-    return decimals.value
-  })
 
   return {
     items,
