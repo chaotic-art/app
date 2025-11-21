@@ -145,8 +145,6 @@ export default function useTransactionModal() {
 
     // Methods
     close,
-
-    // Methods
     onSuccess,
   }
 }
