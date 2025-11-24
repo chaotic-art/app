@@ -152,7 +152,7 @@ watchEffect(() => {
       <div class="px-6! pb-6! pt-4! min-h-[40vh] overflow-y-auto">
         <div class="flex justify-between items-center">
           <span>
-            {{ count }} {{ $t('items') }}
+            {{ count }} {{ $t('general.items') }}
           </span>
 
           <UButton
