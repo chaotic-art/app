@@ -127,6 +127,7 @@ watch([ownedCollections, accountId], async ([ownedCollections, account]) => {
             />
 
             <AddressChecker
+              class="mt-2"
               :address="traderAddress"
               @check="handleAddressCheck"
               @change="address => traderAddress = address"
