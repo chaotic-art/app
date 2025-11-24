@@ -4,9 +4,6 @@ import { defineStore } from 'pinia'
 import { computed } from 'vue'
 import { SwapStep } from '@/components/swap/types'
 
-// const ITEMS_MAX_AGE_MS = 7 * ONE_DAY_MS
-// const ITEMS_MAX_AMOUNT_PER_CHAIN = 5
-
 export type CrateSwapWithFields = Partial<Omit<AtomicSwap, 'id'>>
 
 export type AtomicSwap = {
@@ -125,21 +122,4 @@ export const useAtomicSwapStore = defineStore('atomicSwap', () => {
     updateStepItems,
     removeStepItem,
   }
-}, {
-  persist: true,
-  // {
-  // clear swaps on session start
-  // afterHydrate: (context) => {
-  //   const recentSwaps = (context.store.items as AtomicSwap[])
-  //     .filter((swap: AtomicSwap) =>
-  //       getSwapStep(swap) !== SwapStep.CREATED
-  //       && swap.createdAt >= Date.now() - ITEMS_MAX_AGE_MS,
-  //     )
-
-  //   context.store.items = Object
-  //     .values(groupBy(recentSwaps, 'chain'))
-  //     .map(items => items.sort((a, b) => a.createdAt - b.createdAt).slice(0, ITEMS_MAX_AMOUNT_PER_CHAIN - 1))
-  //     .flat()
-  // },
-  // }
-})
+}, { persist: true })
