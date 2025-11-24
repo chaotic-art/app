@@ -47,7 +47,7 @@ const title = computed(() => {
   const items
     = listingCartStore.count === 1
       ? 'NFT'
-      : `${listingCartStore.count} ${$i18n.t('items')}`
+      : `${listingCartStore.count} ${$i18n.t('general.items')}`
 
   return showChangePriceModal.value
     ? $i18n.t('listingCart.changePrice')
