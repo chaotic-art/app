@@ -9,7 +9,7 @@ import {
 import { BLOCKS_PER_HOUR } from '@/composables/onchain/utils'
 import useRelayBlock from '@/composables/useRelayBlock'
 import { collectionsOwnersByIds } from '~/graphql/queries/collections'
-import { offersList } from '~/graphql/queries/trades'
+import { offersList, swapList } from '~/graphql/queries/trades'
 
 interface CollectionWithTokenOwners {
   id: string
@@ -20,9 +20,9 @@ interface CollectionWithTokenOwners {
   isExpired: boolean
 }
 
-export const TRADES_QUERY_MAP: Record<TradeType, { queryDocument: typeof offersList, dataKey: string }> = {
+export const TRADES_QUERY_MAP: Record<TradeType, { queryDocument: typeof offersList | typeof swapList, dataKey: string }> = {
   [TradeTypes.Swap]: {
-    queryDocument: offersList, // TODO change
+    queryDocument: swapList,
     dataKey: 'swaps',
   },
   [TradeTypes.Offer]: {

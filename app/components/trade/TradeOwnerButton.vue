@@ -10,8 +10,10 @@ const props = defineProps<{
   disabled?: boolean
   label?: string
   mainClass?: string
+  detailed?: boolean
 }>()
-const emit = defineEmits(['clickMain'])
+
+const emit = defineEmits(['clickMain', 'clickCounterSwap'])
 const { accountId } = useAuth()
 const { $i18n } = useNuxtApp()
 
@@ -21,7 +23,7 @@ const onClick = () => emit('clickMain', props.trade)
 
 const details: Record<TradeType, { cancel: string, accept: string, withdraw: string }> = {
   [TradeTypes.Swap]: {
-    cancel: 'transaction.cancelSwap',
+    cancel: 'swap.cancelSwap',
     accept: 'general.accept',
     withdraw: 'swap.withdrawSwap',
   },
@@ -90,6 +92,18 @@ const buttonConfig = computed<ButtonConfig | null>(() => {
       @click="buttonConfig.onClick"
     />
 
-    <!-- Conter swap here -->
+    <template v-if="isTargetOfTrade && detailed && trade.type === TradeTypes.Swap">
+      <UTooltip
+        :text="$t('swap.counterSwap')"
+      >
+        <UButton
+          variant="outline"
+          class="px-3"
+          @click="emit('clickCounterSwap')"
+        >
+          <UIcon name="material-symbols:repeat" />
+        </UButton>
+      </UTooltip>
+    </template>
   </div>
 </template>

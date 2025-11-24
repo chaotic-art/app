@@ -25,6 +25,12 @@ const tabsItems = ref([
     value: 'offers',
   },
   {
+    label: 'Swaps',
+    name: 'Swaps',
+    slot: 'swaps',
+    value: 'swaps',
+  },
+  {
     label: 'Traits',
     name: 'Traits',
     slot: 'traits',
@@ -238,6 +244,9 @@ defineOgImageComponent('Frame', {
         </template>
         <template #offers>
           <CollectionTrades :trade-type="TradeTypes.Offer" />
+        </template>
+        <template #swaps>
+          <CollectionTrades :trade-type="TradeTypes.Swap" />
         </template>
         <template #traits>
           <TraitOverview :collection-id="collection_id?.toString() ?? ''" />
