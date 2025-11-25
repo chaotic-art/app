@@ -19,9 +19,7 @@ function handleFileChange(file: File | null | undefined) {
 }
 
 function handleRemoveFile() {
-  selectedFile.value = null
-  emits('clear')
-  emits('update:selectedFile', null)
+  handleFileChange(null)
 }
 </script>
 
@@ -54,7 +52,7 @@ function handleRemoveFile() {
         color="neutral"
         icon="i-heroicons-x-mark"
         size="sm"
-        @click="handleRemoveFile()"
+        @click="handleRemoveFile"
       />
     </div>
   </div>
