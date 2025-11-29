@@ -49,6 +49,9 @@ watchEffect(() => {
 <template>
   <UModal
     v-model:open="isOpen"
+    :ui="{
+      content: 'max-w-md w-full',
+    }"
   >
     <template #body>
       <div class="mb-6">
