@@ -88,6 +88,13 @@ export interface CancelSwapTransactionResult {
   prefix: AssetHubChain
 }
 
+export interface DestroyCollectionTransactionResult {
+  type: 'collection_destroy'
+  hash: string
+  prefix: AssetHubChain
+  collectionId: number
+}
+
 type TransactionResult
   = CollectionCategory
     | NftCategory
@@ -99,6 +106,7 @@ type TransactionResult
     | AcceptSwapTransactionResult
     | CancelSwapTransactionResult
     | CreateSwapTransactionResult
+    | DestroyCollectionTransactionResult
 
 // Transaction status progression:
 // 1. status.value = 'signed'

@@ -7,7 +7,7 @@ import { Binary, Enum } from 'polkadot-api'
 import { generateAirdropTxs } from '@/components/airdrop/utils'
 import { generateIdAssethub } from '@/services/dyndata'
 import { MultiAddress } from '~/descriptors/dist'
-import { refreshOdaTokenMetadata } from '~/services/oda'
+import { refreshOdaCollection, refreshOdaTokenMetadata } from '~/services/oda'
 import { BLOCKS_PER_DAY, getOfferCollectionId, OFFER_MINT_PRICE } from './utils'
 
 export type TxType = 'submit' | 'estimate'
@@ -796,6 +796,67 @@ export function useNftPallets() {
     })
   }
 
+  async function destroyCollection({
+    collectionId,
+    chain,
+    type = 'submit',
+  }: {
+    collectionId: number
+    chain: AssetHubChain
+    type?: TxType
+  }) {
+    await cryptoWaitReady()
+    const { signer, address } = await getAccountSigner()
+
+    const api = $sdk(chain).api
+    await api.compatibilityToken
+
+    // Get witness data from chain
+    const witness = await api.query.Nfts.Collection.getValue(collectionId)
+
+    const witnessArg = {
+      item_metadatas: witness?.item_metadatas || 0,
+      item_configs: witness?.item_configs || 0,
+      attributes: witness?.attributes || 0,
+    }
+
+    const transaction = api.tx.Nfts.destroy({
+      collection: collectionId,
+      witness: witnessArg,
+    })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(address)
+      return estimatedFees
+    }
+
+    // purge metadata
+    await refreshOdaCollection(chain, collectionId.toString())
+
+    open.value = true
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+
+          result.value = {
+            type: 'collection_destroy',
+            hash: hash.value,
+            prefix: chain,
+            collectionId,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   async function createOffer({
     items: tokens,
     chain,
@@ -1161,5 +1222,6 @@ export function useNftPallets() {
     getAccountSigner,
     airdropNfts,
     transferNfts,
+    destroyCollection,
   }
 }

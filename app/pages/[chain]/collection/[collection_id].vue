@@ -10,6 +10,7 @@ import { getSubscanAccountUrl } from '~/utils/format/address'
 const route = useRoute()
 const router = useRouter()
 const { chain: chainPrefix, collection_id } = route.params
+const { isCurrentAccount, isLogIn } = useAuth()
 
 const tabsItems = ref([
   {
@@ -83,6 +84,22 @@ const queryVariables = computed(() => {
   return baseVariables
 })
 
+const isOwner = computed(() => {
+  const owner = data.value?.drops?.data[0]?.creator || data.value?.collection?.owner
+  return isLogIn.value && owner && isCurrentAccount(owner)
+})
+
+const overlay = useOverlay()
+const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
+
+function handleDestroyCollection() {
+  destroyCollectionModal.open({
+    collectionId: collection_id?.toString() ?? '',
+    collectionName: data.value?.collection?.metadata?.name,
+    chain: chain.value,
+  })
+}
+
 function handleNftIdsUpdate(nftIds: string[]) {
   filteredNftIds.value = nftIds
 }
@@ -128,7 +145,7 @@ defineOgImageComponent('Frame', {
 
         <div class="relative flex items-center px-8 py-8 z-10">
           <div class="flex flex-col items-center">
-            <div class="w-36 h-36 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-4 border-white dark:border-gray-900 shadow-xl">
+            <div class="w-36 h-36 rounded-xl overflow-hidden bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-4 border-white dark:border-gray-900 shadow-xl">
               <img
                 v-if="data?.collection?.metadata?.image"
                 :src="sanitizeIpfsUrl(data.collection.metadata.image)"
@@ -150,8 +167,19 @@ defineOgImageComponent('Frame', {
         <div class="flex justify-between flex-col md:flex-row gap-12">
           <div class="flex flex-col flex-1">
             <div class="my-4">
-              <div class="text-2xl font-bold mb-2">
-                {{ data?.collection?.metadata?.name || `Collection #${collection_id}` }}
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-2xl font-bold">
+                  {{ data?.collection?.metadata?.name || `Collection #${collection_id}` }}
+                </div>
+                <UButton
+                  v-if="isOwner"
+                  color="error"
+                  variant="outline"
+                  icon="i-heroicons-trash"
+                  @click="handleDestroyCollection"
+                >
+                  Delete Collection
+                </UButton>
               </div>
               <div v-if="data?.drops?.data[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
                 <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" custom-name>
