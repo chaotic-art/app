@@ -53,11 +53,14 @@ export function useCollectionForm() {
     name: '',
   })
   const isEstimatingFee = ref(false)
+  const isFetchingBalance = ref(false)
 
   // Fetch user balance on component mount
   watchEffect(async () => {
     if (!isWalletConnected.value)
       return
+
+    isFetchingBalance.value = true
 
     try {
       const { name, tokenDecimals, tokenSymbol } = chainSpec[state.blockchain]
@@ -72,6 +75,9 @@ export function useCollectionForm() {
       console.error('Error fetching balance:', error)
       balance.userBalance = 0n
       balance.userBalanceFormatted = '0'
+    }
+    finally {
+      isFetchingBalance.value = false
     }
   })
 
@@ -233,7 +239,7 @@ export function useCollectionForm() {
     }
 
     // Check if user has insufficient funds
-    if (balance.estimatedFee !== 0n && balance.userBalance !== 0n && balance.userBalance < balance.estimatedFee) {
+    if (balance.total !== 0n && balance.userBalance < balance.total) {
       return
     }
 
@@ -298,6 +304,7 @@ export function useCollectionForm() {
     blockchains,
     isWalletConnected,
     isEstimatingFee,
+    isFetchingBalance,
     balance,
 
     // Functions

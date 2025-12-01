@@ -57,6 +57,7 @@ export function useNftForm() {
     name: '',
   })
   const isEstimatingFee = ref(false)
+  const isFetchingBalance = ref(false)
 
   // Fetch collections and user balance on component mount
   watchEffect(async () => {
@@ -64,6 +65,7 @@ export function useNftForm() {
       return
 
     collectionsLoading.value = true
+    isFetchingBalance.value = true
     state.collection = ''
 
     try {
@@ -95,6 +97,7 @@ export function useNftForm() {
     }
     finally {
       collectionsLoading.value = false
+      isFetchingBalance.value = false
     }
   })
 
@@ -285,8 +288,7 @@ export function useNftForm() {
   async function handleNftOperation(formData: typeof state, type: 'estimate' | 'submit') {
     if (!isWalletConnected.value || !mediaFile.value || !formData.collection || !formData.name || !formData.description) {
       if (type === 'estimate') {
-        balance.estimatedFee = 0n
-        balance.estimatedFeeFormatted = '0'
+        resetBalanceCost()
       }
       return
     }
@@ -351,7 +353,7 @@ export function useNftForm() {
     }
 
     // Check if user has insufficient funds
-    if (balance.estimatedFee !== 0n && balance.userBalance !== 0n && balance.userBalance < balance.estimatedFee) {
+    if (balance.total !== 0n && balance.userBalance < balance.total) {
       return
     }
 
@@ -419,6 +421,7 @@ export function useNftForm() {
     isWalletConnected,
     balance,
     isEstimatingFee,
+    isFetchingBalance,
 
     // Functions
     validate,

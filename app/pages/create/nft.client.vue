@@ -25,22 +25,26 @@ const {
   isEstimatingFee,
   handleNftOperation,
   balance,
+  isFetchingBalance,
 } = useNftForm()
+
+const { $i18n } = useNuxtApp()
 
 // Computed properties for cleaner logic
 const hasInsufficientFunds = computed(() => {
-  return balance.estimatedFee !== 0n
-    && balance.userBalance !== 0n
-    && balance.userBalance < balance.estimatedFee
+  return balance.total !== 0n
+    && balance.userBalance < balance.total
 })
 
 const isSubmitDisabled = computed(() => {
-  return !isWalletConnected.value || hasInsufficientFunds.value || isEstimatingFee.value
+  return !isWalletConnected.value || hasInsufficientFunds.value || isEstimatingFee.value || isFetchingBalance.value
 })
 
 const submitButtonText = computed(() => {
   if (!isWalletConnected.value)
     return 'Connect Wallet to Create NFT'
+  if (isFetchingBalance.value)
+    return $i18n.t('balance.checking')
   if (hasInsufficientFunds.value)
     return 'Insufficient Funds'
   return 'Create NFT'
@@ -48,7 +52,7 @@ const submitButtonText = computed(() => {
 
 // Auto-estimate fees when form data changes (debounced to prevent excessive API calls)
 watchDebounced(
-  [isWalletConnected, mediaFile, () => state.collection, () => state.name, () => state.description, () => state.supply],
+  [isWalletConnected, mediaFile, () => state.collection, () => state.name, () => state.description, () => state.supply, () => state.properties.length],
   ([connected, file, collection, name, description, supply]) => {
     if (connected && file && collection && name && description && supply > 0) {
       handleNftOperation(state, 'estimate')
@@ -440,7 +444,7 @@ watchDebounced(
                 <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
                 <span class="text-xs font-medium">Insufficient</span>
               </div>
-              <div v-else-if="balance.estimatedFee !== 0n && balance.userBalance !== 0n" class="flex items-center gap-1 text-green-600 dark:text-green-400">
+              <div v-else-if="balance.total !== 0n" class="flex items-center gap-1 text-green-600 dark:text-green-400">
                 <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
                 <span class="text-xs font-medium">Ready</span>
               </div>

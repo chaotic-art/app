@@ -234,7 +234,8 @@
     "purchaseSuccessful": "Purchase successful"
   },
   "balance": {
-    "insufficient": "Insufficient Balance"
+    "insufficient": "Insufficient Balance",
+    "checking": "Checking Balance..."
   },
   "transfer": {
     "title": "Transfer",
