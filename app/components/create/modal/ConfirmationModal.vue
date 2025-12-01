@@ -131,8 +131,10 @@ function handleCancel() {
             </div>
           </div>
 
+          <USeparator class="mt-2" />
+
           <!-- Chain -->
-          <div class="flex items-center justify-between pt-2 border-t border-gray-200">
+          <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-globe-alt" class="w-4 h-4 text-gray-600 dark:text-gray-400" />
               <span class="text-sm text-gray-600 dark:text-gray-400">Chain</span>
