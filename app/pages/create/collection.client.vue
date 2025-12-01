@@ -246,19 +246,19 @@ watchDebounced(
           <!-- Simple Fee & Balance -->
           <div class="flex items-center justify-between text-sm">
             <div class="flex flex-col font-mono">
-              <span class="text-gray-600 dark:text-gray-400 flex">
-                <span class="w-18">Fee:</span>
+              <span class="text-gray-600 dark:text-gray-400 flex gap-2">
+                <span class="w-22">Est. Cost:</span>
                 <span v-if="isEstimatingFee" class="text-gray-500">Calculating...</span>
-                <span v-else-if="balance.estimatedFee !== 0n" class="font-medium text-gray-900 dark:text-white">
-                  {{ balance.estimatedFeeFormatted }}
+                <span v-else-if="balance.total !== 0n" class="font-medium text-gray-900 dark:text-white">
+                  {{ balance.totalFormatted }}
                 </span>
                 <span v-else class="text-gray-600 dark:text-gray-400">
                   ---
                 </span>
               </span>
 
-              <span class="text-gray-600 dark:text-gray-400 flex">
-                <span class="w-18">Balance:</span>
+              <span class="text-gray-600 dark:text-gray-400 flex gap-2">
+                <span class="w-22">Balance:</span>
                 <span class="font-medium text-gray-900 dark:text-white">
                   {{ balance.userBalanceFormatted }}
                 </span>

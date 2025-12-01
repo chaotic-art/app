@@ -446,5 +446,8 @@
   "validation": {
     "inputAddressFirst": "Input address first",
     "addressIncorrect": "Address Incorrect"
+  },
+  "create": {
+    "depositTooltip": "A deposit of {0} is required. Please note, this initial deposit is refundable."
   }
 }

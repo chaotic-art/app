@@ -3,6 +3,7 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
+import { getAssethubDeposit } from '~/composables/useDeposit'
 import { pinDirectory, pinJson } from '~/services/storage'
 
 // Blockchains for select
@@ -43,6 +44,10 @@ export function useCollectionForm() {
     userBalanceFormatted: '0',
     estimatedFee: 0n,
     estimatedFeeFormatted: '0',
+    deposit: 0n,
+    depositFormatted: '0',
+    total: 0n,
+    totalFormatted: '0',
     symbol: 'DOT',
     decimals: 12,
     name: '',
@@ -161,12 +166,20 @@ export function useCollectionForm() {
     }
   }
 
+  function resetBalanceCost() {
+    balance.estimatedFee = 0n
+    balance.estimatedFeeFormatted = '0'
+    balance.deposit = 0n
+    balance.depositFormatted = '0'
+    balance.total = 0n
+    balance.totalFormatted = '0'
+  }
+
   // Combined function to handle both fee estimation and collection creation
   async function handleCollectionOperation(formData: typeof state, type: 'estimate' | 'submit') {
     if (!isWalletConnected.value || !logoFile.value || !formData.name || !formData.description) {
       if (type === 'estimate') {
-        balance.estimatedFee = 0n
-        balance.estimatedFeeFormatted = '0'
+        resetBalanceCost()
       }
       return
     }
@@ -190,13 +203,19 @@ export function useCollectionForm() {
       if (type === 'estimate') {
         balance.estimatedFee = result || 0n
         balance.estimatedFeeFormatted = formatBalance(result, { decimals: balance.decimals, symbol: balance.symbol })
+
+        const { collectionDeposit, metadataDeposit, attributeDeposit } = await getAssethubDeposit(formData.blockchain)
+        balance.deposit = collectionDeposit + metadataDeposit + attributeDeposit * 2n
+        balance.depositFormatted = formatBalance(balance.deposit, { decimals: balance.decimals, symbol: balance.symbol })
+
+        balance.total = balance.deposit + balance.estimatedFee
+        balance.totalFormatted = formatBalance(balance.total, { decimals: balance.decimals, symbol: balance.symbol })
       }
     }
     catch (error) {
       console.error(`Error ${type === 'estimate' ? 'estimating fee' : 'creating collection'}:`, error)
       if (type === 'estimate') {
-        balance.estimatedFee = 0n
-        balance.estimatedFeeFormatted = '0'
+        resetBalanceCost()
       }
     }
     finally {
@@ -227,9 +246,11 @@ export function useCollectionForm() {
       const instance = modalConfirmation.open({
         chain: balance.name,
         estimatedFee: balance.estimatedFeeFormatted,
+        deposit: balance.depositFormatted,
+        total: formatBalance(balance.total, { decimals: balance.decimals, symbol: balance.symbol }),
         walletAddress: actualWalletAddress,
         walletBalance: balance.userBalanceFormatted,
-        remainsBalance: formatBalance(balance.userBalance - balance.estimatedFee, { decimals: balance.decimals, symbol: balance.symbol }),
+        remainsBalance: formatBalance(balance.userBalance - balance.total, { decimals: balance.decimals, symbol: balance.symbol }),
         title: 'Create Collection',
         items: [
           {

@@ -48,6 +48,10 @@ export function useNftForm() {
     userBalanceFormatted: '0',
     estimatedFee: 0n,
     estimatedFeeFormatted: '0',
+    deposit: 0n,
+    depositFormatted: '0',
+    total: 0n,
+    totalFormatted: '0',
     symbol: 'DOT',
     decimals: 12,
     name: '',
@@ -268,6 +272,15 @@ export function useNftForm() {
     }
   }
 
+  function resetBalanceCost() {
+    balance.estimatedFee = 0n
+    balance.estimatedFeeFormatted = '0'
+    balance.deposit = 0n
+    balance.depositFormatted = '0'
+    balance.total = 0n
+    balance.totalFormatted = '0'
+  }
+
   // Combined function to handle both fee estimation and NFT creation
   async function handleNftOperation(formData: typeof state, type: 'estimate' | 'submit') {
     if (!isWalletConnected.value || !mediaFile.value || !formData.collection || !formData.name || !formData.description) {
@@ -281,8 +294,7 @@ export function useNftForm() {
     // For non-image media, require a cover image before proceeding
     if (mediaFile.value && !mediaFile.value.type.startsWith('image/') && !coverImage.value) {
       if (type === 'estimate') {
-        balance.estimatedFee = 0n
-        balance.estimatedFeeFormatted = '0'
+        resetBalanceCost()
       }
       return
     }
@@ -309,13 +321,19 @@ export function useNftForm() {
       if (type === 'estimate') {
         balance.estimatedFee = result || 0n
         balance.estimatedFeeFormatted = formatBalance(result, { decimals: balance.decimals, symbol: balance.symbol })
+
+        const { itemDeposit, metadataDeposit, attributeDeposit } = await getAssethubDeposit(formData.blockchain)
+        balance.deposit = BigInt(formData.supply) * (itemDeposit + metadataDeposit + (attributeDeposit * BigInt(validProperties.length)))
+        balance.depositFormatted = formatBalance(balance.deposit, { decimals: balance.decimals, symbol: balance.symbol })
+
+        balance.total = balance.deposit + balance.estimatedFee
+        balance.totalFormatted = formatBalance(balance.total, { decimals: balance.decimals, symbol: balance.symbol })
       }
     }
     catch (error) {
       console.error(`Error ${type === 'estimate' ? 'estimating fee' : 'creating NFT'}:`, error)
       if (type === 'estimate') {
-        balance.estimatedFee = 0n
-        balance.estimatedFeeFormatted = '0'
+        resetBalanceCost()
       }
     }
     finally {
@@ -347,6 +365,8 @@ export function useNftForm() {
         chain: balance.name,
         estimatedFee: balance.estimatedFeeFormatted,
         walletAddress: actualWalletAddress,
+        deposit: balance.depositFormatted,
+        total: formatBalance(balance.total, { decimals: balance.decimals, symbol: balance.symbol }),
         walletBalance: balance.userBalanceFormatted,
         remainsBalance: formatBalance(balance.userBalance - balance.estimatedFee, { decimals: balance.decimals, symbol: balance.symbol }),
         title: 'Create NFT',
