@@ -211,7 +211,7 @@ export function useCollectionForm() {
         balance.estimatedFeeFormatted = formatBalance(result, { decimals: balance.decimals, symbol: balance.symbol })
 
         const { collectionDeposit, metadataDeposit, attributeDeposit } = await getAssethubDeposit(formData.blockchain)
-        balance.deposit = collectionDeposit + metadataDeposit + attributeDeposit * 2n
+        balance.deposit = collectionDeposit + metadataDeposit + (attributeDeposit * 2n)
         balance.depositFormatted = formatBalance(balance.deposit, { decimals: balance.decimals, symbol: balance.symbol })
 
         balance.total = balance.deposit + balance.estimatedFee
