@@ -28,8 +28,6 @@ export async function getAssethubDeposit(chain: AssetHubChain) {
 }
 
 export default function (prefix: Ref<SupportedChain>) {
-  const { $sdk } = useNuxtApp()
-
   const collectionDeposit = ref(0)
   const itemDeposit = ref(0)
   const metadataDeposit = ref(0)
@@ -42,6 +40,10 @@ export default function (prefix: Ref<SupportedChain>) {
   const chainSymbol = ref('')
 
   watchEffect(async () => {
+    if (import.meta.server) {
+      return
+    }
+
     if (isAssetHubChain(prefix.value)) {
       const {
         existentialDeposit: existentialDepositValue,
@@ -58,6 +60,7 @@ export default function (prefix: Ref<SupportedChain>) {
       attributeDeposit.value = Number(attributeDepositValue)
     }
     else {
+      const { $sdk } = useNuxtApp()
       const api = $sdk(prefix.value).api
       existentialDeposit.value = Number(await api.constants.Balances.ExistentialDeposit())
     }
