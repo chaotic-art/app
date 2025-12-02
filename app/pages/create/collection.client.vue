@@ -47,7 +47,7 @@ const submitButtonText = computed(() => {
 
 // Auto-estimate fees when form data changes (debounced to prevent excessive API calls)
 watchDebounced(
-  [isWalletConnected, logoFile, () => state.name, () => state.description, () => state.royalties, () => state.maxNfts, () => state.maxNftsNumber],
+  [isWalletConnected, logoFile, () => state.name, () => state.description, () => state.royalties, () => state.maxNfts, () => state.maxNftsNumber, () => state.blockchain],
   ([connected, file, name, description, _royalties, _maxNfts, _maxNftsNumber]) => {
     if (connected && file && name && description) {
       handleCollectionOperation(state, 'estimate')

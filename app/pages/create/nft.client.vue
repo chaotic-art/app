@@ -51,7 +51,7 @@ const submitButtonText = computed(() => {
   return 'Create NFT'
 })
 
-const validProperties = computed(() => state.properties.filter(property => property.trait.trim() && property.value.trim()))
+const validProperties = computed(() => state.properties.filter(property => property.trait.trim() || property.value.trim()))
 
 // Auto-estimate fees when form data changes (debounced to prevent excessive API calls)
 watchDebounced(

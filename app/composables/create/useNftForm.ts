@@ -284,6 +284,8 @@ export function useNftForm() {
     balance.totalFormatted = '0'
   }
 
+  watch(() => state.blockchain, resetBalanceCost)
+
   // Combined function to handle both fee estimation and NFT creation
   async function handleNftOperation(formData: typeof state, type: 'estimate' | 'submit') {
     if (!isWalletConnected.value || !mediaFile.value || !formData.collection || !formData.name || !formData.description) {
