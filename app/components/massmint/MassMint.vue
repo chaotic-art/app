@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { NFT, NFTToMint } from './types'
 import { LazyReviewMassMintModal } from '#components'
+import { useQuery } from '@tanstack/vue-query'
 import { blockchains } from '~/composables/create/useCollectionForm'
 import { useMassMint } from '~/composables/massmint/useMassMint'
 import { useMassMintForm } from '~/composables/massmint/useMassMintForm'
@@ -21,20 +22,39 @@ const isEditPanelOpen = ref(false)
 
 const selectedNft = ref<NFT | undefined>(undefined)
 const overlay = useOverlay()
+const { accountId } = useAuth()
+const { getBalance } = useBalances()
 const reviewMassMintModal = overlay.create(LazyReviewMassMintModal)
 
 // Form and minting composables
 const { state, collections, collectionsLoading } = useMassMintForm()
 const { massMint, progress, isLoading: isMinting } = useMassMint()
+const { itemDeposit, metadataDeposit, attributeDeposit, existentialDeposit } = useDeposit(computed(() => state.blockchain))
 const selectedCollection = computed(() => state.collection)
 const selectedCollectionName = computed(() => collections.value.find(collection => collection.value === selectedCollection.value)?.name || '')
 
 // Computed
-const hasEnoughBalance = computed(() => {
-  // TODO: Implement balance checking logic
-  return true
+const total = computed(() => {
+  const totals = Object.values(NFTS.value).map((nft) => {
+    const tx = itemDeposit.value // tmp add real tx calcualtion
+
+    return ((nft.attributes?.length || 0) * attributeDeposit.value) + itemDeposit.value + metadataDeposit.value + tx
+  })
+
+  return totals.reduce((acc, curr) => acc + curr, 0)
 })
 
+const { data: balanceData } = useQuery({
+  queryKey: ['wallet-balance', accountId, () => state.blockchain],
+  queryFn: () => {
+    return getBalance({
+      address: accountId.value,
+      prefix: state.blockchain,
+    })
+  },
+})
+
+const hasEnoughBalance = computed(() => (Number(balanceData?.value?.balance || 0) - existentialDeposit.value) > total.value)
 const numOfValidNFTs = computed(() => (Object.values(NFTS.value) as NFT[]).length)
 
 const numMissingDescriptions = computed(() => {
@@ -263,28 +283,38 @@ function deleteNFT(nft?: NFT) {
 
     <!-- Action Button -->
     <div class="flex justify-center w-full pb-8">
-      <UButton
-        class="w-full max-w-md"
-        size="lg"
-        :disabled="!mediaLoaded || !hasEnoughBalance || isMinting"
-        :loading="isMinting"
-        @click="openReviewModal"
-      >
-        <span class="text-xl">
-          <template v-if="isMinting">
-            {{ progress.message }}
-          </template>
-          <template v-else>
-            {{ hasEnoughBalance ? 'Mint NFTs' : 'Not Enough Funds' }}
-            <span
-              v-if="numOfValidNFTs && hasEnoughBalance"
-              class="font-bold"
-            >
-              ({{ numOfValidNFTs }})
-            </span>
-          </template>
-        </span>
-      </UButton>
+      <div class="flex flex-col items-center flex-1 max-w-md gap-4">
+        <UButton
+          class="w-full"
+          size="lg"
+          :disabled="!mediaLoaded || !hasEnoughBalance || isMinting"
+          :loading="isMinting"
+          @click="openReviewModal"
+        >
+          <span class="text-xl">
+            <template v-if="isMinting">
+              {{ progress.message }}
+            </template>
+            <template v-else>
+              {{ hasEnoughBalance ? 'Mint NFTs' : 'Not Enough Funds' }}
+              <span
+                v-if="numOfValidNFTs && hasEnoughBalance"
+                class="font-bold"
+              >
+                ({{ numOfValidNFTs }})
+              </span>
+            </template>
+          </span>
+        </UButton>
+
+        <div v-if="mediaLoaded" class="flex gap-2 w-full justify-between">
+          <span class="text-gray-600 dark:text-gray-400">
+            Est. Cost:
+          </span>
+
+          <Money :value="total" inline :chain="state.blockchain" />
+        </div>
+      </div>
     </div>
   </div>
 </template>

@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { AssetHubChain } from '~/plugins/sdk.client'
+import { chainSpec } from '@/utils/chain'
 import { formatAmountWithRound } from '@/utils/format/balance'
 
 const props = withDefaults(
@@ -8,6 +10,7 @@ const props = withDefaults(
     hideUnit?: boolean
     unitSymbol?: string
     round?: number
+    chain: AssetHubChain
   }>(),
   {
     value: 0,
@@ -17,7 +20,7 @@ const props = withDefaults(
 
 const { decimals, chainSymbol } = useChain()
 
-const displayUnit = computed(() => props.unitSymbol || chainSymbol.value)
+const displayUnit = computed(() => props.chain ? chainSpec[props.chain].tokenSymbol : props.unitSymbol || chainSymbol.value)
 const finalValue = computed(() =>
   formatAmountWithRound(props.value, decimals.value, props.round),
 )
