@@ -1,7 +1,9 @@
 <script setup lang="ts">
 interface Props {
   chain: string
+  total: string
   estimatedFee: string
+  deposit: string
   walletAddress: string
   walletBalance: string
   remainsBalance: string
@@ -66,7 +68,7 @@ function handleCancel() {
             </div>
             <div class="text-right">
               <div class="text-sm font-medium">
-                {{ estimatedFee }}
+                {{ total }}
               </div>
             </div>
           </div>
@@ -131,8 +133,10 @@ function handleCancel() {
             </div>
           </div>
 
+          <USeparator class="mt-2" />
+
           <!-- Chain -->
-          <div class="flex items-center justify-between pt-2 border-t border-gray-200">
+          <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <UIcon name="i-heroicons-globe-alt" class="w-4 h-4 text-gray-600 dark:text-gray-400" />
               <span class="text-sm text-gray-600 dark:text-gray-400">Chain</span>
@@ -145,11 +149,36 @@ function handleCancel() {
           <!-- Estimated Fee -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-600 dark:text-gray-400">Fee</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">Network Fee</span>
             </div>
             <div class="text-right">
               <div class="text-sm font-medium font-mono">
                 {{ estimatedFee }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Storage Deposit -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div class="text-sm text-gray-600 dark:text-gray-400 flex gap-2 items-center">
+                <span>Storage Deposit</span>
+
+                <UTooltip
+                  :text="$t('create.depositTooltip', [deposit])"
+                  :delay-duration="0"
+                  :content="{ side: 'top' }"
+                >
+                  <UIcon
+                    name="i-mdi:info-outline"
+                    class="h-4 w-4"
+                  />
+                </UTooltip>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-medium font-mono">
+                {{ deposit }}
               </div>
             </div>
           </div>
@@ -197,8 +226,8 @@ function handleCancel() {
         class="flex-1"
         @click="handleConfirm"
       >
-        <UIcon name="i-heroicons-arrow-right" class="w-4 h-4 mr-2" />
         Sign
+        <UIcon name="i-heroicons-arrow-right" class="w-4 h-4 mr-2" />
       </UButton>
     </template>
   </UModal>
