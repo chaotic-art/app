@@ -437,7 +437,8 @@ watchDebounced(
 
                 <span class="text-gray-600 dark:text-gray-400 flex gap-2">
                   <span class="w-22">Balance:</span>
-                  <span class="font-medium text-gray-900 dark:text-white">
+                  <USkeleton v-if="isFetchingBalance" class="w-22 h-4" />
+                  <span v-else class="font-medium text-gray-900 dark:text-white">
                     {{ balance.userBalanceFormatted }}
                   </span>
                 </span>
