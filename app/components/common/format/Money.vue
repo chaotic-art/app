@@ -10,7 +10,7 @@ const props = withDefaults(
     hideUnit?: boolean
     unitSymbol?: string
     round?: number
-    chain: AssetHubChain
+    chain?: AssetHubChain
   }>(),
   {
     value: 0,
