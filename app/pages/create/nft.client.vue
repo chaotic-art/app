@@ -51,7 +51,7 @@ const submitButtonText = computed(() => {
   return 'Create NFT'
 })
 
-const validProperties = computed(() => state.properties.filter(property => property.trait.trim() || property.value.trim()))
+const validProperties = computed(() => state.properties.filter(p => [p.trait, p.value].every(Boolean)))
 
 // Auto-estimate fees when form data changes (debounced to prevent excessive API calls)
 watchDebounced(
@@ -350,6 +350,7 @@ watchDebounced(
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                 Properties (Optional)
+                {{ validProperties.length }}
               </h3>
               <UButton
                 variant="ghost"
