@@ -166,7 +166,7 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
 
         <!-- Action Dropdown Menu -->
         <div v-if="!tokenData">
-          <USkeleton class="h-7 w-7 rounded-md" />
+          <USkeleton class="size-7 rounded-md" />
         </div>
         <UDropdownMenu
           v-else
@@ -175,9 +175,9 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
           :ui="{ content: 'w-48' }"
         >
           <UButton
-            color="neutral"
+            variant="outline"
             size="sm"
-            class="h-7 w-7"
+            class="size-7"
             icon="i-heroicons-ellipsis-horizontal"
           />
         </UDropdownMenu>
