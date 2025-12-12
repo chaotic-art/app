@@ -35,14 +35,14 @@ const queryVariables = ref<Record<string, any>>({})
     </ExploreHeader>
 
     <!-- Grid Content for NFTs -->
-    <div class="my-8">
+    <ExploreFilters class="my-8">
       <NftsGrid
         :key="JSON.stringify(queryVariables)"
         :search="queryVariables.name || ''"
         :variables="queryVariables"
         :prefix="chain"
       />
-    </div>
+    </ExploreFilters>
     <ScrollToTop />
   </UContainer>
 </template>
