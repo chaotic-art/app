@@ -1,15 +1,15 @@
-import type { BaseTrade, Offer, Swap, TradeNftItem, TradeTarget } from '@/components/trade/types'
+import type { BaseTrade, Offer, Swap, TradeNftItem, TradeTarget, TradeType } from '@/components/trade/types'
 import type { OffersListData } from '~/graphql/queries/trades'
 import { addSeconds, subSeconds } from 'date-fns'
 import {
-  TradeDesiredTokenType,
-  TradeStatus,
-  TradeType,
+  TradeDesiredTokenTypes,
+  TradeStatuses,
+  TradeTypes,
 } from '@/components/trade/types'
 import { BLOCKS_PER_HOUR } from '@/composables/onchain/utils'
 import useRelayBlock from '@/composables/useRelayBlock'
 import { collectionsOwnersByIds } from '~/graphql/queries/collections'
-import { offersList } from '~/graphql/queries/trades'
+import { offersList, swapList } from '~/graphql/queries/trades'
 
 interface CollectionWithTokenOwners {
   id: string
@@ -20,12 +20,12 @@ interface CollectionWithTokenOwners {
   isExpired: boolean
 }
 
-export const TRADES_QUERY_MAP: Record<TradeType, { queryDocument: typeof offersList, dataKey: string }> = {
-  [TradeType.SWAP]: {
-    queryDocument: offersList, // TODO change
+export const TRADES_QUERY_MAP: Record<TradeType, { queryDocument: typeof offersList | typeof swapList, dataKey: string }> = {
+  [TradeTypes.Swap]: {
+    queryDocument: swapList,
     dataKey: 'swaps',
   },
-  [TradeType.OFFER]: {
+  [TradeTypes.Offer]: {
     queryDocument: offersList,
     dataKey: 'offers',
   },
@@ -46,7 +46,7 @@ export default function ({
   where = {},
   limit = 100,
   disabled = computed(() => false),
-  type = TradeType.SWAP,
+  type = TradeTypes.Swap,
   minimal = false,
   orderBy = ['blockNumber_DESC'],
 }: UseTradesParams) {
@@ -149,7 +149,7 @@ export default function ({
     const relayHead = relayHeadNow.value!
 
     items.value = dataItems.value.map((trade) => {
-      const desiredType = trade.desired ? TradeDesiredTokenType.SPECIFIC : TradeDesiredTokenType.ANY_IN_COLLECTION
+      const desiredType = trade.desired ? TradeDesiredTokenTypes.Specific : TradeDesiredTokenTypes.AnyInCollection
 
       const expirationRelay = Number(trade.expiration) // expiration is in RELAY block number
       const createdAtPara = Number(trade.blockNumber)
@@ -163,10 +163,10 @@ export default function ({
         expirationDate: addSeconds(new Date(), etaRelayBlocks * SECONDS_PER_BLOCK),
         offered: trade.nft,
         desiredType,
-        isAnyTokenInCollectionDesired: desiredType === TradeDesiredTokenType.ANY_IN_COLLECTION,
+        isAnyTokenInCollectionDesired: desiredType === TradeDesiredTokenTypes.AnyInCollection,
         // Check block number to handle trades that are expired but not yet updated in indexer
         // @see https://github.com/kodadot/stick/blob/9eac12938c47bf0e66e93760231208e4249d8637/src/mappings/utils/cache.ts#L127
-        isExpired: trade.status === TradeStatus.EXPIRED || relayHead > expirationRelay,
+        isExpired: trade.status === TradeStatuses.Expired || relayHead > expirationRelay,
         type,
         targets: targetsOfTrades.value?.get(trade.id) || [],
         createdAt: subSeconds(new Date(), ageParaBlocks * SECONDS_PER_BLOCK),

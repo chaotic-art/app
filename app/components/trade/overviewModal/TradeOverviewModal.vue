@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import type { ExecTxParams, OverviewMode, TradeDetailedToken } from './utils'
-import type { TradeNftItem } from '@/components/trade/types'
+import type { TradeNftItem, TradeType } from '@/components/trade/types'
 import { useQuery } from '@tanstack/vue-query'
 import { whenever } from '@vueuse/core'
 import ModalIdentityItem from '@/components/common/ModalIdentityItem.vue'
-import { TradeType } from '@/components/trade/types'
+import { TradeTypes } from '@/components/trade/types'
 import TradeOverviewModalContent from './Content.vue'
 import { fetchTradeDetailedToken, TradeTypeTx, useIsTradeOverview } from './utils'
 
 interface OverviewModeDetails {
   title: string
-  signingTitle: string
   notificationTitle: string
 }
 
@@ -31,38 +30,34 @@ const { $i18n } = useNuxtApp()
 const { isSuccess, close, result } = useTransactionModal()
 
 const TradeTypeOverviewModeDetails: Record<TradeType, Record<OverviewMode, OverviewModeDetails>> = {
-  [TradeType.SWAP]: {
+  [TradeTypes.Swap]: {
     incoming: {
       title: $i18n.t('swap.incomingSwap'),
-      signingTitle: $i18n.t('transaction.acceptSwap'),
       notificationTitle: $i18n.t('swap.acceptSwap'),
     },
     owner: {
       title: $i18n.t('swap.yourSwap'),
-      signingTitle: $i18n.t('transaction.cancelSwap'),
       notificationTitle: $i18n.t('swap.swapCancellation'),
     },
   },
-  [TradeType.OFFER]: {
+  [TradeTypes.Offer]: {
     incoming: {
       title: $i18n.t('offer.incomingOffer'),
-      signingTitle: $i18n.t('offer.acceptOffer'),
       notificationTitle: $i18n.t('offer.offerAccept'),
     },
     owner: {
       title: $i18n.t('offer.yourOffer'),
-      signingTitle: $i18n.t('offer.cancelOffer'),
       notificationTitle: $i18n.t('offer.offerCancellation'),
     },
   },
 }
 
 const TradeTypeDetails: Record<TradeType, Details> = {
-  [TradeType.SWAP]: {
+  [TradeTypes.Swap]: {
     transactionSuccessTitle: $i18n.t('swap.manageSwaps'),
     transactionSuccessTab: 'swaps',
   },
-  [TradeType.OFFER]: {
+  [TradeTypes.Offer]: {
     transactionSuccessTitle: $i18n.t('offer.manageOffers'),
     transactionSuccessTab: 'offers',
   },
@@ -106,7 +101,6 @@ const details = computed<Details & OverviewModeDetails>(() =>
       }
     : {
         title: '',
-        signingTitle: '',
         notificationTitle: '',
         transactionSuccessTitle: '',
         transactionSuccessTab: '',
@@ -179,6 +173,8 @@ useModalIsOpenTracker({
 whenever(() => isSuccess.value
   && (result.value?.type === 'accept_offer'
     || result.value?.type === 'cancel_offer'
+    || result.value?.type === 'accept_swap'
+    || result.value?.type === 'cancel_swap'
   ), () => {
   close()
 

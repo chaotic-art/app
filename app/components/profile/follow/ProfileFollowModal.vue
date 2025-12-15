@@ -49,37 +49,37 @@ watchEffect(() => {
 <template>
   <UModal
     v-model:open="isOpen"
+    :ui="{
+      content: 'max-w-md w-full',
+    }"
   >
     <template #body>
-      <div class="p-6">
-        <div class="mb-6">
-          <UTabs
-            v-model="activeTab"
-
-            :items="tabItems"
-            :content="false"
-            variant="pill"
-            color="primary"
-            size="sm"
-            class="w-full"
-            :ui="{
-              list: 'rounded-lg p-1 gap-1',
-              trigger: 'flex-1 transition-colors duration-200',
-            }"
-          />
-        </div>
-        <div class="min-h-[300px]">
-          <ProfileFollowTab
-            v-if="activeTab === 'followers'"
-            type="followers"
-            :total-count="followersCount"
-          />
-          <ProfileFollowTab
-            v-else
-            type="following"
-            :total-count="followingCount"
-          />
-        </div>
+      <div class="mb-6">
+        <UTabs
+          v-model="activeTab"
+          :items="tabItems"
+          :content="false"
+          variant="pill"
+          color="primary"
+          size="sm"
+          class="w-full"
+          :ui="{
+            list: 'rounded-lg p-1 gap-1',
+            trigger: 'flex-1 transition-colors duration-200',
+          }"
+        />
+      </div>
+      <div class="min-h-[300px]">
+        <ProfileFollowTab
+          v-if="activeTab === 'followers'"
+          type="followers"
+          :total-count="followersCount"
+        />
+        <ProfileFollowTab
+          v-else
+          type="following"
+          :total-count="followingCount"
+        />
       </div>
     </template>
   </UModal>

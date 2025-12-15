@@ -18,12 +18,14 @@ export interface MakingOfferItem {
   sn: string | null
 }
 
-export enum TradeStatus {
-  ACTIVE = 'ACTIVE',
-  EXPIRED = 'EXPIRED',
-  WITHDRAWN = 'WITHDRAWN',
-  ACCEPTED = 'ACCEPTED',
-}
+export const TradeStatuses = {
+  Active: 'ACTIVE',
+  Expired: 'EXPIRED',
+  Withdrawn: 'WITHDRAWN',
+  Accepted: 'ACCEPTED',
+} as const
+
+export type TradeStatus = typeof TradeStatuses[keyof typeof TradeStatuses]
 
 export interface TradeToken {
   id: string
@@ -59,17 +61,19 @@ export interface BaseTrade {
   surcharge: SwapSurchargeDirection | null
 }
 
-// TODO to object as const
-export enum TradeDesiredTokenType {
-  SPECIFIC,
-  ANY_IN_COLLECTION,
-}
+export const TradeDesiredTokenTypes = {
+  Specific: 'specific',
+  AnyInCollection: 'any_in_collection',
+} as const
 
-// TODO to object as const
-export enum TradeType {
-  SWAP = 'swap',
-  OFFER = 'offer',
-}
+export type TradeDesiredTokenType = typeof TradeDesiredTokenTypes[keyof typeof TradeDesiredTokenTypes]
+
+export const TradeTypes = {
+  Swap: 'swap',
+  Offer: 'offer',
+} as const
+
+export type TradeType = typeof TradeTypes[keyof typeof TradeTypes]
 
 export type Swap = BaseTrade
 

@@ -2,7 +2,6 @@
 import type { MakingOfferItem } from '@/components/trade/types'
 import { useQuery } from '@tanstack/vue-query'
 import { highestOfferByCollectionId } from '@/graphql/queries/trades'
-import { fetchOdaCollection } from '~/services/oda'
 
 const props = defineProps<{
   collectionId: string
@@ -22,10 +21,7 @@ const { data: collectionOfferData } = useQuery({
   queryFn: () => $apolloClient.query({ query: highestOfferByCollectionId, variables: { id: collectionId.value } }),
 })
 
-const { data: collection } = useQuery({
-  queryKey: ['odaCollection', collectionId],
-  queryFn: () => fetchOdaCollection(currentChain.value, collectionId.value).catch(() => null),
-})
+const { collection } = useOdaCollection(collectionId)
 
 const highestOfferPrice = computed(() => (collectionOfferData.value)?.data.offers[0]?.price)
 
@@ -69,6 +65,7 @@ function onCreateCollectionOfferClick() {
   <div>
     <UButton
       variant="secondary"
+      :disabled="!collection"
       @click="onCreateCollectionOfferClick"
     >
       {{ $t('offer.createCollectionOffer') }}

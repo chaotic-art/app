@@ -10,6 +10,7 @@ export const dotHubDenyList = [
 ]
 
 export const URLS = {
+  appDomain: 'https://chaotic.art',
   services: {
     price: 'https://price.chaotic.art',
     genart: 'https://genart.chaotic.art',

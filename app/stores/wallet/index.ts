@@ -10,6 +10,11 @@ const USER_CONNECTED_WALLET_STATES: WalletState[] = [
   WalletStates.Connected,
 ]
 
+export function destructWalletAccountId(accountId: string) {
+  const [walletId, address] = accountId.split(':')
+  return { walletId, address }
+}
+
 export const useWalletStore = defineStore('wallet', () => {
   const wallets = ref<WalletExtension[]>([])
   const selectedAccounts = ref<Record<ChainVM, string | undefined>>({ SUB: '', EVM: '' })
@@ -29,7 +34,7 @@ export const useWalletStore = defineStore('wallet', () => {
   }
 
   function getWalletAccount(accountId: string): WalletAccount | undefined {
-    const [walletId] = accountId.split(':')
+    const { walletId } = destructWalletAccountId(accountId)
 
     if (!walletId)
       return undefined
@@ -95,6 +100,11 @@ export const useWalletStore = defineStore('wallet', () => {
     return selectedAccounts.value[wallet.vm]?.includes(wallet.id)
   }
 
+  function getSelectedAccountAddress(vm: ChainVM) {
+    const id = selectedAccounts.value[vm]
+    return id ? destructWalletAccountId(id).address : undefined
+  }
+
   return {
     wallets,
     addWallet,
@@ -106,6 +116,7 @@ export const useWalletStore = defineStore('wallet', () => {
     getInstalledWallets,
     getConnectedSubAccount,
     getConnectedEvmAccount,
+    getSelectedAccountAddress,
     getConnectedWallets,
     getUserConnectedWallets,
     clear,

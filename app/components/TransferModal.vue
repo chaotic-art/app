@@ -8,6 +8,7 @@ const { currentChain } = useChain()
 const { accountId, isCurrentAccount } = useAuth()
 const { items } = useActionCartStore()
 const { transferNfts } = useNftPallets()
+const { $i18n } = useNuxtApp()
 
 const address = ref('')
 const isAddressValid = ref(false)
@@ -33,7 +34,7 @@ const label = computed(() => {
     return 'Address is incorrect'
   }
   if (isYourAddress.value) {
-    return 'Cannot transfer to yourself'
+    return $i18n.t('transfer.selfTransfer')
   }
   return `Transfer ${items.length} NFT(s)`
 })

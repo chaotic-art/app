@@ -5,15 +5,12 @@ import { useMakingOfferStore } from '@/stores/makeOffer'
 
 const props = defineProps<{
   item: MakingOfferItem
-  showPrice?: boolean
 }>()
 
 const offerPrice = defineModel('offerPrice', { type: Number, default: 0 })
 
 const offerStore = useMakingOfferStore()
 const { chainSymbol, decimals } = useChain()
-
-const { formatted: itemPrice } = useAmount(computed(() => props.item.price), decimals, chainSymbol, { withBlank: true })
 
 const offerPriceStoreItem = computed({
   get: () => offerStore.getItem(props.item.id)?.offerPrice,
@@ -45,16 +42,7 @@ watch(
       :image="item.meta?.image || '' "
       :collection-name="item.collection.metadata?.name || '' "
       :price="Number(item.price)"
-    >
-      <template #right>
-        <div
-          v-if="showPrice"
-          class="flex items-end"
-        >
-          {{ itemPrice }}
-        </div>
-      </template>
-    </CartItemDetails>
+    />
 
     <USeparator class="my-4" />
 

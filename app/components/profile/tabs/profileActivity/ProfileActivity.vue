@@ -61,13 +61,15 @@ async function fetchProfileActivity() {
 }
 
 onMounted(async () => {
-  router.replace({
-    query: {
-      ...route.query,
-      buy: String(true),
-      sale: String(true),
-    },
-  })
+  if (!activeFilters.value.length) {
+    router.replace({
+      query: {
+        ...route.query,
+        buy: String(true),
+        sale: String(true),
+      },
+    })
+  }
 
   await fetchProfileActivity()
 

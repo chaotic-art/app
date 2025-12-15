@@ -3,21 +3,20 @@ import type { MakingOfferItem } from '../types'
 import type { TxType } from '~/composables/onchain/useNftPallets'
 import { whenever } from '@vueuse/core'
 import { formatBalance } from 'dedot/utils'
-import { shuffle } from 'lodash'
 import ModalIdentityItem from '@/components/common/ModalIdentityItem.vue'
-import { getOfferCollectionId, OFFER_MINT_PRICE } from '@/composables/onchain/utils'
+import { getOfferCollectionId, getRelayNow, OFFER_MINT_PRICE } from '@/composables/onchain/utils'
 import { useMakingOfferStore } from '@/stores/makeOffer'
 import { usePreferencesStore } from '@/stores/preferences'
 import { toNative } from '@/utils/format/balance'
 import { sum } from '@/utils/math'
 import { warningMessage } from '@/utils/notification'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
-import { unusedOfferedItems } from '~/graphql/queries/trades'
+import { unusedOfferedItems as unusedOfferedItemsQuery } from '~/graphql/queries/trades'
 
 const DEFAULT_OFFER_EXPIRATION_DURATION = 7
 
 const offerStore = useMakingOfferStore()
-const { accountId } = useAuth()
+const { accountId, isCurrentAccount } = useAuth()
 const { currentChain } = useChain()
 const { isSuccess, close, result } = useTransactionModal()
 
@@ -25,10 +24,9 @@ const { makeOfferModalOpen } = storeToRefs(usePreferencesStore())
 const { itemsInChain: items, hasInvalidOfferPrices, count } = storeToRefs(offerStore)
 
 const { decimals, chainSymbol } = useChain()
-const { $i18n, $apolloClient } = useNuxtApp()
+const { $i18n, $apolloClient, $sdk } = useNuxtApp()
 const { createOffer } = useNftPallets()
 
-const usedOfferedItems = ref<string[]>([])
 const offeredItem = ref<string>()
 
 const txFees = ref(0)
@@ -96,6 +94,61 @@ function onClose() {
   closeMakingOfferModal()
 }
 
+async function fetchUnusedOfferCollectionTokens(collectionId: string): Promise<string[]> {
+  const { api } = $sdk(currentChain.value)
+
+  try {
+    const { data: { offers: items } } = await $apolloClient.query({
+      query: unusedOfferedItemsQuery,
+      variables: {
+        where: {
+          status_not_in: ['ACTIVE', 'ACCEPTED'],
+          caller_eq: accountId.value,
+          nft: {
+            currentOwner_eq: accountId.value,
+            collection: {
+              id_eq: collectionId,
+            },
+          },
+        },
+      },
+    })
+
+    const keys = items.map(({ nft }) => [Number(collectionId), Number(nft.sn)] as [number, number])
+
+    const [itemsData, pendingSwapsData, relayNow] = await Promise.all([
+      api.query.Nfts.Item.getValues(keys, { at: 'best' }),
+      api.query.Nfts.PendingSwapOf.getValues(keys, { at: 'best' }),
+      getRelayNow(api),
+    ])
+
+    const onchainTokenData = items.map(({ nft }, index) => ({
+      owner: itemsData[index]?.owner,
+      pendingSwap: pendingSwapsData[index],
+      sn: nft.sn,
+    }))
+
+    // edge case: if a user quickly creates/accepts multiple offers and
+    // due to indexer delay we need to verify with onchain data the following cases
+    const unusedOfferItems = onchainTokenData.filter(token =>
+      // after a offer is accepted the offered item changes ownership
+      // so we need to check the current owner of the item
+      token.owner && isCurrentAccount(token.owner)
+      // since offer id follows format `collectionId-tokenId`
+      // is not possible to create multiple offers using the same offered item
+      // doing so will be overridden the previous offer
+      // keep items with no pending swap or with an expired deadline
+      && (!token.pendingSwap || (relayNow > Number(token.pendingSwap?.deadline ?? Number.NEGATIVE_INFINITY))),
+    )
+
+    return unusedOfferItems.map(token => token.sn)
+  }
+  catch (error) {
+    console.error(error)
+    return []
+  }
+}
+
 watch(
   () => count.value,
   () => {
@@ -114,7 +167,7 @@ useModalIsOpenTracker({
 
 useModalIsOpenTracker({
   isOpen: makeOfferModalOpen,
-  onOpen: () => {
+  onOpen: async () => {
     createOfferTx(items.value, 'estimate')
       .then((amount) => {
         txFees.value = Number(amount)
@@ -123,40 +176,13 @@ useModalIsOpenTracker({
         console.error('Error estimating transaction fees:', error)
       })
 
-    $apolloClient.query({
-      query: unusedOfferedItems,
-      variables: {
-        where: {
-          status_not_in: ['ACTIVE', 'ACCEPTED'],
-          caller_eq: accountId.value,
-          nft: {
-            currentOwner_eq: accountId.value,
-            collection: {
-              id_eq: String(getOfferCollectionId(currentChain.value)),
-            },
-          },
-        },
-      },
-    }).then(({ data: { offers: items } }) => {
-      const tokensSn = items
-        .map(({ nft }) => nft.sn)
-        .filter((tokenSn: string) => !usedOfferedItems.value.includes(tokenSn))
-
-      const unusedOfferedItems = shuffle(tokensSn)
-
-      offeredItem.value = unusedOfferedItems[0]
-    }).catch((error) => {
-      console.warn('Error fetching unused offered items:', error)
-    })
+    offeredItem.value = undefined
+    const unusedOfferedItems = await fetchUnusedOfferCollectionTokens(String(getOfferCollectionId(currentChain.value)))
+    offeredItem.value = unusedOfferedItems[0]
   },
 })
 
 whenever(() => isSuccess.value && result.value?.type === 'create_offer', () => {
-  if (offeredItem.value) {
-    usedOfferedItems.value.push(offeredItem.value)
-    offeredItem.value = undefined
-  }
-
   close()
 
   successMessage(
@@ -198,7 +224,6 @@ onUnmounted(closeMakingOfferModal)
           <MakeOfferSingleItem
             v-if="offerStore.items.length === 1 && offerStore.items[0]"
             :item="offerStore.items[0]"
-            :show-price="Boolean(offerStore.items[0]?.price)"
           />
         </div>
 

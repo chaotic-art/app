@@ -17,7 +17,7 @@ type DisplayUnit = 'token' | 'usd'
 const { t } = useI18n()
 const { balance, transferableBalance, isLoading: isBalanceLoading } = useQueryBalance()
 const { chainSymbol, decimals } = useChain()
-const { accountId } = useAuth()
+const { accountId, isCurrentAccount } = useAuth()
 const { prefix } = usePrefix()
 const { getCurrentTokenValue } = useFiatStore()
 const router = useRouter()
@@ -93,6 +93,7 @@ const {
 )
 
 const insufficientBalance = computed(() => transferableBalance.value < amountToNative(totalValues.withFee.token, decimals.value))
+const hasSelfTransfer = computed(() => targetAddresses.value.some(address => address.address && isCurrentAccount(address.address)))
 
 const isDisabled = computed(() => (
   targetAddresses.value.some(address =>
@@ -101,7 +102,9 @@ const isDisabled = computed(() => (
     || insufficientBalance.value
     || (!address.usd && !address.token),
   )
+  || !accountId.value
   || isBalanceLoading.value
+  || hasSelfTransfer.value
 ))
 
 const tabs = computed(() => {
@@ -118,6 +121,14 @@ const tabs = computed(() => {
 })
 
 const label = computed(() => {
+  if (!accountId.value) {
+    return t('general.connectWalletFirst')
+  }
+
+  if (hasSelfTransfer.value) {
+    return t('transfer.selfTransfer')
+  }
+
   if (insufficientBalance.value) {
     return t('balance.insufficient')
   }
@@ -298,7 +309,7 @@ whenever(() => Boolean(currentTokenValue.value), () => {
   if (targetAddresses.value.length > 1) {
     sendSameAmount.value = targetAddresses.value.map(({ token }) => token).every(Boolean)
   }
-}, { once: true })
+}, { once: true, immediate: true })
 </script>
 
 <template>
@@ -489,7 +500,7 @@ whenever(() => Boolean(currentTokenValue.value), () => {
       </div>
 
       <UButton
-        class="w-full"
+        class="w-full capitalize"
         color="neutral"
         :disabled="isDisabled"
         :label="label"
