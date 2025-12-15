@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { destructWalletAccountId } from '@/stores/wallet'
+
 const emit = defineEmits(['select'])
 
 const walletStore = useWalletStore()
@@ -25,8 +27,8 @@ const filteredAccounts = computed(() => {
 })
 
 function handleAccountSelect(accountId: string) {
-  // TODO: add destrucure account id method
-  const [walletId] = accountId.split(':')
+  const { walletId } = destructWalletAccountId(accountId)
+
   const wallet = wallets.value.find(wallet => wallet.id === walletId)
 
   if (!wallet) {

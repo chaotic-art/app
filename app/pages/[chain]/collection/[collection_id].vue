@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { SelectedTrait } from '@/components/trait/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
-import { TradeType } from '@/components/trade/types'
+import { TradeTypes } from '@/components/trade/types'
 import { useSortOptions } from '~/composables/useSortOptions'
 import { fetchOdaCollection } from '~/services/oda'
 import { getSubscanAccountUrl } from '~/utils/format/address'
@@ -9,6 +10,7 @@ import { getSubscanAccountUrl } from '~/utils/format/address'
 const route = useRoute()
 const router = useRouter()
 const { chain: chainPrefix, collection_id } = route.params
+const { isCurrentAccount, isLogIn } = useAuth()
 
 const tabsItems = ref([
   {
@@ -22,6 +24,18 @@ const tabsItems = ref([
     name: 'Offers',
     slot: 'offers',
     value: 'offers',
+  },
+  {
+    label: 'Swaps',
+    name: 'Swaps',
+    slot: 'swaps',
+    value: 'swaps',
+  },
+  {
+    label: 'Traits',
+    name: 'Traits',
+    slot: 'traits',
+    value: 'traits',
   },
 ])
 
@@ -52,9 +66,47 @@ const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value
 
 const { selectedSort, createQueryVariables } = useSortOptions()
 
-const queryVariables = computed(() =>
-  createQueryVariables([collection_id?.toString() ?? '']),
-)
+const filteredNftIds = ref<string[]>([])
+const selectedTraits = ref<SelectedTrait[]>([])
+
+const queryVariables = computed(() => {
+  const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
+
+  if (selectedTraits.value.length > 0) {
+    return {
+      ...baseVariables,
+      search: [{
+        id_in: filteredNftIds.value,
+      }],
+    }
+  }
+
+  return baseVariables
+})
+
+const isOwner = computed(() => {
+  const owner = data.value?.drops?.data[0]?.creator || data.value?.collection?.owner
+  return isLogIn.value && owner && isCurrentAccount(owner)
+})
+
+const overlay = useOverlay()
+const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
+
+function handleDestroyCollection() {
+  destroyCollectionModal.open({
+    collectionId: collection_id?.toString() ?? '',
+    collectionName: data.value?.collection?.metadata?.name,
+    chain: chain.value,
+  })
+}
+
+function handleNftIdsUpdate(nftIds: string[]) {
+  filteredNftIds.value = nftIds
+}
+
+function handleSelectedTraitsUpdate(traits: SelectedTrait[]) {
+  selectedTraits.value = traits
+}
 
 definePageMeta({
   validate: async (route) => {
@@ -93,7 +145,7 @@ defineOgImageComponent('Frame', {
 
         <div class="relative flex items-center px-8 py-8 z-10">
           <div class="flex flex-col items-center">
-            <div class="w-36 h-36 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-4 border-white dark:border-gray-900 shadow-xl">
+            <div class="w-36 h-36 rounded-xl overflow-hidden bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-4 border-white dark:border-gray-900 shadow-xl">
               <img
                 v-if="data?.collection?.metadata?.image"
                 :src="sanitizeIpfsUrl(data.collection.metadata.image)"
@@ -115,8 +167,19 @@ defineOgImageComponent('Frame', {
         <div class="flex justify-between flex-col md:flex-row gap-12">
           <div class="flex flex-col flex-1">
             <div class="my-4">
-              <div class="text-2xl font-bold mb-2">
-                {{ data?.collection?.metadata?.name || `Collection #${collection_id}` }}
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-2xl font-bold">
+                  {{ data?.collection?.metadata?.name || `Collection #${collection_id}` }}
+                </div>
+                <UButton
+                  v-if="isOwner"
+                  color="error"
+                  variant="outline"
+                  icon="i-heroicons-trash"
+                  @click="handleDestroyCollection"
+                >
+                  Delete Collection
+                </UButton>
               </div>
               <div v-if="data?.drops?.data[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
                 <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" custom-name>
@@ -185,6 +248,11 @@ defineOgImageComponent('Frame', {
             <div class="flex flex-col md:flex-row justify-end items-center gap-4">
               <div class="w-full md:w-auto flex items-center gap-2">
                 <ArtViewFilter />
+                <TraitFilter
+                  :collection-id="collection_id?.toString() ?? ''"
+                  @update:nft-ids="handleNftIdsUpdate"
+                  @update:selected-traits="handleSelectedTraitsUpdate"
+                />
                 <SortOptions
                   v-model="selectedSort"
                   class="w-full md:w-48"
@@ -194,7 +262,7 @@ defineOgImageComponent('Frame', {
 
             <!-- Items Grid -->
             <LazyNftsGrid
-              :key="selectedSort"
+              :key="`${selectedSort}-${filteredNftIds.length}-${filteredNftIds.join(',')}`"
               :variables="queryVariables"
               grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
               no-items-found-message="This collection doesn't have any items yet."
@@ -203,7 +271,13 @@ defineOgImageComponent('Frame', {
           </div>
         </template>
         <template #offers>
-          <CollectionTrades :trade-type="TradeType.OFFER" />
+          <CollectionTrades :trade-type="TradeTypes.Offer" />
+        </template>
+        <template #swaps>
+          <CollectionTrades :trade-type="TradeTypes.Swap" />
+        </template>
+        <template #traits>
+          <TraitOverview :collection-id="collection_id?.toString() ?? ''" />
         </template>
       </UTabs>
     </div>

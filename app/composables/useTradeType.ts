@@ -1,8 +1,8 @@
-import type { TradeNftItem } from '@/components/trade/types'
-import { TradeType } from '@/components/trade/types'
+import type { TradeNftItem, TradeType } from '@/components/trade/types'
+import { TradeTypes } from '@/components/trade/types'
 
-export const isTradeSwap = (type: TradeType) => type === TradeType.SWAP
-export const isTradeOffer = (type: TradeType) => type === TradeType.OFFER
+export const isTradeSwap = (type: TradeType) => type === TradeTypes.Swap
+export const isTradeOffer = (type: TradeType) => type === TradeTypes.Offer
 
 export default (trade: Ref<TradeNftItem | undefined>) => {
   return {

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineProps<{
+  disabled?: boolean
+}>()
+
 const { chainSymbol } = useChain()
 
 const price = defineModel<number | string>({ required: true, default: '' })
@@ -14,6 +18,7 @@ const price = defineModel<number | string>({ required: true, default: '' })
       placeholder="Price"
       size="xl"
       class="w-full text-lg"
+      :disabled="disabled"
     />
     <div class="absolute right-10 top-1/2 transform -translate-y-1/2">
       <span class="text-gray-500 dark:text-gray-400 font-medium">

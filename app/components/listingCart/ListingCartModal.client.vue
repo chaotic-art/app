@@ -47,20 +47,20 @@ const title = computed(() => {
   const items
     = listingCartStore.count === 1
       ? 'NFT'
-      : `${listingCartStore.count} ${$i18n.t('items')}`
+      : `${listingCartStore.count} ${$i18n.t('general.items')}`
 
   return showChangePriceModal.value
     ? $i18n.t('listingCart.changePrice')
     : `List ${items}`
 })
 
-const confirmButtonDisabled = computed(
-  () => Boolean(listingCartStore.incompleteListPrices),
-)
-
 const hasEnoughFunds = computed(() => {
   return (Number(balance.value) - Number(existentialDeposit.value)) > listingFees.value
 })
+
+const confirmButtonDisabled = computed(
+  () => Boolean(listingCartStore.incompleteListPrices) || !hasEnoughFunds.value,
+)
 
 const label = computed(() => {
   if (!hasEnoughFunds.value) {

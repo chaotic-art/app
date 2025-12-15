@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import { TradeTypes } from '@/components/trade/types'
 import TokenCard from '~/components/common/card/TokenCard.client.vue'
 import TokenActivity from '~/components/gallery/TokenActivity.vue'
 import { tokenEntries } from '~/utils/api/substrate.nft-pallets'
@@ -12,6 +14,12 @@ interface Props {
   collectionId: string
   tokenId: string
   mimeType?: string
+}
+
+interface PropertyRow {
+  trait_type: string
+  value: string
+  rarity: number
 }
 
 const props = defineProps<Props>()
@@ -31,6 +39,44 @@ const activeTab = computed({
   },
 })
 
+const { getAttributeRarity } = useCollectionAttributes({
+  collectionId: computed(() => props.collectionId),
+})
+
+const properties = computed<PropertyRow[]>(() => {
+  const attributes = (props.tokenData?.metadata?.attributes || []) as Array<Record<string, string>>
+
+  return attributes.map((attr) => {
+    const traitType = attr.trait_type || attr.trait || attr.key || ''
+    const traitValue = attr.value || ''
+    const rarity = getAttributeRarity(traitType, traitValue)
+
+    return {
+      trait_type: traitType,
+      value: traitValue,
+      rarity,
+    }
+  })
+})
+
+const propertiesColumns: TableColumn<PropertyRow>[] = [
+  {
+    accessorKey: 'trait_type',
+    header: 'Trait',
+  },
+  {
+    accessorKey: 'value',
+    header: 'Value',
+  },
+  {
+    accessorKey: 'rarity',
+    header: 'Rarity',
+    cell: ({ row }) => {
+      return `${row.original.rarity}%`
+    },
+  },
+]
+
 const tabsItems = ref([
   {
     label: 'Activity',
@@ -43,6 +89,18 @@ const tabsItems = ref([
     name: 'Offers',
     slot: 'offers',
     value: 'offers',
+  },
+  {
+    label: 'Swaps',
+    name: 'Swaps',
+    slot: 'swaps',
+    value: 'swaps',
+  },
+  {
+    label: 'Properties',
+    name: 'Properties',
+    slot: 'properties',
+    value: 'properties',
   },
 ])
 
@@ -79,11 +137,32 @@ onMounted(async () => {
               />
             </template>
             <template #offers>
-              <TokenOffers
+              <TokenTrades
                 :chain="chain"
                 :collection-id="collectionId"
                 :token-id="tokenId"
+                :type="TradeTypes.Offer"
               />
+            </template>
+            <template #swaps>
+              <TokenTrades
+                :chain="chain"
+                :collection-id="collectionId"
+                :token-id="tokenId"
+                :type="TradeTypes.Swap"
+              />
+            </template>
+            <template #properties>
+              <div class="bg-background rounded-xl border border-border overflow-hidden">
+                <UTable
+                  v-if="properties.length"
+                  :data="properties"
+                  :columns="propertiesColumns"
+                />
+                <div v-else class="p-8 text-center text-muted-foreground">
+                  No properties available for this NFT
+                </div>
+              </div>
             </template>
           </UTabs>
         </div>

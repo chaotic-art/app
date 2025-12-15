@@ -4,13 +4,18 @@ import type { Profile } from '@/services/profile'
 import { computed } from 'vue'
 import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
+import { SwapStep } from '@/components/swap/types'
+import { TradeTypes } from '@/components/trade/types'
 import { fetchFollowersOf, fetchFollowing } from '@/services/profile'
 import { copyAddress, getSubscanAccountUrl, shortenAddress } from '@/utils/format/address'
+import { getSwapStepRouteName } from '@/utils/swap'
 
 const props = defineProps<{ address: string, profile?: Profile | null, bannerUrl?: string }>()
 const { isCurrentAccount } = useAuth()
 const route = useRoute()
 const router = useRouter()
+const { currentChain } = useChain()
+const swapStore = useAtomicSwapStore()
 
 const followButton = ref()
 const followModalTab = ref<'followers' | 'following'>('followers')
@@ -47,6 +52,12 @@ const tabsItems = ref([
     name: 'Offers',
     slot: 'offers',
     value: 'offers',
+  },
+  {
+    label: 'Swaps',
+    name: 'Swaps',
+    slot: 'swaps',
+    value: 'swaps',
   },
 ])
 
@@ -113,6 +124,15 @@ function onTotalCountChange(slot: string, totalCount: number) {
   if (tab) {
     tab.label = totalCount > 0 ? `${tab.name} (${totalCount})` : tab.name
   }
+}
+
+async function onClickSwaps() {
+  const createdId = swapStore.createSwap(props.address, currentChain.value).id
+  await navigateTo({
+    name: getSwapStepRouteName(SwapStep.DESIRED),
+    params: { id: props.address, chain: currentChain.value },
+    query: { swapId: createdId },
+  })
 }
 </script>
 
@@ -183,12 +203,24 @@ function onTotalCountChange(slot: string, totalCount: number) {
             />
             <FollowButton v-else ref="followButton" :target="address" @follow-action="refresh" />
 
-            <!-- <UButton
-              icon="i-lucide-dollar-sign"
-              variant="outline"
-            >
-              Transfer
-            </UButton> -->
+            <template v-if="!isCurrentAccount(address)">
+              <UButton
+                icon="mdi:swap-horizontal"
+                variant="outline"
+                @click="onClickSwaps"
+              >
+                {{ $t('general.swaps') }}
+              </UButton>
+
+              <NuxtLink :to="`/${currentChain}/transfer?target=${address}`">
+                <UButton
+                  icon="i-lucide-dollar-sign"
+                  variant="outline"
+                >
+                  {{ $t('general.transfer') }}
+                </UButton>
+              </NuxtLink>
+            </template>
 
             <ProfileShareDropdown />
           </div>
@@ -237,7 +269,10 @@ function onTotalCountChange(slot: string, totalCount: number) {
         <ProfileActivity :address="address" @total-count-change="onTotalCountChange('activity', $event)" />
       </template>
       <template #offers>
-        <ProfileTrades :address="address" @total-count-change="onTotalCountChange('offers', $event)" />
+        <ProfileTrades :address="address" :type="TradeTypes.Offer" />
+      </template>
+      <template #swaps>
+        <ProfileTrades :address="address" :type="TradeTypes.Swap" />
       </template>
     </UTabs>
   </div>

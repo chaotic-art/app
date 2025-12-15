@@ -19,22 +19,27 @@ const {
   isEstimatingFee,
   handleCollectionOperation,
   balance,
+  isFetchingBalance,
 } = useCollectionForm()
 
+const { $i18n } = useNuxtApp()
+
 // Computed properties for cleaner logic
-const hasInsufficientFunds = computed(() => {
-  return balance.estimatedFee !== 0n
-    && balance.userBalance !== 0n
-    && balance.userBalance < balance.estimatedFee
-})
+const isLoading = computed(() => isEstimatingFee.value || isFetchingBalance.value)
+const hasInsufficientFunds = computed(() => balance.total !== 0n && balance.userBalance < balance.total)
+const isReady = computed(() => balance.total !== 0n && !isLoading.value && !hasInsufficientFunds.value)
 
 const isSubmitDisabled = computed(() => {
-  return !isWalletConnected.value || hasInsufficientFunds.value || isEstimatingFee.value
+  return !isWalletConnected.value || hasInsufficientFunds.value || isLoading.value
 })
 
 const submitButtonText = computed(() => {
   if (!isWalletConnected.value)
     return 'Connect Wallet to Create Collection'
+  if (isFetchingBalance.value)
+    return $i18n.t('balance.checking')
+  if (isEstimatingFee.value)
+    return 'Calculating...'
   if (hasInsufficientFunds.value)
     return 'Insufficient Funds'
   return 'Create Collection'
@@ -42,7 +47,7 @@ const submitButtonText = computed(() => {
 
 // Auto-estimate fees when form data changes (debounced to prevent excessive API calls)
 watchDebounced(
-  [isWalletConnected, logoFile, () => state.name, () => state.description, () => state.royalties, () => state.maxNfts, () => state.maxNftsNumber],
+  [isWalletConnected, logoFile, () => state.name, () => state.description, () => state.royalties, () => state.maxNfts, () => state.maxNftsNumber, () => state.blockchain],
   ([connected, file, name, description, _royalties, _maxNfts, _maxNftsNumber]) => {
     if (connected && file && name && description) {
       handleCollectionOperation(state, 'estimate')
@@ -246,30 +251,31 @@ watchDebounced(
           <!-- Simple Fee & Balance -->
           <div class="flex items-center justify-between text-sm">
             <div class="flex flex-col font-mono">
-              <span class="text-gray-600 dark:text-gray-400 flex">
-                <span class="w-18">Fee:</span>
-                <span v-if="isEstimatingFee" class="text-gray-500">Calculating...</span>
-                <span v-else-if="balance.estimatedFee !== 0n" class="font-medium text-gray-900 dark:text-white">
-                  {{ balance.estimatedFeeFormatted }}
+              <span class="text-gray-600 dark:text-gray-400 flex gap-2">
+                <span class="w-22">Est. Cost:</span>
+                <USkeleton v-if="isEstimatingFee" class="w-22 h-4" />
+                <span v-else-if="balance.total !== 0n" class="font-medium text-gray-900 dark:text-white">
+                  {{ balance.totalFormatted }}
                 </span>
                 <span v-else class="text-gray-600 dark:text-gray-400">
                   ---
                 </span>
               </span>
 
-              <span class="text-gray-600 dark:text-gray-400 flex">
-                <span class="w-18">Balance:</span>
-                <span class="font-medium text-gray-900 dark:text-white">
+              <span class="text-gray-600 dark:text-gray-400 flex gap-2">
+                <span class="w-22">Balance:</span>
+                <USkeleton v-if="isFetchingBalance" class="w-22 h-4" />
+                <span v-else class="font-medium text-gray-900 dark:text-white">
                   {{ balance.userBalanceFormatted }}
                 </span>
               </span>
             </div>
 
-            <div v-if="hasInsufficientFunds" class="flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
+            <div v-if="hasInsufficientFunds && !isLoading" class="flex items-center gap-1 text-yellow-600 dark:text-yellow-400">
               <UIcon name="i-heroicons-exclamation-triangle" class="w-4 h-4" />
               <span class="text-xs font-medium">Insufficient</span>
             </div>
-            <div v-else-if="balance.estimatedFee !== 0n && balance.userBalance !== 0n" class="flex items-center gap-1 text-green-600 dark:text-green-400">
+            <div v-else-if="isReady" class="flex items-center gap-1 text-green-600 dark:text-green-400">
               <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
               <span class="text-xs font-medium">Ready</span>
             </div>

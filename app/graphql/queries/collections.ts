@@ -71,3 +71,19 @@ export const collectionIdList = graphql(`
 `)
 
 export type CollectionIdListData = ResultOf<typeof collectionIdList>
+
+export const nftAttributesListByCollection = graphql(`
+  query nftAttributesListByCollection($id: String!) {
+    nfts: nftEntities(where: {collection: {id_eq: $id}, burned_eq: false }) {
+      id
+      meta {
+        attributes {
+          trait
+          value
+        }
+      }
+    }
+  }
+`)
+
+export type NftAttributesListByCollectionData = ResultOf<typeof nftAttributesListByCollection>

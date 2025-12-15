@@ -6,6 +6,7 @@ import type {
 } from '@/utils/wallet/substrate/types'
 import { defineStore } from 'pinia'
 import { connectInjectedExtension } from 'polkadot-api/pjs-signer'
+import { isValidAddress } from '@/utils/format/address'
 import { isExtensionInstalled } from '@/utils/wallet/substrate'
 import { getAvailableWallets } from '@/utils/wallet/substrate/config'
 
@@ -70,6 +71,10 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     return Boolean(wallets.value.find(w => w.id === walletId)?.extension)
   }
 
+  function filterAccounts(accounts: InjectedPolkadotAccount[]): InjectedPolkadotAccount[] {
+    return accounts.filter(account => isValidAddress(account.address))
+  }
+
   function subscribeAccounts(walletId: string) {
     const wallet = wallets.value.find(w => w.id === walletId)
 
@@ -86,7 +91,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
     wallet.unsub?.()
 
     const unsub = extension.subscribe((accounts) => {
-      wallet.accounts = formatAccounts(wallet.source, accounts)
+      wallet.accounts = formatAccounts(wallet.source, filterAccounts(accounts))
     })
 
     wallet.unsub = unsub
@@ -112,10 +117,9 @@ export const useSubWalletStore = defineStore('subWallet', () => {
 
       const rawExtension = await connectInjectedExtension(walletSource, DAPP_NAME)
 
-      const accounts = rawExtension.getAccounts()
-      const walletAccounts = formatAccounts(wallet.source, accounts)
+      const accounts = formatAccounts(wallet.source, filterAccounts(rawExtension.getAccounts()))
 
-      wallet.accounts = walletAccounts
+      wallet.accounts = accounts
       wallet.enabled = true
       wallet.extension = rawExtension
       error.value = null
@@ -160,7 +164,7 @@ export const useSubWalletStore = defineStore('subWallet', () => {
 
   async function getSigner(source: SubstrateWalletSource, address: string) {
     const selectedExtension = await connectInjectedExtension(source)
-    const account = selectedExtension.getAccounts().find(account => account.address === address)
+    const account = filterAccounts(selectedExtension.getAccounts()).find(account => account.address === address)
 
     return account?.polkadotSigner
   }

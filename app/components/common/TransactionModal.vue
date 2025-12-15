@@ -68,6 +68,21 @@ const resolvedStatus = computed(() => {
         :status="resolvedStatus"
       />
 
+      <!-- Collection destroy success preview -->
+      <div v-else-if="isSuccess && result?.type === 'collection_destroy'" class="text-center space-y-4">
+        <div class="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
+          <UIcon name="i-heroicons-check" class="text-3xl text-green-600 dark:text-green-400" />
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            Collection Destroyed Successfully
+          </h4>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            The collection has been permanently destroyed
+          </p>
+        </div>
+      </div>
+
       <!-- Error State -->
       <div v-else-if="error" class="text-center space-y-4">
         <div class="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto">

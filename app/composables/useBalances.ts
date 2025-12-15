@@ -35,7 +35,7 @@ export default function () {
   // }
 
   const getBalance = async ({ address, prefix }: GetBalanceParams): Promise<GetBalanceResult> => {
-    if (prefix === 'ahp' || prefix === 'ahk' || prefix === 'dot' || prefix === 'ksm') {
+    if (prefix === 'ahp' || prefix === 'ahk' || prefix === 'dot' || prefix === 'ksm' || prefix === 'ahpas') {
       return getSubstrateBalance({ address, prefix })
     }
 
