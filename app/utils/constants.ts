@@ -14,7 +14,7 @@ export const URLS = {
     price: 'https://price.chaotic.art',
     genart: 'https://genart.chaotic.art',
     profile: 'https://profile.chaotic.art',
-    bucket: 'https://bucket.chaotic.art',
+    bucket: 'https://bucket.chaotic.art/',
     dyndata: 'https://dyndata.chaotic.art',
     oda: 'https://oda.chaotic.art',
     playground: 'https://playground.chaotic.art',
