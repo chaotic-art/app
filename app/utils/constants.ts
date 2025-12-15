@@ -21,9 +21,7 @@ export const URLS = {
     playground: 'https://playground.chaotic.art',
     playground_bucket: 'https://playground-bucket.chaotic.art',
     cors_proxy: 'https://cors-proxy.chaotic.art',
-
-    // TODO: migrate to chaotic
-    nftStorage: 'https://ipos.kodadot.workers.dev/',
+    nftStorage: 'https://ipos.chaotic.art',
   },
   graphql: {
     ahk: 'https://ahk.gql.api.kodadot.xyz/',
