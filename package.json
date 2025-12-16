@@ -30,7 +30,7 @@
     "@nuxt/ui": "^4.1.0",
     "@nuxtjs/i18n": "^10.1.2",
     "@nuxtjs/seo": "3.2.2",
-    "@paraport/vue": "0.1.10",
+    "@paraport/vue": "0.2.1",
     "@pinia/nuxt": "0.11.1",
     "@polkadot/util-crypto": "^13.5.7",
     "@reown/appkit": "^1.8.12",
