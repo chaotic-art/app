@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatCompactNumber } from '~/utils/format/balance'
+
 const props = defineProps<{
   min: number
   max: number
@@ -31,16 +33,6 @@ const priceTabs = computed(() => [
 
 const formattedMin = computed(() => formatCompactNumber(props.min))
 const formattedMax = computed(() => formatCompactNumber(props.max))
-
-function formatCompactNumber(value: number): string {
-  if (value >= 1_000_000) {
-    return `${(value / 1_000_000).toFixed(value % 1_000_000 === 0 ? 0 : 1)}M`
-  }
-  if (value >= 1_000) {
-    return `${(value / 1_000).toFixed(value % 1_000 === 0 ? 0 : 1)}K`
-  }
-  return value.toString()
-}
 
 function selectLastSale(value: string) {
   lastSale.value = lastSale.value === value ? '' : value
