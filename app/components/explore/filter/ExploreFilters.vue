@@ -186,7 +186,11 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
 
     <div class="flex gap-6">
       <!-- Desktop -->
-      <CollapsibleSidebar v-if="!isMobile" v-model="sidebarCollapsed">
+      <CollapsibleSidebar
+        v-if="!isMobile"
+        v-model="sidebarCollapsed"
+        sticky
+      >
         <div class="p-3 border-b border-border">
           <FilterHeader>
             <template #actions>
@@ -201,7 +205,7 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
           </FilterHeader>
         </div>
 
-        <div class="p-3">
+        <div class="p-3 overflow-y-auto max-h-[calc(100vh-300px)]">
           <FilterContent
             v-model:price-by="priceBy"
             v-model:price-range="priceRange"
