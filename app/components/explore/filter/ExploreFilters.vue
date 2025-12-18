@@ -1,37 +1,44 @@
 <script setup lang="ts">
-import { whenever } from '@vueuse/core'
+import { useWindowSize, whenever } from '@vueuse/core'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
-
-const lastSaleItems = [
-  { label: '24h', value: '24h' },
-  { label: '7d', value: '7d' },
-  { label: '30d', value: '30d' },
-  { label: 'All', value: 'all' },
-] as const
 
 type PriceBy = 'token' | 'usd'
 
+const REASONABLE_MAX_CAP = 100_000
+
 const route = useRoute()
 const router = useRouter()
-const { chainSymbol, decimals } = useChain()
+const { chainSymbol, decimals: tokenDecimals } = useChain()
 const { getCurrentTokenValue } = useFiatStore()
+const { width } = useWindowSize()
 
-const sidebarCollapsed = ref(false)
+const isModalOpen = defineModel('modalOpen', { type: Boolean, default: false })
+
 const priceBy = ref<PriceBy>((route.query.price_by as PriceBy) || 'token')
 const min = ref(0)
-const max = ref(100)
+const max = ref(REASONABLE_MAX_CAP)
 const priceRange = ref([min.value, max.value])
 const belowFloor = ref(route.query.below_floor === 'true')
 const lastSale = ref((route.query.last_sale as string) || '')
+const sidebarCollapsed = ref(false)
 
-const tokenDecimals = computed(() => decimals.value ?? 10)
+const isMobile = computed(() => width.value < 768)
 const tokenPrice = computed(() => Number(getCurrentTokenValue(chainSymbol.value as Token)) || 0)
 const loading = computed(() => tokenPrice.value === 0)
 
-const priceTabs = computed(() => [
-  { label: chainSymbol.value, value: 'token' },
-  { label: 'USD', value: 'usd' },
-])
+const activeFiltersCount = computed(() => {
+  let count = 0
+  if (priceRange.value[0] !== min.value || priceRange.value[1] !== max.value) {
+    count++
+  }
+  if (belowFloor.value) {
+    count++
+  }
+  if (lastSale.value) {
+    count++
+  }
+  return count
+})
 
 function updateQueryParams() {
   const minNative = priceBy.value === 'usd'
@@ -58,16 +65,17 @@ function applyFilters() {
   updateQueryParams()
 }
 
+function handleApplyFilters() {
+  isModalOpen.value = false
+  updateQueryParams()
+}
+
 function clearFilters() {
   priceBy.value = 'token'
   priceRange.value = [min.value, max.value]
   belowFloor.value = false
   lastSale.value = ''
   updateQueryParams()
-}
-
-function selectLastSale(value: string) {
-  lastSale.value = lastSale.value === value ? '' : value
 }
 
 whenever(() => Boolean(tokenPrice.value), () => {
@@ -87,95 +95,159 @@ whenever(() => Boolean(tokenPrice.value), () => {
       : tokenAmount
   }
 }, { once: true, immediate: true })
+
+watch(priceBy, (newPriceBy, oldPriceBy) => {
+  if (!tokenPrice.value || newPriceBy === oldPriceBy) {
+    return
+  }
+
+  const currentMin = priceRange.value[0]
+  const currentMax = priceRange.value[1]
+
+  if (typeof currentMin !== 'number' || typeof currentMax !== 'number') {
+    return
+  }
+
+  if (newPriceBy === 'usd') {
+    // Converting from token to USD
+    priceRange.value = [
+      calculateUsdFromToken(currentMin, tokenPrice.value),
+      calculateUsdFromToken(currentMax, tokenPrice.value),
+    ]
+    min.value = calculateUsdFromToken(0, tokenPrice.value)
+    max.value = calculateUsdFromToken(REASONABLE_MAX_CAP, tokenPrice.value)
+  }
+  else {
+    // Converting from USD to token
+    priceRange.value = [
+      calculateTokenFromUsd(currentMin, tokenPrice.value),
+      calculateTokenFromUsd(currentMax, tokenPrice.value),
+    ]
+    min.value = 0
+    max.value = REASONABLE_MAX_CAP
+  }
+})
 </script>
 
 <template>
-  <div class="flex gap-6">
-    <CollapsibleSidebar v-model="sidebarCollapsed">
-      <template #header>
-        <div class="flex items-center justify-between p-3 border-b border-border">
-          <div class="flex items-center gap-2">
-            <UIcon name="i-heroicons-funnel" class="text-lg text-muted-foreground" />
-            <span class="font-semibold text-foreground">{{ $t('explore.filters') }}</span>
-          </div>
-        </div>
-      </template>
+  <div class="flex flex-col gap-4">
+    <template v-if="isMobile">
+      <UButton
+        class="w-full"
+        variant="outline"
+        size="lg"
+        @click="isModalOpen = true"
+      >
+        <template #leading>
+          <UIcon name="i-heroicons-funnel" class="text-lg" />
+        </template>
+        {{ $t('explore.filters') }}
+        <template v-if="activeFiltersCount > 0" #trailing>
+          <UBadge :label="String(activeFiltersCount)" size="xs" />
+        </template>
+      </UButton>
 
-      <div class="text-muted-foreground text-sm">
-        <div class="flex flex-col">
-          <PriceRangeSkeleton v-if="loading" />
-
-          <template v-else>
-            <div class="flex justify-between items-center mb-4">
-              <span>{{ $t('explore.price') }}</span>
-              <UTabs v-model="priceBy" :items="priceTabs" size="sm" />
-            </div>
-
-            <div class="flex flex-col gap-2 mb-4">
-              <USlider v-model="priceRange" :min="min" :max="max" />
-              <div class="flex justify-between">
-                <span>{{ min }}</span>
-                <span>{{ max }}</span>
-              </div>
-            </div>
-
-            <div class="flex gap-2">
-              <UInput v-model.number="priceRange[0]" :ui="{ base: 'pl-12' }" type="number">
-                <template #leading>
-                  <span>{{ $t('explore.min') }}</span>
-                </template>
-              </UInput>
-
-              <UInput v-model.number="priceRange[1]" :ui="{ base: 'pl-12' }" type="number">
-                <template #leading>
-                  <span>{{ $t('explore.max') }}</span>
-                </template>
-              </UInput>
-            </div>
-          </template>
-
-          <USeparator class="my-4" />
-
-          <div class="flex justify-between items-center">
-            <span>{{ $t('explore.belowFloorPrice') }}</span>
-            <USwitch v-model="belowFloor" />
-          </div>
-
-          <USeparator class="my-4" />
-
-          <!-- Last Sale -->
-          <div class="flex flex-col gap-2">
-            <span>{{ $t('explore.lastSale') }}</span>
-            <div class="flex gap-2">
+      <!-- Mobile -->
+      <USlideover v-model:open="isModalOpen" side="left">
+        <template #header>
+          <FilterHeader class="flex-1">
+            <template #actions>
               <UButton
-                v-for="item in lastSaleItems"
-                :key="item.value"
+                variant="ghost"
+                icon="i-heroicons-x-mark"
                 size="sm"
-                class="flex-1"
-                :variant="lastSale === item.value ? 'solid' : 'outline'"
-                @click="selectLastSale(item.value)"
-              >
-                {{ item.label }}
-              </UButton>
-            </div>
-          </div>
+                @click="isModalOpen = false"
+              />
+            </template>
+          </FilterHeader>
+        </template>
 
-          <USeparator class="my-4" />
+        <template #body>
+          <FilterContent
+            v-model:price-by="priceBy"
+            v-model:price-range="priceRange"
+            v-model:below-floor="belowFloor"
+            v-model:last-sale="lastSale"
+            :min="min"
+            :max="max"
+            :loading="loading"
+          />
+        </template>
 
-          <div class="flex flex-col gap-2">
-            <UButton class="w-full" @click="applyFilters">
-              {{ $t('explore.applyFilters') }}
-            </UButton>
-            <UButton class="w-full" variant="link" @click="clearFilters">
-              {{ $t('explore.clearAll') }}
-            </UButton>
-          </div>
+        <template #footer>
+          <FilterFooter
+            class="flex-1"
+            @apply="handleApplyFilters"
+            @clear="clearFilters"
+          />
+        </template>
+      </USlideover>
+    </template>
+
+    <div class="flex gap-6">
+      <!-- Desktop -->
+      <CollapsibleSidebar v-if="!isMobile" v-model="sidebarCollapsed">
+        <div class="p-3 border-b border-border">
+          <FilterHeader>
+            <template #actions>
+              <UButton
+                v-tooltip="$t('explore.hideFilters')"
+                variant="ghost"
+                icon="i-heroicons-chevron-left"
+                size="sm"
+                @click="sidebarCollapsed = true"
+              />
+            </template>
+          </FilterHeader>
         </div>
-      </div>
-    </CollapsibleSidebar>
 
-    <div class="flex-1 min-w-0">
-      <slot />
+        <div class="p-3">
+          <FilterContent
+            v-model:price-by="priceBy"
+            v-model:price-range="priceRange"
+            v-model:below-floor="belowFloor"
+            v-model:last-sale="lastSale"
+            :min="min"
+            :max="max"
+            :loading="loading"
+          />
+        </div>
+
+        <div class="p-3 border-t border-border">
+          <FilterFooter
+            @apply="applyFilters"
+            @clear="clearFilters"
+          />
+        </div>
+      </CollapsibleSidebar>
+
+      <div class="flex-1 min-w-0">
+        <slot />
+      </div>
     </div>
+
+    <!-- Floating expand button when desktop sidebar is collapsed -->
+    <Transition
+      enter-active-class="transition-all duration-300 ease-out"
+      enter-from-class="opacity-0 -translate-x-4 scale-95"
+      enter-to-class="opacity-100 translate-x-0 scale-100"
+      leave-active-class="transition-all duration-200 ease-in"
+      leave-from-class="opacity-100 translate-x-0 scale-100"
+      leave-to-class="opacity-0 -translate-x-4 scale-95"
+    >
+      <UButton
+        v-if="!isMobile && sidebarCollapsed"
+        v-tooltip="$t('explore.showFilters')"
+        icon="i-heroicons-chevron-right"
+        color="neutral"
+        variant="solid"
+        size="sm"
+        class="fixed left-6 top-72 z-50 w-10! h-10 rounded-full! shadow-md hover:shadow-lg transition-shadow duration-200 md:left-8"
+        aria-label="Show filters"
+        @click="sidebarCollapsed = false"
+      >
+        <UBadge v-if="activeFiltersCount > 0" :label="String(activeFiltersCount)" size="xs" class="absolute -top-1 -right-1" />
+      </UButton>
+    </Transition>
   </div>
 </template>

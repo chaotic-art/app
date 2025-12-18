@@ -459,6 +459,8 @@
     "belowFloorPrice": "Below Floor Price",
     "lastSale": "Last Sale",
     "applyFilters": "Apply Filters",
-    "clearAll": "Clear All"
+    "clearAll": "Clear All",
+    "hideFilters": "Hide Filters",
+    "showFilters": "Show Filters"
   }
 }

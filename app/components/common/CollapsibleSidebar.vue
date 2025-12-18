@@ -19,9 +19,7 @@ const isCollapsed = defineModel({ type: Boolean })
       minWidth: isCollapsed ? collapsedWidth : expandedWidth,
     }"
   >
-    <slot name="header" />
-
-    <div v-show="!isCollapsed" class="p-3">
+    <div v-show="!isCollapsed">
       <slot />
     </div>
   </aside>
