@@ -36,59 +36,9 @@ const mergedQueryVariables = computed(() => {
     }
   }
 
-  const minPrice = route.query.min_price as string | undefined
-  const maxPrice = route.query.max_price as string | undefined
+  const nftFilters = buildNftSearchFilters()
 
-  if (minPrice) {
-    searchFilters.push({ price_gte: minPrice })
-  }
-  if (maxPrice) {
-    searchFilters.push({ price_lte: maxPrice })
-  }
-
-  const belowFloor = route.query.below_floor === 'true'
-  if (belowFloor) {
-    // TODO: floor price filter needs indexer change
-  }
-
-  const lastSale = route.query.last_sale as string | undefined
-  if (lastSale && lastSale !== '') {
-    if (lastSale === 'all') {
-      searchFilters.push({
-        events_some: {
-          interaction_eq: 'BUY',
-        },
-      })
-    }
-    else {
-      const now = new Date()
-      let hoursAgo = 0
-
-      switch (lastSale) {
-        case '24h':
-          hoursAgo = 24
-          break
-        case '7d':
-          hoursAgo = 24 * 7
-          break
-        case '30d':
-          hoursAgo = 24 * 30
-          break
-      }
-
-      if (hoursAgo > 0) {
-        const filterDate = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000)
-        searchFilters.push({
-          events_some: {
-            AND: [
-              { interaction_eq: 'BUY' },
-              { timestamp_gte: filterDate.toISOString() },
-            ],
-          },
-        })
-      }
-    }
-  }
+  searchFilters.push(...nftFilters)
 
   if (searchFilters.length > 0) {
     filters.search = searchFilters

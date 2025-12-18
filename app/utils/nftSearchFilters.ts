@@ -1,0 +1,55 @@
+export function buildNftSearchFilters(): Record<string, any>[] {
+  const route = useRoute()
+  const searchFilters: Record<string, any>[] = []
+
+  const minPrice = route.query.min_price as string | undefined
+  const maxPrice = route.query.max_price as string | undefined
+
+  if (minPrice) {
+    searchFilters.push({ price_gte: minPrice })
+  }
+  if (maxPrice) {
+    searchFilters.push({ price_lte: maxPrice })
+  }
+
+  const lastSaleValue = route.query.last_sale as string | undefined
+  if (lastSaleValue && lastSaleValue !== '') {
+    if (lastSaleValue === 'all') {
+      searchFilters.push({
+        events_some: {
+          interaction_eq: 'BUY',
+        },
+      })
+    }
+    else {
+      const now = new Date()
+      let hoursAgo = 0
+
+      switch (lastSaleValue) {
+        case '24h':
+          hoursAgo = 24
+          break
+        case '7d':
+          hoursAgo = 24 * 7
+          break
+        case '30d':
+          hoursAgo = 24 * 30
+          break
+      }
+
+      if (hoursAgo > 0) {
+        const filterDate = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000)
+        searchFilters.push({
+          events_some: {
+            AND: [
+              { interaction_eq: 'BUY' },
+              { timestamp_gte: filterDate.toISOString() },
+            ],
+          },
+        })
+      }
+    }
+  }
+
+  return searchFilters
+}

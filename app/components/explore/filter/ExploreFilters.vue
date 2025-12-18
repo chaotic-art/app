@@ -131,99 +131,103 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
 
 <template>
   <div class="flex flex-col gap-4">
-    <template v-if="isMobile">
-      <UButton
-        class="w-full"
-        variant="outline"
-        size="lg"
-        @click="isModalOpen = true"
-      >
-        <template #leading>
-          <UIcon name="i-heroicons-funnel" class="text-lg" />
-        </template>
-        {{ $t('explore.filters') }}
-        <template v-if="activeFiltersCount > 0" #trailing>
-          <UBadge :label="String(activeFiltersCount)" size="xs" />
-        </template>
-      </UButton>
+    <ClientOnly>
+      <template v-if="isMobile">
+        <UButton
+          class="w-full"
+          variant="outline"
+          size="lg"
+          @click="isModalOpen = true"
+        >
+          <template #leading>
+            <UIcon name="i-heroicons-funnel" class="text-lg" />
+          </template>
+          {{ $t('explore.filters') }}
+          <template v-if="activeFiltersCount > 0" #trailing>
+            <UBadge :label="String(activeFiltersCount)" size="xs" />
+          </template>
+        </UButton>
 
-      <!-- Mobile -->
-      <USlideover v-model:open="isModalOpen" side="left">
-        <template #header>
-          <FilterHeader class="flex-1">
-            <template #actions>
-              <UButton
-                variant="ghost"
-                icon="i-heroicons-x-mark"
-                size="sm"
-                @click="isModalOpen = false"
-              />
-            </template>
-          </FilterHeader>
-        </template>
+        <!-- Mobile -->
+        <USlideover v-model:open="isModalOpen" side="left">
+          <template #header>
+            <FilterHeader class="flex-1">
+              <template #actions>
+                <UButton
+                  variant="ghost"
+                  icon="i-heroicons-x-mark"
+                  size="sm"
+                  @click="isModalOpen = false"
+                />
+              </template>
+            </FilterHeader>
+          </template>
 
-        <template #body>
-          <FilterContent
-            v-model:price-by="priceBy"
-            v-model:price-range="priceRange"
-            v-model:below-floor="belowFloor"
-            v-model:last-sale="lastSale"
-            :min="min"
-            :max="max"
-            :loading="loading"
-          />
-        </template>
+          <template #body>
+            <FilterContent
+              v-model:price-by="priceBy"
+              v-model:price-range="priceRange"
+              v-model:below-floor="belowFloor"
+              v-model:last-sale="lastSale"
+              :min="min"
+              :max="max"
+              :loading="loading"
+            />
+          </template>
 
-        <template #footer>
-          <FilterFooter
-            class="flex-1"
-            @apply="handleApplyFilters"
-            @clear="clearFilters"
-          />
-        </template>
-      </USlideover>
-    </template>
+          <template #footer>
+            <FilterFooter
+              class="flex-1"
+              @apply="handleApplyFilters"
+              @clear="clearFilters"
+            />
+          </template>
+        </USlideover>
+      </template>
+    </ClientOnly>
 
     <div class="flex gap-6">
       <!-- Desktop -->
-      <CollapsibleSidebar
-        v-if="!isMobile"
-        v-model="sidebarCollapsed"
-        sticky
-      >
-        <div class="p-3 border-b border-border">
-          <FilterHeader>
-            <template #actions>
-              <UButton
-                v-tooltip="$t('explore.hideFilters')"
-                variant="ghost"
-                icon="i-heroicons-chevron-left"
-                size="sm"
-                @click="sidebarCollapsed = true"
-              />
-            </template>
-          </FilterHeader>
-        </div>
+      <ClientOnly>
+        <CollapsibleSidebar
+          v-if="!isMobile"
+          v-model="sidebarCollapsed"
+          sticky
+        >
+          <div class="p-3 border-b border-border">
+            <FilterHeader>
+              <template #actions>
+                <UButton
+                  v-tooltip="$t('explore.hideFilters')"
+                  variant="ghost"
+                  icon="i-heroicons-chevron-left"
+                  size="sm"
+                  @click="sidebarCollapsed = true"
+                />
+              </template>
+            </FilterHeader>
+          </div>
 
-        <div class="p-3 overflow-y-auto max-h-[calc(100vh-300px)]">
-          <FilterContent
-            v-model:price-by="priceBy"
-            v-model:price-range="priceRange"
-            v-model:below-floor="belowFloor"
-            v-model:last-sale="lastSale"
-            :min="min"
-            :max="max"
-            :loading="loading"
-          />
-        </div>
+          <div class="p-3 overflow-y-auto max-h-[calc(100vh-300px)]">
+            <FilterContent
+              v-model:price-by="priceBy"
+              v-model:price-range="priceRange"
+              v-model:below-floor="belowFloor"
+              v-model:last-sale="lastSale"
+              :min="min"
+              :max="max"
+              :loading="loading"
+            />
+          </div>
 
-        <div class="p-3 border-t border-border">
-          <FilterFooter
-            @apply="applyFilters"
-            @clear="clearFilters"
-          />
-        </div>
-      </CollapsibleSidebar>
+          <div class="p-3 border-t border-border">
+            <FilterFooter
+              @apply="applyFilters"
+              @clear="clearFilters"
+            />
+          </div>
+        </CollapsibleSidebar>
+      </ClientOnly>
 
       <div class="flex-1 min-w-0">
         <slot />
@@ -231,27 +235,29 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
     </div>
 
     <!-- Floating expand button when desktop sidebar is collapsed -->
-    <Transition
-      enter-active-class="transition-all duration-300 ease-out"
-      enter-from-class="opacity-0 -translate-x-4 scale-95"
-      enter-to-class="opacity-100 translate-x-0 scale-100"
-      leave-active-class="transition-all duration-200 ease-in"
-      leave-from-class="opacity-100 translate-x-0 scale-100"
-      leave-to-class="opacity-0 -translate-x-4 scale-95"
-    >
-      <UButton
-        v-if="!isMobile && sidebarCollapsed"
-        v-tooltip="$t('explore.showFilters')"
-        icon="i-heroicons-chevron-right"
-        color="neutral"
-        variant="solid"
-        size="sm"
-        class="fixed left-6 top-72 z-50 w-10! h-10 rounded-full! shadow-md hover:shadow-lg transition-shadow duration-200 md:left-8"
-        aria-label="Show filters"
-        @click="sidebarCollapsed = false"
+    <ClientOnly>
+      <Transition
+        enter-active-class="transition-all duration-300 ease-out"
+        enter-from-class="opacity-0 -translate-x-4 scale-95"
+        enter-to-class="opacity-100 translate-x-0 scale-100"
+        leave-active-class="transition-all duration-200 ease-in"
+        leave-from-class="opacity-100 translate-x-0 scale-100"
+        leave-to-class="opacity-0 -translate-x-4 scale-95"
       >
-        <UBadge v-if="activeFiltersCount > 0" :label="String(activeFiltersCount)" size="xs" class="absolute -top-1 -right-1" />
-      </UButton>
-    </Transition>
+        <UButton
+          v-if="!isMobile && sidebarCollapsed"
+          v-tooltip="$t('explore.showFilters')"
+          icon="i-heroicons-chevron-right"
+          color="neutral"
+          variant="solid"
+          size="sm"
+          class="fixed left-6 top-72 z-50 w-10! h-10 rounded-full! shadow-md hover:shadow-lg transition-shadow duration-200 md:left-8"
+          aria-label="Show filters"
+          @click="sidebarCollapsed = false"
+        >
+          <UBadge v-if="activeFiltersCount > 0" :label="String(activeFiltersCount)" size="xs" class="absolute -top-1 -right-1" />
+        </UButton>
+      </Transition>
+    </ClientOnly>
   </div>
 </template>
