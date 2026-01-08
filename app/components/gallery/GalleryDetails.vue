@@ -138,7 +138,7 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
           class="font-medium transition-colors flex items-center gap-2 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500"
         >
           <!-- Collection Image -->
-          <div class="w-6 h-6 rounded-full overflow-hidden bg-muted flex-shrink-0">
+          <div class="size-6 rounded-full overflow-hidden bg-muted flex shrink-0 items-center">
             <img
               v-if="collection.metadata?.image"
               :src="sanitizeIpfsUrl(collection.metadata.image)"
@@ -148,7 +148,7 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
             <UIcon
               v-else
               name="i-heroicons-rectangle-stack"
-              class="w-4 h-4 text-muted-foreground m-0.5"
+              class="size-4 text-muted-foreground m-auto"
             />
           </div>
           {{ collection.metadata?.name || `Collection ${collectionId || ''}` }}
