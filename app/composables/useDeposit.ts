@@ -38,35 +38,82 @@ export default function (prefix: Ref<SupportedChain>) {
   const totalItemDeposit = ref(0)
 
   const chainSymbol = ref('')
+  const loading = ref(true)
 
-  watchEffect(async () => {
+  watchEffect((onInvalidate) => {
+    let cancelled = false
+    onInvalidate(() => {
+      cancelled = true
+    })
+
     if (import.meta.server) {
+      loading.value = false
       return
     }
 
-    if (isAssetHubChain(prefix.value)) {
-      const {
-        existentialDeposit: existentialDepositValue,
-        collectionDeposit: collectionDepositValue,
-        itemDeposit: itemDepositValue,
-        metadataDeposit: metadataDepositValue,
-        attributeDeposit: attributeDepositValue,
-      } = await getAssethubDeposit(prefix.value)
+    const chain = prefix.value
+    loading.value = true
 
-      existentialDeposit.value = Number(existentialDepositValue)
-      collectionDeposit.value = Number(collectionDepositValue)
-      itemDeposit.value = Number(itemDepositValue)
-      metadataDeposit.value = Number(metadataDepositValue)
-      attributeDeposit.value = Number(attributeDepositValue)
-    }
-    else {
-      const { $sdk } = useNuxtApp()
-      const api = $sdk(prefix.value).api
-      existentialDeposit.value = Number(await api.constants.Balances.ExistentialDeposit())
+    const updateTotals = () => {
+      totalCollectionDeposit.value = metadataDeposit.value + collectionDeposit.value + existentialDeposit.value
+      totalItemDeposit.value = metadataDeposit.value + itemDeposit.value + existentialDeposit.value
     }
 
-    totalCollectionDeposit.value = metadataDeposit.value + collectionDeposit.value + existentialDeposit.value
-    totalItemDeposit.value = metadataDeposit.value + itemDeposit.value + existentialDeposit.value
+    // Keep the effect synchronous; async work is fired separately with cancellation via onInvalidate.
+    const loadDeposits = async () => {
+      try {
+        if (isAssetHubChain(chain)) {
+          const {
+            existentialDeposit: existentialDepositValue,
+            collectionDeposit: collectionDepositValue,
+            itemDeposit: itemDepositValue,
+            metadataDeposit: metadataDepositValue,
+            attributeDeposit: attributeDepositValue,
+          } = await getAssethubDeposit(chain)
+
+          if (cancelled) {
+            return
+          }
+
+          existentialDeposit.value = Number(existentialDepositValue)
+          collectionDeposit.value = Number(collectionDepositValue)
+          itemDeposit.value = Number(itemDepositValue)
+          metadataDeposit.value = Number(metadataDepositValue)
+          attributeDeposit.value = Number(attributeDepositValue)
+        }
+        else {
+          const { $sdk } = useNuxtApp()
+          const api = $sdk(chain).api
+          const existential = Number(await api.constants.Balances.ExistentialDeposit())
+
+          if (cancelled) {
+            return
+          }
+
+          existentialDeposit.value = existential
+          collectionDeposit.value = 0
+          itemDeposit.value = 0
+          metadataDeposit.value = 0
+          attributeDeposit.value = 0
+        }
+
+        if (cancelled) {
+          return
+        }
+
+        updateTotals()
+      }
+      catch (error) {
+        console.error(error)
+      }
+      finally {
+        if (!cancelled) {
+          loading.value = false
+        }
+      }
+    }
+
+    void loadDeposits()
   })
 
   return {
@@ -78,5 +125,6 @@ export default function (prefix: Ref<SupportedChain>) {
     totalCollectionDeposit,
     totalItemDeposit,
     chainSymbol,
+    loading,
   }
 }
