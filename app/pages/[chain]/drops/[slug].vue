@@ -22,6 +22,7 @@ const { data: drop } = useLazyAsyncData(
       metadata: {
         title: collection.metadata?.name,
         description: collection.metadata?.description,
+        image: collection?.metadata?.image,
       },
     }
   },
@@ -30,7 +31,7 @@ const { data: drop } = useLazyAsyncData(
 useSeoMeta({
   title: () => drop.value?.metadata?.title,
   description: () => drop.value?.metadata?.description?.slice(0, 150),
-  ogImage: () => `https://ogi.koda.art/__og-image__/image/${params.chain}/drops/${params.slug}/og.png`, // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
+  ogImage: () => sanitizeIpfsUrl(drop.value?.metadata?.image || ''), // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
 })
 </script>
 

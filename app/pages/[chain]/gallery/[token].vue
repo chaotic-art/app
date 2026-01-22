@@ -50,7 +50,7 @@ const { data: item } = useLazyAsyncData(
 useSeoMeta({
   title: () => item.value?.metadata?.name,
   description: () => item.value?.metadata?.description?.slice(0, 150),
-  ogImage: () => `https://ogi.koda.art/__og-image__/image/${chainPrefix.value}/gallery/${collectionId}-${tokenId}/og.png`, // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
+  ogImage: () => sanitizeIpfsUrl(item.value?.metadata?.image || ''), // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
 })
 
 const tokenMetadata = computed(() => {
