@@ -22,7 +22,7 @@ const { data: drop } = useLazyAsyncData(
       metadata: {
         title: collection.metadata?.name,
         description: collection.metadata?.description,
-        image: collection?.metadata?.image,
+        image: sanitizeIpfsUrl(collection?.metadata?.image),
       },
     }
   },
@@ -37,8 +37,7 @@ defineOgImage({
   component: 'Drops',
   props: {
     title: drop.value?.metadata.title,
-    image: sanitizeIpfsUrl(drop.value?.metadata?.image),
-    items: drop.value?.count || '0',
+    image: drop.value?.metadata?.image,
   },
 })
 </script>
