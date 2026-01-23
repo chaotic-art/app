@@ -8,8 +8,8 @@ defineOptions({
 
 defineProps<{
   title: string
-  image: string
-  items: string
+  image?: string
+  items?: string
 }>()
 
 const cover: CSSProperties = {
@@ -19,12 +19,13 @@ const cover: CSSProperties = {
 </script>
 
 <template>
-  <img :src="image" :alt="title" :style="cover" class="h-full w-full">
+  <img v-if="image" :src="image" :alt="title" :style="cover" class="h-full w-full">
 
   <div
     class="flex flex-col justify-end h-full w-full bg-slate-900/85 text-white p-20 text-2xl font-bold absolute inset-0"
   >
     <img
+      v-if="image"
       :src="image"
       :alt="title"
       class="w-30 rounded-md border border-white"
@@ -32,7 +33,7 @@ const cover: CSSProperties = {
     <h1 class="mb-6 font-bold">
       {{ title }}
     </h1>
-    <div class="flex flex-row">
+    <div v-if="items" class="flex flex-row">
       <div>
         <div class="text-2xl font-bold m-0">
           {{ items }}
