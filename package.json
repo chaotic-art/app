@@ -74,7 +74,8 @@
     "eslint": "^9.38.0",
     "husky": "^9.1.7",
     "pino-pretty": "^13.1.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vue-tsc": "^3.2.3"
   },
   "pnpm": {
     "overrides": {
