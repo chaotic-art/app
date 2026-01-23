@@ -50,7 +50,16 @@ const { data: item } = useLazyAsyncData(
 useSeoMeta({
   title: () => item.value?.metadata?.name,
   description: () => item.value?.metadata?.description?.slice(0, 150),
-  ogImage: () => sanitizeIpfsUrl(item.value?.metadata?.image || ''), // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
+})
+
+defineOgImage({
+  component: 'Gallery',
+  props: {
+    title: item.value?.metadata.name,
+    image: sanitizeIpfsUrl(item.value?.metadata?.image),
+    price: item.value?.price,
+    network: chainPrefix.value,
+  },
 })
 
 const tokenMetadata = computed(() => {

@@ -31,7 +31,15 @@ const { data: drop } = useLazyAsyncData(
 useSeoMeta({
   title: () => drop.value?.metadata?.title,
   description: () => drop.value?.metadata?.description?.slice(0, 150),
-  ogImage: () => sanitizeIpfsUrl(drop.value?.metadata?.image || ''), // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
+})
+
+defineOgImage({
+  component: 'Drops',
+  props: {
+    title: drop.value?.metadata.title,
+    image: sanitizeIpfsUrl(drop.value?.metadata?.image),
+    items: drop.value?.count || '0',
+  },
 })
 </script>
 
