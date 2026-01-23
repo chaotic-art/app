@@ -10,34 +10,27 @@ onUnmounted(() => dropStore.reset())
 
 const { params } = useRoute()
 
-// for opengraph purposes only
-const { data: drop } = useLazyAsyncData(
-  `drop-${params.chain}-${params.slug}`,
-  async () => {
-    const drop = await $fetch('/api/genart/list', { query: { alias: params.slug?.toString() ?? '' } })
-    const collection = await fetchOdaCollection(params.chain?.toString() as AssetHubChain, drop.data[0]?.collection ?? '')
-
-    return {
-      ...drop,
-      metadata: {
-        title: collection.metadata?.name,
-        description: collection.metadata?.description,
-        image: sanitizeIpfsUrl(collection?.metadata?.image),
-      },
-    }
+const dropData = await $fetch('/api/genart/list', { query: { alias: params.slug?.toString() ?? '' } })
+const collectionData = await fetchOdaCollection(params.chain?.toString() as AssetHubChain, dropData?.data[0]?.collection ?? '')
+const drop = {
+  ...dropData,
+  metadata: {
+    title: collectionData.metadata?.name,
+    description: collectionData.metadata?.description,
+    image: sanitizeIpfsUrl(collectionData?.metadata?.image),
   },
-)
-
+}
 useSeoMeta({
-  title: () => drop.value?.metadata?.title,
-  description: () => drop.value?.metadata?.description?.slice(0, 150),
+  title: () => drop.metadata?.title,
+  description: () => drop.metadata?.description?.slice(0, 150),
 })
 
 defineOgImage({
   component: 'Drops',
   props: {
-    title: drop.value?.metadata.title,
-    image: drop.value?.metadata?.image,
+    title: drop.metadata.title,
+    image: drop.metadata?.image,
+    items: collectionData.claimed,
   },
 })
 </script>
