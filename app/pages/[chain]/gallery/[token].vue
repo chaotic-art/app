@@ -57,7 +57,7 @@ const tokenMetadata = computed(() => {
     return item
   }
 
-  return tokenData
+  return tokenData.value
 })
 </script>
 
