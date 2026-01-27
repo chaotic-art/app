@@ -8,6 +8,8 @@ const { data: dropItems } = useFetch('/api/genart/list', {
 
 const allArtists = computed(() => [...new Set(dropItems.value?.data.map(drop => drop.creator).filter(Boolean))])
 const randomSixArtist = computed(() => allArtists.value?.slice().sort(() => Math.random() - 0.5).slice(0, 6))
+
+const { currentChain } = useChain()
 </script>
 
 <template>
@@ -18,9 +20,10 @@ const randomSixArtist = computed(() => allArtists.value?.slice().sort(() => Math
       </div>
       <ClientOnly>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
-          <div
+          <NuxtLink
             v-for="artist in randomSixArtist"
             :key="artist"
+            :to="`/${currentChain}/u/${artist}`"
             class="flex items-center justify-between rounded-xl px-4 py-3 md:px-6 md:py-4 border border-border hover-card-effect bg-card"
           >
             <UserInfo :address="artist" :avatar-size="56" :custom-name="true" :transparent-background="true" class="md:hidden">
@@ -37,8 +40,8 @@ const randomSixArtist = computed(() => allArtists.value?.slice().sort(() => Math
                 </span>
               </template>
             </UserInfo>
-            <FollowButton :target="artist!" class="text-sm md:text-base hidden md:block" />
-          </div>
+            <FollowButton :target="artist!" class="text-sm md:text-base hidden md:block" @click.prevent />
+          </NuxtLink>
         </div>
       </ClientOnly>
       <div class="flex justify-center mt-6 md:mt-8">
