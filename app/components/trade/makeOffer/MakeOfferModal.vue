@@ -238,9 +238,8 @@ onUnmounted(closeMakingOfferModal)
           </div>
         </div>
 
-        <!-- tmp provide amount above 0 to force paraport to render propely -->
         <ParaportButton
-          :amount="totalNeededAmount || 1"
+          :amount="totalNeededAmount"
           :label="confirmListingLabel"
           :disabled="confirmButtonDisabled"
           @confirm="confirm"

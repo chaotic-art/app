@@ -54,9 +54,10 @@ function onSubmit({ completed, autoteleport }: { completed: boolean, autotelepor
 
   <USkeleton v-else-if="loading" class="h-12 w-full rounded" />
 
+  <!-- Provide a minimal amount if amount is 0 to satisfy SDK validation and allow rendering and handle at least tx fees -->
   <Paraport
     v-else
-    :amount="String(amount)"
+    :amount="String(amount || 1e3)"
     :address="accountId"
     :get-signer="getSigner"
     :chain="SupportedChainMap[currentChain].chain"
