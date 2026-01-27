@@ -199,7 +199,7 @@ onClickOutside(searchDropdownRef, () => {
       <div class="p-6 max-h-96 overflow-y-auto">
         <!-- Collections Tab -->
         <div v-if="activeTab === 'collections'" class="space-y-4">
-          <div v-if="isLoading" class="space-y-4">
+          <div v-if="isLoading" class="space-y-2">
             <div v-for="i in 3" :key="i" class="flex items-center gap-4">
               <div class="w-14 h-14 bg-muted rounded-2xl animate-pulse" />
               <div class="flex-1 space-y-3">
@@ -217,11 +217,11 @@ onClickOutside(searchDropdownRef, () => {
               Try adjusting your search terms
             </p>
           </div>
-          <div v-else-if="collections.length > 0" class="space-y-4">
+          <div v-else-if="collections.length > 0" class="space-y-2">
             <div
               v-for="collection in collections"
               :key="collection.id"
-              class="flex items-center gap-4 p-4 rounded-2xl hover:bg-muted/60 cursor-pointer transition-all duration-200 ease-in-out hover:scale-[1.02] group"
+              class="flex items-center gap-4 p-2 rounded-2xl hover:bg-muted/60 cursor-pointer transition-all duration-200 ease-in-out hover:scale-[1.02] group"
               @click="hideSuggestionsAndGoTo(`/${currentChain}/collection/${collection.id}`)"
             >
               <img
@@ -254,7 +254,7 @@ onClickOutside(searchDropdownRef, () => {
 
         <!-- NFTs Tab -->
         <div v-if="activeTab === 'nfts'" class="space-y-4">
-          <div v-if="isLoading" class="space-y-4">
+          <div v-if="isLoading" class="space-y-2">
             <div v-for="i in 3" :key="i" class="flex items-center gap-4">
               <div class="w-14 h-14 bg-muted rounded-2xl animate-pulse" />
               <div class="flex-1 space-y-3">
@@ -272,11 +272,11 @@ onClickOutside(searchDropdownRef, () => {
               Try adjusting your search terms
             </p>
           </div>
-          <div v-else-if="nfts.length > 0" class="space-y-4">
+          <div v-else-if="nfts.length > 0" class="space-y-2">
             <div
               v-for="nft in nfts"
               :key="nft.id"
-              class="flex items-center gap-4 p-4 rounded-2xl hover:bg-muted/60 cursor-pointer transition-all duration-200 ease-in-out hover:scale-[1.02] group"
+              class="flex items-center gap-4 p-2 rounded-2xl hover:bg-muted/60 cursor-pointer transition-all duration-200 ease-in-out hover:scale-[1.02] group"
               @click="hideSuggestionsAndGoTo(`/${currentChain}/gallery/${nft.id}`)"
             >
               <img
@@ -331,7 +331,7 @@ onClickOutside(searchDropdownRef, () => {
             <div
               v-for="user in users"
               :key="user.address"
-              class="flex items-center gap-4 p-4 rounded-2xl hover:bg-muted/60 cursor-pointer transition-all duration-200 ease-in-out hover:scale-[1.02] group"
+              class="flex items-center gap-4 p-2 rounded-2xl hover:bg-muted/60 cursor-pointer transition-all duration-200 ease-in-out hover:scale-[1.02] group"
               @click="hideSuggestionsAndGoTo(`/${currentChain}/u/${user.address}`)"
             >
               <div class="w-14 h-14 bg-muted rounded-full flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow duration-200">
