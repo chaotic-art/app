@@ -149,7 +149,7 @@ function removeAttribute(index: number) {
                     size="sm"
                     icon="i-heroicons-x-mark"
                     class="mb-0"
-                    @click="removeAttribute(index)"
+                    @click="removeAttribute(Number(index))"
                   />
                 </div>
               </div>
