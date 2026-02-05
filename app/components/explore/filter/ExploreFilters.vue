@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWindowSize, whenever } from '@vueuse/core'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
+import { parseQueryNumber } from '~/utils/query'
 
 type PriceBy = 'token' | 'usd'
 
@@ -41,6 +42,10 @@ const activeFiltersCount = computed(() => {
 })
 
 function updateQueryParams() {
+  if (priceBy.value === 'usd' && !tokenPrice.value) {
+    return
+  }
+
   const minNative = priceBy.value === 'usd'
     ? amountToNative(calculateTokenFromUsd(priceRange.value[0] as number, tokenPrice.value), tokenDecimals.value as number)
     : amountToNative(priceRange.value[0] as number, tokenDecimals.value as number)
@@ -79,8 +84,8 @@ function clearFilters() {
 }
 
 whenever(() => Boolean(tokenPrice.value), () => {
-  const urlMinPrice = route.query.min_price ? Number(route.query.min_price) : null
-  const urlMaxPrice = route.query.max_price ? Number(route.query.max_price) : null
+  const urlMinPrice = parseQueryNumber(route.query.min_price)
+  const urlMaxPrice = parseQueryNumber(route.query.max_price)
 
   if (urlMinPrice !== null) {
     const tokenAmount = nativeToAmount(urlMinPrice, tokenDecimals.value as number)

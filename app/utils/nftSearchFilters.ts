@@ -1,22 +1,11 @@
 import type { LocationQuery } from 'vue-router'
+import { parseQueryNumber } from '~/utils/query'
 
 export function buildNftSearchFilters({ query }: { query: LocationQuery }): Record<string, any>[] {
   const searchFilters: Record<string, any>[] = []
 
-  const normalizeQueryValue = (value: LocationQuery[keyof LocationQuery] | undefined) => (
-    Array.isArray(value) ? value[0] : value
-  )
-
-  const toFiniteNumber = (value: LocationQuery[keyof LocationQuery] | undefined) => {
-    if (value === undefined || value === null || value === '') {
-      return null
-    }
-    const parsed = Number(value)
-    return Number.isFinite(parsed) ? parsed : null
-  }
-
-  const minPriceValue = toFiniteNumber(normalizeQueryValue(query.min_price))
-  const maxPriceValue = toFiniteNumber(normalizeQueryValue(query.max_price))
+  const minPriceValue = parseQueryNumber(query.min_price)
+  const maxPriceValue = parseQueryNumber(query.max_price)
 
   if (minPriceValue !== null) {
     searchFilters.push({ price_gte: minPriceValue })
