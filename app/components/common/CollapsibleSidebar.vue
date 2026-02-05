@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useElementVisibility } from '@vueuse/core'
+import { useIntersectionObserver } from '@vueuse/core'
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   modelValue?: boolean
   collapsedWidth?: string
   expandedWidth?: string
@@ -13,8 +13,20 @@ withDefaults(defineProps<{
 })
 
 const isCollapsed = defineModel({ type: Boolean })
-const target = ref()
-const isTargetVisible = useElementVisibility(target)
+const target = ref<HTMLElement | null>(null)
+const hasMeasured = ref(false)
+const isTargetVisible = ref(true)
+
+useIntersectionObserver(target, ([entry]) => {
+  if (!entry) {
+    return
+  }
+
+  hasMeasured.value = true
+  isTargetVisible.value = entry.isIntersecting
+})
+
+const isFixed = computed(() => props.sticky && hasMeasured.value && !isTargetVisible.value)
 </script>
 
 <template>
@@ -35,7 +47,7 @@ const isTargetVisible = useElementVisibility(target)
       class="bg-background-muted border border-border rounded-xl h-fit transition-all duration-300 ease-in-out overflow-hidden"
       :class="{
         'sticky top-4': !sticky,
-        'fixed top-[100px]': sticky && !isTargetVisible,
+        'fixed top-[100px]': isFixed,
       }"
       :style="{
         width: isCollapsed ? collapsedWidth : expandedWidth,
