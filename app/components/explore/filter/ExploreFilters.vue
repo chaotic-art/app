@@ -86,14 +86,32 @@ function clearFilters() {
 whenever(() => Boolean(tokenPrice.value), () => {
   const urlMinPrice = parseQueryNumber(route.query.min_price)
   const urlMaxPrice = parseQueryNumber(route.query.max_price)
+  const hasUrlMin = urlMinPrice !== null
+  const hasUrlMax = urlMaxPrice !== null
 
-  if (urlMinPrice !== null) {
+  if (priceBy.value === 'usd') {
+    min.value = calculateUsdFromToken(0, tokenPrice.value)
+    max.value = calculateUsdFromToken(REASONABLE_MAX_CAP, tokenPrice.value)
+  }
+  else {
+    min.value = 0
+    max.value = REASONABLE_MAX_CAP
+  }
+
+  if (!hasUrlMin) {
+    priceRange.value[0] = min.value
+  }
+  if (!hasUrlMax) {
+    priceRange.value[1] = max.value
+  }
+
+  if (hasUrlMin) {
     const tokenAmount = nativeToAmount(urlMinPrice, tokenDecimals.value as number)
     priceRange.value[0] = priceBy.value === 'usd'
       ? calculateUsdFromToken(tokenAmount, tokenPrice.value)
       : tokenAmount
   }
-  if (urlMaxPrice !== null) {
+  if (hasUrlMax) {
     const tokenAmount = nativeToAmount(urlMaxPrice, tokenDecimals.value as number)
     priceRange.value[1] = priceBy.value === 'usd'
       ? calculateUsdFromToken(tokenAmount, tokenPrice.value)
