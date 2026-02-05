@@ -197,13 +197,14 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
           <div class="p-3 border-b border-border">
             <FilterHeader>
               <template #actions>
-                <UButton
-                  v-tooltip="$t('explore.hideFilters')"
-                  variant="ghost"
-                  icon="i-heroicons-chevron-left"
-                  size="sm"
-                  @click="sidebarCollapsed = true"
-                />
+                <UTooltip :text="$t('explore.hideFilters')">
+                  <UButton
+                    variant="ghost"
+                    icon="i-heroicons-chevron-left"
+                    size="sm"
+                    @click="sidebarCollapsed = true"
+                  />
+                </UTooltip>
               </template>
             </FilterHeader>
           </div>
@@ -244,19 +245,19 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
         leave-from-class="opacity-100 translate-x-0 scale-100"
         leave-to-class="opacity-0 -translate-x-4 scale-95"
       >
-        <UButton
-          v-if="!isMobile && sidebarCollapsed"
-          v-tooltip="$t('explore.showFilters')"
-          icon="i-heroicons-chevron-right"
-          color="neutral"
-          variant="solid"
-          size="sm"
-          class="fixed left-6 top-72 z-50 w-10! h-10 rounded-full! shadow-md hover:shadow-lg transition-shadow duration-200 md:left-8"
-          aria-label="Show filters"
-          @click="sidebarCollapsed = false"
-        >
-          <UBadge v-if="activeFiltersCount > 0" :label="String(activeFiltersCount)" size="xs" class="absolute -top-1 -right-1" />
-        </UButton>
+        <UTooltip v-if="!isMobile && sidebarCollapsed" :text="$t('explore.showFilters')">
+          <UButton
+            icon="i-heroicons-chevron-right"
+            color="neutral"
+            variant="solid"
+            size="sm"
+            class="fixed left-6 top-72 z-50 w-10! h-10 rounded-full! shadow-md hover:shadow-lg transition-shadow duration-200 md:left-8"
+            aria-label="Show filters"
+            @click="sidebarCollapsed = false"
+          >
+            <UBadge v-if="activeFiltersCount > 0" :label="String(activeFiltersCount)" size="xs" class="absolute -top-1 -right-1" />
+          </UButton>
+        </UTooltip>
       </Transition>
     </ClientOnly>
   </div>
