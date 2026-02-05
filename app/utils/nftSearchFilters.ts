@@ -3,14 +3,26 @@ import type { LocationQuery } from 'vue-router'
 export function buildNftSearchFilters({ query }: { query: LocationQuery }): Record<string, any>[] {
   const searchFilters: Record<string, any>[] = []
 
-  const minPrice = query.min_price as string | undefined
-  const maxPrice = query.max_price as string | undefined
+  const normalizeQueryValue = (value: LocationQuery[keyof LocationQuery] | undefined) => (
+    Array.isArray(value) ? value[0] : value
+  )
 
-  if (minPrice) {
-    searchFilters.push({ price_gte: minPrice })
+  const toFiniteNumber = (value: LocationQuery[keyof LocationQuery] | undefined) => {
+    if (value === undefined || value === null || value === '') {
+      return null
+    }
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
   }
-  if (maxPrice) {
-    searchFilters.push({ price_lte: maxPrice })
+
+  const minPriceValue = toFiniteNumber(normalizeQueryValue(query.min_price))
+  const maxPriceValue = toFiniteNumber(normalizeQueryValue(query.max_price))
+
+  if (minPriceValue !== null) {
+    searchFilters.push({ price_gte: minPriceValue })
+  }
+  if (maxPriceValue !== null) {
+    searchFilters.push({ price_lte: maxPriceValue })
   }
 
   const lastSaleValue = query.last_sale as string | undefined
