@@ -20,7 +20,7 @@ const max = ref(REASONABLE_MAX_CAP)
 const priceRange = ref([min.value, max.value])
 const belowFloor = ref(route.query.below_floor === 'true')
 const lastSale = ref((route.query.last_sale as string) || '')
-const sidebarCollapsed = ref(false)
+const { exploreSidebarCollapsed: sidebarCollapsed } = storeToRefs(usePreferencesStore())
 
 const isMobile = computed(() => width.value < 768)
 const tokenPrice = computed(() => Number(getCurrentTokenValue(chainSymbol.value as Token)) || 0)
@@ -186,7 +186,7 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
       </template>
     </ClientOnly>
 
-    <div class="flex gap-6">
+    <div class="flex" :class="{ 'gap-6': !sidebarCollapsed }">
       <!-- Desktop -->
       <ClientOnly>
         <CollapsibleSidebar
