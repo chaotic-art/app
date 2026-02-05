@@ -75,12 +75,12 @@ function selectLastSale(value: string) {
 
       <USeparator class="my-4" />
 
-      <div class="flex justify-between items-center opacity-60 cursor-not-allowed">
-        <span>{{ $t('explore.belowFloorPrice') }}</span>
-        <UTooltip text="Coming soon" :content="{ side: 'bottom', align: 'end' }">
+      <UTooltip text="Coming soon" :content="{ side: 'bottom', align: 'center' }">
+        <div class="flex justify-between items-center opacity-60 cursor-not-allowed">
+          <span>{{ $t('explore.belowFloorPrice') }}</span>
           <USwitch v-model="belowFloor" disabled />
-        </UTooltip>
-      </div>
+        </div>
+      </UTooltip>
 
       <USeparator class="my-4" />
 
