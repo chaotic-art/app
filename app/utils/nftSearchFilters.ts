@@ -1,9 +1,10 @@
-export function buildNftSearchFilters(): Record<string, any>[] {
-  const route = useRoute()
+import type { LocationQuery } from 'vue-router'
+
+export function buildNftSearchFilters({ query }: { query: LocationQuery }): Record<string, any>[] {
   const searchFilters: Record<string, any>[] = []
 
-  const minPrice = route.query.min_price as string | undefined
-  const maxPrice = route.query.max_price as string | undefined
+  const minPrice = query.min_price as string | undefined
+  const maxPrice = query.max_price as string | undefined
 
   if (minPrice) {
     searchFilters.push({ price_gte: minPrice })
@@ -12,7 +13,7 @@ export function buildNftSearchFilters(): Record<string, any>[] {
     searchFilters.push({ price_lte: maxPrice })
   }
 
-  const lastSaleValue = route.query.last_sale as string | undefined
+  const lastSaleValue = query.last_sale as string | undefined
   if (lastSaleValue && lastSaleValue !== '') {
     if (lastSaleValue === 'all') {
       searchFilters.push({

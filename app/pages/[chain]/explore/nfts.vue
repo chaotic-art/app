@@ -36,7 +36,7 @@ const mergedQueryVariables = computed(() => {
     }
   }
 
-  const nftFilters = buildNftSearchFilters()
+  const nftFilters = buildNftSearchFilters({ query: route.query })
 
   searchFilters.push(...nftFilters)
 

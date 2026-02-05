@@ -78,7 +78,7 @@ const queryVariables = computed(() => {
     searchFilters.push({ id_in: filteredNftIds.value })
   }
 
-  const nftFilters = buildNftSearchFilters()
+  const nftFilters = buildNftSearchFilters({ query: route.query })
   searchFilters.push(...nftFilters)
 
   if (searchFilters.length > 0) {
