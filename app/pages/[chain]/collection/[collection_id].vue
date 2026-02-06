@@ -72,12 +72,19 @@ const selectedTraits = ref<SelectedTrait[]>([])
 const queryVariables = computed(() => {
   const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
 
+  const searchFilters: Record<string, any>[] = []
+
   if (selectedTraits.value.length > 0) {
+    searchFilters.push({ id_in: filteredNftIds.value })
+  }
+
+  const nftFilters = buildNftSearchFilters({ query: route.query })
+  searchFilters.push(...nftFilters)
+
+  if (searchFilters.length > 0) {
     return {
       ...baseVariables,
-      search: [{
-        id_in: filteredNftIds.value,
-      }],
+      search: searchFilters,
     }
   }
 
@@ -244,31 +251,33 @@ defineOgImageComponent('Frame', {
       <UTabs v-model="activeTab" color="neutral" :items="tabsItems" class="w-full" :ui="{ root: 'gap-4' }">
         <template #items>
           <!-- Items Section -->
-          <div class="space-y-6 mt-2">
-            <div class="flex flex-col md:flex-row justify-end items-center gap-4">
-              <div class="w-full md:w-auto flex items-center gap-2">
-                <ArtViewFilter />
-                <TraitFilter
-                  :collection-id="collection_id?.toString() ?? ''"
-                  @update:nft-ids="handleNftIdsUpdate"
-                  @update:selected-traits="handleSelectedTraitsUpdate"
-                />
-                <SortOptions
-                  v-model="selectedSort"
-                  class="w-full md:w-48"
-                />
+          <ExploreFilters class="mt-2">
+            <div class="space-y-6">
+              <div class="flex flex-col md:flex-row justify-end items-center gap-4">
+                <div class="w-full md:w-auto flex items-center gap-2">
+                  <ArtViewFilter />
+                  <TraitFilter
+                    :collection-id="collection_id?.toString() ?? ''"
+                    @update:nft-ids="handleNftIdsUpdate"
+                    @update:selected-traits="handleSelectedTraitsUpdate"
+                  />
+                  <SortOptions
+                    v-model="selectedSort"
+                    class="w-full md:w-48"
+                  />
+                </div>
               </div>
-            </div>
 
-            <!-- Items Grid -->
-            <LazyNftsGrid
-              :key="`${selectedSort}-${filteredNftIds.length}-${filteredNftIds.join(',')}`"
-              :variables="queryVariables"
-              grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
-              no-items-found-message="This collection doesn't have any items yet."
-              :prefix="chain"
-            />
-          </div>
+              <!-- Items Grid -->
+              <LazyNftsGrid
+                :key="`${selectedSort}-${filteredNftIds.length}-${filteredNftIds.join(',')}-${JSON.stringify(queryVariables)}`"
+                :variables="queryVariables"
+                grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
+                no-items-found-message="This collection doesn't have any items yet."
+                :prefix="chain"
+              />
+            </div>
+          </ExploreFilters>
         </template>
         <template #offers>
           <CollectionTrades :trade-type="TradeTypes.Offer" />
