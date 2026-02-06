@@ -202,6 +202,7 @@ defineOgImageComponent('Frame', {
                 <UButton
                   :to="getSubscanAccountUrl((data?.drops?.data[0]?.creator || data?.collection?.owner) ?? '', chain)"
                   target="_blank"
+                  variant="outline"
                 >
                   Subscan
                 </UButton>
@@ -227,12 +228,7 @@ defineOgImageComponent('Frame', {
           <div class="pt-4 w-auto md:w-60 space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-sm text-gray-500 dark:text-gray-400">Minted</span>
-              <span class="font-medium text-gray-900 dark:text-white">{{ data?.collection?.claimed || 0 }}</span>
-            </div>
-
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-500 dark:text-gray-400">Supply</span>
-              <span class="font-medium text-gray-900 dark:text-white">{{ unlimited(data?.collection?.supply) ? '∞' : data?.collection?.supply || 0 }}</span>
+              <span class="font-medium text-gray-900 dark:text-white">{{ data?.collection?.claimed || 0 }} / {{ unlimited(data?.collection?.supply) ? '∞' : data?.collection?.supply || 0 }}</span>
             </div>
 
             <div class="flex justify-between items-center">
