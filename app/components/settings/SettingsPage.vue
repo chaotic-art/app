@@ -96,17 +96,23 @@ async function testAllProviders() {
 
 function latencyColorClass(url: string): string {
   const ms = latencies.value.get(url)
-  if (ms === undefined) return 'text-muted'
-  if (ms === null) return 'text-red-500'
-  if (ms <= 300) return 'text-green-500'
-  if (ms <= 1000) return 'text-yellow-500'
+  if (ms === undefined)
+    return 'text-muted'
+  if (ms === null)
+    return 'text-red-500'
+  if (ms <= 300)
+    return 'text-green-500'
+  if (ms <= 1000)
+    return 'text-yellow-500'
   return 'text-red-500'
 }
 
 function formatLatency(url: string): string {
   const ms = latencies.value.get(url)
-  if (ms === undefined) return '--'
-  if (ms === null) return 'err'
+  if (ms === undefined)
+    return '--'
+  if (ms === null)
+    return 'err'
   return `${ms}ms`
 }
 
