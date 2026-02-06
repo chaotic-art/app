@@ -1,7 +1,7 @@
 /**
  * Network providers configuration
  * Generated from @polkadot/apps-config endpoints
- *
+ * 
  * This file is auto-generated. Do not edit manually.
  * Run 'node scripts/generate-providers.mjs' to regenerate.
  */
@@ -9,16 +9,28 @@
 export const PROVIDERS = {
   // Polkadot Asset Hub (AHP)
   ahp: [
+    'wss://asset-hub-polkadot-rpc.n.dwellir.com',
+    'wss://statemint-rpc-tn.dwellir.com',
     'wss://sys.ibp.network/asset-hub-polkadot',
     'wss://asset-hub-polkadot.dotters.network',
+    'wss://rpc-asset-hub-polkadot.luckyfriday.io',
+    'wss://statemint.api.onfinality.io/public-ws',
     'wss://polkadot-asset-hub-rpc.polkadot.io',
+    'wss://statemint.public.curie.radiumblock.co/ws',
+    'wss://dot-rpc.stakeworld.io/assethub',
   ] as const,
 
   // Kusama Asset Hub (AHK)
   ahk: [
+    'wss://asset-hub-kusama-rpc.n.dwellir.com',
+    'wss://statemine-rpc-tn.dwellir.com',
     'wss://sys.ibp.network/asset-hub-kusama',
     'wss://asset-hub-kusama.dotters.network',
+    'wss://rpc-asset-hub-kusama.luckyfriday.io',
+    'wss://assethub-kusama.api.onfinality.io/public-ws',
     'wss://kusama-asset-hub-rpc.polkadot.io',
+    'wss://statemine.public.curie.radiumblock.co/ws',
+    'wss://ksm-rpc.stakeworld.io/assethub',
   ] as const,
 
   // Polkadot Relay Chain (DOT)
