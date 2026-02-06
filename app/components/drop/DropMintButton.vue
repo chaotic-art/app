@@ -8,17 +8,12 @@ const props = withDefaults(
   defineProps<{
     drop?: DropItem
     isDropPage?: boolean
-    size?: 'md' | 'sm'
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   }>(),
   {
     size: 'md',
   },
 )
-
-const sizeClassMap = {
-  sm: 'px-6 py-3 md:px-4 md:py-[10px] text-sm',
-  md: 'px-4 py-2 md:px-6 md:py-3',
-}
 
 const { drop: storeDrop, amountToMint, previewItem } = storeToRefs(useDropStore())
 const { $i18n } = useNuxtApp()
@@ -93,7 +88,8 @@ function handleMint() {
 
 <template>
   <UButton
-    :class="sizeClassMap[size]"
+    :size="size"
+    class="rounded-full"
     :disabled="!enabled"
     @click.stop="handleMint"
   >
