@@ -202,6 +202,7 @@ defineOgImageComponent('Frame', {
                 <UButton
                   :to="getSubscanAccountUrl((data?.drops?.data[0]?.creator || data?.collection?.owner) ?? '', chain)"
                   target="_blank"
+                  variant="outline"
                 >
                   Subscan
                 </UButton>
