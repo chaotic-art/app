@@ -36,9 +36,6 @@ export const exploreNfts = graphql(`
     query tokenListWithSearch(
         $first: Int!
         $offset: Int
-        $price_gte: Float
-        $price_gt: Float
-        $price_lte: Float
         $price_isNull: Boolean
         $owner: String
         $issuer: String
@@ -73,6 +70,10 @@ export const exploreNfts = graphql(`
             metadata
             price
             currentOwner
+            rarityScore
+            rarityRank
+            rarityPercentile
+            rarityTier
             meta {
                 id
                 image
@@ -81,15 +82,21 @@ export const exploreNfts = graphql(`
                 kind
             }
         }
-        tokenEntityCount(
-            owner: $owner
-            issuer: $issuer
-            denyList: $denyList
-            price_gte: $price_gte
-            price_gt: $price_gt
-            price_lte: $price_lte
-            collections: $collections
-            name: $name
+        stats: nftEntitiesConnection(
+            orderBy: blockNumber_DESC
+            where: {
+                issuer_not_in: $denyList
+                currentOwner_eq: $owner
+                issuer_eq: $issuer
+                name_containsInsensitive: $name
+                price_isNull: $price_isNull
+                collection: {
+                    id_in: $collections
+                }
+                burned_eq: false
+                metadata_isNull: false
+                AND: $search
+            }
         ) {
             totalCount
         }
