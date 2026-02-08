@@ -62,6 +62,8 @@ const { data } = await useLazyAsyncData(
     return { collection, drops }
   },
 )
+
+const collectionName = computed(() => data.value?.collection?.metadata?.name)
 const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.collection?.metadata?.banner || data.value?.collection?.metadata?.image)))
 
 const { selectedSort, createQueryVariables } = useSortOptions()
@@ -102,7 +104,7 @@ const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import(
 function handleDestroyCollection() {
   destroyCollectionModal.open({
     collectionId: collection_id?.toString() ?? '',
-    collectionName: data.value?.collection?.metadata?.name,
+    collectionName: collectionName.value,
     chain: chain.value,
   })
 }
@@ -123,12 +125,12 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: () => data.value?.collection?.metadata?.name,
+  title: () => collectionName.value,
   description: () => data.value?.collection?.metadata?.description?.slice(0, 150),
 })
 
 defineOgImageComponent('Frame', {
-  title: data.value?.collection?.metadata?.name,
+  title: collectionName.value,
   image: sanitizeIpfsUrl(data.value?.collection?.metadata?.image),
   items: data.value?.collection?.supply,
   claimed: data.value?.collection?.claimed,
@@ -273,7 +275,7 @@ defineOgImageComponent('Frame', {
           <CollectionTrades :trade-type="TradeTypes.Swap" />
         </template>
         <template #traits>
-          <TraitOverview :collection-id="collection_id?.toString() ?? ''" />
+          <TraitOverview :collection-id="collection_id?.toString() ?? ''" :collection-name="collectionName" />
         </template>
       </UTabs>
     </div>
