@@ -8,6 +8,8 @@ const { data: dropItems, pending } = await useFetch('/api/genart/list', {
 const allArtists = computed(() => [...new Set(dropItems.value?.data.map(drop => drop.creator).filter(Boolean))] as string[])
 
 const refreshKey = ref(0)
+
+const { currentChain } = useChain()
 </script>
 
 <template>
@@ -40,25 +42,28 @@ const refreshKey = ref(0)
         </div>
       </template>
       <template v-else>
-        <div
-          v-for="artist in allArtists"
-          :key="artist"
-          class="flex flex-col gap-4 items-start md:gap-0 md:flex-row md:items-center justify-between bg-card rounded-xl px-4 py-3 md:px-6 md:py-4 border border-border hover-card-effect"
-        >
-          <UserInfo :address="artist" :avatar-size="72" :custom-name="true" :transparent-background="true">
-            <template #name="{ addressName, description }">
-              <div class="flex flex-col gap-2 ml-4 max-w-full">
-                <span class="text-[32px] font-serif italic font-medium text-nowrap max-w-[220px] md:max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-foreground">
-                  {{ addressName }}
-                </span>
-                <div class="text-ring break-all line-clamp-4 min-h-[100px]">
-                  <MarkdownPreview :source="description || ''" />
+        <ClientOnly>
+          <NuxtLink
+            v-for="artist in allArtists"
+            :key="artist"
+            :to="`/${currentChain}/u/${artist}`"
+            class="flex flex-col gap-4 items-start md:gap-0 md:flex-row md:items-center justify-between bg-card rounded-xl px-4 py-3 md:px-6 md:py-4 border border-border hover-card-effect"
+          >
+            <UserInfo :address="artist" :avatar-size="72" :custom-name="true" :transparent-background="true">
+              <template #name="{ addressName, description }">
+                <div class="flex flex-col gap-2 ml-4 max-w-full">
+                  <span class="text-[32px] font-serif italic font-medium text-nowrap max-w-[220px] md:max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-foreground">
+                    {{ addressName }}
+                  </span>
+                  <div class="text-ring break-all line-clamp-4 min-h-[100px]">
+                    <MarkdownPreview :source="description || ''" />
+                  </div>
                 </div>
-              </div>
-            </template>
-          </UserInfo>
-          <FollowButton :target="artist" class="text-sm md:text-base" />
-        </div>
+              </template>
+            </UserInfo>
+            <FollowButton :target="artist" class="text-sm md:text-base" @click.prevent />
+          </NuxtLink>
+        </ClientOnly>
       </template>
     </div>
   </UContainer>

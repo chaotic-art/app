@@ -48,6 +48,7 @@ export function useToken(props: {
   // Fetch data on component mount
   onMounted(async () => {
     try {
+      // fetch token data, collection data, and highest offer data
       const [tokenData, collectionData, highestOfferData] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()).catch(() => null),
         fetchOdaCollection(props.chain, props.collectionId.toString()).catch(() => null),
@@ -61,6 +62,15 @@ export function useToken(props: {
       owner.value = token.value?.owner ?? null
       collectionCreator.value = collection.value?.owner ?? null
       queryPrice.value = token.value?.price ?? null
+
+      // fetch mime type for media
+      const media = token.value?.metadata?.animation_url || token.value?.metadata?.image || props.image
+      if (media) {
+        const [ok, _, mimeTypeData] = await t(fetchMimeType(media))
+        if (ok) {
+          mimeType.value = mimeTypeData.mime_type
+        }
+      }
 
       // fetch real-time price and owner
       const { api } = $sdk(props.chain)
@@ -97,14 +107,6 @@ export function useToken(props: {
           metadata_uri: collection.value?.metadata_uri ?? undefined,
           price: tokenData?.price ?? null,
           owner: tokenData?.owner ?? null,
-        }
-      }
-
-      const media = token.value?.metadata?.animation_url || token.value?.metadata?.image || props.image
-      if (media) {
-        const [ok, _, mimeTypeData] = await t(fetchMimeType(media))
-        if (ok) {
-          mimeType.value = mimeTypeData.mime_type
         }
       }
     }

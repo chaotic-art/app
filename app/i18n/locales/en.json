@@ -450,5 +450,17 @@
   },
   "create": {
     "depositTooltip": "A deposit of {0} is required. Please note, this initial deposit is refundable."
+  },
+  "explore": {
+    "filters": "Filters",
+    "price": "Price",
+    "min": "Min:",
+    "max": "Max:",
+    "belowFloorPrice": "Below Floor Price",
+    "lastSale": "Last Sale",
+    "applyFilters": "Apply Filters",
+    "clearAll": "Clear All",
+    "hideFilters": "Hide Filters",
+    "showFilters": "Show Filters"
   }
 }

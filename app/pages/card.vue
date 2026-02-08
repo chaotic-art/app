@@ -1,15 +1,4 @@
 <script setup lang="ts">
-import { CHAOTIC_CARD_COLLECTION_ID, CHAOTIC_CARD_PREFIX } from '@/components/mintCard/constants'
-import { fetchOdaCollection } from '~/services/oda'
-
-const { data } = useLazyAsyncData(
-  `card:${CHAOTIC_CARD_PREFIX}:${CHAOTIC_CARD_COLLECTION_ID}`,
-  async () => {
-    const collection = await fetchOdaCollection(CHAOTIC_CARD_PREFIX, CHAOTIC_CARD_COLLECTION_ID)
-    return collection
-  },
-)
-
 const title = 'Chaotic Cards'
 
 definePageMeta({
@@ -19,8 +8,8 @@ definePageMeta({
 
 useSeoMeta({
   title,
-  description: () => data.value?.metadata?.description?.slice(0, 150),
-  ogImage: () => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.metadata?.banner || data.value?.metadata?.image)),
+  description: () => `The Polkadot ecosystem has always been about innovation, freedom, and community. Now it’s time to capture that energy in a new way: Chaotic Cards.`,
+  ogImage: () => toOriginalContentUrl(sanitizeIpfsUrl('ipfs://QmTUB5xvkGqHKK6Ew6Hbhs4YpgV29wt8FmZqmccEG5sMpg')),
 })
 </script>
 
