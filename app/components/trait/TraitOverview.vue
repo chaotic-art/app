@@ -5,7 +5,7 @@ import { exportTraitsToCsv } from './utils'
 
 interface Props {
   collectionId: string
-  collectionName: string
+  collectionName?: string
 }
 
 type ViewMode = 'table' | 'charts'
