@@ -1,12 +1,8 @@
 <script setup lang="ts">
 const walletStore = useWalletStore()
-const { disconnectWallet } = useWalletManager()
+const { logoutConnectedWallets, backToWalletSelection } = useWalletManager()
 
 const { getUserConnectedWallets: connectedWallets } = storeToRefs(walletStore)
-
-function backToWalletSelection() {
-  walletStore.setStage(WalletStageTypes.Wallet)
-}
 
 function handleManageWallets() {
   walletStore.clearSelectedWallets()
@@ -14,11 +10,7 @@ function handleManageWallets() {
 }
 
 function handleLogout() {
-  for (const extension of connectedWallets.value) {
-    disconnectWallet(extension)
-  }
-
-  backToWalletSelection()
+  logoutConnectedWallets()
 }
 </script>
 

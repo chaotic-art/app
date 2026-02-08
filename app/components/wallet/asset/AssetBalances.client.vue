@@ -6,33 +6,10 @@ const { getConnectedSubAccount } = storeToRefs(useWalletStore())
 
 const mainNet: Exclude<SupportedChain, 'ahpas'>[] = ['dot', 'ksm', 'ahp', 'ahk']
 const balances = ref<Awaited<ReturnType<typeof getBalance>>[]>([])
-const isLoading = ref(true)
+const isLoading = ref(false)
+const fetchRun = ref(0)
 
-watchEffect(async () => {
-  if (!getConnectedSubAccount?.value?.address) {
-    return
-  }
-
-  // Load balances gradually as they resolve
-  const promises = mainNet.map(async (chain, index) => {
-    try {
-      const balance = await getBalance(chain, getConnectedSubAccount.value?.address ?? '')
-      // Add balance to the array as soon as it resolves
-      balances.value[index] = balance
-    }
-    catch (error) {
-      console.error(`Failed to load balance for ${chain}:`, error)
-    }
-  })
-
-  // Wait for all to complete, then stop loading
-  await Promise.allSettled(promises)
-  isLoading.value = false
-})
-
-const isEmpty = computed(() =>
-  !isLoading.value && balances.value.filter(Boolean).length === 0,
-)
+const isEmpty = computed(() => !isLoading.value && balances.value.filter(Boolean).length === 0)
 
 // Computed values using real data directly
 const nonZeroBalances = computed(() =>
@@ -60,6 +37,45 @@ const formattedTotal = computed(() =>
 function handleAddFunds() {
   // Add funds functionality would be implemented here
 }
+
+watch(
+  () => getConnectedSubAccount.value?.address,
+  async (address, _, onCleanup) => {
+    balances.value = []
+    isLoading.value = Boolean(address)
+
+    if (!address) {
+      return
+    }
+
+    const currentRun = ++fetchRun.value
+    let cancelled = false
+
+    onCleanup(() => {
+      cancelled = true
+    })
+
+    const promises = mainNet.map(async (chain, index) => {
+      try {
+        const balance = await getBalance(chain, address)
+        if (cancelled || currentRun !== fetchRun.value) {
+          return
+        }
+        balances.value[index] = balance
+      }
+      catch (error) {
+        console.error(`Failed to load balance for ${chain}:`, error)
+      }
+    })
+
+    await Promise.allSettled(promises)
+
+    if (!cancelled && currentRun === fetchRun.value) {
+      isLoading.value = false
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

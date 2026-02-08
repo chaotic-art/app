@@ -12,6 +12,7 @@ export const usePreferencesStore = defineStore('preferences', () => {
   const completePurchaseModal = ref<ConfirmPurchaseModal>({ open: false, mode: 'shopping-cart' })
   const makeOfferModalOpen = ref(false)
   const artViewFilter = ref(false)
+  const exploreSidebarCollapsed = ref(false)
 
   return {
     walletConnectModalOpen,
@@ -20,5 +21,6 @@ export const usePreferencesStore = defineStore('preferences', () => {
     completePurchaseModal,
     makeOfferModalOpen,
     artViewFilter,
+    exploreSidebarCollapsed,
   }
 })
