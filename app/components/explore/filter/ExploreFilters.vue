@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { RarityTierQueryValue } from '~/utils/nftSearchFilters'
 import { useWindowSize, whenever } from '@vueuse/core'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
-import { parseQueryNumber } from '~/utils/query'
+import { isRarityTierQueryValue } from '~/utils/nftSearchFilters'
+import { parseQueryCsv, parseQueryNumber } from '~/utils/query'
 
 type PriceBy = 'token' | 'usd'
 
@@ -21,6 +23,11 @@ const max = ref(REASONABLE_MAX_CAP)
 const priceRange = ref([min.value, max.value])
 const belowFloor = ref(route.query.below_floor === 'true')
 const lastSale = ref((route.query.last_sale as string) || '')
+const rarityTiers = ref<RarityTierQueryValue[]>(
+  parseQueryCsv(route.query.rarity_tier)
+    .map(tier => tier.toLowerCase())
+    .filter(isRarityTierQueryValue),
+)
 const { exploreSidebarCollapsed: sidebarCollapsed } = storeToRefs(usePreferencesStore())
 
 const isMobile = computed(() => width.value < 768)
@@ -36,6 +43,9 @@ const activeFiltersCount = computed(() => {
     count++
   }
   if (lastSale.value) {
+    count++
+  }
+  if (rarityTiers.value.length > 0) {
     count++
   }
   return count
@@ -61,6 +71,7 @@ function updateQueryParams() {
     max_price: priceRange.value[1] !== max.value ? String(maxNative) : undefined,
     below_floor: belowFloor.value ? 'true' : undefined,
     last_sale: lastSale.value || undefined,
+    rarity_tier: rarityTiers.value.length > 0 ? rarityTiers.value.join(',') : undefined,
   }
 
   router.replace({ query })
@@ -80,6 +91,7 @@ function clearFilters() {
   priceRange.value = [min.value, max.value]
   belowFloor.value = false
   lastSale.value = ''
+  rarityTiers.value = []
   updateQueryParams()
 }
 
@@ -192,6 +204,7 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
               v-model:price-range="priceRange"
               v-model:below-floor="belowFloor"
               v-model:last-sale="lastSale"
+              v-model:rarity-tiers="rarityTiers"
               :min="min"
               :max="max"
               :loading="loading"
@@ -238,6 +251,7 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
               v-model:price-range="priceRange"
               v-model:below-floor="belowFloor"
               v-model:last-sale="lastSale"
+              v-model:rarity-tiers="rarityTiers"
               :min="min"
               :max="max"
               :loading="loading"

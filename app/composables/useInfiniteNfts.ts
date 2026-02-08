@@ -35,6 +35,12 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     else if (orderBy[0] === 'blockNumber_ASC') {
       variables.orderBy = ['blockNumber_ASC', 'sn_ASC']
     }
+    else if (orderBy[0] === 'rarityRank_ASC_NULLS_LAST') {
+      variables.orderBy = ['rarityRank_ASC_NULLS_LAST', 'sn_ASC']
+    }
+    else if (orderBy[0] === 'rarityRank_DESC_NULLS_LAST') {
+      variables.orderBy = ['rarityRank_DESC_NULLS_LAST', 'sn_DESC']
+    }
   }
 
   const infiniteQuery = useInfiniteQuery<ExploreNftsData, NftEntity>({
@@ -49,7 +55,7 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
       ...variables,
     },
     extractData: data => data.tokenEntities,
-    extractTotal: data => data.tokenEntityCount.totalCount,
+    extractTotal: data => data.stats.totalCount,
     placeholderCount: 18,
     endpoint,
   })

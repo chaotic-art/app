@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import type { RarityTierQueryValue } from '~/utils/nftSearchFilters'
 import { formatCompactNumber } from '~/utils/format/balance'
+import { RARITY_TIERS } from '~/utils/nftSearchFilters'
 
 const props = defineProps<{
   min: number
@@ -16,8 +18,10 @@ const priceBy = defineModel<'token' | 'usd'>('priceBy', { required: true })
 const priceRange = defineModel<number[]>('priceRange', { required: true })
 const belowFloor = defineModel<boolean>('belowFloor', { required: true })
 const lastSale = defineModel<string>('lastSale', { required: true })
+const rarityTiers = defineModel<RarityTierQueryValue[]>('rarityTiers', { required: true })
 
 const { chainSymbol } = useChain()
+const { t } = useI18n()
 
 const lastSaleItems = [
   { label: '24h', value: '24h' },
@@ -33,9 +37,22 @@ const priceTabs = computed(() => [
 
 const formattedMin = computed(() => formatCompactNumber(props.min))
 const formattedMax = computed(() => formatCompactNumber(props.max))
+const rarityTierItems = computed(() => [
+  { value: RARITY_TIERS.LEGENDARY.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierLegendary'), range: t('explore.rarityRangeLegendary') },
+  { value: RARITY_TIERS.EPIC.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierEpic'), range: t('explore.rarityRangeEpic') },
+  { value: RARITY_TIERS.RARE.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierRare'), range: t('explore.rarityRangeRare') },
+  { value: RARITY_TIERS.UNCOMMON.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierUncommon'), range: t('explore.rarityRangeUncommon') },
+  { value: RARITY_TIERS.COMMON.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierCommon'), range: t('explore.rarityRangeCommon') },
+])
 
 function selectLastSale(value: string) {
   lastSale.value = lastSale.value === value ? '' : value
+}
+
+function toggleRarityTier(value: RarityTierQueryValue) {
+  rarityTiers.value = rarityTiers.value.includes(value)
+    ? rarityTiers.value.filter(tier => tier !== value)
+    : [...rarityTiers.value, value]
 }
 </script>
 
@@ -96,6 +113,25 @@ function selectLastSale(value: string) {
             @click="selectLastSale(item.value)"
           >
             {{ item.label }}
+          </UButton>
+        </div>
+      </div>
+
+      <USeparator class="my-4" />
+
+      <div class="flex flex-col gap-2">
+        <span>{{ $t('explore.rarity') }}</span>
+        <div class="flex flex-col gap-2">
+          <UButton
+            v-for="item in rarityTierItems"
+            :key="item.value"
+            size="sm"
+            :variant="rarityTiers.includes(item.value) ? 'solid' : 'outline'"
+            class="justify-between"
+            @click="toggleRarityTier(item.value)"
+          >
+            <span>{{ item.label }}</span>
+            <span class="text-xs opacity-75">{{ item.range }}</span>
           </UButton>
         </div>
       </div>
