@@ -189,16 +189,7 @@ defineOgImageComponent('Frame', {
                 </UButton>
               </div>
               <div v-if="data?.drops?.data[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
-                <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" custom-name>
-                  <template #name="{ addressName }">
-                    <div class="pr-1 flex">
-                      <p>Creator:</p>
-                      <p class="font-bold">
-                        {{ addressName }}
-                      </p>
-                    </div>
-                  </template>
-                </UserInfo>
+                <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" class="min-w-0" />
                 <UButton
                   :to="getSubscanAccountUrl((data?.drops?.data[0]?.creator || data?.collection?.owner) ?? '', chain)"
                   target="_blank"
