@@ -5,6 +5,7 @@ import { exportTraitsToCsv } from './utils'
 
 interface Props {
   collectionId: string
+  collectionName: string
 }
 
 type ViewMode = 'table' | 'charts'
@@ -98,7 +99,7 @@ const chartTypeItems = [
 ]
 
 function exportToCsv() {
-  exportTraitsToCsv(groupedTraits.value)
+  exportTraitsToCsv(groupedTraits.value, props.collectionName)
 }
 </script>
 

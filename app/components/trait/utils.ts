@@ -8,7 +8,7 @@ export function escapeCsvCell(value: string | number): string {
   return s
 }
 
-export function exportTraitsToCsv(groupedTraits: Map<string, TraitValueRow[]>): void {
+export function exportTraitsToCsv(groupedTraits: Map<string, TraitValueRow[]>, collectionName?: string): void {
   if (groupedTraits.size === 0)
     return
   const lines: string[] = []
@@ -30,7 +30,7 @@ export function exportTraitsToCsv(groupedTraits: Map<string, TraitValueRow[]>): 
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'traits-export.csv'
+  a.download = `${collectionName || 'collection'}-traits-export.csv`
   a.click()
   URL.revokeObjectURL(url)
 }
