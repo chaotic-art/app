@@ -4,6 +4,7 @@ import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
 import { getWsProvider } from 'polkadot-api/ws-provider/web'
 import { PROVIDERS } from '~/config/providers'
 import { ahk, ahp, ahpas, dot, ksm } from '~/descriptors'
+import { useRpcProviderStore } from '~/stores/rpcProvider'
 
 const config = {
   ahp: {
@@ -73,9 +74,10 @@ function sdk(chain: Chain = DEFAULT_CHAIN) {
 
   // Create client if it doesn't exist
   if (!clients.value[effectiveChain]) {
-    const chainConfig = config[effectiveChain]
+    const rpcStore = useRpcProviderStore()
+    const selectedEndpoint = rpcStore.getProvider(effectiveChain)
     clients.value[effectiveChain] = createClient(
-      withPolkadotSdkCompat(getWsProvider({ endpoints: [...chainConfig.providers] })),
+      withPolkadotSdkCompat(getWsProvider({ endpoints: [selectedEndpoint] })),
     )
   }
 
