@@ -74,7 +74,7 @@ export function toOriginalContentUrl(baseurl: string) {
   return url.toString()
 }
 
-export function ipfsToCfImageUrl(ipfsUrl?: string, variant = 'public') {
+export function ipfsToCfImageUrl(ipfsUrl?: string, variant: 'public' | 'card' = 'public') {
   if (!ipfsUrl) {
     return ''
   }

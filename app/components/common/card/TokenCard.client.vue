@@ -70,7 +70,7 @@ const route = useRoute()
 const { isCurrentAccount } = useAuth()
 const { artViewFilter } = storeToRefs(usePreferencesStore())
 
-const imageStatus = ref<'normal' | 'fallback'>('normal')
+const imageStatus = ref<'card' | 'normal' | 'fallback'>('card')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
@@ -131,6 +131,18 @@ watchEffect(() => {
               @error="($event.target as HTMLAudioElement).style.display = 'none'"
             />
           </div>
+
+          <!-- Card Image -->
+          <!-- 1. Image from cloudflare image delivery -->
+          <!-- 2. Image from bucket.chaotic.art ipfs -->
+          <!-- 3. Image from collection metadata -->
+          <img
+            v-else-if="imageStatus === 'card' && (image || token?.metadata?.image)"
+            :src="ipfsToCfImageUrl(image || token?.metadata?.image, 'card')"
+            :alt="token?.metadata?.name || 'NFT'"
+            class="w-full h-full object-contain"
+            @error="imageStatus = 'normal'"
+          >
           <img
             v-else-if="imageStatus === 'normal' && (image || token?.metadata?.image)"
             :src="sanitizeIpfsUrl(image || token?.metadata?.image)"
@@ -144,6 +156,7 @@ watchEffect(() => {
             :alt="token?.metadata?.name || 'NFT'"
             class="w-full h-full object-contain"
           >
+
           <div
             v-else
             class="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-neutral-700"

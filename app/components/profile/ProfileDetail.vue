@@ -61,13 +61,31 @@ const tabsItems = ref([
   },
 ])
 
-const { data: followers, refresh: refreshFollowers } = useAsyncData(
-  `followersof${props.address}`,
-  () =>
-    fetchFollowersOf(props.address, {
-      limit: 3,
-    }),
-)
+const followers = ref<Awaited<ReturnType<typeof fetchFollowersOf>> | null>(null)
+const following = ref<Awaited<ReturnType<typeof fetchFollowing>> | null>(null)
+
+async function refreshFollowers() {
+  try {
+    followers.value = await fetchFollowersOf(props.address, { limit: 3 })
+  }
+  catch (error) {
+    console.error('Failed to fetch followers:', error)
+  }
+}
+
+async function refreshFollowing() {
+  try {
+    following.value = await fetchFollowing(props.address, { limit: 1 })
+  }
+  catch (error) {
+    console.error('Failed to fetch following:', error)
+  }
+}
+
+onMounted(() => {
+  refreshFollowers()
+  refreshFollowing()
+})
 
 const editProfileConfig: ButtonConfig = {
   label: 'Edit Existing Profile',
@@ -106,15 +124,10 @@ function onFollowingClick() {
   isFollowModalActive.value = true
 }
 
-const { data: following, refresh: refreshFollowing } = useAsyncData(
-  `following${props.address}`,
-  () => fetchFollowing(props.address, { limit: 1 }),
-)
-
-function refresh({ fetchFollowing = true } = {}) {
+function refresh({ fetchFollowing: shouldFetchFollowing = true } = {}) {
   refreshFollowers()
   refreshFollowing()
-  fetchFollowing && followButton.value?.refresh()
+  shouldFetchFollowing && followButton.value?.refresh()
 }
 const followersCount = computed(() => followers.value?.totalCount ?? 0)
 const followingCount = computed(() => following.value?.totalCount ?? 0)

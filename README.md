@@ -1,4 +1,4 @@
-# Chaotic.art · Your Polkadot NFT Marketplace (Beta)
+# Chaotic.art · Your Polkadot NFT Marketplace
 
 [chaotic.art](https://chaotic.art) · [Design system](https://www.figma.com/design/XTcZsQREdo9574lTzqkMDL/Chaotic)
 

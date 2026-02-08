@@ -28,34 +28,33 @@ const {
   chain: chainPrefix.value,
 })
 
-const { data: item } = useLazyAsyncData(
-  `token:${chainPrefix.value}:${tokenId}`,
-  async () => {
-    const item = await fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value)
-    return item
+const odaTokenData = await fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value)
+const item = {
+  ...odaTokenData,
+  metadata: {
+    ...odaTokenData.metadata,
+    image: sanitizeIpfsUrl(odaTokenData.metadata?.image),
   },
-  {
-    transform: (data) => {
-      return {
-        ...data,
-        metadata: {
-          ...data.metadata,
-          image: data.metadata?.image ? sanitizeIpfsUrl(data.metadata.image) : undefined,
-        },
-      }
-    },
-  },
-)
+}
 
 useSeoMeta({
-  title: () => item.value?.metadata?.name,
-  description: () => item.value?.metadata?.description?.slice(0, 150),
-  ogImage: () => `https://ogi.koda.art/__og-image__/image/${chainPrefix.value}/gallery/${collectionId}-${tokenId}/og.png`, // TODO: at the moment satori somehow doesn't work on cf-pages (defineOgImageComponent)
+  title: () => item.metadata?.name,
+  description: () => item.metadata?.description?.slice(0, 150),
+})
+
+defineOgImage({
+  component: 'Gallery',
+  props: {
+    title: item.metadata.name,
+    image: item.metadata?.image,
+    network: chainSpec[chainPrefix.value].name,
+    symbol: chainSpec[chainPrefix.value].tokenSymbol,
+  },
 })
 
 const tokenMetadata = computed(() => {
-  if (item.value?.metadata.name) {
-    return item.value
+  if (item.metadata.name) {
+    return item
   }
 
   return tokenData.value

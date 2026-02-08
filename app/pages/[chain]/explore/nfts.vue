@@ -21,6 +21,34 @@ const route = useRoute()
 const { chain } = route.params as { chain: AssetHubChain }
 
 const queryVariables = ref<Record<string, any>>({})
+
+const mergedQueryVariables = computed(() => {
+  const filters: Record<string, any> = { ...queryVariables.value }
+
+  const searchFilters = []
+
+  if (filters.search) {
+    if (Array.isArray(filters.search)) {
+      searchFilters.push(...filters.search)
+    }
+    else {
+      searchFilters.push(filters.search)
+    }
+  }
+
+  const nftFilters = buildNftSearchFilters({ query: route.query })
+
+  searchFilters.push(...nftFilters)
+
+  if (searchFilters.length > 0) {
+    filters.search = searchFilters
+  }
+  else {
+    delete filters.search
+  }
+
+  return filters
+})
 </script>
 
 <template>
@@ -35,14 +63,14 @@ const queryVariables = ref<Record<string, any>>({})
     </ExploreHeader>
 
     <!-- Grid Content for NFTs -->
-    <div class="my-8">
+    <ExploreFilters class="my-8">
       <NftsGrid
-        :key="JSON.stringify(queryVariables)"
-        :search="queryVariables.name || ''"
-        :variables="queryVariables"
+        :key="JSON.stringify(mergedQueryVariables)"
+        :search="mergedQueryVariables.name || ''"
+        :variables="mergedQueryVariables"
         :prefix="chain"
       />
-    </div>
+    </ExploreFilters>
     <ScrollToTop />
   </UContainer>
 </template>
