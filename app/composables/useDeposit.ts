@@ -37,7 +37,6 @@ export default function (prefix: Ref<SupportedChain>) {
   const totalCollectionDeposit = ref(0)
   const totalItemDeposit = ref(0)
 
-  const chainSymbol = ref('')
   const loading = ref(true)
 
   watchEffect((onInvalidate) => {
@@ -124,7 +123,6 @@ export default function (prefix: Ref<SupportedChain>) {
     existentialDeposit,
     totalCollectionDeposit,
     totalItemDeposit,
-    chainSymbol,
     loading,
   }
 }
