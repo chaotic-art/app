@@ -1,15 +1,19 @@
 <script setup lang="ts">
+import type { SelectedTrait } from '~/components/trait/types'
 import { formatCompactNumber } from '~/utils/format/balance'
 
 const props = defineProps<{
   min: number
   max: number
   loading: boolean
+  collectionId?: string
 }>()
 
 defineEmits<{
-  applyFilters: []
-  clearFilters: []
+  'applyFilters': []
+  'clearFilters': []
+  'update:nft-ids': [nftIds: string[]]
+  'update:selected-traits': [selectedTraits: SelectedTrait[]]
 }>()
 
 const priceBy = defineModel<'token' | 'usd'>('priceBy', { required: true })
@@ -42,6 +46,16 @@ function selectLastSale(value: string) {
 <template>
   <div class="text-muted-foreground text-sm">
     <div class="flex flex-col">
+      <template v-if="collectionId">
+        <FilterTraitSection
+          :collection-id="collectionId"
+          @update:nft-ids="(ids: string[]) => $emit('update:nft-ids', ids)"
+          @update:selected-traits="(traits: SelectedTrait[]) => $emit('update:selected-traits', traits)"
+        />
+
+        <USeparator class="my-4" />
+      </template>
+
       <PriceRangeSkeleton v-if="loading" />
 
       <template v-else>
