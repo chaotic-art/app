@@ -12,6 +12,14 @@ const isMeasuring = ref(false)
 
 const chainOrder: SupportedChain[] = ['ahp', 'ahk', 'dot', 'ksm', 'ahpas']
 
+const chainTabs = computed(() =>
+  chainOrder.map(chain => ({
+    label: chainSpec[chain].name,
+    value: chain,
+    badge: chainSpec[chain].tokenSymbol,
+  })),
+)
+
 function extractHostname(url: string): string {
   try {
     const parsed = new URL(url)
@@ -156,33 +164,22 @@ function isSelected(chain: SupportedChain, url: string): boolean {
           Select a preferred RPC endpoint for each chain. Click "Test All" to measure latency.
         </p>
 
-        <!-- Chain Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <UCard
-            v-for="chain in chainOrder"
-            :key="chain"
-          >
-            <template #header>
-              <div class="flex items-center gap-3">
-                <span class="text-base font-semibold">
-                  {{ chainSpec[chain].name }}
-                </span>
-                <UBadge
-                  :label="chainSpec[chain].tokenSymbol"
-                  variant="subtle"
-                  color="neutral"
-                  size="sm"
-                />
-              </div>
-            </template>
-
-            <div class="space-y-1">
+        <!-- Chain Tabs -->
+        <UTabs
+          :items="chainTabs"
+          default-value="ahp"
+          color="neutral"
+          variant="link"
+          class="w-full"
+        >
+          <template #content="{ item }">
+            <div class="space-y-1 pt-2">
               <button
-                v-for="url in PROVIDERS[chain]"
+                v-for="url in PROVIDERS[item.value as SupportedChain]"
                 :key="url"
                 class="w-full flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors"
-                :class="isSelected(chain, url) ? 'bg-primary/10' : 'hover:bg-elevated'"
-                @click="selectProvider(chain, url)"
+                :class="isSelected(item.value as SupportedChain, url) ? 'bg-primary/10' : 'hover:bg-elevated'"
+                @click="selectProvider(item.value as SupportedChain, url)"
               >
                 <UIcon
                   name="i-lucide-circle"
@@ -196,14 +193,14 @@ function isSelected(chain: SupportedChain, url: string): boolean {
                   {{ formatLatency(url) }}
                 </span>
                 <UIcon
-                  v-if="isSelected(chain, url)"
+                  v-if="isSelected(item.value as SupportedChain, url)"
                   name="i-lucide-check"
                   class="h-4 w-4 text-primary shrink-0"
                 />
               </button>
             </div>
-          </UCard>
-        </div>
+          </template>
+        </UTabs>
       </div>
     </div>
   </UContainer>
