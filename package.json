@@ -67,7 +67,7 @@
     "@antfu/eslint-config": "^6.1.0",
     "@gql.tada/vue-support": "^1.0.1",
     "@nuxt/eslint": "^1.9.0",
-    "@polkadot/apps-config": "^0.166.1",
+    "@polkadot/apps-config": "^0.169.1",
     "@types/lodash": "^4.17.20",
     "@types/markdown-it": "^14.1.2",
     "@types/prismjs": "^1.26.5",
