@@ -70,7 +70,6 @@ const { selectedSort, createQueryVariables } = useSortOptions()
 
 const filteredNftIds = ref<string[]>([])
 const selectedTraits = ref<SelectedTrait[]>([])
-
 const queryVariables = computed(() => {
   const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
 
@@ -240,16 +239,16 @@ defineOgImageComponent('Frame', {
       <UTabs v-model="activeTab" color="neutral" :items="tabsItems" class="w-full" :ui="{ root: 'gap-4' }">
         <template #items>
           <!-- Items Section -->
-          <ExploreFilters class="mt-2">
+          <ExploreFilters
+            class="mt-2"
+            :collection-id="collection_id?.toString() ?? ''"
+            @update:nft-ids="handleNftIdsUpdate"
+            @update:selected-traits="handleSelectedTraitsUpdate"
+          >
             <div class="space-y-6">
               <div class="flex flex-col md:flex-row justify-end items-center gap-4">
                 <div class="w-full md:w-auto flex items-center gap-2">
                   <ArtViewFilter />
-                  <TraitFilter
-                    :collection-id="collection_id?.toString() ?? ''"
-                    @update:nft-ids="handleNftIdsUpdate"
-                    @update:selected-traits="handleSelectedTraitsUpdate"
-                  />
                   <SortOptions
                     v-model="selectedSort"
                     class="w-full md:w-48"
