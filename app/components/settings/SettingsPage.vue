@@ -12,11 +12,19 @@ const isMeasuring = ref(false)
 
 const chainOrder: SupportedChain[] = ['ahp', 'ahk', 'dot', 'ksm', 'ahpas']
 
+const activeChain = ref<SupportedChain>('ahp')
+
 const chainTabs = computed(() =>
   chainOrder.map(chain => ({
     label: chainSpec[chain].name,
     value: chain,
-    badge: chainSpec[chain].tokenSymbol,
+  })),
+)
+
+const chainSelectItems = computed(() =>
+  chainOrder.map(chain => ({
+    label: chainSpec[chain].name,
+    value: chain,
   })),
 )
 
@@ -131,6 +139,10 @@ function selectProvider(chain: SupportedChain, url: string) {
 function isSelected(chain: SupportedChain, url: string): boolean {
   return rpcStore.getProvider(chain) === url
 }
+
+function isProviderError(url: string): boolean {
+  return latencies.value.get(url) === null
+}
 </script>
 
 <template>
@@ -164,21 +176,72 @@ function isSelected(chain: SupportedChain, url: string): boolean {
           Select a preferred RPC endpoint for each chain. Click "Test All" to measure latency.
         </p>
 
-        <!-- Chain Tabs -->
+        <!-- Mobile: Select dropdown -->
+        <div class="block md:hidden space-y-3">
+          <USelect
+            v-model="activeChain"
+            :items="chainSelectItems"
+            class="w-full"
+            size="md"
+          />
+
+          <div class="space-y-1">
+            <button
+              v-for="url in PROVIDERS[activeChain]"
+              :key="url"
+              :disabled="isProviderError(url)"
+              class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
+              :class="[
+                isProviderError(url)
+                  ? 'opacity-40 cursor-not-allowed'
+                  : isSelected(activeChain, url)
+                    ? 'bg-primary/10 cursor-pointer'
+                    : 'hover:bg-elevated cursor-pointer',
+              ]"
+              @click="selectProvider(activeChain, url)"
+            >
+              <UIcon
+                name="i-lucide-circle"
+                :class="latencyColorClass(url)"
+                class="h-3 w-3 shrink-0"
+              />
+              <span class="flex-1 text-sm truncate text-left font-mono">
+                {{ extractHostname(url) }}
+              </span>
+              <span class="text-xs text-muted tabular-nums shrink-0">
+                {{ formatLatency(url) }}
+              </span>
+              <UIcon
+                v-if="isSelected(activeChain, url)"
+                name="i-lucide-check"
+                class="h-4 w-4 text-primary shrink-0"
+              />
+            </button>
+          </div>
+        </div>
+
+        <!-- Desktop: Tabs -->
         <UTabs
+          v-model="activeChain"
           :items="chainTabs"
-          default-value="ahp"
           color="neutral"
           variant="link"
-          class="w-full"
+          class="hidden md:flex w-full"
         >
           <template #content="{ item }">
             <div class="space-y-1 pt-2">
               <button
                 v-for="url in PROVIDERS[item.value as SupportedChain]"
                 :key="url"
-                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors"
-                :class="isSelected(item.value as SupportedChain, url) ? 'bg-primary/10' : 'hover:bg-elevated'"
+                :disabled="isProviderError(url)"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
+                :class="[
+                  isProviderError(url)
+                    ? 'opacity-40 cursor-not-allowed'
+                    : isSelected(item.value as SupportedChain, url)
+                      ? 'bg-primary/10 cursor-pointer'
+                      : 'hover:bg-elevated cursor-pointer',
+                ]"
                 @click="selectProvider(item.value as SupportedChain, url)"
               >
                 <UIcon
