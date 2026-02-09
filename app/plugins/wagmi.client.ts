@@ -1,10 +1,9 @@
-import type { AppKitNetwork } from '@reown/appkit/networks'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { base } from '@reown/appkit/networks'
 import { reconnect } from '@wagmi/core'
 import { WagmiPlugin } from '@wagmi/vue'
 
-const networks = [base]
+const networks = [base] // TODO: temporary hardcoded network, we need to add more networks
 
 const metadata = {
   name: 'Chaotic',
