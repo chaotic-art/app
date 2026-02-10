@@ -32,6 +32,7 @@ const isHovering = ref(false)
 function checkOverflow() {
   if (titleRef.value && titleTextRef.value) {
     shouldScroll.value = titleTextRef.value.scrollWidth > titleRef.value.clientWidth
+    titleRef.value.style.setProperty('--container-width', `${titleRef.value.clientWidth}px`)
   }
 }
 
