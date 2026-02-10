@@ -273,31 +273,5 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
         <slot />
       </div>
     </div>
-
-    <!-- Floating expand button when desktop sidebar is collapsed -->
-    <ClientOnly>
-      <Transition
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0 -translate-x-4 scale-95"
-        enter-to-class="opacity-100 translate-x-0 scale-100"
-        leave-active-class="transition-all duration-200 ease-in"
-        leave-from-class="opacity-100 translate-x-0 scale-100"
-        leave-to-class="opacity-0 -translate-x-4 scale-95"
-      >
-        <UTooltip v-if="!isMobile && sidebarCollapsed" :text="$t('explore.showFilters')">
-          <UButton
-            icon="i-heroicons-chevron-right"
-            color="neutral"
-            variant="solid"
-            size="sm"
-            class="fixed left-6 top-72 z-50 w-10! h-10 rounded-full! shadow-md hover:shadow-lg transition-shadow duration-200 md:left-8"
-            aria-label="Show filters"
-            @click="sidebarCollapsed = false"
-          >
-            <UBadge v-if="activeFiltersCount > 0" :label="String(activeFiltersCount)" size="xs" class="absolute -top-1 -right-1" />
-          </UButton>
-        </UTooltip>
-      </Transition>
-    </ClientOnly>
   </div>
 </template>

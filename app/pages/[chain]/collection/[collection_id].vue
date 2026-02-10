@@ -246,8 +246,12 @@ defineOgImageComponent('Frame', {
             @update:selected-traits="handleSelectedTraitsUpdate"
           >
             <div class="space-y-6">
-              <div class="flex flex-col md:flex-row justify-end items-center gap-4">
-                <div class="w-full md:w-auto flex items-center gap-2">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="w-full md:w-auto flex items-center justify-start">
+                  <ExploreFilterToggleButton />
+                </div>
+
+                <div class="w-full md:w-auto flex items-center gap-2 md:ml-auto">
                   <ArtViewFilter />
                   <SortOptions
                     v-model="selectedSort"
