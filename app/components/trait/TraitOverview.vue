@@ -1,15 +1,11 @@
 <script setup lang="ts">
+import type { TraitValueRow } from './types'
 import { ChartType } from './types'
+import { exportTraitsToCsv } from './utils'
 
 interface Props {
   collectionId: string
-}
-
-interface TraitValueRow {
-  traitType: string
-  value: string
-  count: number
-  rarity: number
+  collectionName?: string
 }
 
 type ViewMode = 'table' | 'charts'
@@ -101,6 +97,10 @@ const chartTypeItems = [
     value: ChartType.DOUGHNUT,
   },
 ]
+
+function exportToCsv() {
+  exportTraitsToCsv(groupedTraits.value, props.collectionName)
+}
 </script>
 
 <template>
@@ -143,19 +143,28 @@ const chartTypeItems = [
         </div>
 
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-background border border-border rounded-xl">
-          <div class="flex items-center gap-2">
-            <span class="text-sm font-medium text-muted-foreground">View Mode:</span>
-            <div class="flex items-center gap-2">
-              <UButton
-                v-for="item in viewModeItems"
-                :key="item.value"
-                :icon="item.icon"
-                :variant="viewMode === item.value ? 'solid' : 'outline'"
-                @click="viewMode = item.value"
-              >
-                {{ item.label }}
-              </UButton>
+          <div class="flex flex-wrap items-center justify-between gap-2 w-full">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-sm font-medium text-muted-foreground">View Mode:</span>
+              <div class="flex items-center gap-2">
+                <UButton
+                  v-for="item in viewModeItems"
+                  :key="item.value"
+                  :icon="item.icon"
+                  :variant="viewMode === item.value ? 'solid' : 'outline'"
+                  @click="viewMode = item.value"
+                >
+                  {{ item.label }}
+                </UButton>
+              </div>
             </div>
+            <UButton
+              icon="i-heroicons-arrow-down-tray"
+              variant="outline"
+              @click="exportToCsv"
+            >
+              Export to CSV
+            </UButton>
           </div>
 
           <div v-if="viewMode === 'charts'" class="flex items-center gap-2">

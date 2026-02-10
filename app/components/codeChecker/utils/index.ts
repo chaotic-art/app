@@ -183,3 +183,16 @@ export function getDocumentFromString(html: string): Document {
   const parser = new DOMParser()
   return parser.parseFromString(html, 'text/html')
 }
+
+export function prettifyZipFileName(name: string = ''): string {
+  const MAX_LENGTH = 18
+  if (name.length <= MAX_LENGTH) {
+    return name
+  }
+
+  const baseName = name.replace(/\.zip$/i, '')
+  const head = baseName.slice(0, 6)
+  const tail = baseName.slice(-6)
+
+  return `${head}...${tail}.zip`
+}

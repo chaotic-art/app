@@ -4,11 +4,17 @@ import { copyAddress } from '~/utils/format/address'
 const { accountId } = useAuth()
 const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
 const { walletAssetModal } = useWalletSidebar()
+const { logoutConnectedWallets } = useWalletManager()
 
 async function handleCopyAddress() {
   if (accountId.value) {
     await copyAddress(accountId.value)
   }
+}
+
+function handleLogout() {
+  logoutConnectedWallets()
+  walletAssetModal.close()
 }
 
 function handleWalletSettings() {
@@ -53,6 +59,16 @@ function handleWalletSettings() {
         @click="handleWalletSettings"
       >
         <UIcon name="i-lucide-settings" class="w-4 h-4" />
+      </UButton>
+      <UButton
+        variant="ghost"
+        size="sm"
+        square
+        title="Manage wallet"
+        class="self-center size-8"
+        @click="handleLogout"
+      >
+        <UIcon name="i-lucide-log-out" class="w-4 h-4" />
       </UButton>
     </div>
   </div>

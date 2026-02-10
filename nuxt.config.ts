@@ -59,8 +59,6 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxtjs/i18n',
-    '@nuxt/scripts',
-    '@nuxt/test-utils',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     '@wagmi/vue/nuxt',
