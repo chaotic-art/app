@@ -166,23 +166,32 @@ onUnmounted(() => {
       <div v-if="loading">
         <UIcon name="i-mdi:loading" class="animate-spin h-8 w-8 my-8" />
       </div>
-      <div v-else class="flex flex-col gap-4 items-center">
+      <div v-else class="flex flex-col gap-3 items-center mt-6">
         <button v-if="minted" class="claim-button" @click="emit('viewCard')">
           View my card
-        </button>
-        <button v-if="minted" class="claim-button" @click="emit('share')">
-          Share on <UIcon name="i-simple-icons:x" class="size-5 ml-2" />
-        </button>
-        <button v-if="minted && screenshotUrl" class="claim-button" @click="emit('download')">
-          Download my card
         </button>
 
         <button v-if="!minted" class="claim-button" @click="emit('claim')">
           Claim Now
         </button>
-        <button class="claim-button" @click="emit('exploreCollection')">
-          Explore collection
-        </button>
+
+        <div class="flex items-center gap-4 mt-2">
+          <UTooltip v-if="minted" text="Share on X">
+            <button class="size-10 shrink-0 flex items-center justify-center rounded-full bg-white/12 border border-white/20 text-white cursor-pointer transition-all duration-300 hover:bg-white/24 hover:border-white/40 hover:scale-110 active:scale-95" @click="emit('share')">
+              <UIcon name="i-simple-icons:x" class="size-4" />
+            </button>
+          </UTooltip>
+          <UTooltip v-if="minted && screenshotUrl" text="Download my card">
+            <button class="size-10 shrink-0 flex items-center justify-center rounded-full bg-white/12 border border-white/20 text-white cursor-pointer transition-all duration-300 hover:bg-white/24 hover:border-white/40 hover:scale-110 active:scale-95" @click="emit('download')">
+              <UIcon name="i-heroicons:arrow-down-tray" class="size-4" />
+            </button>
+          </UTooltip>
+          <UTooltip text="Explore collection">
+            <button class="size-10 shrink-0 flex items-center justify-center rounded-full bg-white/12 border border-white/20 text-white cursor-pointer transition-all duration-300 hover:bg-white/24 hover:border-white/40 hover:scale-110 active:scale-95" @click="emit('exploreCollection')">
+              <UIcon name="i-heroicons:squares-2x2" class="size-4" />
+            </button>
+          </UTooltip>
+        </div>
       </div>
     </div>
   </div>
@@ -494,7 +503,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-top: 32px;
 }
 
 .claim-button:hover {
