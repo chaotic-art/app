@@ -24,17 +24,34 @@ const imageStatus = ref<'normal' | 'placeholder'>('normal')
 
 const isPlaceholder = computed(() => imageStatus.value === 'placeholder' || !props.item.image)
 
+const titleRef = ref<HTMLElement | null>(null)
+const titleTextRef = ref<HTMLElement | null>(null)
+const shouldScroll = ref(false)
+const isHovering = ref(false)
+
+const checkOverflow = () => {
+  if (titleRef.value && titleTextRef.value) {
+    shouldScroll.value = titleTextRef.value.scrollWidth > titleRef.value.clientWidth
+  }
+}
+
 onMounted(async () => {
   const collection = await fetchOdaCollection(props.prefix, props.item.id)
   collectionData.floor = collection.floor ?? 0
   collectionData.items = Number(collection.claimed)
   collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
+  
+  nextTick(() => {
+    checkOverflow()
+  })
 })
 </script>
 
 <template>
   <article
     class="group relative rounded-xl shadow-xs hover:shadow-sm border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1"
+    @mouseenter="isHovering = true"
+    @mouseleave="isHovering = false"
   >
     <NuxtLink
       :to="`/${prefix}/collection/${item.id}`"
@@ -84,8 +101,17 @@ onMounted(async () => {
 
             <!-- Collection Title -->
             <div class="flex-1 min-w-0 pb-1">
-              <h3 class="font-bold text-lg text-white leading-tight truncate drop-shadow-lg">
-                {{ item.name }}
+              <h3 
+                ref="titleRef"
+                class="font-bold text-lg text-white leading-tight drop-shadow-lg overflow-hidden"
+              >
+                <span 
+                  ref="titleTextRef"
+                  class="inline-block whitespace-nowrap scrolling-title"
+                  :class="{ 'is-scrolling': isHovering && shouldScroll }"
+                >
+                  {{ item.name }}
+                </span>
               </h3>
 
               <p class="text-sm text-white/80 mt-1 truncate">
@@ -136,3 +162,28 @@ onMounted(async () => {
     </NuxtLink>
   </article>
 </template>
+
+<style scoped>
+.scrolling-title {
+  transition: transform 0.3s ease;
+}
+
+.scrolling-title.is-scrolling {
+  animation: scroll-horizontal 8s linear infinite;
+}
+
+@keyframes scroll-horizontal {
+  0% {
+    transform: translateX(0);
+  }
+  45% {
+    transform: translateX(calc(-100% + var(--container-width, 200px)));
+  }
+  55% {
+    transform: translateX(calc(-100% + var(--container-width, 200px)));
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+</style>
