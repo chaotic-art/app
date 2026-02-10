@@ -9,7 +9,7 @@
         "schemas": [
           {
             "name": "ahp",
-            "schema": "https://ahp.gql.api.kodadot.xyz/",
+            "schema": "https://chaotic-ahp.stellate.sh/",
             "tadaOutputLocation": "./app/graphql/ahp-env.d.ts"
           }
         ]
