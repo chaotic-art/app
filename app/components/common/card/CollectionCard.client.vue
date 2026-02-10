@@ -29,7 +29,7 @@ const titleTextRef = ref<HTMLElement | null>(null)
 const shouldScroll = ref(false)
 const isHovering = ref(false)
 
-const checkOverflow = () => {
+function checkOverflow() {
   if (titleRef.value && titleTextRef.value) {
     shouldScroll.value = titleTextRef.value.scrollWidth > titleRef.value.clientWidth
   }
@@ -40,7 +40,7 @@ onMounted(async () => {
   collectionData.floor = collection.floor ?? 0
   collectionData.items = Number(collection.claimed)
   collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
-  
+
   nextTick(() => {
     checkOverflow()
   })
@@ -101,11 +101,11 @@ onMounted(async () => {
 
             <!-- Collection Title -->
             <div class="flex-1 min-w-0 pb-1">
-              <h3 
+              <h3
                 ref="titleRef"
                 class="font-bold text-lg text-white leading-tight drop-shadow-lg overflow-hidden"
               >
-                <span 
+                <span
                   ref="titleTextRef"
                   class="inline-block whitespace-nowrap scrolling-title"
                   :class="{ 'is-scrolling': isHovering && shouldScroll }"
