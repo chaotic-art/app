@@ -42,16 +42,20 @@ function measureLatency(url: string): Promise<number | null> {
   return new Promise((resolve) => {
     const start = performance.now()
     let resolved = false
+    let ws: WebSocket | undefined
 
     const timeout = setTimeout(() => {
       if (!resolved) {
         resolved = true
+        if (ws) {
+          ws.close()
+        }
         resolve(null)
       }
     }, LATENCY_TIMEOUT)
 
     try {
-      const ws = new WebSocket(url)
+      ws = new WebSocket(url)
 
       ws.onopen = () => {
         if (!resolved) {
@@ -60,7 +64,7 @@ function measureLatency(url: string): Promise<number | null> {
           const latency = Math.round(performance.now() - start)
           resolve(latency)
         }
-        ws.close()
+        ws?.close()
       }
 
       ws.onerror = () => {
@@ -69,13 +73,16 @@ function measureLatency(url: string): Promise<number | null> {
           clearTimeout(timeout)
           resolve(null)
         }
-        ws.close()
+        ws?.close()
       }
     }
     catch {
       if (!resolved) {
         resolved = true
         clearTimeout(timeout)
+        if (ws) {
+          ws.close()
+        }
         resolve(null)
       }
     }
