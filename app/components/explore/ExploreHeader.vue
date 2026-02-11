@@ -50,6 +50,10 @@ function handleTypeChange(type: string) {
             {{ type }}
           </UButton>
         </div>
+
+        <div v-if="$slots['left-controls']" class="flex items-center gap-2">
+          <slot name="left-controls" />
+        </div>
       </div>
 
       <!-- Right Side - Slot for page-specific controls -->

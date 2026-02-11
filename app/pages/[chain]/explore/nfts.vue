@@ -54,6 +54,10 @@ const mergedQueryVariables = computed(() => {
 <template>
   <UContainer class="px-4 md:px-6">
     <ExploreHeader>
+      <template #left-controls>
+        <ExploreFilterToggleButton />
+      </template>
+
       <template #controls>
         <NftsToolbar
           :has-owned-filter="isLogIn"

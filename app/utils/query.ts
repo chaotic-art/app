@@ -2,8 +2,10 @@ import type { LocationQuery, LocationQueryValue } from 'vue-router'
 
 export const NFT_GRID_NON_FETCH_QUERY_KEYS = ['art_view'] as const
 
+type QueryValue = LocationQueryValue | LocationQueryValue[] | null | undefined
+
 export function parseQueryNumber(
-  value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+  value: QueryValue,
 ): number | null {
   const normalized = Array.isArray(value) ? value[0] : value
   if (normalized === undefined || normalized === null || normalized === '') {
@@ -13,7 +15,9 @@ export function parseQueryNumber(
   return Number.isFinite(parsed) ? parsed : null
 }
 
-function serializeQueryValue(value: LocationQueryValue | LocationQueryValue[] | null | undefined): string {
+function serializeQueryValue(
+  value: LocationQueryValue | LocationQueryValue[] | null | undefined,
+): string {
   if (Array.isArray(value)) {
     return value.join(',')
   }
@@ -32,4 +36,20 @@ export function serializeQueryForKey(
     .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
     .map(([key, value]) => `${key}=${serializeQueryValue(value)}`)
     .join('&')
+}
+
+export function hasQueryFilterValue(value: QueryValue): boolean {
+  if (Array.isArray(value)) {
+    return value.some(item => typeof item === 'string' && item.length > 0)
+  }
+
+  return typeof value === 'string' && value.length > 0
+}
+
+export function hasQueryTrueValue(value: QueryValue): boolean {
+  if (Array.isArray(value)) {
+    return value.includes('true')
+  }
+
+  return value === 'true'
 }
