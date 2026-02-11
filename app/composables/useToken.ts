@@ -30,6 +30,7 @@ export function useToken(props: {
   const collection = ref<Awaited<ReturnType<typeof fetchOdaCollection>> | null>(null)
   const highestOffer = ref<HighestNftOffer | null>(null)
   const queryPrice = ref<string | null>(null)
+  const isPriceLoading = ref(true)
   const owner = ref<string | null>(null)
   const collectionCreator = ref<string | null>(null)
   const error = ref<unknown | null>(null)
@@ -114,6 +115,9 @@ export function useToken(props: {
       console.error('Failed to fetch token data:', err)
       error.value = err
     }
+    finally {
+      isPriceLoading.value = false
+    }
   })
 
   const price = computed(() => {
@@ -151,6 +155,7 @@ export function useToken(props: {
 
     // Computed properties
     nativePrice: queryPrice,
+    isPriceLoading,
     price,
     usdPrice,
     mediaIcon,

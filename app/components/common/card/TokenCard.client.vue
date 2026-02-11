@@ -23,6 +23,7 @@ const {
   usdPrice,
   mediaIcon,
   nativePrice,
+  isPriceLoading,
 } = useToken(props)
 
 const isNsfw = computed(() => isNsfwNft(token.value?.metadata?.attributes))
@@ -232,7 +233,10 @@ watchEffect(() => {
                 Price
               </div>
               <div class="text-right">
-                <div v-if="price" class="flex items-baseline gap-1">
+                <div v-if="isPriceLoading" class="h-5 flex items-center">
+                  <USkeleton class="h-4 w-20 rounded" />
+                </div>
+                <div v-else-if="price" class="flex items-baseline gap-1">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ price }}</span>
                 </div>
                 <div v-else>
@@ -247,7 +251,10 @@ watchEffect(() => {
                 USD
               </div>
               <div class="text-right">
-                <div v-if="price" class="flex items-baseline gap-1">
+                <div v-if="isPriceLoading" class="h-5 flex items-center">
+                  <USkeleton class="h-4 w-14 rounded" />
+                </div>
+                <div v-else-if="price" class="flex items-baseline gap-1">
                   <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ usdPrice || '$0.00' }}</span>
                 </div>
                 <div v-else>
