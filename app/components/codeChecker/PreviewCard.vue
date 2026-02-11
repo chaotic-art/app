@@ -3,7 +3,7 @@ import type { AssetMessage, Passed } from './types'
 import { useFullscreen } from '@vueuse/core'
 import config from './codechecker.config'
 import { downloadBase64Image } from './massPreview/utils'
-import { generateRandomHash } from './utils'
+import { generateRandomHash, prettifyZipFileName } from './utils'
 
 const props = defineProps<{
   selectedFile: File | null
@@ -271,7 +271,7 @@ watch(hash, emitHashUpdate)
           :disabled="!kodaRendererUsed"
           @click="exportAsPNG"
         >
-          <span>{{ `Export ${fileName} as PNG` }}</span>
+          <span>{{ `Export ${prettifyZipFileName(fileName)} as PNG` }}</span>
         </UButton>
         <USelectMenu
           :model-value="selectedVariation"

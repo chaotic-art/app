@@ -25,7 +25,7 @@ export function useWalletSidebar() {
 export default function useWalletManager() {
   const walletStore = useWalletStore()
   const { accountId } = useAuth()
-  const { selectedAccounts } = storeToRefs(walletStore)
+  const { selectedAccounts, getUserConnectedWallets } = storeToRefs(walletStore)
   const accountStore = useAccountStore()
   const disconnectEvent = createEventHook<void>()
 
@@ -54,6 +54,18 @@ export default function useWalletManager() {
     }
   }
 
+  function backToWalletSelection() {
+    walletStore.setStage(WalletStageTypes.Wallet)
+  }
+
+  async function logoutConnectedWallets() {
+    for (const wallet of getUserConnectedWallets.value) {
+      await disconnectWallet(wallet)
+    }
+
+    backToWalletSelection()
+  }
+
   whenever(
     () => !accountId.value,
     () => disconnectEvent.trigger(),
@@ -62,6 +74,8 @@ export default function useWalletManager() {
 
   return {
     disconnectWallet,
+    logoutConnectedWallets,
     onDisconnect: disconnectEvent.on,
+    backToWalletSelection,
   }
 }

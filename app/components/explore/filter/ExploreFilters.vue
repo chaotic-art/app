@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { SelectedTrait } from '~/components/trait/types'
 import type { RarityTierQueryValue } from '~/utils/nftSearchFilters'
 import { useWindowSize, whenever } from '@vueuse/core'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
@@ -6,6 +7,15 @@ import { isRarityTierQueryValue } from '~/utils/nftSearchFilters'
 import { parseQueryCsv, parseQueryNumber } from '~/utils/query'
 
 type PriceBy = 'token' | 'usd'
+
+const props = defineProps<{
+  collectionId?: string
+}>()
+
+const emit = defineEmits<{
+  'update:nft-ids': [nftIds: string[]]
+  'update:selected-traits': [selectedTraits: SelectedTrait[]]
+}>()
 
 const REASONABLE_MAX_CAP = 100_000
 
@@ -208,6 +218,9 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
               :min="min"
               :max="max"
               :loading="loading"
+              :collection-id="props.collectionId"
+              @update:nft-ids="(ids: string[]) => emit('update:nft-ids', ids)"
+              @update:selected-traits="(traits: SelectedTrait[]) => emit('update:selected-traits', traits)"
             />
           </template>
 
@@ -255,6 +268,9 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
               :min="min"
               :max="max"
               :loading="loading"
+              :collection-id="props.collectionId"
+              @update:nft-ids="(ids: string[]) => emit('update:nft-ids', ids)"
+              @update:selected-traits="(traits: SelectedTrait[]) => $emit('update:selected-traits', traits)"
             />
           </div>
 

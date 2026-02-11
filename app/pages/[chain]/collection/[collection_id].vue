@@ -62,13 +62,14 @@ const { data } = await useLazyAsyncData(
     return { collection, drops }
   },
 )
+
+const collectionName = computed(() => data.value?.collection?.metadata?.name)
 const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.collection?.metadata?.banner || data.value?.collection?.metadata?.image)))
 
 const { selectedSort, createQueryVariables } = useSortOptions()
 
 const filteredNftIds = ref<string[]>([])
 const selectedTraits = ref<SelectedTrait[]>([])
-
 const queryVariables = computed(() => {
   const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
 
@@ -102,7 +103,7 @@ const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import(
 function handleDestroyCollection() {
   destroyCollectionModal.open({
     collectionId: collection_id?.toString() ?? '',
-    collectionName: data.value?.collection?.metadata?.name,
+    collectionName: collectionName.value,
     chain: chain.value,
   })
 }
@@ -123,12 +124,12 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: () => data.value?.collection?.metadata?.name,
+  title: () => collectionName.value,
   description: () => data.value?.collection?.metadata?.description?.slice(0, 150),
 })
 
 defineOgImageComponent('Frame', {
-  title: data.value?.collection?.metadata?.name,
+  title: collectionName.value,
   image: sanitizeIpfsUrl(data.value?.collection?.metadata?.image),
   items: data.value?.collection?.supply,
   claimed: data.value?.collection?.claimed,
@@ -189,16 +190,7 @@ defineOgImageComponent('Frame', {
                 </UButton>
               </div>
               <div v-if="data?.drops?.data[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
-                <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" custom-name>
-                  <template #name="{ addressName }">
-                    <div class="pr-1 flex">
-                      <p>Creator:</p>
-                      <p class="font-bold">
-                        {{ addressName }}
-                      </p>
-                    </div>
-                  </template>
-                </UserInfo>
+                <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" class="min-w-0" />
                 <UButton
                   :to="getSubscanAccountUrl((data?.drops?.data[0]?.creator || data?.collection?.owner) ?? '', chain)"
                   target="_blank"
@@ -247,16 +239,16 @@ defineOgImageComponent('Frame', {
       <UTabs v-model="activeTab" color="neutral" :items="tabsItems" class="w-full" :ui="{ root: 'gap-4' }">
         <template #items>
           <!-- Items Section -->
-          <ExploreFilters class="mt-2">
+          <ExploreFilters
+            class="mt-2"
+            :collection-id="collection_id?.toString() ?? ''"
+            @update:nft-ids="handleNftIdsUpdate"
+            @update:selected-traits="handleSelectedTraitsUpdate"
+          >
             <div class="space-y-6">
               <div class="flex flex-col md:flex-row justify-end items-center gap-4">
                 <div class="w-full md:w-auto flex items-center gap-2">
                   <ArtViewFilter />
-                  <TraitFilter
-                    :collection-id="collection_id?.toString() ?? ''"
-                    @update:nft-ids="handleNftIdsUpdate"
-                    @update:selected-traits="handleSelectedTraitsUpdate"
-                  />
                   <SortOptions
                     v-model="selectedSort"
                     class="w-full md:w-48"
@@ -282,7 +274,7 @@ defineOgImageComponent('Frame', {
           <CollectionTrades :trade-type="TradeTypes.Swap" />
         </template>
         <template #traits>
-          <TraitOverview :collection-id="collection_id?.toString() ?? ''" />
+          <TraitOverview :collection-id="collection_id?.toString() ?? ''" :collection-name="collectionName" />
         </template>
       </UTabs>
     </div>

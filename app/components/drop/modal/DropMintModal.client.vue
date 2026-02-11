@@ -15,7 +15,7 @@ const modalStep = ref<ModalStep>(ModalSteps.Overview)
 
 const { $i18n } = useNuxtApp()
 const { canMint } = useDropMassMintState()
-const { minimumFunds } = useDropMinimumFunds()
+const { minimumFunds, loading: minimumFundsLoading } = useDropMinimumFunds()
 const { toMintNFTs, mintingSession } = storeToRefs(useDropStore())
 const { executeTransaction, isModalOpen, transaction } = useDropMint()
 
@@ -27,7 +27,7 @@ const { isTransactionSuccessful } = useTransactionSuccessful({
   isLoading: computed(() => mintingSession.value.isLoading),
 })
 
-const loading = computed(() => !canMint.value)
+const loading = computed(() => !canMint.value || minimumFundsLoading.value)
 
 const isMintOverviewStep = computed(() => modalStep.value === ModalSteps.Overview)
 const isSigningStep = computed(() => modalStep.value === ModalSteps.Signing)

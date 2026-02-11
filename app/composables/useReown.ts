@@ -1,3 +1,4 @@
+import type { AppKitNetwork } from '@reown/appkit/networks'
 import type { AppKit, ConnectedWalletInfo, PublicStateControllerState, UseAppKitAccountReturn } from '@reown/appkit/vue'
 import { createAppKit, useAppKit, useDisconnect } from '@reown/appkit/vue'
 
@@ -24,7 +25,7 @@ const accounts = ref<Account[]>([])
 const currentKey = ref<string>()
 
 export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOptions = {}) => {
-  const { $wagmi } = useNuxtApp()
+  const { $wagmi } = useNuxtApp() as unknown as { $wagmi: import('~/plugins/wagmi.client').WagmiPluginProvide }
   const { disconnect } = useDisconnect()
 
   const isReady = computed(() => Boolean(appKit.value))
@@ -33,8 +34,8 @@ export default ({ onAccountChange, onModalOpenChange, onWalletChange }: AppKitOp
 
   const initAppKit = () => {
     appKit.value = createAppKit({
-      adapters: [$wagmi.adapter],
-      networks: [$wagmi.defaultNetwork, ...$wagmi.networks],
+      adapters: [$wagmi.adapter] as never,
+      networks: $wagmi.networks as unknown as [AppKitNetwork, ...AppKitNetwork[]],
       projectId: $wagmi.projectId,
       metadata: $wagmi.metadata,
       themeMode: 'light',
