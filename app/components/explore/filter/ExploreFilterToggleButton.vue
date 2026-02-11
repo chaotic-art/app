@@ -12,7 +12,7 @@ const { sidebarCollapsed, openFilters, activeFiltersCount } = useExploreFilterTo
           variant="outline"
           size="sm"
           class="relative shrink-0 w-9! h-9 rounded-md!"
-          aria-label="Show filters"
+          :aria-label="$t('explore.showFilters')"
           @click="openFilters"
         >
           <UBadge
