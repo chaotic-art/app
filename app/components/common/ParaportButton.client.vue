@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ParaportParams } from '@paraport/vue'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 import { Paraport } from '@paraport/vue'
 import { isProduction } from '@/utils/env'
 
@@ -20,8 +20,19 @@ const SupportedChainMap: Record<AssetHubChain, { chain: ParaportParams['chain'],
 } as const
 
 const { getConnectedSubAccount } = storeToRefs(useWalletStore())
+const { selectedProviders } = storeToRefs(useRpcProviderStore())
 const { accountId } = useAuth()
 const { currentChain } = useChain()
+
+const endpoints = computed<ParaportParams['endpoints']>(() => {
+  const selectedProviderEntries = Object.entries(selectedProviders.value) as [SupportedChain, string | undefined][]
+
+  return Object.fromEntries(
+    selectedProviderEntries
+      .filter((entry): entry is [AssetHubChain, string] => Boolean(entry[1]) && entry[0] in SupportedChainMap)
+      .map(([chain, endpoint]) => [SupportedChainMap[chain].chain, [endpoint]]),
+  )
+})
 
 async function getSigner() {
   const signer = await getConnectedSubAccount.value?.signer
@@ -64,6 +75,7 @@ function onSubmit({ completed, autoteleport }: { completed: boolean, autotelepor
     :asset="SupportedChainMap[currentChain].asset"
     :label="label"
     :disabled="disabled"
+    :endpoints="endpoints"
     :log-level="isProduction ? 'INFO' : 'DEBUG'"
     @submit="onSubmit"
   />
