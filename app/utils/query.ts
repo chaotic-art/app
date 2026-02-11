@@ -19,10 +19,12 @@ function serializeQueryValue(
   value: LocationQueryValue | LocationQueryValue[] | null | undefined,
 ): string {
   if (Array.isArray(value)) {
-    return value.join(',')
+    return value
+      .map(item => (item === null ? '' : encodeURIComponent(item)))
+      .join(',')
   }
 
-  return value ?? ''
+  return value === undefined || value === null ? '' : encodeURIComponent(value)
 }
 
 export function serializeQueryForKey(
@@ -34,7 +36,7 @@ export function serializeQueryForKey(
   return Object.entries(query)
     .filter(([key]) => !excluded.has(key))
     .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-    .map(([key, value]) => `${key}=${serializeQueryValue(value)}`)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${serializeQueryValue(value)}`)
     .join('&')
 }
 
