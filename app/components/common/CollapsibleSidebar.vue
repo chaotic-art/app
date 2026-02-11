@@ -15,29 +15,34 @@ const FIXED_TOP_OFFSET = 100
 const FIXED_BOTTOM_OFFSET = 16
 
 const isCollapsed = defineModel({ type: Boolean })
+
 const target = ref<HTMLElement | null>(null)
 const sidebarRef = ref<HTMLElement | null>(null)
 const containerRef = ref<HTMLElement | null>(null)
-const hasMeasured = ref(false)
-const isTargetVisible = ref(true)
 
-useIntersectionObserver(target, ([entry]) => {
+const scrolledPastTop = ref(false)
+const hasScrolledPastTarget = computed(() => props.sticky && scrolledPastTop.value)
+
+useIntersectionObserver(target, ([entry]: IntersectionObserverEntry[]) => {
   if (!entry) {
     return
   }
 
-  hasMeasured.value = true
-  isTargetVisible.value = entry.isIntersecting
+  const isAboveViewport = !entry.isIntersecting
+    && entry.boundingClientRect.bottom <= (entry.rootBounds?.top ?? 0)
+
+  scrolledPastTop.value = isAboveViewport
 })
 
 const { height: sidebarHeight } = useElementSize(sidebarRef)
 const { height: windowHeight } = useWindowSize()
 const { bottom: containerBottom } = useElementBounding(containerRef)
 
-const fitsInViewport = computed(() => sidebarHeight.value <= windowHeight.value - FIXED_TOP_OFFSET - FIXED_BOTTOM_OFFSET)
+const availableHeight = computed(() => windowHeight.value - FIXED_TOP_OFFSET - FIXED_BOTTOM_OFFSET)
+const fitsInViewport = computed(() => sidebarHeight.value <= availableHeight.value)
 const hasRoomBeforeBottom = computed(() => containerBottom.value >= FIXED_TOP_OFFSET + sidebarHeight.value + FIXED_BOTTOM_OFFSET)
 
-const isFixed = computed(() => props.sticky && hasMeasured.value && !isTargetVisible.value && fitsInViewport.value && hasRoomBeforeBottom.value)
+const isFixed = computed(() => hasScrolledPastTarget.value && fitsInViewport.value && hasRoomBeforeBottom.value)
 </script>
 
 <template>

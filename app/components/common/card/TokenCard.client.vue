@@ -78,7 +78,8 @@ const isAirdropRoute = computed(() => route.name?.toString().includes('airdrop-s
 const isCollectionRoute = computed(() => route.name?.toString().includes('chain-collection-collection_id'))
 const canAddToActionCart = computed(() => (isProfileRoute.value || isAirdropRoute.value) && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
 
-const hideMediaInfo = computed(() => artViewFilter.value && isCollectionRoute.value)
+const isArtViewEnabled = computed(() => route.query.art_view?.toString() === 'true' || artViewFilter.value)
+const hideMediaInfo = computed(() => isArtViewEnabled.value && isCollectionRoute.value)
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
