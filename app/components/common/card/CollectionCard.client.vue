@@ -42,7 +42,8 @@ onMounted(async () => {
     collectionData.floor = collection.floor ?? 0
     collectionData.items = Number(collection.claimed)
     collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
-  } finally {
+  }
+  finally {
     await nextTick()
     checkOverflow()
   }
