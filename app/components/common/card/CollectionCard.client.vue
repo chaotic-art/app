@@ -37,14 +37,15 @@ function checkOverflow() {
 }
 
 onMounted(async () => {
-  const collection = await fetchOdaCollection(props.prefix, props.item.id)
-  collectionData.floor = collection.floor ?? 0
-  collectionData.items = Number(collection.claimed)
-  collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
-
-  nextTick(() => {
+  try {
+    const collection = await fetchOdaCollection(props.prefix, props.item.id)
+    collectionData.floor = collection.floor ?? 0
+    collectionData.items = Number(collection.claimed)
+    collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
+  } finally {
+    await nextTick()
     checkOverflow()
-  })
+  }
 })
 </script>
 
@@ -53,6 +54,8 @@ onMounted(async () => {
     class="group relative rounded-xl shadow-xs hover:shadow-sm border border-border overflow-hidden transition-all duration-300 hover:-translate-y-1"
     @mouseenter="isHovering = true"
     @mouseleave="isHovering = false"
+    @focusin="isHovering = true"
+    @focusout="isHovering = false"
   >
     <NuxtLink
       :to="`/${prefix}/collection/${item.id}`"
