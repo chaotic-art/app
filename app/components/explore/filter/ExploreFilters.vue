@@ -2,6 +2,7 @@
 import type { SelectedTrait } from '~/components/trait/types'
 import { useWindowSize, whenever } from '@vueuse/core'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
+import { countExploreActiveFilters } from '~/utils/exploreFilterCount'
 import { parseQueryNumber } from '~/utils/query'
 
 type PriceBy = 'token' | 'usd'
@@ -38,17 +39,11 @@ const tokenPrice = computed(() => Number(getCurrentTokenValue(chainSymbol.value 
 const loading = computed(() => tokenPrice.value === 0)
 
 const activeFiltersCount = computed(() => {
-  let count = 0
-  if (priceRange.value[0] !== min.value || priceRange.value[1] !== max.value) {
-    count++
-  }
-  if (belowFloor.value) {
-    count++
-  }
-  if (lastSale.value) {
-    count++
-  }
-  return count
+  return countExploreActiveFilters({
+    hasPriceFilter: priceRange.value[0] !== min.value || priceRange.value[1] !== max.value,
+    hasBelowFloorFilter: belowFloor.value,
+    hasLastSaleFilter: Boolean(lastSale.value),
+  })
 })
 
 function updateQueryParams() {
