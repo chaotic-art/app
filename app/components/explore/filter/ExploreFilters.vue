@@ -2,6 +2,7 @@
 import type { SelectedTrait } from '~/components/trait/types'
 import type { RarityTierQueryValue } from '~/utils/nftSearchFilters'
 import { useWindowSize, whenever } from '@vueuse/core'
+import { countExploreActiveFilters } from '~/composables/useExploreFilterToggleState'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
 import { isRarityTierQueryValue } from '~/utils/nftSearchFilters'
 import { parseQueryCsv, parseQueryNumber } from '~/utils/query'
@@ -45,20 +46,12 @@ const tokenPrice = computed(() => Number(getCurrentTokenValue(chainSymbol.value 
 const loading = computed(() => tokenPrice.value === 0)
 
 const activeFiltersCount = computed(() => {
-  let count = 0
-  if (priceRange.value[0] !== min.value || priceRange.value[1] !== max.value) {
-    count++
-  }
-  if (belowFloor.value) {
-    count++
-  }
-  if (lastSale.value) {
-    count++
-  }
-  if (rarityTiers.value.length > 0) {
-    count++
-  }
-  return count
+  return countExploreActiveFilters({
+    hasPriceFilter: priceRange.value[0] !== min.value || priceRange.value[1] !== max.value,
+    hasBelowFloorFilter: belowFloor.value,
+    hasLastSaleFilter: Boolean(lastSale.value),
+    hasRarityTierFilter: rarityTiers.value.length > 0,
+  })
 })
 
 function updateQueryParams() {
@@ -287,31 +280,5 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
         <slot />
       </div>
     </div>
-
-    <!-- Floating expand button when desktop sidebar is collapsed -->
-    <ClientOnly>
-      <Transition
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="opacity-0 -translate-x-4 scale-95"
-        enter-to-class="opacity-100 translate-x-0 scale-100"
-        leave-active-class="transition-all duration-200 ease-in"
-        leave-from-class="opacity-100 translate-x-0 scale-100"
-        leave-to-class="opacity-0 -translate-x-4 scale-95"
-      >
-        <UTooltip v-if="!isMobile && sidebarCollapsed" :text="$t('explore.showFilters')">
-          <UButton
-            icon="i-heroicons-chevron-right"
-            color="neutral"
-            variant="solid"
-            size="sm"
-            class="fixed left-6 top-72 z-50 w-10! h-10 rounded-full! shadow-md hover:shadow-lg transition-shadow duration-200 md:left-8"
-            aria-label="Show filters"
-            @click="sidebarCollapsed = false"
-          >
-            <UBadge v-if="activeFiltersCount > 0" :label="String(activeFiltersCount)" size="xs" class="absolute -top-1 -right-1" />
-          </UButton>
-        </UTooltip>
-      </Transition>
-    </ClientOnly>
   </div>
 </template>
