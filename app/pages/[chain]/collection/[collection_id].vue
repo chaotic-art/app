@@ -70,6 +70,17 @@ const { selectedSort, createQueryVariables } = useSortOptions()
 
 const filteredNftIds = ref<string[]>([])
 const selectedTraits = ref<SelectedTrait[]>([])
+
+const gridKey = computed(() => {
+  const serializedQuery = serializeQueryForKey(route.query, NFT_GRID_NON_FETCH_QUERY_KEYS)
+
+  return [
+    selectedSort.value,
+    filteredNftIds.value.join(','),
+    serializedQuery,
+  ].join('::')
+})
+
 const queryVariables = computed(() => {
   const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
 
@@ -258,7 +269,7 @@ defineOgImageComponent('Frame', {
 
               <!-- Items Grid -->
               <LazyNftsGrid
-                :key="`${selectedSort}-${filteredNftIds.length}-${filteredNftIds.join(',')}-${JSON.stringify(queryVariables)}`"
+                :key="gridKey"
                 :variables="queryVariables"
                 grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
                 no-items-found-message="This collection doesn't have any items yet."
