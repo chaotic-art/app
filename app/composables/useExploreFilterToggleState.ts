@@ -1,5 +1,18 @@
-import { countExploreActiveFilters } from '~/utils/exploreFilterCount'
 import { hasQueryFilterValue, hasQueryTrueValue } from '~/utils/query'
+
+interface ExploreActiveFiltersState {
+  hasPriceFilter: boolean
+  hasBelowFloorFilter: boolean
+  hasLastSaleFilter: boolean
+}
+
+export function countExploreActiveFilters({
+  hasPriceFilter,
+  hasBelowFloorFilter,
+  hasLastSaleFilter,
+}: ExploreActiveFiltersState): number {
+  return Number(hasPriceFilter) + Number(hasBelowFloorFilter) + Number(hasLastSaleFilter)
+}
 
 export function useExploreFilterToggleState() {
   const route = useRoute()

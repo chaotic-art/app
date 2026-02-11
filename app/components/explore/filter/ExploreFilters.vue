@@ -2,7 +2,6 @@
 import type { SelectedTrait } from '~/components/trait/types'
 import { useWindowSize, whenever } from '@vueuse/core'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
-import { countExploreActiveFilters } from '~/utils/exploreFilterCount'
 import { parseQueryNumber } from '~/utils/query'
 
 type PriceBy = 'token' | 'usd'
