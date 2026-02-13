@@ -53,5 +53,16 @@ export function buildNftSearchFilters({ query }: { query: LocationQuery }): Reco
     }
   }
 
+  const minRarityPercentile = parseQueryNumber(query.min_rarity_percentile)
+  const maxRarityPercentile = parseQueryNumber(query.max_rarity_percentile)
+
+  if (minRarityPercentile !== null) {
+    searchFilters.push({ rarityPercentile_gte: minRarityPercentile })
+  }
+
+  if (maxRarityPercentile !== null) {
+    searchFilters.push({ rarityPercentile_lte: maxRarityPercentile })
+  }
+
   return searchFilters
 }

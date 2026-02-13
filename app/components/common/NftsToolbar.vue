@@ -20,12 +20,15 @@ const emit = defineEmits<{
 const route = useRoute()
 const router = useRouter()
 const { accountId } = useAuth()
+const { t } = useI18n()
 
 const sortOptions = [
   { label: 'Recent', value: 'blockNumber_DESC' },
   { label: 'Oldest', value: 'blockNumber_ASC' },
   { label: 'A-Z', value: 'name_ASC' },
   { label: 'Z-A', value: 'name_DESC' },
+  { label: t('explore.sortRarestFirst'), value: 'rarityRank_ASC_NULLS_LAST' },
+  { label: t('explore.sortCommonFirst'), value: 'rarityRank_DESC_NULLS_LAST' },
 ]
 
 const listedOptions = [
