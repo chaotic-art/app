@@ -1,30 +1,5 @@
 import type { LocationQuery } from 'vue-router'
-import { parseQueryCsv, parseQueryNumber } from '~/utils/query'
-
-export const RARITY_TIERS = {
-  LEGENDARY: 'LEGENDARY',
-  EPIC: 'EPIC',
-  RARE: 'RARE',
-  UNCOMMON: 'UNCOMMON',
-  COMMON: 'COMMON',
-} as const
-
-export type RarityTier = typeof RARITY_TIERS[keyof typeof RARITY_TIERS]
-export type RarityTierQueryValue = Lowercase<RarityTier>
-
-const VALID_RARITY_TIERS = new Set<RarityTier>(Object.values(RARITY_TIERS))
-export const RARITY_TIER_QUERY_VALUES = Object.values(RARITY_TIERS).map(
-  tier => tier.toLowerCase() as RarityTierQueryValue,
-)
-const VALID_RARITY_TIER_QUERY_VALUES = new Set<RarityTierQueryValue>(RARITY_TIER_QUERY_VALUES)
-
-function isRarityTier(value: string): value is RarityTier {
-  return VALID_RARITY_TIERS.has(value as RarityTier)
-}
-
-export function isRarityTierQueryValue(value: string): value is RarityTierQueryValue {
-  return VALID_RARITY_TIER_QUERY_VALUES.has(value as RarityTierQueryValue)
-}
+import { parseQueryNumber } from '~/utils/query'
 
 export function buildNftSearchFilters({ query }: { query: LocationQuery }): Record<string, any>[] {
   const searchFilters: Record<string, any>[] = []
@@ -78,14 +53,15 @@ export function buildNftSearchFilters({ query }: { query: LocationQuery }): Reco
     }
   }
 
-  const rarityTiers = parseQueryCsv(query.rarity_tier)
-    .map(tier => tier.toLowerCase())
-    .filter(isRarityTierQueryValue)
-    .map(tier => tier.toUpperCase())
-    .filter(isRarityTier)
+  const minRarityPercentile = parseQueryNumber(query.min_rarity_percentile)
+  const maxRarityPercentile = parseQueryNumber(query.max_rarity_percentile)
 
-  if (rarityTiers.length > 0) {
-    searchFilters.push({ rarityTier_in: rarityTiers })
+  if (minRarityPercentile !== null) {
+    searchFilters.push({ rarityPercentile_gte: minRarityPercentile })
+  }
+
+  if (maxRarityPercentile !== null) {
+    searchFilters.push({ rarityPercentile_lte: maxRarityPercentile })
   }
 
   return searchFilters

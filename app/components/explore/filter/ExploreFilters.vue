@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import type { SelectedTrait } from '~/components/trait/types'
-import type { RarityTierQueryValue } from '~/utils/nftSearchFilters'
 import { useWindowSize, whenever } from '@vueuse/core'
 import { countExploreActiveFilters } from '~/composables/useExploreFilterToggleState'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
-import { isRarityTierQueryValue } from '~/utils/nftSearchFilters'
-import { parseQueryCsv, parseQueryNumber } from '~/utils/query'
+import { parseQueryNumber } from '~/utils/query'
 
 type PriceBy = 'token' | 'usd'
 
@@ -28,17 +26,25 @@ const { width } = useWindowSize()
 
 const isModalOpen = defineModel('modalOpen', { type: Boolean, default: false })
 
+function clampPercentile(value: number) {
+  return Math.min(100, Math.max(0, value))
+}
+
+function getNormalizedRarityPercentileRange(): [number, number] {
+  const rawMin = parseQueryNumber(route.query.min_rarity_percentile)
+  const rawMax = parseQueryNumber(route.query.max_rarity_percentile)
+  const nextMin = clampPercentile(rawMin ?? 0)
+  const nextMax = clampPercentile(rawMax ?? 100)
+
+  return nextMin <= nextMax ? [nextMin, nextMax] : [nextMax, nextMin]
+}
+
 const priceBy = ref<PriceBy>((route.query.price_by as PriceBy) || 'token')
 const min = ref(0)
 const max = ref(REASONABLE_MAX_CAP)
-const priceRange = ref([min.value, max.value])
-const belowFloor = ref(route.query.below_floor === 'true')
+const priceRange = ref<[number, number]>([min.value, max.value])
 const lastSale = ref((route.query.last_sale as string) || '')
-const rarityTiers = ref<RarityTierQueryValue[]>(
-  parseQueryCsv(route.query.rarity_tier)
-    .map(tier => tier.toLowerCase())
-    .filter(isRarityTierQueryValue),
-)
+const rarityPercentileRange = ref<[number, number]>(getNormalizedRarityPercentileRange())
 const { exploreSidebarCollapsed: sidebarCollapsed } = storeToRefs(usePreferencesStore())
 
 const isMobile = computed(() => width.value < 768)
@@ -48,9 +54,8 @@ const loading = computed(() => tokenPrice.value === 0)
 const activeFiltersCount = computed(() => {
   return countExploreActiveFilters({
     hasPriceFilter: priceRange.value[0] !== min.value || priceRange.value[1] !== max.value,
-    hasBelowFloorFilter: belowFloor.value,
     hasLastSaleFilter: Boolean(lastSale.value),
-    hasRarityTierFilter: rarityTiers.value.length > 0,
+    hasRarityFilter: rarityPercentileRange.value[0] > 0 || rarityPercentileRange.value[1] < 100,
   })
 })
 
@@ -72,9 +77,9 @@ function updateQueryParams() {
     price_by: priceBy.value !== 'token' ? priceBy.value : undefined,
     min_price: priceRange.value[0] !== min.value ? String(minNative) : undefined,
     max_price: priceRange.value[1] !== max.value ? String(maxNative) : undefined,
-    below_floor: belowFloor.value ? 'true' : undefined,
     last_sale: lastSale.value || undefined,
-    rarity_tier: rarityTiers.value.length > 0 ? rarityTiers.value.join(',') : undefined,
+    min_rarity_percentile: rarityPercentileRange.value[0] > 0 ? String(rarityPercentileRange.value[0]) : undefined,
+    max_rarity_percentile: rarityPercentileRange.value[1] < 100 ? String(rarityPercentileRange.value[1]) : undefined,
   }
 
   router.replace({ query })
@@ -92,9 +97,8 @@ function handleApplyFilters() {
 function clearFilters() {
   priceBy.value = 'token'
   priceRange.value = [min.value, max.value]
-  belowFloor.value = false
   lastSale.value = ''
-  rarityTiers.value = []
+  rarityPercentileRange.value = [0, 100]
   updateQueryParams()
 }
 
@@ -205,9 +209,8 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
             <FilterContent
               v-model:price-by="priceBy"
               v-model:price-range="priceRange"
-              v-model:below-floor="belowFloor"
               v-model:last-sale="lastSale"
-              v-model:rarity-tiers="rarityTiers"
+              v-model:rarity-percentile-range="rarityPercentileRange"
               :min="min"
               :max="max"
               :loading="loading"
@@ -255,9 +258,8 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
             <FilterContent
               v-model:price-by="priceBy"
               v-model:price-range="priceRange"
-              v-model:below-floor="belowFloor"
               v-model:last-sale="lastSale"
-              v-model:rarity-tiers="rarityTiers"
+              v-model:rarity-percentile-range="rarityPercentileRange"
               :min="min"
               :max="max"
               :loading="loading"

@@ -1,19 +1,17 @@
-import { hasQueryFilterValue, hasQueryTrueValue } from '~/utils/query'
+import { hasQueryFilterValue } from '~/utils/query'
 
 interface ExploreActiveFiltersState {
   hasPriceFilter: boolean
-  hasBelowFloorFilter: boolean
   hasLastSaleFilter: boolean
-  hasRarityTierFilter: boolean
+  hasRarityFilter: boolean
 }
 
 export function countExploreActiveFilters({
   hasPriceFilter,
-  hasBelowFloorFilter,
   hasLastSaleFilter,
-  hasRarityTierFilter,
+  hasRarityFilter,
 }: ExploreActiveFiltersState): number {
-  return Number(hasPriceFilter) + Number(hasBelowFloorFilter) + Number(hasLastSaleFilter) + Number(hasRarityTierFilter)
+  return Number(hasPriceFilter) + Number(hasLastSaleFilter) + Number(hasRarityFilter)
 }
 
 export function useExploreFilterToggleState() {
@@ -23,9 +21,9 @@ export function useExploreFilterToggleState() {
   const activeFiltersCount = computed(() => {
     return countExploreActiveFilters({
       hasPriceFilter: hasQueryFilterValue(route.query.min_price) || hasQueryFilterValue(route.query.max_price),
-      hasBelowFloorFilter: hasQueryTrueValue(route.query.below_floor),
       hasLastSaleFilter: hasQueryFilterValue(route.query.last_sale),
-      hasRarityTierFilter: hasQueryFilterValue(route.query.rarity_tier),
+      hasRarityFilter: hasQueryFilterValue(route.query.min_rarity_percentile)
+        || hasQueryFilterValue(route.query.max_rarity_percentile),
     })
   })
 

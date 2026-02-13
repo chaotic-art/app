@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { SelectedTrait } from '~/components/trait/types'
-import type { RarityTierQueryValue } from '~/utils/nftSearchFilters'
 import { formatCompactNumber } from '~/utils/format/balance'
-import { RARITY_TIERS } from '~/utils/nftSearchFilters'
 
 const props = defineProps<{
   min: number
@@ -12,20 +10,16 @@ const props = defineProps<{
 }>()
 
 defineEmits<{
-  'applyFilters': []
-  'clearFilters': []
   'update:nft-ids': [nftIds: string[]]
   'update:selected-traits': [selectedTraits: SelectedTrait[]]
 }>()
 
 const priceBy = defineModel<'token' | 'usd'>('priceBy', { required: true })
 const priceRange = defineModel<number[]>('priceRange', { required: true })
-const belowFloor = defineModel<boolean>('belowFloor', { required: true })
 const lastSale = defineModel<string>('lastSale', { required: true })
-const rarityTiers = defineModel<RarityTierQueryValue[]>('rarityTiers', { required: true })
+const rarityPercentileRange = defineModel<number[]>('rarityPercentileRange', { required: true })
 
 const { chainSymbol } = useChain()
-const { t } = useI18n()
 
 const lastSaleItems = [
   { label: '24h', value: '24h' },
@@ -39,24 +33,28 @@ const priceTabs = computed(() => [
   { label: 'USD', value: 'usd' },
 ])
 
+const rarityExpanded = ref(false)
+
 const formattedMin = computed(() => formatCompactNumber(props.min))
 const formattedMax = computed(() => formatCompactNumber(props.max))
-const rarityTierItems = computed(() => [
-  { value: RARITY_TIERS.LEGENDARY.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierLegendary'), range: t('explore.rarityRangeLegendary') },
-  { value: RARITY_TIERS.EPIC.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierEpic'), range: t('explore.rarityRangeEpic') },
-  { value: RARITY_TIERS.RARE.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierRare'), range: t('explore.rarityRangeRare') },
-  { value: RARITY_TIERS.UNCOMMON.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierUncommon'), range: t('explore.rarityRangeUncommon') },
-  { value: RARITY_TIERS.COMMON.toLowerCase() as RarityTierQueryValue, label: t('explore.rarityTierCommon'), range: t('explore.rarityRangeCommon') },
-])
 
 function selectLastSale(value: string) {
   lastSale.value = lastSale.value === value ? '' : value
 }
 
-function toggleRarityTier(value: RarityTierQueryValue) {
-  rarityTiers.value = rarityTiers.value.includes(value)
-    ? rarityTiers.value.filter(tier => tier !== value)
-    : [...rarityTiers.value, value]
+function clampPercentile(value: number) {
+  return Math.min(100, Math.max(0, value))
+}
+
+function normalizeRarityRange() {
+  const rawMin = rarityPercentileRange.value[0]
+  const rawMax = rarityPercentileRange.value[1]
+  const nextMin = typeof rawMin === 'number' && Number.isFinite(rawMin) ? clampPercentile(rawMin) : 0
+  const nextMax = typeof rawMax === 'number' && Number.isFinite(rawMax) ? clampPercentile(rawMax) : 100
+
+  rarityPercentileRange.value = nextMin <= nextMax
+    ? [nextMin, nextMax]
+    : [nextMax, nextMin]
 }
 </script>
 
@@ -72,6 +70,45 @@ function toggleRarityTier(value: RarityTierQueryValue) {
 
         <USeparator class="my-4" />
       </template>
+
+      <div class="flex flex-col">
+        <button
+          class="flex items-center justify-between w-full py-1"
+          @click="rarityExpanded = !rarityExpanded"
+        >
+          <span>{{ $t('explore.rarity') }}</span>
+          <UIcon
+            :name="rarityExpanded ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+            class="w-4 h-4"
+          />
+        </button>
+
+        <div v-if="rarityExpanded" class="mt-3 flex flex-col gap-3">
+          <div class="flex items-center gap-2">
+            <UInput
+              v-model.number="rarityPercentileRange[0]"
+              type="number"
+              :placeholder="$t('explore.minValue')"
+              :min="0"
+              :max="100"
+              class="flex-1"
+              @blur="normalizeRarityRange"
+            />
+            <span class="font-semibold text-foreground">{{ $t('explore.to') }}</span>
+            <UInput
+              v-model.number="rarityPercentileRange[1]"
+              type="number"
+              :placeholder="$t('explore.maxValue')"
+              :min="0"
+              :max="100"
+              class="flex-1"
+              @blur="normalizeRarityRange"
+            />
+          </div>
+        </div>
+      </div>
+
+      <USeparator class="my-4" />
 
       <PriceRangeSkeleton v-if="loading" />
 
@@ -106,15 +143,6 @@ function toggleRarityTier(value: RarityTierQueryValue) {
 
       <USeparator class="my-4" />
 
-      <UTooltip text="Coming soon" :content="{ side: 'bottom', align: 'center' }">
-        <div class="flex justify-between items-center opacity-60 cursor-not-allowed">
-          <span>{{ $t('explore.belowFloorPrice') }}</span>
-          <USwitch v-model="belowFloor" disabled />
-        </div>
-      </UTooltip>
-
-      <USeparator class="my-4" />
-
       <div class="flex flex-col gap-2">
         <span>{{ $t('explore.lastSale') }}</span>
         <div class="flex gap-2">
@@ -127,25 +155,6 @@ function toggleRarityTier(value: RarityTierQueryValue) {
             @click="selectLastSale(item.value)"
           >
             {{ item.label }}
-          </UButton>
-        </div>
-      </div>
-
-      <USeparator class="my-4" />
-
-      <div class="flex flex-col gap-2">
-        <span>{{ $t('explore.rarity') }}</span>
-        <div class="flex flex-col gap-2">
-          <UButton
-            v-for="item in rarityTierItems"
-            :key="item.value"
-            size="sm"
-            :variant="rarityTiers.includes(item.value) ? 'solid' : 'outline'"
-            class="justify-between"
-            @click="toggleRarityTier(item.value)"
-          >
-            <span>{{ item.label }}</span>
-            <span class="text-xs opacity-75">{{ item.range }}</span>
           </UButton>
         </div>
       </div>
