@@ -84,7 +84,7 @@ onMounted(async () => {
 
             <!-- Collection Title -->
             <div class="flex-1 min-w-0 pb-1">
-              <h3 class="font-bold text-lg text-white leading-tight truncate drop-shadow-lg">
+              <h3 class="font-bold text-lg text-white leading-tight line-clamp-3 drop-shadow-lg">
                 {{ item.name }}
               </h3>
 
