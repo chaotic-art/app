@@ -15,20 +15,6 @@ export function parseQueryNumber(
   return Number.isFinite(parsed) ? parsed : null
 }
 
-export function parseQueryCsv(
-  value: LocationQueryValue | LocationQueryValue[] | null | undefined,
-): string[] {
-  const normalized = Array.isArray(value) ? value[0] : value
-  if (normalized === undefined || normalized === null || normalized === '') {
-    return []
-  }
-
-  return String(normalized)
-    .split(',')
-    .map(item => item.trim())
-    .filter(Boolean)
-}
-
 function serializeQueryValue(
   value: LocationQueryValue | LocationQueryValue[] | null | undefined,
 ): string {
