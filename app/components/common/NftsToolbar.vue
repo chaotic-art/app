@@ -27,8 +27,8 @@ const sortOptions = [
   { label: 'Oldest', value: 'blockNumber_ASC' },
   { label: 'A-Z', value: 'name_ASC' },
   { label: 'Z-A', value: 'name_DESC' },
-  { label: t('explore.sortRarestFirst'), value: 'rarityRank_ASC_NULLS_LAST' },
-  { label: t('explore.sortCommonFirst'), value: 'rarityRank_DESC_NULLS_LAST' },
+  { label: t('explore.sortRarestFirst'), value: 'rarityPercentile_ASC' },
+  { label: t('explore.sortCommonFirst'), value: 'rarityPercentile_DESC' },
 ]
 
 const listedOptions = [

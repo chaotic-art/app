@@ -35,11 +35,17 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     else if (orderBy[0] === 'blockNumber_ASC') {
       variables.orderBy = ['blockNumber_ASC', 'sn_ASC']
     }
-    else if (orderBy[0] === 'rarityRank_ASC_NULLS_LAST') {
-      variables.orderBy = ['rarityRank_ASC_NULLS_LAST', 'sn_ASC']
+    else if (orderBy[0] === 'rarityRank_ASC') {
+      variables.orderBy = ['rarityRank_ASC_NULLS_LAST', 'rarityScore_DESC_NULLS_LAST', 'sn_ASC']
     }
-    else if (orderBy[0] === 'rarityRank_DESC_NULLS_LAST') {
-      variables.orderBy = ['rarityRank_DESC_NULLS_LAST', 'sn_DESC']
+    else if (orderBy[0] === 'rarityRank_DESC') {
+      variables.orderBy = ['rarityRank_DESC_NULLS_LAST', 'rarityScore_ASC_NULLS_LAST', 'sn_DESC']
+    }
+    else if (orderBy[0] === 'rarityPercentile_ASC') {
+      variables.orderBy = ['rarityPercentile_ASC_NULLS_LAST', 'rarityScore_DESC_NULLS_LAST', 'sn_ASC']
+    }
+    else if (orderBy[0] === 'rarityPercentile_DESC') {
+      variables.orderBy = ['rarityPercentile_DESC_NULLS_LAST', 'rarityScore_ASC_NULLS_LAST', 'sn_DESC']
     }
   }
 
