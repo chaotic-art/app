@@ -23,9 +23,9 @@ export function useSortOptions(defaultSort = 'newest') {
       case 'oldest':
         return 'blockNumber_ASC'
       case 'rarest':
-        return 'rarityRank_ASC_NULLS_LAST'
+        return 'rarityRank_ASC'
       case 'most_common':
-        return 'rarityRank_DESC_NULLS_LAST'
+        return 'rarityRank_DESC'
       case 'lowest_price':
         return 'price_ASC'
       case 'higher_price':
