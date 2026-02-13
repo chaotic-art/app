@@ -70,10 +70,6 @@ export const exploreNfts = graphql(`
             metadata
             price
             currentOwner
-            rarityScore
-            rarityRank
-            rarityPercentile
-            rarityTier
             meta {
                 id
                 image
