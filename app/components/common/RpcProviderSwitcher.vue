@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SupportedChain } from '~/plugins/sdk.client'
-import { extractHostname, measureLatency } from '~/composables/useRpcLatency'
+import { extractHostname, formatLatency, latencyColorClass, measureLatency } from '~/composables/useRpcLatency'
 import { PROVIDERS } from '~/config/providers'
 
 const { currentChain } = useChain()
@@ -15,26 +15,6 @@ const providerUrls = computed(() => {
 
 const latencies = ref(new Map<string, number | null>())
 const isMeasuring = ref(false)
-
-function latencyColorClass(ms: number | null | undefined): string {
-  if (ms === undefined)
-    return 'text-muted'
-  if (ms === null)
-    return 'text-red-500'
-  if (ms <= 300)
-    return 'text-green-500'
-  if (ms <= 1000)
-    return 'text-yellow-500'
-  return 'text-red-500'
-}
-
-function formatLatency(ms: number | null | undefined): string {
-  if (ms === undefined)
-    return '--'
-  if (ms === null)
-    return 'err'
-  return `${ms}ms`
-}
 
 async function measureCurrentChain() {
   const urls = providerUrls.value

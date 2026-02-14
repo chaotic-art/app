@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SupportedChain } from '~/plugins/sdk.client'
-import { extractHostname, measureLatency } from '~/composables/useRpcLatency'
+import { extractHostname, formatLatency, latencyColorClass, measureLatency } from '~/composables/useRpcLatency'
 import { PROVIDERS } from '~/config/providers'
 import { chainSpec } from '~/utils/chain'
 
@@ -53,28 +53,6 @@ async function testAllProviders() {
   }
 
   isMeasuring.value = false
-}
-
-function latencyColorClass(url: string): string {
-  const ms = latencies.value.get(url)
-  if (ms === undefined)
-    return 'text-muted'
-  if (ms === null)
-    return 'text-red-500'
-  if (ms <= 300)
-    return 'text-green-500'
-  if (ms <= 1000)
-    return 'text-yellow-500'
-  return 'text-red-500'
-}
-
-function formatLatency(url: string): string {
-  const ms = latencies.value.get(url)
-  if (ms === undefined)
-    return '--'
-  if (ms === null)
-    return 'err'
-  return `${ms}ms`
 }
 
 function selectProvider(chain: SupportedChain, url: string) {
@@ -147,14 +125,14 @@ function isProviderError(url: string): boolean {
             >
               <UIcon
                 name="i-lucide-circle"
-                :class="latencyColorClass(url)"
+                :class="latencyColorClass(latencies.get(url))"
                 class="h-3 w-3 shrink-0"
               />
               <span class="flex-1 text-sm truncate text-left font-mono">
                 {{ extractHostname(url) }}
               </span>
               <span class="text-xs text-muted tabular-nums shrink-0">
-                {{ formatLatency(url) }}
+                {{ formatLatency(latencies.get(url)) }}
               </span>
               <UIcon
                 v-if="isSelected(activeChain, url)"
@@ -191,14 +169,14 @@ function isProviderError(url: string): boolean {
               >
                 <UIcon
                   name="i-lucide-circle"
-                  :class="latencyColorClass(url)"
+                  :class="latencyColorClass(latencies.get(url))"
                   class="h-3 w-3 shrink-0"
                 />
                 <span class="flex-1 text-sm truncate text-left font-mono">
                   {{ extractHostname(url) }}
                 </span>
                 <span class="text-xs text-muted tabular-nums shrink-0">
-                  {{ formatLatency(url) }}
+                  {{ formatLatency(latencies.get(url)) }}
                 </span>
                 <UIcon
                   v-if="isSelected(item.value as SupportedChain, url)"

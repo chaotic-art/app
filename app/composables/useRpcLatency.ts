@@ -6,6 +6,28 @@
 export const DEFAULT_LATENCY_TIMEOUT_MS = 5000
 export const SLOW_RPC_THRESHOLD_MS = 1000
 
+/** Tailwind class for latency: muted (unknown), green (≤300ms), yellow (≤1s), red (slow/error). */
+export function latencyColorClass(ms: number | null | undefined): string {
+  if (ms === undefined)
+    return 'text-muted'
+  if (ms === null)
+    return 'text-red-500'
+  if (ms <= 300)
+    return 'text-green-500'
+  if (ms <= 1000)
+    return 'text-yellow-500'
+  return 'text-red-500'
+}
+
+/** Human-readable latency: '--' (unknown), 'err' (error), or 'Nms'. */
+export function formatLatency(ms: number | null | undefined): string {
+  if (ms === undefined)
+    return '--'
+  if (ms === null)
+    return 'err'
+  return `${ms}ms`
+}
+
 export function extractHostname(url: string): string {
   try {
     const parsed = new URL(url)
