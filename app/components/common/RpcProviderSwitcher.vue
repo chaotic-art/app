@@ -13,7 +13,7 @@ const providerUrls = computed(() => {
   return PROVIDERS[chain] ?? []
 })
 
-const latencies = ref(new Map<string, number | null>())
+const latencies = shallowRef(new Map<string, number | null>())
 const isMeasuring = ref(false)
 
 async function measureCurrentChain() {
@@ -21,21 +21,21 @@ async function measureCurrentChain() {
   if (!urls.length)
     return
   isMeasuring.value = true
-  latencies.value = new Map()
+  const newLatencies = new Map<string, number | null>()
 
   const promises = urls.map(async (url) => {
     const result = await measureLatency(url)
-    latencies.value.set(url, result)
-    latencies.value = new Map(latencies.value)
+    newLatencies.set(url, result)
   })
 
   await Promise.allSettled(promises)
+  latencies.value = newLatencies
+  triggerRef(latencies)
   isMeasuring.value = false
 }
 
 function handleSelect(url: string, close?: () => void) {
   rpcStore.setProvider(currentChain.value as SupportedChain, url)
-  isOpen.value = false
   close?.()
 }
 
