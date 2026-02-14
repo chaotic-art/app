@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { NftRarity, RarityTierValue } from '~/types/rarity'
-import { RarityTier } from '~/types/rarity'
+import { isRarityTier, RarityTier } from '~/types/rarity'
 
 interface TierStyle {
   chip: string
@@ -97,7 +97,10 @@ const tooltipTopText = computed(() => topPercent.value !== null ? `(Top ${topPer
 
 const rankLabel = computed(() => `#${normalizedRarityRank.value.toLocaleString('en-US')}`)
 
-const activeStyle = computed<TierStyle>(() => props.rarity?.rarityTier ? tierStyles[props.rarity.rarityTier] : defaultTierStyle)
+const activeStyle = computed<TierStyle>(() => {
+  const tier = props.rarity?.rarityTier
+  return isRarityTier(tier) ? tierStyles[tier] : defaultTierStyle
+})
 
 const tooltipUi = {
   content: 'h-7 rounded-md px-2.5 py-1 text-sm font-medium shadow-md',
