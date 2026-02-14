@@ -5,6 +5,10 @@ import { useRpcProviderStore } from '~/stores/rpcProvider'
 
 const AUTO_SWITCH_COOLDOWN_MS = 60_000
 
+function hasRpcProviders(chain: string): chain is SupportedChain {
+  return chain in PROVIDERS
+}
+
 /**
  * Auto-switch to the fastest RPC provider when the current one is slow (timeout or latency > threshold).
  * Call from layout so it runs once per app; reacts to chain changes.
@@ -13,7 +17,7 @@ export function useRpcAutoSwitch() {
   const { currentChain } = useChain()
   const rpcStore = useRpcProviderStore()
   const toast = useToast()
-  const lastAutoSwitchAt = ref<Record<string, number>>({})
+  const lastAutoSwitchAt = ref<Partial<Record<SupportedChain, number>>>({})
 
   async function checkAndSwitch(chain: SupportedChain) {
     const now = Date.now()
@@ -29,12 +33,6 @@ export function useRpcAutoSwitch() {
       return
     }
 
-    toast.add({
-      title: 'RPC is slow',
-      description: 'Switching to a faster provider...',
-      color: 'warning',
-    })
-
     const urls = PROVIDERS[chain] ?? []
     const results = await Promise.all(
       urls.map(async url => ({ url, latency: await measureLatency(url) })),
@@ -46,9 +44,19 @@ export function useRpcAutoSwitch() {
 
     const fastest = withLatency[0]
     if (!fastest || fastest.url === currentUrl) {
+      toast.add({
+        title: 'No faster RPC provider found',
+        description: 'Current provider is slow but no faster alternative was available.',
+        color: 'warning',
+      })
       return
     }
 
+    toast.add({
+      title: 'RPC is slow',
+      description: 'Switching to a faster provider...',
+      color: 'warning',
+    })
     rpcStore.setProvider(chain, fastest.url)
     lastAutoSwitchAt.value[chain] = now
 
@@ -59,20 +67,9 @@ export function useRpcAutoSwitch() {
     })
   }
 
-  function runForCurrentChain() {
-    const chain = currentChain.value as SupportedChain
-    if (chain && PROVIDERS[chain]) {
+  watch(currentChain, (chain) => {
+    if (chain && hasRpcProviders(chain)) {
       checkAndSwitch(chain)
     }
-  }
-
-  onMounted(() => {
-    runForCurrentChain()
-  })
-
-  watch(currentChain, (chain) => {
-    if (chain && PROVIDERS[chain as SupportedChain]) {
-      checkAndSwitch(chain as SupportedChain)
-    }
-  })
+  }, { immediate: true })
 }
