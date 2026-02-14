@@ -12,6 +12,7 @@ const AUTO_SWITCH_COOLDOWN_MS = 60_000
 export function useRpcAutoSwitch() {
   const { currentChain } = useChain()
   const rpcStore = useRpcProviderStore()
+  const toast = useToast()
   const lastAutoSwitchAt = ref<Record<string, number>>({})
 
   async function checkAndSwitch(chain: SupportedChain) {
@@ -28,7 +29,6 @@ export function useRpcAutoSwitch() {
       return
     }
 
-    const toast = useToast()
     toast.add({
       title: 'RPC is slow',
       description: 'Switching to a faster provider...',
