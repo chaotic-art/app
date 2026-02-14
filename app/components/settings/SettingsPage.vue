@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { SupportedChain } from '~/plugins/sdk.client'
+import { extractHostname, measureLatency } from '~/composables/useRpcLatency'
 import { PROVIDERS } from '~/config/providers'
 import { chainSpec } from '~/utils/chain'
-
-const LATENCY_TIMEOUT = 5000
 
 const rpcStore = useRpcProviderStore()
 
@@ -27,67 +26,6 @@ const chainSelectItems = computed(() =>
     value: chain,
   })),
 )
-
-function extractHostname(url: string): string {
-  try {
-    const parsed = new URL(url)
-    return parsed.hostname
-  }
-  catch {
-    return url
-  }
-}
-
-function measureLatency(url: string): Promise<number | null> {
-  return new Promise((resolve) => {
-    const start = performance.now()
-    let resolved = false
-    let ws: WebSocket | undefined
-
-    const timeout = setTimeout(() => {
-      if (!resolved) {
-        resolved = true
-        if (ws) {
-          ws.close()
-        }
-        resolve(null)
-      }
-    }, LATENCY_TIMEOUT)
-
-    try {
-      ws = new WebSocket(url)
-
-      ws.onopen = () => {
-        if (!resolved) {
-          resolved = true
-          clearTimeout(timeout)
-          const latency = Math.round(performance.now() - start)
-          resolve(latency)
-        }
-        ws?.close()
-      }
-
-      ws.onerror = () => {
-        if (!resolved) {
-          resolved = true
-          clearTimeout(timeout)
-          resolve(null)
-        }
-        ws?.close()
-      }
-    }
-    catch {
-      if (!resolved) {
-        resolved = true
-        clearTimeout(timeout)
-        if (ws) {
-          ws.close()
-        }
-        resolve(null)
-      }
-    }
-  })
-}
 
 async function testChainProviders(chain: SupportedChain) {
   const providers = PROVIDERS[chain]
