@@ -46,6 +46,10 @@ const emit = defineEmits<{
 - Use `~/` alias for app imports
 - Auto-imports are enabled for Vue, Nuxt, and composables
 
+### Language
+
+- **Always use English in code**: comments, UI strings (labels, placeholders, messages), aria-labels, and user-facing text must be in English.
+
 ## Key Conventions
 
 ### Chain Handling

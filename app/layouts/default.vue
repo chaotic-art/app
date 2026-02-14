@@ -2,6 +2,8 @@
 const { $config } = useNuxtApp()
 const route = useRoute()
 
+useRpcAutoSwitch()
+
 useHead({
   link: [
     {
