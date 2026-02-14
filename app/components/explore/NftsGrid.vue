@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { NftRarity } from '~/types/rarity'
 
 interface Props {
   search?: string
@@ -8,6 +9,8 @@ interface Props {
   gridClass?: string
   prefix?: AssetHubChain
   hideHoverAction?: boolean
+  showRarity?: boolean
+  rarityTotalItems?: number | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -15,6 +18,8 @@ const props = withDefaults(defineProps<Props>(), {
   search: '',
   gridClass: 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6',
   noItemsFoundMessage: 'Try adjusting your search or filters to see more results.',
+  showRarity: false,
+  rarityTotalItems: null,
 })
 
 const emit = defineEmits(['totalCountChange'])
@@ -42,6 +47,17 @@ onMounted(async () => {
 watch(totalCount, (newCount) => {
   emit('totalCountChange', newCount)
 })
+
+function getRarity(nft: { rarity?: NftRarity | null }): NftRarity | null {
+  if (!props.showRarity || !nft.rarity) {
+    return null
+  }
+
+  return {
+    ...nft.rarity,
+    rarityTotalItems: props.rarityTotalItems,
+  }
+}
 </script>
 
 <template>
@@ -60,6 +76,8 @@ watch(totalCount, (newCount) => {
         :price="nft.price"
         :current-owner="nft.currentOwner"
         :hide-hover-action="hideHoverAction"
+        :show-rarity="showRarity"
+        :rarity="getRarity(nft)"
       />
 
       <slot name="additional-item" />
