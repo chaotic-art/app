@@ -13,36 +13,36 @@ const props = defineProps<{
 }>()
 
 const defaultTierStyle: TierStyle = {
-  chip: 'border-slate-300/30 bg-slate-500/10',
-  text: 'text-slate-200',
-  icon: 'bg-slate-300',
+  chip: 'border-slate-300 bg-slate-100 dark:border-slate-300/30 dark:bg-slate-500/10',
+  text: 'text-slate-700 dark:text-slate-200',
+  icon: 'bg-slate-500 dark:bg-slate-300',
 }
 
 const tierStyles: Record<RarityTierValue, TierStyle> = {
   [RarityTier.LEGENDARY]: {
-    chip: 'border-amber-400/35 bg-amber-500/12',
-    text: 'text-amber-300',
-    icon: 'bg-amber-400',
+    chip: 'border-amber-300 bg-amber-50 dark:border-amber-400/35 dark:bg-amber-500/12',
+    text: 'text-amber-700 dark:text-amber-300',
+    icon: 'bg-amber-500 dark:bg-amber-400',
   },
   [RarityTier.EPIC]: {
-    chip: 'border-fuchsia-400/35 bg-fuchsia-500/12',
-    text: 'text-fuchsia-300',
-    icon: 'bg-fuchsia-400',
+    chip: 'border-fuchsia-300 bg-fuchsia-50 dark:border-fuchsia-400/35 dark:bg-fuchsia-500/12',
+    text: 'text-fuchsia-700 dark:text-fuchsia-300',
+    icon: 'bg-fuchsia-500 dark:bg-fuchsia-400',
   },
   [RarityTier.RARE]: {
-    chip: 'border-sky-400/35 bg-sky-500/12',
-    text: 'text-sky-300',
-    icon: 'bg-sky-400',
+    chip: 'border-sky-300 bg-sky-50 dark:border-sky-400/35 dark:bg-sky-500/12',
+    text: 'text-sky-700 dark:text-sky-300',
+    icon: 'bg-sky-500 dark:bg-sky-400',
   },
   [RarityTier.UNCOMMON]: {
-    chip: 'border-emerald-400/35 bg-emerald-500/12',
-    text: 'text-emerald-300',
-    icon: 'bg-emerald-400',
+    chip: 'border-emerald-300 bg-emerald-50 dark:border-emerald-400/35 dark:bg-emerald-500/12',
+    text: 'text-emerald-700 dark:text-emerald-300',
+    icon: 'bg-emerald-500 dark:bg-emerald-400',
   },
   [RarityTier.COMMON]: {
-    chip: 'border-slate-300/30 bg-slate-500/10',
-    text: 'text-slate-300',
-    icon: 'bg-slate-300',
+    chip: 'border-slate-300 bg-slate-100 dark:border-slate-300/30 dark:bg-slate-500/10',
+    text: 'text-slate-600 dark:text-slate-300',
+    icon: 'bg-slate-500 dark:bg-slate-300',
   },
 }
 
@@ -78,8 +78,8 @@ const topPercent = computed(() => {
   return percentile !== null ? clamp(Math.ceil(percentile), 1, 100) : null
 })
 
-const tooltipText = computed(() => {
-  if (!hasRarity.value || topPercent.value === null) {
+const tooltipRankText = computed(() => {
+  if (!hasRarity.value) {
     return ''
   }
 
@@ -87,11 +87,13 @@ const tooltipText = computed(() => {
 
   if (normalizedRarityTotalItems.value) {
     const totalText = normalizedRarityTotalItems.value.toLocaleString('en-US')
-    return `Ranked ${rankText} / ${totalText} (Top ${topPercent.value}%)`
+    return `Ranked ${rankText} / ${totalText}`
   }
 
-  return `Ranked ${rankText} (Top ${topPercent.value}%)`
+  return `Ranked ${rankText}`
 })
+
+const tooltipTopText = computed(() => topPercent.value !== null ? `(Top ${topPercent.value}%)` : null)
 
 const rankLabel = computed(() => `#${normalizedRarityRank.value.toLocaleString('en-US')}`)
 
@@ -110,10 +112,16 @@ function clamp(value: number, min: number, max: number): number {
 <template>
   <UTooltip
     v-if="hasRarity"
-    :text="tooltipText"
     :content="{ side: 'top', sideOffset: 14, align: 'center' }"
     :ui="tooltipUi"
   >
+    <template #content>
+      <span class="font-medium text-highlighted">{{ tooltipRankText }}</span>
+      <span v-if="tooltipTopText" class="font-medium text-muted">
+        {{ tooltipTopText }}
+      </span>
+    </template>
+
     <div
       class="inline-flex shrink-0 items-center gap-1.5 rounded-md border px-1.5 py-0.5 shadow-sm transition-colors md:px-2"
       :class="activeStyle.chip"
