@@ -44,6 +44,7 @@ export function useRpcAutoSwitch() {
 
     const fastest = withLatency[0]
     if (!fastest || fastest.url === currentUrl) {
+      lastAutoSwitchAt.value[chain] = now
       toast.add({
         title: 'No faster RPC provider found',
         description: 'Current provider is slow but no faster alternative was available.',

@@ -2,11 +2,14 @@
 import type { SupportedChain } from '~/plugins/sdk.client'
 import { extractHostname, formatLatency, latencyColorClass, measureLatency } from '~/composables/useRpcLatency'
 import { PROVIDERS } from '~/config/providers'
+import { chainSpec } from '~/utils/chain'
 
 const { currentChain } = useChain()
 const rpcStore = useRpcProviderStore()
 const isOpen = ref(false)
 const selectedUrl = computed(() => rpcStore.getProvider(currentChain.value as SupportedChain))
+
+const chainName = computed(() => chainSpec?.[currentChain.value as SupportedChain]?.name ?? 'Unknown')
 
 const providerUrls = computed(() => {
   const chain = currentChain.value as SupportedChain
@@ -68,7 +71,7 @@ function isProviderError(url: string): boolean {
           </span>
           <div class="flex items-center gap-1">
             <span class="text-xs text-muted">
-              {{ chainSpec[currentChain].name }}
+              {{ chainName }}
             </span>
             <UButton
               icon="i-lucide-refresh-cw"
