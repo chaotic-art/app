@@ -6,7 +6,7 @@ import { chainSpec } from '~/utils/chain'
 
 const rpcStore = useRpcProviderStore()
 
-const latencies = ref(new Map<string, number | null>())
+const latencies = shallowRef(new Map<string, number | null>())
 const isMeasuring = ref(false)
 
 const chainOrder: SupportedChain[] = ['ahp', 'ahk', 'dot', 'ksm', 'ahpas']
@@ -41,6 +41,7 @@ async function testChainProviders(chain: SupportedChain) {
   })
 
   await Promise.allSettled(promises)
+  triggerRef(latencies)
 }
 
 async function testAllProviders() {

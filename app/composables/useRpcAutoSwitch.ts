@@ -70,7 +70,7 @@ export function useRpcAutoSwitch() {
 
   watch(currentChain, (chain) => {
     if (chain && hasRpcProviders(chain)) {
-      checkAndSwitch(chain)
+      checkAndSwitch(chain).catch(console.error)
     }
   }, { immediate: true })
 }

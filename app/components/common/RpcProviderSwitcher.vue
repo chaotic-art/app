@@ -4,16 +4,26 @@ import { extractHostname, formatLatency, latencyColorClass, measureLatency } fro
 import { PROVIDERS } from '~/config/providers'
 import { chainSpec } from '~/utils/chain'
 
+function isSupportedChain(chain: string | undefined): chain is SupportedChain {
+  return !!chain && chain in PROVIDERS
+}
+
 const { currentChain } = useChain()
 const rpcStore = useRpcProviderStore()
 const isOpen = ref(false)
-const selectedUrl = computed(() => rpcStore.getProvider(currentChain.value as SupportedChain))
+const selectedUrl = computed(() => {
+  const chain = currentChain.value
+  return isSupportedChain(chain) ? rpcStore.getProvider(chain) : undefined
+})
 
-const chainName = computed(() => chainSpec?.[currentChain.value as SupportedChain]?.name ?? 'Unknown')
+const chainName = computed(() => {
+  const chain = currentChain.value
+  return isSupportedChain(chain) ? (chainSpec?.[chain]?.name ?? 'Unknown') : 'Unknown'
+})
 
 const providerUrls = computed(() => {
-  const chain = currentChain.value as SupportedChain
-  return PROVIDERS[chain] ?? []
+  const chain = currentChain.value
+  return isSupportedChain(chain) ? PROVIDERS[chain] : []
 })
 
 const latencies = shallowRef(new Map<string, number | null>())
@@ -38,7 +48,10 @@ async function measureCurrentChain() {
 }
 
 function handleSelect(url: string, close?: () => void) {
-  rpcStore.setProvider(currentChain.value as SupportedChain, url)
+  const chain = currentChain.value
+  if (isSupportedChain(chain)) {
+    rpcStore.setProvider(chain, url)
+  }
   close?.()
 }
 
