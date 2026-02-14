@@ -278,6 +278,8 @@ defineOgImageComponent('Frame', {
                 grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
                 no-items-found-message="This collection doesn't have any items yet."
                 :prefix="chain"
+                :rarity-total-items="Number(data?.collection?.supply || 0) || null"
+                show-rarity
               />
             </div>
           </ExploreFilters>

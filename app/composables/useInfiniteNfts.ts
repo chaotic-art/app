@@ -1,6 +1,8 @@
 import type { ExploreNftsData } from '~/graphql/queries/explore'
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { NftRarity } from '~/types/rarity'
 import { exploreNfts } from '~/graphql/queries/explore'
+import { isRarityTier } from '~/types/rarity'
 import { getDenyList } from '~/utils/prefix'
 
 type NftEntity = ExploreNftsData['tokenEntities'][0]
@@ -81,6 +83,13 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
           isPlaceholder: true,
           price: null,
           currentOwner: null,
+          rarity: {
+            rarityRank: null,
+            rarityScore: null,
+            rarityPercentile: null,
+            rarityTier: null,
+            rarityTotalItems: null,
+          } satisfies NftRarity,
         }
       }
 
@@ -97,6 +106,13 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
         chain: endpoint,
         image: nft.meta?.image || nft.image,
         isPlaceholder: false,
+        rarity: {
+          rarityRank: nft.rarityRank,
+          rarityScore: nft.rarityScore,
+          rarityPercentile: nft.rarityPercentile,
+          rarityTier: isRarityTier(nft.rarityTier) ? nft.rarityTier : null,
+          rarityTotalItems: null,
+        } satisfies NftRarity,
       }
     })
   })

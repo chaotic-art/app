@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { NftRarity } from '~/types/rarity'
 import { isNsfwNft } from '~/utils/mint'
 
 const props = defineProps<{
@@ -11,6 +12,8 @@ const props = defineProps<{
   price?: string | null
   currentOwner?: string | null
   hideHoverAction?: boolean
+  showRarity?: boolean
+  rarity?: NftRarity | null
 }>()
 
 const {
@@ -81,6 +84,17 @@ const canAddToActionCart = computed(() => (isProfileRoute.value || isAirdropRout
 
 const isArtViewEnabled = computed(() => route.query.art_view?.toString() === 'true' || artViewFilter.value)
 const hideMediaInfo = computed(() => isArtViewEnabled.value && isCollectionRoute.value)
+const rarity = computed(() => props.rarity ?? null)
+
+const hasRarity = computed(() => {
+  return Boolean(
+    props.showRarity
+    && rarity.value
+    && typeof rarity.value.rarityRank === 'number'
+    && Number.isFinite(rarity.value.rarityRank)
+    && rarity.value.rarityRank > 0,
+  )
+})
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
@@ -222,9 +236,16 @@ watchEffect(() => {
 
         <!-- Card Content -->
         <div v-if="!hideMediaInfo" class="p-3 md:p-4">
-          <h3 class="font-bold text-base md:text-lg mb-2 text-gray-900 dark:text-white line-clamp-1" :title="name || token?.metadata?.name || 'Untitled NFT'">
-            {{ name || token?.metadata?.name || 'Untitled NFT' }}
-          </h3>
+          <div class="mb-2 flex items-center justify-between gap-2">
+            <h3 class="min-w-0 flex-1 font-bold text-base md:text-lg text-gray-900 dark:text-white line-clamp-1" :title="name || token?.metadata?.name || 'Untitled NFT'">
+              {{ name || token?.metadata?.name || 'Untitled NFT' }}
+            </h3>
+
+            <RarityRankChip
+              v-if="hasRarity"
+              :rarity="rarity"
+            />
+          </div>
 
           <!-- Price Section -->
           <div class="flex items-center justify-between mt-3">
