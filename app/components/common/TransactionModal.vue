@@ -32,8 +32,6 @@ const resolvedError = computed(() => {
       return {
         title: $i18n.t('transactionModal.error.insufficientFunds.title'),
         description: $i18n.t('transactionModal.error.insufficientFunds.description'),
-        hint: $i18n.t('transactionModal.error.insufficientFunds.hint'),
-        details: '',
       }
     case 'dispatch_error':
       return {
