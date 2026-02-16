@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { warningMessage } from '~/utils/notification'
+
 defineProps<{
   ownerAddress?: string
 }>()

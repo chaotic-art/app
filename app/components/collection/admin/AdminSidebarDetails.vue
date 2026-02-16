@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { sanitizeIpfsUrl } from '~/utils/ipfs'
+import { warningMessage } from '~/utils/notification'
+
 defineProps<{
   name?: string
   description?: string

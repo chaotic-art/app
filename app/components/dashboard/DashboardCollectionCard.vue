@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DashboardCollection } from '~/composables/dashboard/useCreatorDashboard'
+import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 const props = defineProps<{
   collection: DashboardCollection
@@ -20,8 +21,10 @@ const logoUrl = computed(() => {
 })
 
 function handleView() {
-  const mockQuery = isMock.value ? '&mock=true' : ''
-  router.push(`/${props.collection.chain}/collection/${props.collection.id}?${mockQuery}`)
+  router.push({
+    path: `/${props.collection.chain}/collection/${props.collection.id}`,
+    query: isMock.value ? { mock: 'true' } : {},
+  })
 }
 
 function handleManage() {

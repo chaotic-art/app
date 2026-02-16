@@ -31,11 +31,3 @@ app/descriptors
 
 # Playwright MCP
 .playwright-mcp/
-
-# Local test/dev files
-ssr-shim.cjs
-/*.png
-/*.csv
-/*.md
-!README.md
-!AGENTS.md

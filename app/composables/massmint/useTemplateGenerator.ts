@@ -1,9 +1,37 @@
 import type { MassMintFile } from '~/components/massmint/types'
 
 export function useTemplateGenerator() {
+  /**
+   * Escapes a CSV field value according to RFC 4180 and prevents CSV injection
+   * - Doubles internal quotes
+   * - Wraps result in quotes
+   * - Prevents formula injection by prefixing dangerous characters with single quote
+   */
+  function escapeCsvField(value: string): string {
+    if (!value)
+      return '""'
+
+    let escaped = value
+    // Prevent CSV formula injection by prefixing values starting with =, +, -, or @
+    if (/^[=+\-@]/.test(escaped)) {
+      escaped = `'${escaped}`
+    }
+    // Escape double quotes by doubling them
+    escaped = escaped.replace(/"/g, '""')
+    // Always wrap in quotes
+    return `"${escaped}"`
+  }
+
   function generateCsvTemplate(files: MassMintFile[]): string {
     const header = 'filename,name,description,price'
-    const rows = files.map(f => `"${f.file.name}","${f.name || ''}","${f.description || ''}",""`)
+    const rows = files.map(f =>
+      [
+        escapeCsvField(f.file.name),
+        escapeCsvField(f.name || ''),
+        escapeCsvField(f.description || ''),
+        escapeCsvField(''),
+      ].join(','),
+    )
     return [header, ...rows].join('\n')
   }
 

@@ -66,26 +66,38 @@ export function useCreatorDashboard(options?: { mock?: boolean }) {
     computed(() => accountId.value || ''),
   )
 
-  watch(collectionIds, async (ids) => {
+  let requestId = 0
+
+  watch([collectionIds, currentChain], async ([ids, chain], _prev, onInvalidate) => {
     if (!ids || ids.length === 0) {
       collections.value = []
       return
     }
 
+    const currentRequestId = ++requestId
+    let isCancelled = false
+
+    onInvalidate(() => {
+      isCancelled = true
+    })
+
     loading.value = true
 
     try {
-      const chain = currentChain.value as AssetHubChain
       const results = await Promise.allSettled(
-        ids.map(id => fetchOdaCollection(chain, id)),
+        ids.map(id => fetchOdaCollection(chain as AssetHubChain, id)),
       )
+
+      if (isCancelled || requestId !== currentRequestId) {
+        return
+      }
 
       collections.value = results
         .map((result, index) => {
           if (result.status === 'fulfilled' && result.value) {
             return {
               id: ids[index]!,
-              chain,
+              chain: chain as AssetHubChain,
               metadata: result.value.metadata,
               supply: result.value.supply,
               claimed: result.value.claimed,
@@ -97,10 +109,15 @@ export function useCreatorDashboard(options?: { mock?: boolean }) {
         .filter((c): c is DashboardCollection => c !== null)
     }
     catch {
+      if (isCancelled || requestId !== currentRequestId) {
+        return
+      }
       collections.value = []
     }
     finally {
-      loading.value = false
+      if (!isCancelled && requestId === currentRequestId) {
+        loading.value = false
+      }
     }
   }, { immediate: true })
 

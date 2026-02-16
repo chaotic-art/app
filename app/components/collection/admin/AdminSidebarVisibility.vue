@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { warningMessage } from '~/utils/notification'
+
 const isExpanded = ref(false)
 const isPublished = ref(true)
 const isNsfw = ref(false)

@@ -1,9 +1,9 @@
-import type { InjectionKey } from 'vue'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { ComputedRef, InjectionKey } from 'vue'
+import type { SupportedChain } from '~/plugins/sdk.client'
 
 export interface StudioCollectionData {
   id: string
-  chain: AssetHubChain
+  chain: SupportedChain
   name: string
   description: string
   image: string
