@@ -8,6 +8,9 @@ interface Props {
   gridClass?: string
   prefix?: AssetHubChain
   hideHoverAction?: boolean
+  selectionMode?: boolean
+  selectedIds?: Set<string>
+  studioMode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -17,7 +20,11 @@ const props = withDefaults(defineProps<Props>(), {
   noItemsFoundMessage: 'Try adjusting your search or filters to see more results.',
 })
 
-const emit = defineEmits(['totalCountChange'])
+const emit = defineEmits<{
+  totalCountChange: [count: number]
+  select: [tokenId: number, collectionId: number]
+  itemClick: [tokenId: number, collectionId: number]
+}>()
 
 // Use the NFTs infinite query composable
 const {
@@ -60,6 +67,11 @@ watch(totalCount, (newCount) => {
         :price="nft.price"
         :current-owner="nft.currentOwner"
         :hide-hover-action="hideHoverAction"
+        :selection-mode="selectionMode"
+        :is-selected="selectedIds?.has(`${nft.collectionId}-${nft.tokenId}`)"
+        :studio-mode="studioMode"
+        @select="emit('select', $event, nft.collectionId)"
+        @item-click="(tokenId, colId) => emit('itemClick', tokenId, colId)"
       />
 
       <slot name="additional-item" />

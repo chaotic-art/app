@@ -33,3 +33,15 @@ export interface NFTToMint {
 }
 
 export interface NFTS { [id: string]: NFT }
+
+export interface MassMintFile {
+  id: string
+  file: File
+  thumbnailUrl: string
+  order: number
+  uploadStatus: 'local' | 'uploading' | 'uploaded' | 'error'
+  name?: string
+  description?: string
+  price?: number
+  attributes?: Array<{ trait_type: string, value: string }>
+}

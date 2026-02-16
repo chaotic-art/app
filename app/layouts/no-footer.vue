@@ -16,7 +16,7 @@ useHead({
   <div class="min-h-full flex flex-col overflow-hidden">
     <Navbar />
 
-    <main class="grow">
+    <main class="grow overflow-hidden">
       <slot />
     </main>
   </div>

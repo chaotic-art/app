@@ -31,7 +31,7 @@ const modalData = computed(() => {
             window.open(getSubscanNftUrl(collectionId, props.result.prefix), '_blank')
           }
           else {
-            router.push(`/${props.result?.prefix}/collection/${collectionId}`)
+            router.push(`/${props.result?.prefix}/studio/${collectionId}`)
           }
         },
       },

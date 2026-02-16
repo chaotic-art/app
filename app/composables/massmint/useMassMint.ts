@@ -38,7 +38,7 @@ export function useMassMint() {
     return progress.value.total > 0 && progress.value.stage !== 'complete' && progress.value.stage !== 'error'
   })
 
-  async function prepareNftMetadata(nfts: NFTToMint[]) {
+  async function prepareNftMetadata(nfts: NFTToMint[], onFileProgress?: (index: number, total: number) => void) {
     error.value = null
     progress.value = {
       total: nfts.length,
@@ -69,6 +69,7 @@ export function useMassMint() {
         })
 
       progress.value.current = index + 1
+      onFileProgress?.(index + 1, nfts.length)
 
       return {
         metadataUri: `ipfs://${metadataCid}`,

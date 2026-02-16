@@ -11,6 +11,14 @@ const props = defineProps<{
   price?: string | null
   currentOwner?: string | null
   hideHoverAction?: boolean
+  selectionMode?: boolean
+  isSelected?: boolean
+  studioMode?: boolean
+}>()
+
+const emit = defineEmits<{
+  select: [tokenId: number, collectionId: number]
+  itemClick: [tokenId: number, collectionId: number]
 }>()
 
 const {
@@ -93,9 +101,11 @@ watchEffect(() => {
   <div
     class="relative border rounded-xl overflow-hidden hover:shadow-lg transition-shadow hover-card-effect group"
     :class="{
-      'border-blue-500! dark:border-blue-400!': isItemInCart || isAtomicSwapItemSelected,
-      'border-gray-300 dark:border-neutral-700': !isItemInCart && !isAtomicSwapItemSelected,
+      'border-blue-500! dark:border-blue-400!': isItemInCart || isAtomicSwapItemSelected || isSelected,
+      'border-gray-300 dark:border-neutral-700': !isItemInCart && !isAtomicSwapItemSelected && !isSelected,
+      'cursor-pointer': selectionMode,
     }"
+    @click="selectionMode ? emit('select', tokenId, collectionId) : (studioMode ? emit('itemClick', tokenId, collectionId) : undefined)"
   >
     <!-- Error State -->
     <template v-if="error">
@@ -111,7 +121,16 @@ watchEffect(() => {
 
     <!-- Loaded State -->
     <template v-else>
-      <NuxtLink :to="`/${chain}/gallery/${collectionId}-${tokenId}`" class="block">
+      <!-- Selection checkbox overlay -->
+      <div
+        v-if="selectionMode"
+        class="absolute top-2 left-2 z-20"
+        @click.stop="emit('select', tokenId, collectionId)"
+      >
+        <UCheckbox :model-value="!!isSelected" />
+      </div>
+
+      <NuxtLink :to="selectionMode || studioMode ? undefined : `/${chain}/gallery/${collectionId}-${tokenId}`" class="block" :class="{ 'pointer-events-none': selectionMode }">
         <!-- NFT Media -->
         <div class="aspect-square bg-gray-200 dark:bg-neutral-800 overflow-hidden relative group/media">
           <video

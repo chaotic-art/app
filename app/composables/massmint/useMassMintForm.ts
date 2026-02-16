@@ -2,18 +2,21 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
-export function useMassMintForm() {
+export function useMassMintForm(options?: { collectionId?: string, chain?: AssetHubChain }) {
   const { userCollection } = useNftPallets()
 
   // Wallet connection check
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
   const isWalletConnected = computed(() => Boolean(getConnectedSubAccount.value?.address))
 
-  // Form state
+  // Form state — pre-fill from route context if provided
   const state = reactive({
-    collection: '',
-    blockchain: 'ahp' as AssetHubChain, // Default to Asset Hub Polkadot
+    collection: options?.collectionId ?? '',
+    blockchain: options?.chain ?? ('ahp' as AssetHubChain),
   })
+
+  // If collection context is provided, skip fetching
+  const hasCollectionContext = Boolean(options?.collectionId && options?.chain)
 
   // Fetch user collections dynamically
   const collections = ref<Array<{ label: string, value: string, name: string, description: string, image: string }>>([])
@@ -21,7 +24,7 @@ export function useMassMintForm() {
 
   // Fetch collections and user balance on component mount
   watchEffect(async () => {
-    if (!isWalletConnected.value)
+    if (hasCollectionContext || !isWalletConnected.value)
       return
 
     collectionsLoading.value = true
