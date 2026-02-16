@@ -2,7 +2,7 @@
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 import { warningMessage } from '~/utils/notification'
 
-defineProps<{
+const props = defineProps<{
   name?: string
   description?: string
   image?: string
@@ -10,6 +10,12 @@ defineProps<{
 }>()
 
 const localDescription = ref('')
+localDescription.value = props.description ?? ''
+
+watch(() => props.description, (newVal) => {
+  localDescription.value = newVal ?? ''
+})
+
 const isExpanded = ref(false)
 
 function handleSave() {
@@ -34,7 +40,7 @@ function handleSave() {
       <div>
         <label class="text-xs font-medium text-muted-foreground block mb-1">Name</label>
         <UInput
-          :model-value="name || ''"
+          :model-value="props.name || ''"
           disabled
           size="sm"
         />
@@ -47,7 +53,7 @@ function handleSave() {
         <label class="text-xs font-medium text-muted-foreground block mb-1">Description</label>
         <UTextarea
           v-model="localDescription"
-          :placeholder="description || 'Add a description...'"
+          :placeholder="props.description || 'Add a description...'"
           size="sm"
           :rows="3"
         />
@@ -57,8 +63,8 @@ function handleSave() {
         <label class="text-xs font-medium text-muted-foreground block mb-1">Logo</label>
         <div class="w-16 h-16 rounded-lg border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
           <img
-            v-if="image"
-            :src="sanitizeIpfsUrl(image)"
+            v-if="props.image"
+            :src="sanitizeIpfsUrl(props.image)"
             alt="Logo"
             class="w-full h-full object-cover rounded-lg"
           >
@@ -70,8 +76,8 @@ function handleSave() {
         <label class="text-xs font-medium text-muted-foreground block mb-1">Banner</label>
         <div class="w-full h-20 rounded-lg border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-primary transition-colors">
           <img
-            v-if="banner"
-            :src="sanitizeIpfsUrl(banner)"
+            v-if="props.banner"
+            :src="sanitizeIpfsUrl(props.banner)"
             alt="Banner"
             class="w-full h-full object-cover rounded-lg"
           >

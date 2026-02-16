@@ -26,12 +26,12 @@ function handleToggle() {
     <div v-if="isExpanded" class="px-4 pb-4 space-y-3">
       <div class="flex items-center justify-between">
         <span class="text-sm">Published</span>
-        <USwitch v-model="isPublished" size="sm" @update:model-value="handleToggle" />
+        <USwitch v-model="isPublished" size="sm" disabled @update:model-value="handleToggle" />
       </div>
 
       <div class="flex items-center justify-between">
         <span class="text-sm">NSFW</span>
-        <USwitch v-model="isNsfw" size="sm" @update:model-value="handleToggle" />
+        <USwitch v-model="isNsfw" size="sm" disabled @update:model-value="handleToggle" />
       </div>
     </div>
   </div>
