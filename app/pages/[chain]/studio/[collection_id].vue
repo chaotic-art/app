@@ -110,7 +110,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div>
+  <div class="w-full">
     <div class="flex flex-col h-screen w-full">
       <!-- Top Bar -->
       <header class="shrink-0 flex items-center justify-between px-5 py-3.5 border-b border-border bg-background">
