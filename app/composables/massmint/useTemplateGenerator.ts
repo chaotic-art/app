@@ -39,11 +39,24 @@ export function useTemplateGenerator() {
     const csv = generateCsvTemplate(files)
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
+
+    // Sanitize filename: remove invalid filesystem characters
+    let sanitizedName = collectionName || ''
+    // eslint-disable-next-line no-control-regex
+    sanitizedName = sanitizedName.replace(/[/\\?%*:|"<>\x00-\x1F]/g, '')
+    if (!sanitizedName.trim()) {
+      sanitizedName = 'massmint'
+    }
+
     const link = document.createElement('a')
     link.href = url
-    link.download = `${collectionName || 'massmint'}_template.csv`
+    link.download = `${sanitizedName}_massmint_template.csv`
+    document.body.appendChild(link)
     link.click()
-    URL.revokeObjectURL(url)
+    document.body.removeChild(link)
+
+    // Defer URL revocation to ensure download completes
+    setTimeout(() => URL.revokeObjectURL(url), 500)
   }
 
   return {
