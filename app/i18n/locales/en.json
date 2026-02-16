@@ -52,6 +52,7 @@
     "seeListing": "See Listing",
     "generativeArtDrops": "Generative Art Drops",
     "pastDrops": "Past Art Drops",
+    "genericMintError": "Something went wrong",
     "mintDropError": "Error encountered, please retry. {0}",
     "youSuccessfullyClaimedNft": "You successfully minted {0} NFT",
     "amountMintedSuccessfully": "{0} NFTs minted successfully",
@@ -142,6 +143,22 @@
     "noSignatureRequired": "Signature not needed",
     "uploading": "Uploading data to IPFS",
     "waiting": "Awaiting Your Signature"
+  },
+  "transactionModal": {
+    "error": {
+      "generic": {
+        "title": "Transaction Failed",
+        "description": "There was an error processing your transaction."
+      },
+      "cancelled": {
+        "title": "Signature Request Canceled",
+        "description": "You canceled signing. No transaction was submitted."
+      },
+      "insufficientFunds": {
+        "title": "Not Enough Funds",
+        "description": "Your wallet cannot pay the transaction fee for this action. Please add more funds, or lower the transaction amount and try again."
+      }
+    }
   },
   "confirmed": "Confirmed",
   "finalazing": "Finalizing",

@@ -1,7 +1,9 @@
 import type { TxEvent } from 'polkadot-api'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
+import type { TransactionError } from '~/utils/transactionError'
 import { whenever } from '@vueuse/core'
+import { resolveTransactionError } from '~/utils/transactionError'
 
 export interface CollectionCategory {
   type: 'collection'
@@ -115,7 +117,20 @@ type TransactionResult
 // 4. status.value = 'finalized'
 const status = ref<TxEvent['type'] | null>(null)
 const hash = ref('')
-const error = ref<Error | null>(null)
+const error = customRef<TransactionError | null>((track, trigger) => {
+  let value: TransactionError | null = null
+
+  return {
+    get() {
+      track()
+      return value
+    },
+    set(newValue) {
+      value = newValue ? resolveTransactionError(newValue) : null
+      trigger()
+    },
+  }
+})
 const result = ref<TransactionResult | null>(null)
 const open = ref(false)
 
