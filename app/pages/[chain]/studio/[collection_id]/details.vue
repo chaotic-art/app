@@ -20,8 +20,15 @@ const {
 const router = useRouter()
 const showLeaveWarning = ref(false)
 let pendingRoute: string | null = null
+const allowLeave = ref(false)
 
 onBeforeRouteLeave((to, _from, next) => {
+  if (allowLeave.value) {
+    allowLeave.value = false
+    next()
+    return
+  }
+
   if (isDirty.value) {
     showLeaveWarning.value = true
     pendingRoute = to.fullPath
@@ -37,6 +44,7 @@ function confirmLeave() {
   if (pendingRoute) {
     const route = pendingRoute
     pendingRoute = null
+    allowLeave.value = true
     router.push(route)
   }
 }
