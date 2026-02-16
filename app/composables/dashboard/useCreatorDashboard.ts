@@ -1,6 +1,7 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OnchainCollection } from '~/services/oda'
 import { fetchOdaCollection } from '~/services/oda'
+import { isAssetHubChain } from '~/utils/chain'
 
 export interface DashboardCollection {
   id: string
@@ -85,12 +86,9 @@ export function useCreatorDashboard(options?: { mock?: boolean }) {
 
     try {
       // Only fetch for AssetHub chains (ahp, ahk, ahpas)
-      const isAssetHubChain = (c: string): c is AssetHubChain => {
-        return c === 'ahp' || c === 'ahk' || c === 'ahpas'
-      }
-
       if (!isAssetHubChain(chain)) {
         collections.value = []
+        loading.value = false
         return
       }
 
