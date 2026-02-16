@@ -72,6 +72,7 @@ export function useCreatorDashboard(options?: { mock?: boolean }) {
   watch([collectionIds, currentChain], async ([ids, chain], _prev, onInvalidate) => {
     if (!ids || ids.length === 0) {
       collections.value = []
+      loading.value = false
       return
     }
 
