@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Papa from 'papaparse'
 import type { MassMintFile } from '~/components/massmint/types'
 import type { useMassMintWizard } from '~/composables/massmint/useMassMintWizard'
+import Papa from 'papaparse'
 import MassMintItemPanel from '~/components/massmint/wizard/MassMintItemPanel.vue'
 import { useTemplateGenerator } from '~/composables/massmint/useTemplateGenerator'
 import { MetadataPath } from '~/types/bulkOperations'
