@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Papa from 'papaparse'
 import type { MassMintFile } from '~/components/massmint/types'
 import type { useMassMintWizard } from '~/composables/massmint/useMassMintWizard'
 import MassMintItemPanel from '~/components/massmint/wizard/MassMintItemPanel.vue'
@@ -122,34 +123,49 @@ function parseTemplateFile(fileName: string, content: string) {
 }
 
 function parseCsvContent(content: string) {
-  const lines = content.trim().split('\n')
-  if (lines.length < 2) {
+  const parseResult = Papa.parse<string[]>(content, {
+    header: false,
+    skipEmptyLines: true,
+    transformHeader: header => header.trim().toLowerCase(),
+  })
+
+  if (parseResult.errors.length > 0) {
+    errorMessage(`CSV parsing error: ${parseResult.errors[0]?.message || 'Invalid CSV format'}`)
+    return
+  }
+
+  const rows = parseResult.data
+  if (rows.length < 2) {
     errorMessage('CSV file is empty — no data rows found')
     return
   }
 
-  const header = lines[0]!.split(',').map(h => h.trim().replace(/^"|"$/g, '').toLowerCase())
+  const header = rows[0]!.map(h => h.trim().toLowerCase())
   const nameIdx = header.indexOf('name')
   const descIdx = header.indexOf('description')
   const priceIdx = header.indexOf('price')
   const filenameIdx = header.indexOf('filename')
 
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i]!.split(',').map(c => c.trim().replace(/^"|"$/g, ''))
-    const filename = filenameIdx >= 0 && filenameIdx < cols.length ? cols[filenameIdx] : undefined
-    const name = nameIdx >= 0 && nameIdx < cols.length ? cols[nameIdx] : undefined
-    const description = descIdx >= 0 && descIdx < cols.length ? cols[descIdx] : undefined
-    const price = priceIdx >= 0 && priceIdx < cols.length ? cols[priceIdx] : undefined
+  for (let i = 1; i < rows.length; i++) {
+    const cols = rows[i]!
+    const filename = filenameIdx >= 0 && filenameIdx < cols.length ? cols[filenameIdx]?.trim() : undefined
+    const name = nameIdx >= 0 && nameIdx < cols.length ? cols[nameIdx]?.trim() : undefined
+    const description = descIdx >= 0 && descIdx < cols.length ? cols[descIdx]?.trim() : undefined
+    const price = priceIdx >= 0 && priceIdx < cols.length ? cols[priceIdx]?.trim() : undefined
+
+    // Remove formula injection protection prefix if present (added during export)
+    const cleanName = name && /^'[=+\-@]/.test(name) ? name.slice(1) : name
+    const cleanDescription = description && /^'[=+\-@]/.test(description) ? description.slice(1) : description
 
     const file = filename
       ? wizard.uploadedFiles.value.find(f => f.file.name === filename)
       : wizard.uploadedFiles.value[i - 1]
 
     if (file) {
-      if (name)
-        file.name = name
-      if (description)
-        file.description = description
+      if (cleanName)
+        file.name = cleanName
+      if (cleanDescription)
+        file.description = cleanDescription
       if (price !== undefined && price !== '' && Number(price) >= 0)
         file.price = Number(price)
     }
