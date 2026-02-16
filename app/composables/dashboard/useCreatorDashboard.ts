@@ -84,8 +84,18 @@ export function useCreatorDashboard(options?: { mock?: boolean }) {
     loading.value = true
 
     try {
+      // Only fetch for AssetHub chains (ahp, ahk, ahpas)
+      const isAssetHubChain = (c: string): c is AssetHubChain => {
+        return c === 'ahp' || c === 'ahk' || c === 'ahpas'
+      }
+
+      if (!isAssetHubChain(chain)) {
+        collections.value = []
+        return
+      }
+
       const results = await Promise.allSettled(
-        ids.map(id => fetchOdaCollection(chain as AssetHubChain, id)),
+        ids.map(id => fetchOdaCollection(chain, id)),
       )
 
       if (isCancelled || requestId !== currentRequestId) {
@@ -97,7 +107,7 @@ export function useCreatorDashboard(options?: { mock?: boolean }) {
           if (result.status === 'fulfilled' && result.value) {
             return {
               id: ids[index]!,
-              chain: chain as AssetHubChain,
+              chain,
               metadata: result.value.metadata,
               supply: result.value.supply,
               claimed: result.value.claimed,

@@ -6,7 +6,7 @@ export function useOwnedCollections(address: MaybeRef<string>) {
   const { currentChain } = useChain()
 
   return useQuery({
-    queryKey: ['ownedCollections', address],
+    queryKey: ['ownedCollections', address, currentChain],
     queryFn: async () => {
       const { data } = await $apolloClient.query({
         query: collectionIdList,
