@@ -19,30 +19,6 @@ const bannerUrl = computed(() => {
   return props.banner ? toOriginalContentUrl(sanitizeIpfsUrl(props.banner)) : ''
 })
 
-const mockNfts = computed(() => {
-  const names = [
-    'Nebula Drift',
-    'Solar Whisper',
-    'Quantum Bloom',
-    'Astral Echo',
-    'Cosmic Seed',
-    'Void Walker',
-    'Star Forge',
-    'Lunar Tide',
-    'Photon Veil',
-    'Dark Matter',
-    'Celestial Shard',
-    'Plasma Wave',
-  ]
-  return names.map((name, i) => ({
-    tokenId: i + 1,
-    collectionId: Number(props.collectionId),
-    chain: props.chain,
-    name: `${name} #${i + 1}`,
-    price: i % 3 === 0 ? String((1.5 + i * 0.25) * 1e10) : null,
-    currentOwner: props.owner,
-  }))
-})
 </script>
 
 <template>
@@ -107,21 +83,6 @@ const mockNfts = computed(() => {
       </div>
     </div>
 
-    <USeparator class="my-12" />
-
-    <!-- Items Grid (read-only, no selection/hover) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
-      <TokenCard
-        v-for="nft in mockNfts"
-        :key="`preview-${nft.tokenId}`"
-        :token-id="nft.tokenId"
-        :collection-id="nft.collectionId"
-        :chain="nft.chain"
-        :name="nft.name"
-        :price="nft.price"
-        :current-owner="nft.currentOwner"
-        :hide-hover-action="readOnly"
-      />
-    </div>
+    <!-- NFT grid omitted: no items to display in read-only preview -->
   </div>
 </template>

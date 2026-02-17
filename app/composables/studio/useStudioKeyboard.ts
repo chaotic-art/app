@@ -10,6 +10,9 @@ export function useStudioKeyboard(options?: {
 
     // ? → show shortcut overlay
     if (e.key === '?' && !isMeta) {
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable)
+        return
       e.preventDefault()
       showOverlay.value = !showOverlay.value
       return

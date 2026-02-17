@@ -33,13 +33,20 @@ export function useBulkOperationWizard(options: WizardOptions) {
   }
 
   function handleKeydown(event: KeyboardEvent) {
+    const target = event.target as HTMLElement
+    const isEditableTarget = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable
+
     if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      if (isEditableTarget)
+        return
       event.preventDefault()
       if (store.canProceed) {
         handleNext()
       }
     }
     if (event.key === 'Escape') {
+      if (isEditableTarget)
+        return
       event.preventDefault()
       handleBack()
     }

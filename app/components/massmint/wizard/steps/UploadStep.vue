@@ -7,6 +7,8 @@ const props = defineProps<{
   wizard: ReturnType<typeof useMassMintWizard>
 }>()
 
+const wizard = props.wizard
+
 const isDragOver = ref(false)
 const fileInputRef = ref<HTMLInputElement>()
 const viewMode = ref<'grid' | 'table'>('grid')
@@ -167,7 +169,7 @@ function openPreview(file: MassMintFile) {
       <!-- Grid view -->
       <draggable
         v-if="viewMode === 'grid'"
-        :model-value="wizard.uploadedFiles.value"
+        v-model="wizard.uploadedFiles.value"
         item-key="id"
         class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3"
         ghost-class="opacity-30"

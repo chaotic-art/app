@@ -12,56 +12,12 @@ export interface DashboardCollection {
   floor: number | null
 }
 
-const MOCK_COLLECTIONS: DashboardCollection[] = [
-  {
-    id: '42',
-    chain: 'ahp' as AssetHubChain,
-    metadata: { name: 'Cosmic Explorers', description: 'A generative art collection exploring digital space.', image: '', banner: '' },
-    supply: '200',
-    claimed: '47',
-    floor: 1500000000,
-  },
-  {
-    id: '108',
-    chain: 'ahp' as AssetHubChain,
-    metadata: { name: 'Polka Punks', description: 'Pixel art characters on Polkadot.', image: '', banner: '' },
-    supply: '1000',
-    claimed: '312',
-    floor: 800000000,
-  },
-  {
-    id: '256',
-    chain: 'ahp' as AssetHubChain,
-    metadata: { name: 'Abstract Realms', description: 'Abstract paintings minted on-chain.', image: '', banner: '' },
-    supply: '50',
-    claimed: '50',
-    floor: 5000000000,
-  },
-  {
-    id: '7',
-    chain: 'ahp' as AssetHubChain,
-    metadata: { name: 'Nature Frames', description: 'Photography collection of landscapes and wildlife.', image: '', banner: '' },
-    supply: '500',
-    claimed: '89',
-    floor: null,
-  },
-]
-
-export function useCreatorDashboard(options?: { mock?: boolean }) {
+export function useCreatorDashboard() {
   const { accountId } = useAuth()
   const { currentChain } = useChain()
 
   const collections = ref<DashboardCollection[]>([])
   const loading = ref(false)
-
-  if (options?.mock) {
-    collections.value = MOCK_COLLECTIONS
-    return {
-      collections,
-      isLoading: computed(() => false),
-      hasCollections: computed(() => true),
-    }
-  }
 
   const { data: collectionIds, isLoading: idsLoading } = useOwnedCollections(
     computed(() => accountId.value || ''),

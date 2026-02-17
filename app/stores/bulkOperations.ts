@@ -86,7 +86,9 @@ export const useBulkOperationsStore = defineStore('bulkOperations', () => {
   function reset() {
     operationType.value = BulkOperationType.MASS_MINT
     currentStep.value = 0
+    maxStepReached.value = 0
     collectionId.value = ''
+    chain.value = 'ahp'
     isActive.value = false
     clearItems()
   }

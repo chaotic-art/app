@@ -123,60 +123,12 @@ const queryVariables = computed(() => {
 
 const isMock = computed(() => route.query.mock === 'true')
 
-const mockCollectionData = {
-  metadata: {
-    name: 'Cosmic Explorers',
-    description: 'A generative art collection exploring the boundaries of digital space. Each piece is a unique composition of cosmic patterns and ethereal forms.',
-    image: '',
-    banner: '',
-  },
-  metadata_uri: null,
-  owner: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
-  supply: '200',
-  claimed: '47',
-  floor: 1500000000,
-}
-
-const collectionData = computed(() => {
-  if (isMock.value && !data.value?.collection?.metadata?.name) {
-    return mockCollectionData
-  }
-  return data.value?.collection
-})
+const collectionData = computed(() => data.value?.collection)
 
 const collectionName = computed(() => collectionData.value?.metadata?.name)
 const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(collectionData.value?.metadata?.banner || collectionData.value?.metadata?.image)))
 
-const mockNfts = computed(() => {
-  if (!isMock.value)
-    return []
-  const names = [
-    'Nebula Drift',
-    'Solar Whisper',
-    'Quantum Bloom',
-    'Astral Echo',
-    'Cosmic Seed',
-    'Void Walker',
-    'Star Forge',
-    'Lunar Tide',
-    'Photon Veil',
-    'Dark Matter',
-    'Celestial Shard',
-    'Plasma Wave',
-  ]
-  return names.map((name, i) => ({
-    tokenId: i + 1,
-    collectionId: Number(collection_id),
-    chain: chain.value,
-    name: `${name} #${i + 1}`,
-    price: i % 3 === 0 ? String((1.5 + i * 0.25) * 1e10) : null,
-    currentOwner: mockCollectionData.owner,
-  }))
-})
-
 const isOwner = computed(() => {
-  if (isMock.value)
-    return true
   const owner = data.value?.drops?.data[0]?.creator || data.value?.collection?.owner
   return isLogIn.value && owner && isCurrentAccount(owner)
 })
@@ -348,26 +300,8 @@ defineOgImageComponent('Frame', {
                   </div>
                 </div>
 
-                <!-- Mock Items Grid -->
-                <div v-if="isMock" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
-                  <TokenCard
-                    v-for="nft in mockNfts"
-                    :key="`mock-${nft.tokenId}`"
-                    :token-id="nft.tokenId"
-                    :collection-id="nft.collectionId"
-                    :chain="nft.chain"
-                    :name="nft.name"
-                    :price="nft.price"
-                    :current-owner="nft.currentOwner"
-                    :selection-mode="selectionMode"
-                    :is-selected="selectedItemIds.has(`${nft.collectionId}-${nft.tokenId}`)"
-                    @select="(tokenId: number, colId: number) => toggleSelection(`${colId}-${tokenId}`)"
-                  />
-                </div>
-
                 <!-- Real Items Grid -->
                 <LazyNftsGrid
-                  v-else
                   :key="gridKey"
                   :variables="queryVariables"
                   grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"

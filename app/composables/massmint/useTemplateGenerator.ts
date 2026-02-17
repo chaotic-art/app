@@ -42,7 +42,7 @@ export function useTemplateGenerator() {
 
     // Sanitize filename: remove invalid filesystem characters
     let sanitizedName = collectionName || ''
-    // eslint-disable-next-line no-control-regex, prefer-regex-literals
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: need to strip control chars from filenames
     sanitizedName = sanitizedName.replace(/[/\\?%*:|"<>\x00-\x1F]/g, '')
     if (!sanitizedName.trim()) {
       sanitizedName = 'massmint'

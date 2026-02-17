@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { warningMessage } from '~/utils/notification'
 
 const props = defineProps<{
   collectionId: string
@@ -18,7 +19,7 @@ const isMock = computed(() => route.query.mock === 'true')
 
 function handleMassMint() {
   const mockQuery = isMock.value ? '?mock=true' : ''
-  const url = `/${props.chain}/collection/${props.collectionId}/massmint${mockQuery}`
+  const url = `/${props.chain}/studio/${props.collectionId}/massmint${mockQuery}`
   router.push(url)
 }
 
@@ -27,7 +28,7 @@ function handleSelectItems() {
 }
 
 function handleDestroyCollection() {
-  // TODO: wire up DestroyCollectionModal via useOverlay
+  warningMessage('Coming soon — collection deletion will be available in a future update.')
 }
 </script>
 

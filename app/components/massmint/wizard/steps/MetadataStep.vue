@@ -88,8 +88,14 @@ function handleTemplateUpload(e: Event) {
   const reader = new FileReader()
   reader.onload = (event) => {
     const content = event.target?.result as string
-    parseTemplateFile(file.name, content)
-    wizard.templateUploaded.value = true
+    const success = parseTemplateFile(file.name, content)
+    if (success) {
+      wizard.templateUploaded.value = true
+    }
+    else {
+      wizard.templateFileName.value = ''
+      wizard.templateFileSize.value = 0
+    }
   }
   reader.readAsText(file)
   input.value = ''
@@ -105,24 +111,26 @@ function handleRemoveTemplate() {
   })
 }
 
-function parseTemplateFile(fileName: string, content: string) {
+function parseTemplateFile(fileName: string, content: string): boolean {
   const ext = fileName.split('.').pop()?.toLowerCase()
 
   if (ext === 'csv') {
-    parseCsvContent(content)
+    return parseCsvContent(content)
   }
   else if (ext === 'json') {
-    parseJsonContent(content)
+    return parseJsonContent(content)
   }
   else if (ext === 'txt') {
     parseTxtContent(content)
+    return true
   }
   else {
     errorMessage('Unsupported template format. Use CSV, JSON, or TXT.')
+    return false
   }
 }
 
-function parseCsvContent(content: string) {
+function parseCsvContent(content: string): boolean {
   const parseResult = Papa.parse<string[]>(content, {
     header: false,
     skipEmptyLines: true,
@@ -131,13 +139,13 @@ function parseCsvContent(content: string) {
 
   if (parseResult.errors.length > 0) {
     errorMessage(`CSV parsing error: ${parseResult.errors[0]?.message || 'Invalid CSV format'}`)
-    return
+    return false
   }
 
   const rows = parseResult.data
   if (rows.length < 2) {
     errorMessage('CSV file is empty — no data rows found')
-    return
+    return false
   }
 
   const header = rows[0]!.map(h => h.trim().toLowerCase())
@@ -170,9 +178,10 @@ function parseCsvContent(content: string) {
         file.price = Number(price)
     }
   }
+  return true
 }
 
-function parseJsonContent(content: string) {
+function parseJsonContent(content: string): boolean {
   try {
     const data = JSON.parse(content)
     const entries = Array.isArray(data) ? data : Object.values(data)
@@ -188,9 +197,11 @@ function parseJsonContent(content: string) {
           file.price = Number(entry.price)
       }
     })
+    return true
   }
   catch {
     errorMessage('Invalid JSON format')
+    return false
   }
 }
 

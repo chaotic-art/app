@@ -11,12 +11,11 @@ definePageMeta({
 })
 
 const { isLogIn } = useAuth()
-const { prefix: _prefix } = usePrefix()
 const route = useRoute()
 const router = useRouter()
 
 const isMock = computed(() => route.query.mock === 'true')
-const { collections, isLoading, hasCollections } = useCreatorDashboard({ mock: isMock.value })
+const { collections, isLoading, hasCollections } = useCreatorDashboard()
 
 watch(isLogIn, (loggedIn) => {
   if (!loggedIn && !isMock.value) {

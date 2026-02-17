@@ -130,7 +130,7 @@ watchEffect(() => {
         <UCheckbox :model-value="!!isSelected" />
       </div>
 
-      <NuxtLink :to="selectionMode || studioMode ? undefined : `/${chain}/gallery/${collectionId}-${tokenId}`" class="block" :class="{ 'pointer-events-none': selectionMode }">
+      <component :is="selectionMode || studioMode ? 'div' : 'NuxtLink'" :to="selectionMode || studioMode ? undefined : `/${chain}/gallery/${collectionId}-${tokenId}`" class="block" :class="{ 'pointer-events-none': selectionMode }">
         <!-- NFT Media -->
         <div class="aspect-square bg-gray-200 dark:bg-neutral-800 overflow-hidden relative group/media">
           <video
@@ -298,7 +298,7 @@ watchEffect(() => {
             </div>
           </div>
         </div>
-      </NuxtLink>
+      </component>
     </template>
   </div>
 </template>
