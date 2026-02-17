@@ -52,7 +52,6 @@
     "seeListing": "See Listing",
     "generativeArtDrops": "Generative Art Drops",
     "pastDrops": "Past Art Drops",
-    "genericMintError": "Something went wrong",
     "mintDropError": "Error encountered, please retry. {0}",
     "youSuccessfullyClaimedNft": "You successfully minted {0} NFT",
     "amountMintedSuccessfully": "{0} NFTs minted successfully",
