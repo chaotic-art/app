@@ -18,6 +18,7 @@ const props = defineProps<{
 const bannerUrl = computed(() => {
   return props.banner ? toOriginalContentUrl(sanitizeIpfsUrl(props.banner)) : ''
 })
+
 </script>
 
 <template>

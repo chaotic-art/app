@@ -16,15 +16,15 @@ const emit = defineEmits<{
 const router = useRouter()
 
 function handleAirdrop() {
-  router.push(`/${props.chain}/studio/${props.collectionId}/airdrop`)
+  router.push(`/${props.chain}/collection/${props.collectionId}/airdrop`)
 }
 
 function handleList() {
-  router.push(`/${props.chain}/studio/${props.collectionId}/list`)
+  router.push(`/${props.chain}/collection/${props.collectionId}/list`)
 }
 
 function handleTransfer() {
-  router.push(`/${props.chain}/studio/${props.collectionId}/transfer`)
+  router.push(`/${props.chain}/collection/${props.collectionId}/transfer`)
 }
 </script>
 

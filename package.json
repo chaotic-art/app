@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "papi --whitelist .papi/whitelist.ts && nuxt build",
-    "dev": "nuxt dev",
+    "dev": "NODE_OPTIONS='--require ./ssr-shim.cjs' nuxt dev",
     "generate": "nuxt generate",
     "generate:providers": "node scripts/generate-providers.mjs",
     "preview": "nuxt preview",
