@@ -1,8 +1,8 @@
 import type { TxEvent } from 'polkadot-api'
 import { InvalidTxError } from 'polkadot-api'
 
-interface RuntimeErrorPayload {
-  type?: unknown
+type TxDispatchError = Extract<TxEvent, { dispatchError: unknown }>['dispatchError']
+type RuntimeErrorPayload = Omit<TxDispatchError, 'value'> & {
   value?: unknown
 }
 
@@ -14,7 +14,7 @@ export interface TransactionError {
 }
 
 const USER_REJECTED_CODES = new Set([4001, '4001'])
-const ABORT_ERROR_NAME = 'aborterror'
+const ABORT_ERROR_NAME = 'AbortError'
 const ABORT_ERROR_TYPE = 'abort'
 
 function isTransactionError(value: unknown): value is TransactionError {
@@ -25,11 +25,12 @@ function isTransactionError(value: unknown): value is TransactionError {
 }
 
 function isRuntimeErrorPayload(value: unknown): value is RuntimeErrorPayload {
-  return typeof value === 'object' && value !== null && ('type' in value || 'value' in value)
-}
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
 
-function getNormalizedType(value: unknown): string {
-  return typeof value === 'string' ? value.trim().toLowerCase() : ''
+  const record = value as Record<string, unknown>
+  return typeof record.type === 'string'
 }
 
 function stringifyPayload(value: unknown): string {
@@ -79,21 +80,17 @@ function isInvalidPaymentError(payload: RuntimeErrorPayload | null): boolean {
     return false
   }
 
-  const type = getNormalizedType(payload.type)
-  if (type === 'payment') {
+  const type = payload.type
+  if (type === 'Payment') {
     return true
   }
 
-  if (type !== 'invalid') {
+  if (type !== 'Invalid') {
     return false
   }
 
-  if (typeof payload.value === 'string') {
-    return getNormalizedType(payload.value) === 'payment'
-  }
-
   if (isRuntimeErrorPayload(payload.value)) {
-    return getNormalizedType(payload.value.type) === 'payment'
+    return payload.value.type === 'Payment'
   }
 
   return false
@@ -104,19 +101,16 @@ function isTokenNoFundsError(payload: RuntimeErrorPayload | null): boolean {
     return false
   }
 
-  const type = getNormalizedType(payload.type)
-  if (type !== 'token') {
+  const type = payload.type
+
+  if (type !== 'Token') {
     return false
   }
 
-  if (typeof payload.value === 'string') {
-    const normalized = getNormalizedType(payload.value)
-    return normalized === 'nofunds' || normalized === 'fundsunavailable' || normalized === 'belowminimum'
-  }
-
   if (isRuntimeErrorPayload(payload.value)) {
-    const normalized = getNormalizedType(payload.value.type)
-    return normalized === 'nofunds' || normalized === 'fundsunavailable' || normalized === 'belowminimum'
+    return payload.value.type === 'NoFunds'
+      || payload.value.type === 'FundsUnavailable'
+      || payload.value.type === 'BelowMinimum'
   }
 
   return false
@@ -166,22 +160,22 @@ function getErrorField(
 
 function isCancelledError(error: unknown): boolean {
   const code = getErrorField(error, 'code')
-  if (USER_REJECTED_CODES.has(code as number | string)) {
+  if ((typeof code === 'number' || typeof code === 'string') && USER_REJECTED_CODES.has(code)) {
     return true
   }
 
-  const name = getNormalizedType(getErrorField(error, 'name'))
+  const name = getErrorField(error, 'name')
   if (name === ABORT_ERROR_NAME) {
     return true
   }
 
-  const type = getNormalizedType(getErrorField(error, 'type'))
+  const type = getErrorField(error, 'type')
   if (type === ABORT_ERROR_TYPE) {
     return true
   }
 
-  const message = getNormalizedType(extractMessage(error))
-  if (message === 'cancelled' || message === 'canceled') {
+  const message = extractMessage(error)
+  if (message === 'Cancelled' || message === 'Canceled') {
     return true
   }
 
@@ -192,12 +186,14 @@ export function resolveTransactionError(error: unknown): TransactionError {
   if (isTransactionError(error)) {
     return error
   }
+
   if (isCancelledError(error)) {
     return {
       kind: 'cancelled',
       details: '',
     }
   }
+
   const payload = getRuntimePayload(error)
 
   if (isInvalidPaymentError(payload) || isTokenNoFundsError(payload)) {
@@ -220,7 +216,7 @@ export function resolveTransactionError(error: unknown): TransactionError {
   }
 }
 
-export function getTxEventError(event: TxEvent): unknown | null {
+export function getTxEventError(event: TxEvent): TxDispatchError | null {
   if (event.type === 'txBestBlocksState') {
     if (!event.found || event.ok) {
       return null
