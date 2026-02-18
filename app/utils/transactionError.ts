@@ -16,13 +16,12 @@ export interface TransactionError {
 const USER_REJECTED_CODES = new Set([4001, '4001'])
 const ABORT_ERROR_NAME = 'AbortError'
 const ABORT_ERROR_TYPE = 'abort'
-
-function isTransactionError(value: unknown): value is TransactionError {
-  return typeof value === 'object'
-    && value !== null
-    && 'kind' in value
-    && 'details' in value
-}
+const TRANSACTION_ERROR_KINDS: ReadonlySet<TransactionErrorKind> = new Set([
+  'insufficient_funds',
+  'dispatch_error',
+  'cancelled',
+  'unknown',
+])
 
 function isRuntimeErrorPayload(value: unknown): value is RuntimeErrorPayload {
   if (typeof value !== 'object' || value === null) {
@@ -39,10 +38,31 @@ function stringifyPayload(value: unknown): string {
   }
 
   try {
-    return JSON.stringify(value)
+    const serialized = JSON.stringify(value)
+    return serialized ?? String(value)
   }
   catch {
     return String(value)
+  }
+}
+
+function isTransactionErrorKind(value: unknown): value is TransactionErrorKind {
+  return typeof value === 'string' && TRANSACTION_ERROR_KINDS.has(value as TransactionErrorKind)
+}
+
+function parseTransactionError(value: unknown): TransactionError | null {
+  if (typeof value !== 'object' || value === null) {
+    return null
+  }
+
+  const record = value as Record<string, unknown>
+  if (!isTransactionErrorKind(record.kind)) {
+    return null
+  }
+
+  return {
+    kind: record.kind,
+    details: typeof record.details === 'string' ? record.details : stringifyPayload(record.details ?? ''),
   }
 }
 
@@ -183,8 +203,10 @@ function isCancelledError(error: unknown): boolean {
 }
 
 export function resolveTransactionError(error: unknown): TransactionError {
-  if (isTransactionError(error)) {
-    return error
+  // If error is already-normalized error object.
+  const transactionError = parseTransactionError(error)
+  if (transactionError) {
+    return transactionError
   }
 
   if (isCancelledError(error)) {
