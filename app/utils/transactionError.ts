@@ -164,7 +164,10 @@ function getErrorField(
 
   const record = error as Record<string, unknown>
   if (field in record) {
-    return record[field]
+    const directValue = record[field]
+    if (directValue !== null && directValue !== undefined) {
+      return directValue
+    }
   }
 
   const nestedKeys = ['cause', 'error', 'originalError', 'data']
