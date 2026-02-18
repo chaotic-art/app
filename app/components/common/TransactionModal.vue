@@ -1,11 +1,12 @@
 <script setup lang="ts">
-const { $i18n } = useNuxtApp()
-const { error, result, isSuccess, status, open, close } = useTransactionModal()
 interface ResolvedError {
   title: string
   description: string
   details?: string
 }
+
+const { $i18n } = useNuxtApp()
+const { error, result, isSuccess, status, open, close } = useTransactionModal()
 
 const resolvedStatus = computed(() => {
   if (status.value === 'broadcasted') {
