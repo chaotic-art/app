@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SupportedChain } from '~/plugins/sdk.client'
-import { extractHostname, formatLatency, latencyColorClass, measureLatency } from '~/composables/useRpcLatency'
+import { extractHostname, formatLatency, latencyColorClass, measureLatency, SLOW_RPC_THRESHOLD_MS } from '~/composables/useRpcLatency'
 import { PROVIDERS } from '~/config/providers'
 import { chainSpec } from '~/utils/chain'
 
@@ -10,6 +10,7 @@ function isSupportedChain(chain: string | undefined): chain is SupportedChain {
 
 const { currentChain } = useChain()
 const rpcStore = useRpcProviderStore()
+const currentBlock = useCurrentBlock()
 const isOpen = ref(false)
 const selectedUrl = computed(() => {
   const chain = currentChain.value
@@ -29,9 +30,60 @@ const providerUrls = computed(() => {
 const latencies = shallowRef(new Map<string, number | null>())
 const isMeasuring = ref(false)
 
+/** Current provider latency from store (set by auto-switch or panel measurement). */
+const currentLatency = computed(() => {
+  const chain = currentChain.value
+  return isSupportedChain(chain) ? rpcStore.lastLatencyByChain[chain] : undefined
+})
+
+/** Connection status for pill: 'live' | 'degraded' | 'offline'. */
+const connectionStatus = computed(() => {
+  const lat = currentLatency.value
+  if (lat === undefined)
+    return 'live'
+  if (lat === null)
+    return 'offline'
+  if (lat > SLOW_RPC_THRESHOLD_MS)
+    return 'degraded'
+  return 'live'
+})
+
+const statusLabel = computed(() => {
+  switch (connectionStatus.value) {
+    case 'offline':
+      return '● Offline'
+    case 'degraded':
+      return '● Degraded'
+    default:
+      return '● Live'
+  }
+})
+
+const statusColorClass = computed(() => {
+  switch (connectionStatus.value) {
+    case 'offline':
+      return 'text-red-500'
+    case 'degraded':
+      return 'text-yellow-500'
+    default:
+      return 'text-green-500'
+  }
+})
+
+const tooltipText = computed(() => {
+  const url = selectedUrl.value
+  const lat = currentLatency.value
+  const host = url ? extractHostname(url) : '—'
+  const latStr = formatLatency(lat)
+  const block = currentBlock.value
+  const blockStr = block ? `Block #${block.toLocaleString()}` : 'Block #—'
+  return `Connected • ${latStr} • ${host} • ${blockStr}`
+})
+
 async function measureCurrentChain() {
   const urls = providerUrls.value
-  if (!urls.length)
+  const chain = currentChain.value
+  if (!urls.length || !isSupportedChain(chain))
     return
   isMeasuring.value = true
   const newLatencies = new Map<string, number | null>()
@@ -44,13 +96,24 @@ async function measureCurrentChain() {
   await Promise.allSettled(promises)
   latencies.value = newLatencies
   triggerRef(latencies)
+  const selected = selectedUrl.value
+  if (selected !== undefined) {
+    rpcStore.setLastLatency(chain, newLatencies.get(selected) ?? null)
+  }
   isMeasuring.value = false
 }
+
+watch(isOpen, (open) => {
+  if (open)
+    measureCurrentChain()
+})
 
 function handleSelect(url: string, close?: () => void) {
   const chain = currentChain.value
   if (isSupportedChain(chain)) {
     rpcStore.setProvider(chain, url)
+    const lat = latencies.value.get(url)
+    rpcStore.setLastLatency(chain, lat ?? null)
   }
   close?.()
 }
@@ -65,16 +128,21 @@ function isProviderError(url: string): boolean {
 </script>
 
 <template>
-  <UPopover v-model:open="isOpen">
-    <UButton
-      icon="i-lucide-network"
-      color="neutral"
-      variant="ghost"
-      size="sm"
-      square
-      class="size-8! min-w-8! min-h-8! p-0!"
-      aria-label="Select RPC provider"
-    />
+  <div v-if="providerUrls.length">
+    <UPopover v-model:open="isOpen">
+    <UTooltip :text="tooltipText" :content="{ side: 'right' }">
+      <UButton
+        variant="ghost"
+        color="neutral"
+        size="sm"
+        class="rounded-full gap-1.5 px-3 py-1.5 text-xs font-medium border border-border bg-elevated/80 backdrop-blur"
+        aria-label="Connection status – Select RPC provider"
+      >
+        <span :class="statusColorClass">
+          {{ statusLabel }}
+        </span>
+      </UButton>
+    </UTooltip>
 
     <template #content="{ close }">
       <div class="p-3 min-w-64 max-w-sm">
@@ -98,7 +166,7 @@ function isProviderError(url: string): boolean {
           </div>
         </div>
         <p class="text-xs text-muted mb-3">
-          Select endpoint. Click refresh to measure. Green = fast, yellow = medium, red = slow.
+          Select endpoint. Latency is measured when opened; use refresh to re-measure. Green = fast, yellow = medium, red = slow.
         </p>
         <div
           v-if="isMeasuring && latencies.size === 0"
@@ -149,5 +217,6 @@ function isProviderError(url: string): boolean {
         </ul>
       </div>
     </template>
-  </UPopover>
+    </UPopover>
+  </div>
 </template>

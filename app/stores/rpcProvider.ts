@@ -4,6 +4,8 @@ import { PROVIDERS } from '~/config/providers'
 
 export const useRpcProviderStore = defineStore('rpcProvider', () => {
   const selectedProviders = ref<Partial<Record<SupportedChain, string>>>({})
+  /** Last measured latency (ms) per chain for the current provider; used for Connection pill tooltip. */
+  const lastLatencyByChain = ref<Partial<Record<SupportedChain, number | null>>>({})
 
   function getProvider(chain: SupportedChain): string {
     return selectedProviders.value[chain] || PROVIDERS[chain][0]
@@ -25,11 +27,19 @@ export const useRpcProviderStore = defineStore('rpcProvider', () => {
     }
   }
 
+  function setLastLatency(chain: SupportedChain, latency: number | null) {
+    lastLatencyByChain.value[chain] = latency
+  }
+
   return {
     selectedProviders,
+    lastLatencyByChain,
     getProvider,
     setProvider,
+    setLastLatency,
   }
 }, {
-  persist: true,
+  persist: {
+    pick: ['selectedProviders'],
+  },
 })

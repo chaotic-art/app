@@ -109,7 +109,6 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
           <UNavigationMenu
             :items="navItems"
           />
-          <RpcProviderSwitcher />
           <ThemeSwitcher v-if="!accountId" />
           <NavbarShoppingCart />
         </div>
@@ -171,11 +170,6 @@ function handleNavClick(item: NavigationMenuItem, event?: Event) {
               />
             </div>
           </UButton>
-        </div>
-
-        <!-- RPC Provider (Mobile) -->
-        <div class="px-4">
-          <RpcProviderSwitcher />
         </div>
 
         <!-- Mobile Shopping Cart -->
