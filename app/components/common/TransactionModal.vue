@@ -1,4 +1,11 @@
 <script setup lang="ts">
+interface ResolvedError {
+  title: string
+  description: string
+  details?: string
+}
+
+const { $i18n } = useNuxtApp()
 const { error, result, isSuccess, status, open, close } = useTransactionModal()
 
 const resolvedStatus = computed(() => {
@@ -19,6 +26,31 @@ const resolvedStatus = computed(() => {
   }
 
   return TransactionStatus.Unknown
+})
+
+const resolvedError = computed<ResolvedError | null>(() => {
+  if (!error.value) {
+    return null
+  }
+
+  switch (error.value.kind) {
+    case 'insufficient_funds':
+      return {
+        title: $i18n.t('transactionModal.error.insufficientFunds.title'),
+        description: $i18n.t('transactionModal.error.insufficientFunds.description'),
+      }
+    case 'cancelled':
+      return {
+        title: $i18n.t('transactionModal.error.cancelled.title'),
+        description: $i18n.t('transactionModal.error.cancelled.description'),
+      }
+    default:
+      return {
+        title: $i18n.t('transactionModal.error.generic.title'),
+        description: $i18n.t('transactionModal.error.generic.description'),
+        details: error.value.details,
+      }
+  }
 })
 </script>
 
@@ -90,14 +122,17 @@ const resolvedStatus = computed(() => {
         </div>
         <div>
           <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            Transaction Failed
+            {{ resolvedError?.title }}
           </h4>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
-            There was an error processing your transaction
+            {{ resolvedError?.description }}
           </p>
-          <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+          <div
+            v-if="resolvedError?.details"
+            class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3"
+          >
             <p class="text-xs text-red-700 dark:text-red-400">
-              {{ error.message }}
+              {{ resolvedError.details }}
             </p>
           </div>
         </div>
