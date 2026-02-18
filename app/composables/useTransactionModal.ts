@@ -117,19 +117,12 @@ type TransactionResult
 // 4. status.value = 'finalized'
 const status = ref<TxEvent['type'] | null>(null)
 const hash = ref('')
-const error = customRef<TransactionError | null>((track, trigger) => {
-  let value: TransactionError | null = null
-
-  return {
-    get() {
-      track()
-      return value
-    },
-    set(newValue) {
-      value = newValue ? resolveTransactionError(newValue) : null
-      trigger()
-    },
-  }
+const rawError = ref<unknown | null>(null)
+const error = computed<TransactionError | null, unknown | null>({
+  get: () => (rawError.value ? resolveTransactionError(rawError.value) : null),
+  set: (newValue) => {
+    rawError.value = newValue
+  },
 })
 const result = ref<TransactionResult | null>(null)
 const open = ref(false)

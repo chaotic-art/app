@@ -1,6 +1,11 @@
 <script setup lang="ts">
 const { $i18n } = useNuxtApp()
 const { error, result, isSuccess, status, open, close } = useTransactionModal()
+interface ResolvedError {
+  title: string
+  description: string
+  details?: string
+}
 
 const resolvedStatus = computed(() => {
   if (status.value === 'broadcasted') {
@@ -22,7 +27,7 @@ const resolvedStatus = computed(() => {
   return TransactionStatus.Unknown
 })
 
-const resolvedError = computed(() => {
+const resolvedError = computed<ResolvedError | null>(() => {
   if (!error.value) {
     return null
   }
