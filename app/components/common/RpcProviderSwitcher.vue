@@ -184,6 +184,7 @@ function isProviderError(url: string): boolean {
             >
               <button
                 type="button"
+                :aria-label="`Select ${extractHostname(url)} - ${formatLatency(latencies.get(url))}`"
                 :disabled="isProviderError(url)"
                 class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 :class="[

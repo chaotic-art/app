@@ -3,7 +3,8 @@
  * Used by Settings RPC section, header RPC switcher, and auto-switch logic.
  */
 
-export const DEFAULT_LATENCY_TIMEOUT_MS = 5000
+/** Max wait for WebSocket connect; kept below typical "slow" threshold so slow connects report latency rather than timeout. */
+export const DEFAULT_LATENCY_TIMEOUT_MS = 3000
 export const SLOW_RPC_THRESHOLD_MS = 1000
 
 /** Tailwind class for latency: muted (unknown), green (≤300ms), yellow (≤1s), red (slow/error). */

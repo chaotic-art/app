@@ -113,6 +113,7 @@ function isProviderError(url: string): boolean {
             <button
               v-for="url in PROVIDERS[activeChain]"
               :key="url"
+              :aria-label="`Select ${extractHostname(url)} - ${formatLatency(latencies.get(url))}`"
               :disabled="isProviderError(url)"
               class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
               :class="[
@@ -157,6 +158,7 @@ function isProviderError(url: string): boolean {
               <button
                 v-for="url in PROVIDERS[item.value as SupportedChain]"
                 :key="url"
+                :aria-label="`Select ${extractHostname(url)} - ${formatLatency(latencies.get(url))}`"
                 :disabled="isProviderError(url)"
                 class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
                 :class="[
