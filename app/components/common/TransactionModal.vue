@@ -27,33 +27,27 @@ const resolvedError = computed(() => {
     return null
   }
 
+  const genericError = {
+    title: $i18n.t('transactionModal.error.generic.title'),
+    description: $i18n.t('transactionModal.error.generic.description'),
+    details: error.value.details,
+  }
+
   switch (error.value.kind) {
     case 'insufficient_funds':
       return {
         title: $i18n.t('transactionModal.error.insufficientFunds.title'),
         description: $i18n.t('transactionModal.error.insufficientFunds.description'),
       }
-    case 'dispatch_error':
-      return {
-        title: $i18n.t('transactionModal.error.generic.title'),
-        description: $i18n.t('transactionModal.error.generic.description'),
-        details: error.value.details || '',
-        hint: '',
-      }
     case 'cancelled':
       return {
         title: $i18n.t('transactionModal.error.cancelled.title'),
         description: $i18n.t('transactionModal.error.cancelled.description'),
-        hint: '',
-        details: '',
       }
+    case 'dispatch_error':
+      return genericError
     default:
-      return {
-        title: $i18n.t('transactionModal.error.generic.title'),
-        description: $i18n.t('transactionModal.error.generic.description'),
-        details: error.value.details || '',
-        hint: '',
-      }
+      return genericError
   }
 })
 </script>
@@ -130,9 +124,6 @@ const resolvedError = computed(() => {
           </h4>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
             {{ resolvedError?.description }}
-          </p>
-          <p v-if="resolvedError?.hint" class="text-sm text-gray-600 dark:text-gray-300 mb-3">
-            {{ resolvedError.hint }}
           </p>
           <div
             v-if="resolvedError?.details"
