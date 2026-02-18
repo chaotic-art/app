@@ -33,12 +33,6 @@ const resolvedError = computed<ResolvedError | null>(() => {
     return null
   }
 
-  const genericError = {
-    title: $i18n.t('transactionModal.error.generic.title'),
-    description: $i18n.t('transactionModal.error.generic.description'),
-    details: error.value.details,
-  }
-
   switch (error.value.kind) {
     case 'insufficient_funds':
       return {
@@ -50,10 +44,12 @@ const resolvedError = computed<ResolvedError | null>(() => {
         title: $i18n.t('transactionModal.error.cancelled.title'),
         description: $i18n.t('transactionModal.error.cancelled.description'),
       }
-    case 'dispatch_error':
-      return genericError
     default:
-      return genericError
+      return {
+        title: $i18n.t('transactionModal.error.generic.title'),
+        description: $i18n.t('transactionModal.error.generic.description'),
+        details: error.value.details,
+      }
   }
 })
 </script>
