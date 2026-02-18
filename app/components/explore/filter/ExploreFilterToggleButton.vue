@@ -1,22 +1,39 @@
 <script setup lang="ts">
-const { sidebarCollapsed, openFilters, activeFiltersCount } = useExploreFilterToggleState()
+const { sidebarCollapsed, openFilters, closeFilters, activeFiltersCount } = useExploreFilterToggleState()
+
+const icon = computed(() =>
+  sidebarCollapsed.value ? 'i-heroicons-funnel' : 'i-heroicons-chevron-double-left',
+)
+
+const tooltipText = computed(() =>
+  sidebarCollapsed.value ? 'explore.showFilters' : 'explore.hideFilters',
+)
+
+function toggleFilters() {
+  if (sidebarCollapsed.value) {
+    openFilters()
+  }
+  else {
+    closeFilters()
+  }
+}
 </script>
 
 <template>
   <ClientOnly>
-    <div v-if="sidebarCollapsed" class="hidden md:block">
-      <UTooltip :text="$t('explore.showFilters')">
+    <div class="hidden md:block">
+      <UTooltip :text="$t(tooltipText)">
         <UButton
-          icon="i-heroicons-chevron-right"
+          :icon="icon"
           color="neutral"
           variant="outline"
           size="sm"
           class="relative shrink-0 w-9! h-9 rounded-md!"
-          :aria-label="$t('explore.showFilters')"
-          @click="openFilters"
+          :aria-label="$t(tooltipText)"
+          @click="toggleFilters"
         >
           <UBadge
-            v-if="activeFiltersCount > 0"
+            v-if="sidebarCollapsed && activeFiltersCount > 0"
             :label="String(activeFiltersCount)"
             size="xs"
             class="absolute -top-1 -right-1"

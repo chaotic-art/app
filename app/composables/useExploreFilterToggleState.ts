@@ -31,9 +31,14 @@ export function useExploreFilterToggleState() {
     sidebarCollapsed.value = false
   }
 
+  function closeFilters() {
+    sidebarCollapsed.value = true
+  }
+
   return {
     sidebarCollapsed,
     activeFiltersCount,
     openFilters,
+    closeFilters,
   }
 }

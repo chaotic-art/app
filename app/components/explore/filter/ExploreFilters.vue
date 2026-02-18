@@ -240,18 +240,7 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
           sticky
         >
           <div class="p-3 border-b border-border">
-            <FilterHeader>
-              <template #actions>
-                <UTooltip :text="$t('explore.hideFilters')">
-                  <UButton
-                    variant="ghost"
-                    icon="i-heroicons-chevron-left"
-                    size="sm"
-                    @click="sidebarCollapsed = true"
-                  />
-                </UTooltip>
-              </template>
-            </FilterHeader>
+            <FilterHeader />
           </div>
 
           <div class="p-3 overflow-y-auto max-h-[calc(100vh-300px)]">
