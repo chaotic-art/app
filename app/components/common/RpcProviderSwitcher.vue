@@ -93,7 +93,7 @@ async function measureCurrentChain() {
     newLatencies.set(url, result)
   })
 
-  await Promise.allSettled(promises)
+  await Promise.all(promises)
   latencies.value = newLatencies
   triggerRef(latencies)
   const selected = selectedUrl.value
@@ -109,6 +109,8 @@ watch(isOpen, (open) => {
 })
 
 function handleSelect(url: string, close?: () => void) {
+  if (isProviderError(url))
+    return
   const chain = currentChain.value
   if (isSupportedChain(chain)) {
     rpcStore.setProvider(chain, url)

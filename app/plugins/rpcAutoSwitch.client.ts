@@ -35,17 +35,30 @@ export default defineNuxtPlugin((nuxtApp) => {
         return
       }
 
-      const urls = PROVIDERS[chain] ?? []
-      const results = await Promise.all(
-        urls.map(async url => ({ url, latency: await measureLatency(url) })),
+      const allUrls = PROVIDERS[chain] ?? []
+      const otherUrls = allUrls.filter(url => url !== currentUrl)
+      const otherResults = await Promise.all(
+        otherUrls.map(async url => ({ url, latency: await measureLatency(url) })),
       )
-
-      const withLatency = results
-        .filter((r): r is { url: (typeof urls)[number], latency: number } => r.latency !== null)
+      const withLatency = [
+        { url: currentUrl, latency },
+        ...otherResults,
+      ]
+        .filter((r): r is { url: (typeof allUrls)[number], latency: number } => r.latency !== null)
         .sort((a, b) => a.latency - b.latency)
 
-      const fastest = withLatency[0]
-      if (!fastest || fastest.url === currentUrl) {
+      if (withLatency.length === 0) {
+        lastAutoSwitchAt.value[chain] = now
+        toast.add({
+          title: 'All RPC providers are unreachable',
+          description: 'Current provider is slow and all providers failed to respond.',
+          color: 'error',
+        })
+        return
+      }
+
+      const fastest = withLatency[0]!
+      if (fastest.url === currentUrl) {
         lastAutoSwitchAt.value[chain] = now
         toast.add({
           title: 'No faster RPC provider found',
