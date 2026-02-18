@@ -80,6 +80,15 @@ describe('resolveTransactionError', () => {
     })
   })
 
+  it('maps runtime payment payloads to insufficient_funds', () => {
+    expect(resolveTransactionError({
+      type: 'Payment',
+    })).toEqual({
+      kind: 'insufficient_funds',
+      details: '',
+    })
+  })
+
   it('maps runtime BadOrigin payload to dispatch_error', () => {
     expect(resolveTransactionError({
       type: 'BadOrigin',
