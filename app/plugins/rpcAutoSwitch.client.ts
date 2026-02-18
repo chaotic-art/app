@@ -41,7 +41,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       )
 
       const withLatency = results
-        .filter((r): r is { url: (typeof urls)[number]; latency: number } => r.latency !== null)
+        .filter((r): r is { url: (typeof urls)[number], latency: number } => r.latency !== null)
         .sort((a, b) => a.latency - b.latency)
 
       const fastest = withLatency[0]

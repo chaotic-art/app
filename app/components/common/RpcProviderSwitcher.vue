@@ -130,93 +130,93 @@ function isProviderError(url: string): boolean {
 <template>
   <div v-if="providerUrls.length">
     <UPopover v-model:open="isOpen">
-    <UTooltip :text="tooltipText" :content="{ side: 'right' }">
-      <UButton
-        variant="ghost"
-        color="neutral"
-        size="sm"
-        class="rounded-full gap-1.5 px-3 py-1.5 text-xs font-medium border border-border bg-elevated/80 backdrop-blur"
-        aria-label="Connection status – Select RPC provider"
-      >
-        <span :class="statusColorClass">
-          {{ statusLabel }}
-        </span>
-      </UButton>
-    </UTooltip>
-
-    <template #content="{ close }">
-      <div class="p-3 min-w-64 max-w-sm">
-        <div class="flex items-center justify-between gap-2 mb-2">
-          <span class="text-sm font-medium text-foreground">
-            RPC Provider
-          </span>
-          <div class="flex items-center gap-1">
-            <span class="text-xs text-muted">
-              {{ chainName }}
-            </span>
-            <UButton
-              icon="i-lucide-refresh-cw"
-              color="neutral"
-              variant="ghost"
-              size="xs"
-              :loading="isMeasuring"
-              aria-label="Refresh latency"
-              @click="measureCurrentChain"
-            />
-          </div>
-        </div>
-        <p class="text-xs text-muted mb-3">
-          Select endpoint. Latency is measured when opened; use refresh to re-measure. Green = fast, yellow = medium, red = slow.
-        </p>
-        <div
-          v-if="isMeasuring && latencies.size === 0"
-          class="flex items-center gap-2 py-2 text-muted text-sm"
+      <UTooltip :text="tooltipText" :content="{ side: 'right' }">
+        <UButton
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          class="rounded-full gap-1.5 px-3 py-1.5 text-xs font-medium border border-border bg-elevated/80 backdrop-blur"
+          aria-label="Connection status – Select RPC provider"
         >
-          <UIcon name="i-lucide-loader-circle" class="h-4 w-4 animate-spin" />
-          Measuring latency...
-        </div>
-        <ul class="space-y-0.5 max-h-72 overflow-y-auto">
-          <li
-            v-for="url in providerUrls"
-            :key="url"
+          <span :class="statusColorClass">
+            {{ statusLabel }}
+          </span>
+        </UButton>
+      </UTooltip>
+
+      <template #content="{ close }">
+        <div class="p-3 min-w-64 max-w-sm">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="text-sm font-medium text-foreground">
+              RPC Provider
+            </span>
+            <div class="flex items-center gap-1">
+              <span class="text-xs text-muted">
+                {{ chainName }}
+              </span>
+              <UButton
+                icon="i-lucide-refresh-cw"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                :loading="isMeasuring"
+                aria-label="Refresh latency"
+                @click="measureCurrentChain"
+              />
+            </div>
+          </div>
+          <p class="text-xs text-muted mb-3">
+            Select endpoint. Latency is measured when opened; use refresh to re-measure. Green = fast, yellow = medium, red = slow.
+          </p>
+          <div
+            v-if="isMeasuring && latencies.size === 0"
+            class="flex items-center gap-2 py-2 text-muted text-sm"
           >
-            <button
-              type="button"
-              :disabled="isProviderError(url)"
-              class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              :class="[
-                isProviderError(url)
-                  ? 'cursor-not-allowed'
-                  : isSelected(url)
-                    ? 'bg-primary/10 text-foreground cursor-pointer'
-                    : 'hover:bg-elevated text-foreground cursor-pointer',
-              ]"
-              @click="handleSelect(url, close)"
+            <UIcon name="i-lucide-loader-circle" class="h-4 w-4 animate-spin" />
+            Measuring latency...
+          </div>
+          <ul class="space-y-0.5 max-h-72 overflow-y-auto">
+            <li
+              v-for="url in providerUrls"
+              :key="url"
             >
-              <UIcon
-                name="i-lucide-circle"
-                class="h-2.5 w-2.5 shrink-0"
-                :class="latencyColorClass(latencies.get(url))"
-              />
-              <span class="flex-1 min-w-0 truncate text-sm font-mono">
-                {{ extractHostname(url) }}
-              </span>
-              <span
-                class="text-xs tabular-nums shrink-0"
-                :class="latencyColorClass(latencies.get(url))"
+              <button
+                type="button"
+                :disabled="isProviderError(url)"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                :class="[
+                  isProviderError(url)
+                    ? 'cursor-not-allowed'
+                    : isSelected(url)
+                      ? 'bg-primary/10 text-foreground cursor-pointer'
+                      : 'hover:bg-elevated text-foreground cursor-pointer',
+                ]"
+                @click="handleSelect(url, close)"
               >
-                {{ formatLatency(latencies.get(url)) }}
-              </span>
-              <UIcon
-                v-if="isSelected(url)"
-                name="i-lucide-check"
-                class="h-4 w-4 text-primary shrink-0"
-              />
-            </button>
-          </li>
-        </ul>
-      </div>
-    </template>
+                <UIcon
+                  name="i-lucide-circle"
+                  class="h-2.5 w-2.5 shrink-0"
+                  :class="latencyColorClass(latencies.get(url))"
+                />
+                <span class="flex-1 min-w-0 truncate text-sm font-mono">
+                  {{ extractHostname(url) }}
+                </span>
+                <span
+                  class="text-xs tabular-nums shrink-0"
+                  :class="latencyColorClass(latencies.get(url))"
+                >
+                  {{ formatLatency(latencies.get(url)) }}
+                </span>
+                <UIcon
+                  v-if="isSelected(url)"
+                  name="i-lucide-check"
+                  class="h-4 w-4 text-primary shrink-0"
+                />
+              </button>
+            </li>
+          </ul>
+        </div>
+      </template>
     </UPopover>
   </div>
 </template>
