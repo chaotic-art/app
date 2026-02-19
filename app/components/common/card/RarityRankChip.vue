@@ -87,22 +87,46 @@ const topPercent = computed(() => {
   return percentile !== null ? clamp(Math.ceil(percentile), 1, 100) : null
 })
 
-const tooltipRankText = computed(() => {
+const tooltipTierLabel = computed(() => {
+  const tier = props.rarity?.rarityTier
+  return isRarityTier(tier) ? `${tier.charAt(0)}${tier.slice(1).toLowerCase()}` : 'Rarity'
+})
+
+const tooltipRankFraction = computed(() => {
+  if (!normalizedRarityTotalItems.value) {
+    return null
+  }
+
+  const rankText = normalizedRarityRank.value.toLocaleString('en-US')
+  const totalText = normalizedRarityTotalItems.value.toLocaleString('en-US')
+  return `${rankText} / ${totalText}`
+})
+
+const tooltipTopText = computed(() => topPercent.value !== null ? `top ${topPercent.value}%` : null)
+
+const tooltipSentence = computed(() => {
   if (!hasRarity.value) {
     return ''
   }
 
-  const rankText = normalizedRarityRank.value.toLocaleString('en-US')
+  const tierLabel = tooltipTierLabel.value
+  const topText = tooltipTopText.value
+  const rankFraction = tooltipRankFraction.value
 
-  if (normalizedRarityTotalItems.value) {
-    const totalText = normalizedRarityTotalItems.value.toLocaleString('en-US')
-    return `Ranked ${rankText} / ${totalText}`
+  if (topText && rankFraction) {
+    return `${tierLabel}: ${topText} • ${rankFraction}`
   }
 
-  return `Ranked ${rankText}`
-})
+  if (topText) {
+    return `${tierLabel}: ${topText}`
+  }
 
-const tooltipTopText = computed(() => topPercent.value !== null ? `(Top ${topPercent.value}%)` : null)
+  if (rankFraction) {
+    return `${tierLabel}: ranked ${rankFraction}`
+  }
+
+  return tierLabel
+})
 
 const rankLabel = computed(() => `#${normalizedRarityRank.value.toLocaleString('en-US')}`)
 
@@ -128,10 +152,7 @@ function clamp(value: number, min: number, max: number): number {
     :ui="tooltipUi"
   >
     <template #content>
-      <span class="font-medium text-highlighted">{{ tooltipRankText }}</span>
-      <span v-if="tooltipTopText" class="font-medium text-muted">
-        {{ tooltipTopText }}
-      </span>
+      <span class="font-medium text-highlighted">{{ tooltipSentence }}</span>
     </template>
 
     <div
