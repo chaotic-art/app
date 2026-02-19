@@ -10,13 +10,6 @@ definePageMeta({
   },
 })
 
-const sortOptions = [
-  { label: 'Recent', value: 'blockNumber_DESC' },
-  { label: 'Oldest', value: 'blockNumber_ASC' },
-  { label: 'A-Z', value: 'name_ASC' },
-  { label: 'Z-A', value: 'name_DESC' },
-]
-
 // SEO Meta
 useSeoMeta({
   title: 'Gallery - Explore Collections and NFTs',
@@ -25,22 +18,24 @@ useSeoMeta({
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
+const { sortOptions, defaultSortKey, normalizeSortKey, getSortDefinition } = useSortOptions('exploreCollections')
 
 const { chain } = route.params as { chain: AssetHubChain }
 
 const queryState = computed({
   get: () => ({
-    sort: sortOptions.find(opt => opt.value === route.query.sort) || sortOptions[0],
+    sort: sortOptions.value.find(opt => opt.value === normalizeSortKey(route.query.sort)) || sortOptions.value[0],
     search: route.query.search as string || '',
   }),
-  set: ({ sort, search }: { sort?: typeof sortOptions[0], search?: string }) => {
+  set: ({ sort, search }: { sort?: { label: string, value: string }, search?: string }) => {
     const query = { ...route.query }
+    const sortKey = sort?.value ? normalizeSortKey(sort.value) : normalizeSortKey(route.query.sort)
 
-    // Clean up default values
-    if (sort?.value === 'blockNumber_DESC')
+    if (sortKey === defaultSortKey)
       delete query.sort
-    else if (sort)
-      query.sort = sort.value
+    else
+      query.sort = sortKey
 
     if (!search)
       delete query.search
@@ -51,13 +46,15 @@ const queryState = computed({
 })
 
 const queryVariables = computed(() => ({
-  orderBy: queryState.value.sort?.value || 'blockNumber_DESC',
+  orderBy: getSortDefinition(queryState.value.sort?.value || defaultSortKey).orderBy,
   search: [
     {
       name_containsInsensitive: queryState.value.search,
     },
   ],
 }))
+
+const gridKey = computed(() => `${queryVariables.value.orderBy.join(',')}::${queryState.value.search}`)
 </script>
 
 <template>
@@ -77,8 +74,9 @@ const queryVariables = computed(() => ({
         <USelectMenu
           :model-value="queryState.sort"
           :items="sortOptions"
-          placeholder="Sort By"
-          class="w-32"
+          :placeholder="t('explore.sortBy')"
+          class="w-40"
+          :search-input="false"
           @update:model-value="queryState = { ...queryState, sort: $event }"
         />
       </template>
@@ -87,7 +85,7 @@ const queryVariables = computed(() => ({
     <!-- Grid Content -->
     <div class="my-8">
       <CollectionsGrid
-        :key="queryVariables.orderBy + queryVariables.search[0]?.name_containsInsensitive"
+        :key="gridKey"
         :variables="queryVariables"
         :prefix="chain"
       />

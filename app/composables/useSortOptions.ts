@@ -1,58 +1,47 @@
-export interface SortOption {
+import type { SortContext, SortDefinition } from '~/utils/sort'
+import { SORT_OPTIONS } from '~/utils/sort'
+
+interface SelectSortOption {
   label: string
   value: string
-  icon: string
+  icon?: string
 }
 
-export const defaultSortOptions: SortOption[] = [
-  { label: 'Newest', value: 'newest', icon: 'i-heroicons-clock' },
-  { label: 'Oldest', value: 'oldest', icon: 'i-heroicons-archive-box' },
-  { label: 'Rarest', value: 'rarest', icon: 'i-heroicons-sparkles' },
-  { label: 'Most Common', value: 'most_common', icon: 'i-heroicons-squares-2x2' },
-  { label: 'Lowest Price', value: 'lowest_price', icon: 'i-heroicons-arrow-trending-down' },
-  { label: 'Higher Price', value: 'higher_price', icon: 'i-heroicons-arrow-trending-up' },
-]
+export function useSortOptions(context: SortContext) {
+  const { t } = useI18n()
 
-export function useSortOptions(defaultSort = 'newest') {
-  const selectedSort = ref(defaultSort)
+  const sortDefinitions = SORT_OPTIONS[context]
+  const defaultSortKey = sortDefinitions[0].key
+  const sortDefinitionByKey = Object.fromEntries(
+    sortDefinitions.map(definition => [definition.key, definition]),
+  ) as Record<string, SortDefinition>
 
-  const orderByValue = computed(() => {
-    switch (selectedSort.value) {
-      case 'newest':
-        return 'blockNumber_DESC'
-      case 'oldest':
-        return 'blockNumber_ASC'
-      case 'rarest':
-        return 'rarityRank_ASC'
-      case 'most_common':
-        return 'rarityRank_DESC'
-      case 'lowest_price':
-        return 'price_ASC'
-      case 'higher_price':
-        return 'price_DESC'
-      default:
-        return 'blockNumber_DESC'
-    }
-  })
+  const sortOptions = computed<SelectSortOption[]>(() =>
+    sortDefinitions.map(definition => ({
+      label: t(definition.labelKey),
+      value: definition.key,
+      icon: definition.icon,
+    })),
+  )
 
-  const createQueryVariables = (collections: string[]) => {
-    const variables: any = {
-      collections,
-      orderBy: orderByValue.value,
+  function normalizeSortKey(value: unknown): string {
+    const normalized = Array.isArray(value) ? value[0] : value
+
+    if (typeof normalized === 'string' && normalized in sortDefinitionByKey) {
+      return normalized
     }
 
-    if (selectedSort.value === 'lowest_price' || selectedSort.value === 'higher_price') {
-      variables.search = [
-        { price_gt: '0' },
-      ]
-    }
+    return defaultSortKey
+  }
 
-    return variables
+  function getSortDefinition(value: unknown): SortDefinition {
+    return sortDefinitionByKey[normalizeSortKey(value)] || sortDefinitions[0]
   }
 
   return {
-    selectedSort,
-    orderByValue,
-    createQueryVariables,
+    defaultSortKey,
+    sortOptions,
+    normalizeSortKey,
+    getSortDefinition,
   }
 }
