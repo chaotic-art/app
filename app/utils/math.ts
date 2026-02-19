@@ -23,7 +23,7 @@ export function between(dateA: Date, dateB: Date) {
     && isBefore(parseISO(event.timestamp), dateB)
 }
 
-export function unlimited(value = '0') {
+export function unlimited(value: string | number | bigint | null | undefined = '0') {
   return Number(value) >= Number.MAX_SAFE_INTEGER
 }
 
