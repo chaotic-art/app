@@ -35,7 +35,7 @@ const groupedTraits = computed(() => {
         return item.value.toLowerCase().includes(traitSearchQuery.value.toLowerCase())
           || traitType.toLowerCase().includes(traitSearchQuery.value.toLowerCase())
       })
-      .sort((a, b) => a.value.localeCompare(b.value))
+      .sort((a, b) => a.count - b.count)
 
     if (traitValues.length > 0) {
       groups.set(traitType, traitValues)
