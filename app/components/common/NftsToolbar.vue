@@ -81,7 +81,7 @@ function computeQueryVariables(queryState: QueryState) {
     listedVariables.price_isNull = true
   }
   else if (listedValue === 'true' || selectedSort.requiresListed) {
-    listedVariables.search = { price_gt: 0 }
+    listedVariables.search = { price_gt: '0' }
   }
 
   const ownedVariables = props.hasOwnedFilter && queryState.owned && accountId.value
