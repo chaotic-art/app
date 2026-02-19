@@ -56,11 +56,20 @@ const hasRarity = computed(() => {
 })
 
 const normalizedRarityRank = computed(() => hasRarity.value ? Math.trunc(props.rarity?.rarityRank as number) : 0)
-const normalizedRarityTotalItems = computed(() =>
-  typeof props.rarity?.rarityTotalItems === 'number' && Number.isFinite(props.rarity.rarityTotalItems) && props.rarity.rarityTotalItems > 0
-    ? Math.trunc(props.rarity.rarityTotalItems)
-    : null,
-)
+const normalizedRarityTotalItems = computed(() => {
+  const rarityTotalItems = props.rarity?.rarityTotalItems
+
+  if (
+    typeof rarityTotalItems !== 'number'
+    || !Number.isFinite(rarityTotalItems)
+    || rarityTotalItems <= 0
+    || unlimited(rarityTotalItems)
+  ) {
+    return null
+  }
+
+  return Math.trunc(rarityTotalItems)
+})
 
 const topPercent = computed(() => {
   if (!hasRarity.value) {

@@ -65,6 +65,18 @@ const { data } = await useLazyAsyncData(
 
 const collectionName = computed(() => data.value?.collection?.metadata?.name)
 const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.collection?.metadata?.banner || data.value?.collection?.metadata?.image)))
+const collectionRarityTotalItems = computed(() => {
+  const supply = data.value?.collection?.supply
+
+  if (supply === null || supply === undefined || unlimited(supply)) {
+    return null
+  }
+
+  const normalizedSupply = Number(supply)
+  return Number.isFinite(normalizedSupply) && normalizedSupply > 0
+    ? Math.trunc(normalizedSupply)
+    : null
+})
 
 const { selectedSort, createQueryVariables } = useSortOptions()
 
@@ -278,7 +290,7 @@ defineOgImageComponent('Frame', {
                 grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
                 no-items-found-message="This collection doesn't have any items yet."
                 :prefix="chain"
-                :rarity-total-items="Number(data?.collection?.supply || 0) || null"
+                :rarity-total-items="collectionRarityTotalItems"
                 show-rarity
               />
             </div>
