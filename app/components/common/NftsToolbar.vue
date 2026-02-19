@@ -123,7 +123,7 @@ watch(() => queryState.value, (newValue) => {
       :placeholder="t('explore.sortBy')"
       class="w-40"
       :search-input="false"
-      :ui="{ content: 'min-w-50' }"
+      :ui="{ content: 'min-w-50 max-h-80 overflow-y-auto' }"
       @update:model-value="updateQueryState({ sort: $event })"
     />
 
