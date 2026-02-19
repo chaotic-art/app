@@ -2,7 +2,7 @@
 interface QueryState {
   sort: { label: string, value: string }
   search: string
-  listed: { label: string, value: string }
+  listed: { label: string, value: string, disabled?: boolean }
   owned: boolean
 }
 
@@ -23,22 +23,39 @@ const { accountId } = useAuth()
 const { t } = useI18n()
 const { sortOptions, defaultSortKey, normalizeSortKey, getSortDefinition } = useSortOptions('exploreNfts')
 
-const listedOptions = [
-  { label: 'All', value: '' },
-  { label: 'Listed', value: 'true' },
-  { label: 'Unlisted', value: 'false' },
-]
+const listedOptions = computed(() => {
+  const sortKey = normalizeSortKey(route.query.sort)
+  const selectedSortDefinition = getSortDefinition(sortKey)
+  const unlistedDisabled = Boolean(selectedSortDefinition.requiresListed)
+
+  return [
+    { label: 'All', value: '' },
+    { label: 'Listed', value: 'true' },
+    { label: 'Unlisted', value: 'false', disabled: unlistedDisabled },
+  ]
+})
 
 const queryState = computed({
-  get: () => ({
-    sort: sortOptions.value.find(opt => opt.value === normalizeSortKey(route.query.sort)) || sortOptions.value[0] as QueryState['sort'],
-    search: route.query.search as string || '',
-    listed: listedOptions.find(opt => opt.value === route.query.listed) || listedOptions[0] as QueryState['listed'],
-    owned: route.query.owned === 'true',
-  }),
+  get: () => {
+    const sort = sortOptions.value.find(opt => opt.value === normalizeSortKey(route.query.sort)) || sortOptions.value[0] as QueryState['sort']
+    const selectedSortDefinition = getSortDefinition(sort.value)
+    const listedFromQuery = listedOptions.value.find(opt => opt.value === route.query.listed) || listedOptions.value[0] as QueryState['listed']
+    const listed = selectedSortDefinition.requiresListed
+      ? listedOptions.value.find(opt => opt.value === 'true') || listedOptions.value[0] as QueryState['listed']
+      : listedFromQuery
+
+    return {
+      sort,
+      search: route.query.search as string || '',
+      listed,
+      owned: route.query.owned === 'true',
+    }
+  },
   set: ({ sort, search, listed, owned }: { sort?: QueryState['sort'], search?: string, listed?: QueryState['listed'], owned?: boolean }) => {
     const query = { ...route.query }
     const sortKey = sort?.value ? normalizeSortKey(sort.value) : normalizeSortKey(route.query.sort)
+    const selectedSortDefinition = getSortDefinition(sortKey)
+    const listedValue = selectedSortDefinition.requiresListed ? 'true' : listed?.value
 
     if (sortKey === defaultSortKey)
       delete query.sort
@@ -49,8 +66,8 @@ const queryState = computed({
       delete query.search
     else query.search = search
 
-    if (listed?.value)
-      query.listed = listed.value
+    if (listedValue)
+      query.listed = listedValue
     else
       delete query.listed
 
@@ -64,7 +81,20 @@ const queryState = computed({
 })
 
 function updateQueryState(updates: Partial<QueryState>) {
-  queryState.value = { ...queryState.value, ...updates }
+  const currentState = queryState.value
+  const nextState: QueryState = { ...currentState, ...updates }
+
+  // If listed was only auto-forced by a price sort, reset back to All when leaving price sorts.
+  if (updates.sort && !updates.listed) {
+    const currentSortRequiresListed = getSortDefinition(currentState.sort.value).requiresListed
+    const nextSortRequiresListed = getSortDefinition(nextState.sort.value).requiresListed
+
+    if (currentSortRequiresListed && !nextSortRequiresListed) {
+      nextState.listed = listedOptions.value.find(opt => opt.value === '') || listedOptions.value[0] as QueryState['listed']
+    }
+  }
+
+  queryState.value = nextState
 
   const queryVariables = computeQueryVariables(queryState.value)
   emit('update:queryVariables', queryVariables)
@@ -77,11 +107,11 @@ function computeQueryVariables(queryState: QueryState) {
   const listedVariables: Record<string, unknown> = {}
   const listedValue = queryState.listed?.value
 
-  if (listedValue === 'false') {
-    listedVariables.price_isNull = true
-  }
-  else if (listedValue === 'true' || selectedSort.requiresListed) {
+  if (selectedSort.requiresListed || listedValue === 'true') {
     listedVariables.search = { price_gt: '0' }
+  }
+  else if (listedValue === 'false') {
+    listedVariables.price_isNull = true
   }
 
   const ownedVariables = props.hasOwnedFilter && queryState.owned && accountId.value
