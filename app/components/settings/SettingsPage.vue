@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import type { SupportedChain } from '~/plugins/sdk.client'
+import { extractHostname, formatLatency, latencyColorClass, measureLatency } from '~/composables/useRpcLatency'
 import { PROVIDERS } from '~/config/providers'
 import { chainSpec } from '~/utils/chain'
 
-const LATENCY_TIMEOUT = 5000
-
 const rpcStore = useRpcProviderStore()
 
-const latencies = ref(new Map<string, number | null>())
+const latencies = shallowRef(new Map<string, number | null>())
 const isMeasuring = ref(false)
 
 const chainOrder: SupportedChain[] = ['ahp', 'ahk', 'dot', 'ksm', 'ahpas']
@@ -28,67 +27,6 @@ const chainSelectItems = computed(() =>
   })),
 )
 
-function extractHostname(url: string): string {
-  try {
-    const parsed = new URL(url)
-    return parsed.hostname
-  }
-  catch {
-    return url
-  }
-}
-
-function measureLatency(url: string): Promise<number | null> {
-  return new Promise((resolve) => {
-    const start = performance.now()
-    let resolved = false
-    let ws: WebSocket | undefined
-
-    const timeout = setTimeout(() => {
-      if (!resolved) {
-        resolved = true
-        if (ws) {
-          ws.close()
-        }
-        resolve(null)
-      }
-    }, LATENCY_TIMEOUT)
-
-    try {
-      ws = new WebSocket(url)
-
-      ws.onopen = () => {
-        if (!resolved) {
-          resolved = true
-          clearTimeout(timeout)
-          const latency = Math.round(performance.now() - start)
-          resolve(latency)
-        }
-        ws?.close()
-      }
-
-      ws.onerror = () => {
-        if (!resolved) {
-          resolved = true
-          clearTimeout(timeout)
-          resolve(null)
-        }
-        ws?.close()
-      }
-    }
-    catch {
-      if (!resolved) {
-        resolved = true
-        clearTimeout(timeout)
-        if (ws) {
-          ws.close()
-        }
-        resolve(null)
-      }
-    }
-  })
-}
-
 async function testChainProviders(chain: SupportedChain) {
   const providers = PROVIDERS[chain]
 
@@ -103,6 +41,7 @@ async function testChainProviders(chain: SupportedChain) {
   })
 
   await Promise.allSettled(promises)
+  triggerRef(latencies)
 }
 
 async function testAllProviders() {
@@ -115,28 +54,6 @@ async function testAllProviders() {
   }
 
   isMeasuring.value = false
-}
-
-function latencyColorClass(url: string): string {
-  const ms = latencies.value.get(url)
-  if (ms === undefined)
-    return 'text-muted'
-  if (ms === null)
-    return 'text-red-500'
-  if (ms <= 300)
-    return 'text-green-500'
-  if (ms <= 1000)
-    return 'text-yellow-500'
-  return 'text-red-500'
-}
-
-function formatLatency(url: string): string {
-  const ms = latencies.value.get(url)
-  if (ms === undefined)
-    return '--'
-  if (ms === null)
-    return 'err'
-  return `${ms}ms`
 }
 
 function selectProvider(chain: SupportedChain, url: string) {
@@ -196,6 +113,7 @@ function isProviderError(url: string): boolean {
             <button
               v-for="url in PROVIDERS[activeChain]"
               :key="url"
+              :aria-label="`Select ${extractHostname(url)} - ${formatLatency(latencies.get(url))}`"
               :disabled="isProviderError(url)"
               class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
               :class="[
@@ -209,14 +127,14 @@ function isProviderError(url: string): boolean {
             >
               <UIcon
                 name="i-lucide-circle"
-                :class="latencyColorClass(url)"
+                :class="latencyColorClass(latencies.get(url))"
                 class="h-3 w-3 shrink-0"
               />
               <span class="flex-1 text-sm truncate text-left font-mono">
                 {{ extractHostname(url) }}
               </span>
               <span class="text-xs text-muted tabular-nums shrink-0">
-                {{ formatLatency(url) }}
+                {{ formatLatency(latencies.get(url)) }}
               </span>
               <UIcon
                 v-if="isSelected(activeChain, url)"
@@ -240,6 +158,7 @@ function isProviderError(url: string): boolean {
               <button
                 v-for="url in PROVIDERS[item.value as SupportedChain]"
                 :key="url"
+                :aria-label="`Select ${extractHostname(url)} - ${formatLatency(latencies.get(url))}`"
                 :disabled="isProviderError(url)"
                 class="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors"
                 :class="[
@@ -253,14 +172,14 @@ function isProviderError(url: string): boolean {
               >
                 <UIcon
                   name="i-lucide-circle"
-                  :class="latencyColorClass(url)"
+                  :class="latencyColorClass(latencies.get(url))"
                   class="h-3 w-3 shrink-0"
                 />
                 <span class="flex-1 text-sm truncate text-left font-mono">
                   {{ extractHostname(url) }}
                 </span>
                 <span class="text-xs text-muted tabular-nums shrink-0">
-                  {{ formatLatency(url) }}
+                  {{ formatLatency(latencies.get(url)) }}
                 </span>
                 <UIcon
                   v-if="isSelected(item.value as SupportedChain, url)"
