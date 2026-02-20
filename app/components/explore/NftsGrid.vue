@@ -64,21 +64,31 @@ function getRarity(nft: { rarity?: NftRarity | null }): NftRarity | null {
   <div class="space-y-8">
     <!-- Grid Content -->
     <div :class="props.gridClass">
-      <TokenCard
-        v-for="nft in nfts"
-        :key="`${prefix}-${nft.collectionId}-${nft.tokenId}-${nft.image}`"
-        :token-id="nft.tokenId"
-        :collection-id="nft.collectionId"
-        :chain="nft.chain"
-        :class="{ 'animate-pulse': nft.isPlaceholder }"
-        :image="nft.image"
-        :name="nft.name"
-        :price="nft.price"
-        :current-owner="nft.currentOwner"
-        :hide-hover-action="hideHoverAction"
-        :show-rarity="showRarity"
-        :rarity="getRarity(nft)"
-      />
+      <template v-for="nft in nfts" :key="nft.isPlaceholder ? nft.id : `${prefix}-${nft.collectionId}-${nft.tokenId}-${nft.image}`">
+        <div
+          v-if="nft.isPlaceholder"
+          class="relative border border-gray-300 dark:border-neutral-700 rounded-xl overflow-hidden"
+        >
+          <USkeleton class="aspect-square w-full rounded-none" />
+          <div class="p-3 md:p-4 space-y-2">
+            <USkeleton class="h-4 w-3/4 rounded" />
+            <USkeleton class="h-3 w-1/2 rounded" />
+          </div>
+        </div>
+        <TokenCard
+          v-else
+          :token-id="nft.tokenId"
+          :collection-id="nft.collectionId"
+          :chain="nft.chain"
+          :image="nft.image"
+          :name="nft.name"
+          :price="nft.price"
+          :current-owner="nft.currentOwner"
+          :hide-hover-action="hideHoverAction"
+          :show-rarity="showRarity"
+          :rarity="getRarity(nft)"
+        />
+      </template>
 
       <slot name="additional-item" />
     </div>
