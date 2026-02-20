@@ -15,7 +15,7 @@ export default defineNuxtConfig({
 
   site: {
     name: 'Chaotic Labs',
-    indexable: false,
+    indexable: true,
   },
 
   seo: {
