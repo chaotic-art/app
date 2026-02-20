@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import { useSortOptions } from '~/composables/useSortOptions'
-
 const props = defineProps<{
   collectionId: string
 }>()
 
-const { selectedSort, createQueryVariables } = useSortOptions()
+const { sortOptions, defaultSortKey, getSortDefinition } = useSortOptions('collectionItems')
 
-const queryVariables = computed(() =>
-  createQueryVariables([props.collectionId]),
-)
+const selectedSort = ref<string>(defaultSortKey)
+
+const queryVariables = computed(() => {
+  const selectedSortDefinition = getSortDefinition(selectedSort.value)
+  const variables: Record<string, unknown> = {
+    collections: [props.collectionId],
+    orderBy: selectedSortDefinition.orderBy,
+  }
+
+  if (selectedSortDefinition.requiresListed) {
+    variables.search = [
+      { price_gt: '0' },
+    ]
+  }
+
+  return variables
+})
 </script>
 
 <template>
@@ -21,7 +33,8 @@ const queryVariables = computed(() =>
     <div class="w-full md:w-auto">
       <SortOptions
         v-model="selectedSort"
-        class="w-full md:w-48"
+        :options="sortOptions"
+        class="w-40"
       />
     </div>
   </div>

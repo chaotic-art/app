@@ -3,7 +3,6 @@ import type { SelectedTrait } from '@/components/trait/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 import { TradeTypes } from '@/components/trade/types'
-import { useSortOptions } from '~/composables/useSortOptions'
 import { fetchOdaCollection } from '~/services/oda'
 import { getSubscanAccountUrl } from '~/utils/format/address'
 
@@ -11,6 +10,7 @@ const route = useRoute()
 const router = useRouter()
 const { chain: chainPrefix, collection_id } = route.params
 const { isCurrentAccount, isLogIn } = useAuth()
+const { sortOptions, defaultSortKey, normalizeSortKey, getSortDefinition } = useSortOptions('collectionItems')
 
 const tabsItems = ref([
   {
@@ -78,7 +78,20 @@ const collectionRarityTotalItems = computed(() => {
     : null
 })
 
-const { selectedSort, createQueryVariables } = useSortOptions()
+const selectedSort = computed({
+  get: () => normalizeSortKey(route.query.sort),
+  set: (value: string) => {
+    const query = { ...route.query }
+    const sortKey = normalizeSortKey(value)
+
+    if (sortKey === defaultSortKey)
+      delete query.sort
+    else
+      query.sort = sortKey
+
+    router.replace({ query })
+  },
+})
 
 const filteredNftIds = ref<string[]>([])
 const selectedTraits = ref<SelectedTrait[]>([])
@@ -94,9 +107,13 @@ const gridKey = computed(() => {
 })
 
 const queryVariables = computed(() => {
-  const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
+  const selectedSortDefinition = getSortDefinition(selectedSort.value)
+  const baseVariables: Record<string, unknown> = {
+    collections: [collection_id?.toString() ?? ''],
+    orderBy: selectedSortDefinition.orderBy,
+  }
 
-  const searchFilters: Record<string, any>[] = []
+  const searchFilters: Record<string, unknown>[] = []
 
   if (selectedTraits.value.length > 0) {
     searchFilters.push({ id_in: filteredNftIds.value })
@@ -104,6 +121,16 @@ const queryVariables = computed(() => {
 
   const nftFilters = buildNftSearchFilters({ query: route.query })
   searchFilters.push(...nftFilters)
+
+  if (selectedSortDefinition.requiresListed) {
+    const hasPriceConstraint = searchFilters.some(
+      filter => Object.hasOwn(filter, 'price_gt') || Object.hasOwn(filter, 'price_gte'),
+    )
+
+    if (!hasPriceConstraint) {
+      searchFilters.unshift({ price_gt: '0' })
+    }
+  }
 
   if (searchFilters.length > 0) {
     return {
@@ -278,7 +305,8 @@ defineOgImageComponent('Frame', {
                   <ArtViewFilter />
                   <SortOptions
                     v-model="selectedSort"
-                    class="w-full md:w-48"
+                    :options="sortOptions"
+                    class="w-40"
                   />
                 </div>
               </div>

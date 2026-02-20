@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { defaultSortOptions } from '~/composables/useSortOptions'
-
 interface SortOption {
   label: string
   value: string
-  icon: string
+  icon?: string
 }
 
 interface Props {
@@ -14,7 +12,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  options: () => defaultSortOptions,
+  options: () => [],
   placeholder: 'Sort by...',
 })
 
@@ -29,9 +27,13 @@ const selectedSort = computed({
 </script>
 
 <template>
-  <USelect
+  <USelectMenu
     v-model="selectedSort"
     :items="options"
+    value-key="value"
     :placeholder="placeholder"
+    class="w-40"
+    :search-input="false"
+    :ui="{ content: 'min-w-50' }"
   />
 </template>
