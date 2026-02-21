@@ -11,6 +11,8 @@ const route = useRoute()
 const router = useRouter()
 const { chain: chainPrefix, collection_id } = route.params
 const { isCurrentAccount, isLogIn } = useAuth()
+const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
+type CollectionTab = typeof availableTabs[number]
 
 const tabsItems = ref([
   {
@@ -37,13 +39,20 @@ const tabsItems = ref([
     slot: 'traits',
     value: 'traits',
   },
+  {
+    label: 'Analytics',
+    name: 'Analytics',
+    slot: 'analytics',
+    value: 'analytics',
+  },
 ])
 
 const activeTab = computed({
   get() {
-    return (route.query.tab as string) || 'items'
+    const tab = route.query.tab?.toString()
+    return (availableTabs.includes(tab as CollectionTab) ? tab : 'items') as CollectionTab
   },
-  set(tab) {
+  set(tab: string) {
     router.replace({
       query: { ...route.query, tab },
     })
@@ -304,6 +313,14 @@ defineOgImageComponent('Frame', {
         </template>
         <template #traits>
           <TraitOverview :collection-id="collection_id?.toString() ?? ''" :collection-name="collectionName" />
+        </template>
+        <template #analytics>
+          <CollectionAnalytics
+            :collection-id="collection_id?.toString() ?? ''"
+            :collection-name="collectionName"
+            :floor-price="data?.collection?.floor"
+            :owners-count="data?.collection?.uniqueOwnersCount ?? null"
+          />
         </template>
       </UTabs>
     </div>
