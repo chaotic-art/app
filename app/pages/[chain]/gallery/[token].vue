@@ -22,10 +22,12 @@ const {
   token: tokenData,
   collection,
   highestOffer,
+  rarity,
 } = useToken({
   tokenId: Number(tokenId),
   collectionId: Number(collectionId),
   chain: chainPrefix.value,
+  fetchRarity: true,
 })
 
 const odaTokenData = await fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value)
@@ -90,6 +92,7 @@ const tokenMetadata = computed(() => {
             :formatted-price="formattedPrice || undefined"
             :usd-price="usdPrice"
             :highest-offer="highestOffer"
+            :rarity="rarity"
             :price="BigInt(price ?? '0')"
             :mime-type="mimeType"
           />

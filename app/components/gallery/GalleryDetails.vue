@@ -3,6 +3,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 import type { HighestNftOffer } from '../trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { NftRarity } from '~/types/rarity'
 import { t } from 'try'
 import { refreshOdaTokenMetadata } from '~/services/oda'
 
@@ -18,6 +19,7 @@ interface Props {
   formattedPrice?: string
   usdPrice?: string
   mimeType: string
+  rarity?: NftRarity | null
   highestOffer: HighestNftOffer | null
 }
 
@@ -182,6 +184,8 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
           />
         </UDropdownMenu>
       </div>
+
+      <RarityRankChip :rarity="rarity" class="mt-3" />
     </div>
 
     <!-- Description -->

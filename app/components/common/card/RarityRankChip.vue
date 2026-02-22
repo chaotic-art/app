@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { NftRarity, RarityTierValue } from '~/types/rarity'
-import { isRarityTier, RarityTier } from '~/types/rarity'
+import { isRarityTier, normalizeRarityTotalItems, RarityTier } from '~/types/rarity'
 
 interface TierStyle {
   chip: string
@@ -56,20 +56,7 @@ const hasRarity = computed(() => {
 })
 
 const normalizedRarityRank = computed(() => hasRarity.value ? Math.trunc(props.rarity?.rarityRank as number) : 0)
-const normalizedRarityTotalItems = computed(() => {
-  const rarityTotalItems = props.rarity?.rarityTotalItems
-
-  if (
-    typeof rarityTotalItems !== 'number'
-    || !Number.isFinite(rarityTotalItems)
-    || rarityTotalItems <= 0
-    || unlimited(rarityTotalItems)
-  ) {
-    return null
-  }
-
-  return Math.trunc(rarityTotalItems)
-})
+const normalizedRarityTotalItems = computed(() => normalizeRarityTotalItems(props.rarity?.rarityTotalItems))
 
 const topPercent = computed(() => {
   if (!hasRarity.value) {
