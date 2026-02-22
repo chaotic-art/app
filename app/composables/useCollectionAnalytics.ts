@@ -68,6 +68,19 @@ interface AnalyticsExportFile {
 }
 
 const MAX_MARKET_EVENTS = 5000
+const ANALYTICS_QUERY_CACHE_TTL_MS = 15_000
+
+interface MarketEventsQueryResult {
+  rows: AnalyticsMarketEventRow[]
+  allRangeCapped: boolean
+}
+
+interface MarketEventsCacheEntry extends MarketEventsQueryResult {
+  expiresAt: number
+}
+
+const marketEventsCache = new Map<string, MarketEventsCacheEntry>()
+const marketEventsInFlight = new Map<string, Promise<MarketEventsQueryResult>>()
 
 function isHourlyRange(range: AnalyticsRange): boolean {
   return range === '1h' || range === '1d'
@@ -124,6 +137,27 @@ function toTimestampLte(range: AnalyticsRange): string | undefined {
   }
 
   return safeIso(rangeEnd(range, new Date()))
+}
+
+function marketEventsRequestKey(id: string, chain: string, range: AnalyticsRange): string {
+  const timestampLte = toTimestampLte(range) || 'none'
+  return `${chain}::${id}::${timestampLte}`
+}
+
+function normalizeMarketEventsRows(events: CollectionAnalyticsMarketEventsData['events'] | undefined): AnalyticsMarketEventRow[] {
+  return (events || [])
+    .map((event: MarketEvent) => ({
+      id: event.id,
+      nftId: event.nft?.id || '',
+      nftName: event.nft?.meta?.name || event.nft?.name || null,
+      nftImage: event.nft?.meta?.image || event.nft?.image || null,
+      interaction: (event.interaction || 'BUY') as MarketInteraction,
+      timestamp: String(event.timestamp || ''),
+      price: event.meta || '0',
+      caller: event.caller || '',
+    }))
+    .filter(event => Boolean(event.timestamp) && Boolean(event.nftId))
+    .sort((first, second) => new Date(first.timestamp).getTime() - new Date(second.timestamp).getTime())
 }
 
 function rangeLabel(date: Date, range: AnalyticsRange): string {
@@ -228,7 +262,7 @@ async function downloadZipBundle(files: AnalyticsExportFile[], filename: string)
 
 export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
   const { $apolloClient } = useNuxtApp()
-  const { currentChain, chainSymbol, decimals } = useChain()
+  const { currentChain, decimals } = useChain()
   const apolloClient = $apolloClient as typeof $apolloClient | undefined
 
   const collectionId = computed(() => unref(options.collectionId))
@@ -240,6 +274,59 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
   const allRangeCapped = ref(false)
   const marketEventsRows = ref<AnalyticsMarketEventRow[]>([])
   let salesRequestId = 0
+
+  async function fetchMarketEvents(id: string, chain: string, range: AnalyticsRange): Promise<MarketEventsQueryResult> {
+    const key = marketEventsRequestKey(id, chain, range)
+    const now = Date.now()
+    const cached = marketEventsCache.get(key)
+
+    if (cached) {
+      if (cached.expiresAt > now) {
+        return {
+          rows: cached.rows,
+          allRangeCapped: cached.allRangeCapped,
+        }
+      }
+
+      marketEventsCache.delete(key)
+    }
+
+    const inFlight = marketEventsInFlight.get(key)
+    if (inFlight) {
+      return inFlight
+    }
+
+    const request = apolloClient!.query<CollectionAnalyticsMarketEventsData>({
+      query: collectionAnalyticsMarketEvents,
+      variables: {
+        id,
+        limit: MAX_MARKET_EVENTS,
+        timestampLte: toTimestampLte(range),
+      },
+      context: {
+        endpoint: chain,
+      },
+      fetchPolicy: 'network-only',
+    }).then(({ data }) => {
+      const rows = normalizeMarketEventsRows(data?.events)
+      const result = {
+        rows,
+        allRangeCapped: range === 'all' && rows.length >= MAX_MARKET_EVENTS,
+      }
+
+      marketEventsCache.set(key, {
+        ...result,
+        expiresAt: Date.now() + ANALYTICS_QUERY_CACHE_TTL_MS,
+      })
+
+      return result
+    }).finally(() => {
+      marketEventsInFlight.delete(key)
+    })
+
+    marketEventsInFlight.set(key, request)
+    return request
+  }
 
   watch([collectionId, currentChain, selectedRange], async ([id, chain, range]) => {
     if (!import.meta.client) {
@@ -268,39 +355,14 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
     const requestId = ++salesRequestId
 
     try {
-      const { data } = await apolloClient.query<CollectionAnalyticsMarketEventsData>({
-        query: collectionAnalyticsMarketEvents,
-        variables: {
-          id,
-          limit: MAX_MARKET_EVENTS,
-          timestampLte: toTimestampLte(range),
-        },
-        context: {
-          endpoint: chain,
-        },
-        fetchPolicy: 'network-only',
-      })
+      const result = await fetchMarketEvents(id, chain, range)
 
       if (requestId !== salesRequestId) {
         return
       }
 
-      const rows = (data?.events || [])
-        .map((event: MarketEvent) => ({
-          id: event.id,
-          nftId: event.nft?.id || '',
-          nftName: event.nft?.meta?.name || event.nft?.name || null,
-          nftImage: event.nft?.meta?.image || event.nft?.image || null,
-          interaction: (event.interaction || 'BUY') as MarketInteraction,
-          timestamp: String(event.timestamp || ''),
-          price: event.meta || '0',
-          caller: event.caller || '',
-        }))
-        .filter(event => Boolean(event.timestamp) && Boolean(event.nftId))
-        .sort((first, second) => new Date(first.timestamp).getTime() - new Date(second.timestamp).getTime())
-
-      marketEventsRows.value = rows
-      allRangeCapped.value = range === 'all' && rows.length >= MAX_MARKET_EVENTS
+      marketEventsRows.value = result.rows
+      allRangeCapped.value = result.allRangeCapped
     }
     catch (error) {
       if (requestId !== salesRequestId) {
@@ -763,34 +825,7 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
       }),
     ]
 
-    const readme = [
-      'Chaotic Collection Analytics Export v2',
-      '',
-      'This ZIP contains market analytics for the selected range only.',
-      `Collection: ${collectionNameValue || collectionId.value || 'Unknown collection'}`,
-      `Range: ${range}`,
-      `GeneratedAt: ${generatedAtIso}`,
-      `Chain: ${currentChain.value}`,
-      `Token: ${chainSymbol.value}`,
-      '',
-      'Files:',
-      '- kpis.csv: summary KPI values with raw and display amounts.',
-      '- trend_volume_sales.csv: bucketed volume and sales count.',
-      '- trend_avg_sale_price.csv: bucketed average sale price.',
-      '- trend_listing_floor.csv: bucketed listing floor price.',
-      '- market_events.csv: BUY/LIST/UNLIST event rows.',
-      '- sales.csv: BUY-only subset.',
-      '',
-      `Event limit: ${MAX_MARKET_EVENTS}`,
-      `Event count in export: ${marketEventsInRange.value.length}`,
-      `Truncated: ${allRangeCapped.value ? 'true' : 'false'}`,
-      '',
-      'Amount columns ending with "_raw" are chain-native raw values.',
-      'Amount columns ending with "_display" are human-readable values.',
-    ].join('\n')
-
     const files: AnalyticsExportFile[] = [
-      { name: 'README.txt', content: readme },
       { name: 'kpis.csv', content: toCsv(kpisRows) },
       { name: 'trend_volume_sales.csv', content: toCsv(trendVolumeSalesRows) },
       { name: 'trend_avg_sale_price.csv', content: toCsv(trendAvgSalePriceRows) },

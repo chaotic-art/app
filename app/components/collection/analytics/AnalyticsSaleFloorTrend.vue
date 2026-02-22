@@ -17,7 +17,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
-import { format as formatDate, parseISO } from 'date-fns'
+import { parseISO } from 'date-fns'
 import { Scatter } from 'vue-chartjs'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
@@ -94,6 +94,7 @@ ChartJS.register(
 
 const { isDarkMode } = useTheme()
 const { chainSymbol, currentChain } = useChain()
+const { locale } = useI18n()
 const chartContainerRef = ref<HTMLElement | null>(null)
 const hoveredMarketPoint = ref<HoveredMarketPoint | null>(null)
 const hoveredFloor = ref<FloorTooltipState | null>(null)
@@ -101,6 +102,22 @@ const previewPosition = ref({ left: 8, top: 8 })
 const floorTooltipPosition = ref({ left: 8, top: 8 })
 const previewImageErrored = ref(false)
 const hideOutliers = ref(true)
+
+const saleTimestampFormatter = computed(() => new Intl.DateTimeFormat(locale.value || undefined, {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+}))
+
+const floorTimestampFormatter = computed(() => new Intl.DateTimeFormat(locale.value || undefined, {
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+}))
 
 watch(hoveredMarketPoint, () => {
   previewImageErrored.value = false
@@ -287,7 +304,7 @@ function formatSaleTimestamp(timestamp: string): string {
     return 'Unknown date'
   }
 
-  return formatDate(date, 'MMM d, yyyy, h:mm a')
+  return saleTimestampFormatter.value.format(date)
 }
 
 function formatFloorTimestamp(dateKey: string, fallbackLabel: string): string {
@@ -296,7 +313,7 @@ function formatFloorTimestamp(dateKey: string, fallbackLabel: string): string {
     return fallbackLabel
   }
 
-  return formatDate(date, 'M/d/yyyy, h:mm a')
+  return floorTimestampFormatter.value.format(date)
 }
 
 function clearHoveredState(): void {
