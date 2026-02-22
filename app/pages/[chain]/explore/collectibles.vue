@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { LocationQueryRaw } from 'vue-router'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { isAssetHubChain } from '~/utils/chain'
+import { getSingleQueryValue } from '~/utils/query'
 
 // Validate chain parameter
 definePageMeta({
@@ -19,34 +21,37 @@ useSeoMeta({
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
-const { sortOptions, defaultSortKey, normalizeSortKey, getSortDefinition } = useSortOptions('exploreCollections')
+const {
+  sortOptions,
+  normalizeSortKeys,
+  buildOrderBy,
+  applySortQuery,
+} = useSortOptions('exploreCollections')
 
 const { chain } = route.params as { chain: AssetHubChain }
 
 const queryState = computed({
   get: () => ({
-    sort: sortOptions.value.find(opt => opt.value === normalizeSortKey(route.query.sort)) || sortOptions.value[0],
-    search: route.query.search as string || '',
+    sortKeys: normalizeSortKeys(route.query.sort),
+    search: getSingleQueryValue(route.query.search),
   }),
-  set: ({ sort, search }: { sort?: { label: string, value: string }, search?: string }) => {
-    const query = { ...route.query }
-    const sortKey = sort?.value ? normalizeSortKey(sort.value) : normalizeSortKey(route.query.sort)
+  set: ({ sortKeys, search }: { sortKeys?: string[], search?: string }) => {
+    const query: LocationQueryRaw = { ...route.query }
+    applySortQuery(query, sortKeys ?? route.query.sort)
 
-    if (sortKey === defaultSortKey)
-      delete query.sort
-    else
-      query.sort = sortKey
-
-    if (!search)
+    if (!search) {
       delete query.search
-    else query.search = search
+    }
+    else {
+      query.search = search
+    }
 
     router.push({ query })
   },
 })
 
 const queryVariables = computed(() => ({
-  orderBy: getSortDefinition(queryState.value.sort?.value || defaultSortKey).orderBy,
+  orderBy: buildOrderBy(queryState.value.sortKeys),
   search: [
     {
       name_containsInsensitive: queryState.value.search,
@@ -72,12 +77,14 @@ const gridKey = computed(() => `${queryVariables.value.orderBy.join(',')}::${que
           @update:model-value="queryState = { ...queryState, search: $event }"
         />
         <USelectMenu
-          :model-value="queryState.sort"
+          :model-value="queryState.sortKeys"
           :items="sortOptions"
           :placeholder="t('explore.sortBy')"
           class="w-40"
           :search-input="false"
-          @update:model-value="queryState = { ...queryState, sort: $event }"
+          value-key="value"
+          multiple
+          @update:model-value="queryState = { ...queryState, sortKeys: normalizeSortKeys($event) }"
         />
       </template>
     </ExploreHeader>

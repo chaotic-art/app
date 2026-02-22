@@ -1,20 +1,37 @@
 <script setup lang="ts">
+import type { LocationQueryRaw } from 'vue-router'
+
 const props = defineProps<{
   collectionId: string
 }>()
 
-const { sortOptions, defaultSortKey, getSortDefinition } = useSortOptions('collectionItems')
+const route = useRoute()
+const router = useRouter()
+const {
+  sortOptions,
+  normalizeSortKeys,
+  buildOrderBy,
+  requiresListed,
+  applySortQuery,
+} = useSortOptions('collectionItems')
 
-const selectedSort = ref<string>(defaultSortKey)
+const selectedSortKeys = computed({
+  get: () => normalizeSortKeys(route.query.sort),
+  set: (value: string[]) => {
+    const query: LocationQueryRaw = { ...route.query }
+    applySortQuery(query, value)
+
+    router.replace({ query })
+  },
+})
 
 const queryVariables = computed(() => {
-  const selectedSortDefinition = getSortDefinition(selectedSort.value)
   const variables: Record<string, unknown> = {
     collections: [props.collectionId],
-    orderBy: selectedSortDefinition.orderBy,
+    orderBy: buildOrderBy(selectedSortKeys.value),
   }
 
-  if (selectedSortDefinition.requiresListed) {
+  if (requiresListed(selectedSortKeys.value)) {
     variables.search = [
       { price_gt: '0' },
     ]
@@ -32,16 +49,15 @@ const queryVariables = computed(() => {
 
     <div class="w-full md:w-auto">
       <SortOptions
-        v-model="selectedSort"
+        v-model="selectedSortKeys"
         :options="sortOptions"
         class="w-40"
       />
     </div>
   </div>
 
-  <!-- items -->
   <LazyNftsGrid
-    :key="selectedSort + collectionId"
+    :key="`${selectedSortKeys.join(',')}::${collectionId}`"
     :variables="queryVariables"
     class="mt-6 md:mt-10"
     grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"

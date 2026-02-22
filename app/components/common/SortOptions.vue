@@ -6,7 +6,7 @@ interface SortOption {
 }
 
 interface Props {
-  modelValue: string
+  modelValue: string[]
   options?: SortOption[]
   placeholder?: string
 }
@@ -17,20 +17,21 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string]
+  'update:modelValue': [value: string[]]
 }>()
 
-const selectedSort = computed({
+const selectedSorts = computed({
   get: () => props.modelValue,
-  set: (value: string) => emit('update:modelValue', value),
+  set: (value: string[]) => emit('update:modelValue', value),
 })
 </script>
 
 <template>
   <USelectMenu
-    v-model="selectedSort"
+    v-model="selectedSorts"
     :items="options"
     value-key="value"
+    multiple
     :placeholder="placeholder"
     class="w-40"
     :search-input="false"

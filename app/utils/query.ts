@@ -15,6 +15,14 @@ export function parseQueryNumber(
   return Number.isFinite(parsed) ? parsed : null
 }
 
+export function getSingleQueryValue(value: QueryValue): string {
+  if (Array.isArray(value)) {
+    return typeof value[0] === 'string' ? value[0] : ''
+  }
+
+  return typeof value === 'string' ? value : ''
+}
+
 function serializeQueryValue(
   value: LocationQueryValue | LocationQueryValue[] | null | undefined,
 ): string {

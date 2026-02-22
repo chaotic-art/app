@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { LocationQueryRaw } from 'vue-router'
 import type { SelectedTrait } from '@/components/trait/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
@@ -10,7 +11,13 @@ const route = useRoute()
 const router = useRouter()
 const { chain: chainPrefix, collection_id } = route.params
 const { isCurrentAccount, isLogIn } = useAuth()
-const { sortOptions, defaultSortKey, normalizeSortKey, getSortDefinition } = useSortOptions('collectionItems')
+const {
+  sortOptions,
+  normalizeSortKeys,
+  buildOrderBy,
+  requiresListed,
+  applySortQuery,
+} = useSortOptions('collectionItems')
 
 const tabsItems = ref([
   {
@@ -78,16 +85,11 @@ const collectionRarityTotalItems = computed(() => {
     : null
 })
 
-const selectedSort = computed({
-  get: () => normalizeSortKey(route.query.sort),
-  set: (value: string) => {
-    const query = { ...route.query }
-    const sortKey = normalizeSortKey(value)
-
-    if (sortKey === defaultSortKey)
-      delete query.sort
-    else
-      query.sort = sortKey
+const selectedSortKeys = computed({
+  get: () => normalizeSortKeys(route.query.sort),
+  set: (value: string[]) => {
+    const query: LocationQueryRaw = { ...route.query }
+    applySortQuery(query, value)
 
     router.replace({ query })
   },
@@ -100,17 +102,16 @@ const gridKey = computed(() => {
   const serializedQuery = serializeQueryForKey(route.query, NFT_GRID_NON_FETCH_QUERY_KEYS)
 
   return [
-    selectedSort.value,
+    selectedSortKeys.value.join(','),
     filteredNftIds.value.join(','),
     serializedQuery,
   ].join('::')
 })
 
 const queryVariables = computed(() => {
-  const selectedSortDefinition = getSortDefinition(selectedSort.value)
   const baseVariables: Record<string, unknown> = {
     collections: [collection_id?.toString() ?? ''],
-    orderBy: selectedSortDefinition.orderBy,
+    orderBy: buildOrderBy(selectedSortKeys.value),
   }
 
   const searchFilters: Record<string, unknown>[] = []
@@ -122,7 +123,7 @@ const queryVariables = computed(() => {
   const nftFilters = buildNftSearchFilters({ query: route.query })
   searchFilters.push(...nftFilters)
 
-  if (selectedSortDefinition.requiresListed) {
+  if (requiresListed(selectedSortKeys.value)) {
     const hasPriceConstraint = searchFilters.some(
       filter => Object.hasOwn(filter, 'price_gt') || Object.hasOwn(filter, 'price_gte'),
     )
@@ -304,7 +305,7 @@ defineOgImageComponent('Frame', {
                 <div class="w-full md:w-auto flex items-center gap-2 md:ml-auto">
                   <ArtViewFilter />
                   <SortOptions
-                    v-model="selectedSort"
+                    v-model="selectedSortKeys"
                     :options="sortOptions"
                     class="w-40"
                   />

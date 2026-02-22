@@ -1,5 +1,13 @@
-import type { SortContext, SortDefinition } from '~/utils/sort'
-import { SORT_OPTIONS } from '~/utils/sort'
+import type { LocationQueryRaw } from 'vue-router'
+import type { SortContext, SortQueryValue } from '~/utils/sort'
+import {
+  buildOrderBy as buildOrderByForContext,
+  dropImplicitDefaultSort as dropImplicitDefaultSortForContext,
+  normalizeSortKeys as normalizeSortKeysForContext,
+  requiresListed as requiresListedForContext,
+  SORT_OPTIONS,
+  sortKeysToQueryValue as sortKeysToQueryValueForContext,
+} from '~/utils/sort'
 
 interface SelectSortOption {
   label: string
@@ -12,9 +20,6 @@ export function useSortOptions(context: SortContext) {
 
   const sortDefinitions = SORT_OPTIONS[context]
   const defaultSortKey = sortDefinitions[0].key
-  const sortDefinitionByKey = Object.fromEntries(
-    sortDefinitions.map(definition => [definition.key, definition]),
-  ) as Record<string, SortDefinition>
 
   const sortOptions = computed<SelectSortOption[]>(() =>
     sortDefinitions.map(definition => ({
@@ -24,24 +29,51 @@ export function useSortOptions(context: SortContext) {
     })),
   )
 
-  function normalizeSortKey(value: unknown): string {
-    const normalized = Array.isArray(value) ? value[0] : value
-
-    if (typeof normalized === 'string' && normalized in sortDefinitionByKey) {
-      return normalized
-    }
-
-    return defaultSortKey
+  function normalizeSortKeys(value: SortQueryValue): string[] {
+    return normalizeSortKeysForContext(context, value)
   }
 
-  function getSortDefinition(value: unknown): SortDefinition {
-    return sortDefinitionByKey[normalizeSortKey(value)] || sortDefinitions[0]
+  function buildOrderBy(selectedSortKeys: SortQueryValue): string[] {
+    return buildOrderByForContext(context, selectedSortKeys)
+  }
+
+  function requiresListed(selectedSortKeys: SortQueryValue): boolean {
+    return requiresListedForContext(context, selectedSortKeys)
+  }
+
+  function sortKeysToQueryValue(selectedSortKeys: SortQueryValue): string[] | string | undefined {
+    return sortKeysToQueryValueForContext(normalizeSortKeys(selectedSortKeys), defaultSortKey)
+  }
+
+  function applySortQuery(query: LocationQueryRaw, selectedSortKeys: SortQueryValue): string[] {
+    const existingSort = query.sort
+    const hasExplicitSortInQuery = Array.isArray(existingSort)
+      ? existingSort.some(sortValue => typeof sortValue === 'string' && sortValue.length > 0)
+      : typeof existingSort === 'string' && existingSort.length > 0
+
+    const normalizedSortKeys = normalizeSortKeys(selectedSortKeys)
+    const nextSortKeys = dropImplicitDefaultSortForContext(
+      normalizedSortKeys,
+      defaultSortKey,
+      hasExplicitSortInQuery,
+    )
+    const sortQueryValue = sortKeysToQueryValue(nextSortKeys)
+
+    if (sortQueryValue === undefined) {
+      delete query.sort
+    }
+    else {
+      query.sort = sortQueryValue
+    }
+
+    return nextSortKeys
   }
 
   return {
-    defaultSortKey,
     sortOptions,
-    normalizeSortKey,
-    getSortDefinition,
+    normalizeSortKeys,
+    buildOrderBy,
+    requiresListed,
+    applySortQuery,
   }
 }
