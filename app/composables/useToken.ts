@@ -1,10 +1,13 @@
 import type { HighestNftOffer } from '~/components/trade/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
+import type { NftRarity } from '~/types/rarity'
 import { formatBalance } from 'dedot/utils'
 import { t } from 'try'
+import { tokenEntityById } from '~/graphql/queries/token'
 import { highestOfferByNftId } from '~/graphql/queries/trades'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
+import { isRarityTier, normalizeRarityTotalItems } from '~/types/rarity'
 
 export async function fetchTokenMetadata(metadataUri: string) {
   const [ok, _, metadataData] = await t($fetch(sanitizeIpfsUrl(metadataUri), {
@@ -24,6 +27,7 @@ export function useToken(props: {
   chain: AssetHubChain
   image?: string | null
   name?: string | null
+  fetchRarity?: boolean
 }) {
   // Reactive data
   const token = ref<Awaited<ReturnType<typeof fetchOdaToken>> | null>(null)
@@ -33,6 +37,7 @@ export function useToken(props: {
   const isPriceLoading = ref(true)
   const owner = ref<string | null>(null)
   const collectionCreator = ref<string | null>(null)
+  const rarity = ref<NftRarity | null>(null)
   const error = ref<unknown | null>(null)
   const mimeType = ref('image/png')
 
@@ -49,11 +54,20 @@ export function useToken(props: {
   // Fetch data on component mount
   onMounted(async () => {
     try {
-      // fetch token data, collection data, and highest offer data
-      const [tokenData, collectionData, highestOfferData] = await Promise.all([
+      const rarityPromise = props.fetchRarity
+        ? $apolloClient.query({
+            query: tokenEntityById,
+            variables: { id: `${props.collectionId}-${props.tokenId}` },
+            context: { endpoint: props.chain },
+          }).catch(() => null)
+        : Promise.resolve(null)
+
+      // fetch token data, collection data, highest offer data, and rarity metadata
+      const [tokenData, collectionData, highestOfferData, rarityData] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()).catch(() => null),
         fetchOdaCollection(props.chain, props.collectionId.toString()).catch(() => null),
         $apolloClient.query({ query: highestOfferByNftId, variables: { id: `${props.collectionId}-${props.tokenId}` } }).catch(() => null),
+        rarityPromise,
       ])
 
       token.value = tokenData
@@ -63,6 +77,19 @@ export function useToken(props: {
       owner.value = token.value?.owner ?? null
       collectionCreator.value = collection.value?.owner ?? null
       queryPrice.value = token.value?.price ?? null
+
+      const tokenRarityData = rarityData?.data.token
+      const rarityTotalItems = normalizeRarityTotalItems(collectionData?.supply)
+
+      rarity.value = tokenRarityData
+        ? {
+            rarityRank: tokenRarityData.rarityRank,
+            rarityScore: tokenRarityData.rarityScore,
+            rarityPercentile: tokenRarityData.rarityPercentile,
+            rarityTier: isRarityTier(tokenRarityData.rarityTier) ? tokenRarityData.rarityTier : null,
+            rarityTotalItems,
+          }
+        : null
 
       // fetch mime type for media
       const media = token.value?.metadata?.animation_url || token.value?.metadata?.image || props.image
@@ -149,6 +176,7 @@ export function useToken(props: {
     collection: computed(() => collection.value),
     owner,
     collectionCreator,
+    rarity: computed(() => rarity.value),
     error,
     mimeType,
     highestOffer,

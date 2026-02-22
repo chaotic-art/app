@@ -15,3 +15,15 @@ export const tokenActivity = graphql(`
     }
 `)
 export type TokenActivityData = ResultOf<typeof tokenActivity>
+
+export const tokenEntityById = graphql(`
+    query tokenEntityById($id: String!) {
+        token: nftEntityById(id: $id) {
+            rarityRank
+            rarityScore
+            rarityPercentile
+            rarityTier
+        }
+    }
+`)
+export type TokenEntityByIdData = ResultOf<typeof tokenEntityById>

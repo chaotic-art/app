@@ -4,6 +4,7 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 import { TradeTypes } from '@/components/trade/types'
 import { fetchOdaCollection } from '~/services/oda'
+import { normalizeRarityTotalItems } from '~/types/rarity'
 import { getSubscanAccountUrl } from '~/utils/format/address'
 
 const route = useRoute()
@@ -66,16 +67,7 @@ const { data } = await useLazyAsyncData(
 const collectionName = computed(() => data.value?.collection?.metadata?.name)
 const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.collection?.metadata?.banner || data.value?.collection?.metadata?.image)))
 const collectionRarityTotalItems = computed(() => {
-  const supply = data.value?.collection?.supply
-
-  if (supply === null || supply === undefined || unlimited(supply)) {
-    return null
-  }
-
-  const normalizedSupply = Number(supply)
-  return Number.isFinite(normalizedSupply) && normalizedSupply > 0
-    ? Math.trunc(normalizedSupply)
-    : null
+  return normalizeRarityTotalItems(data.value?.collection?.supply)
 })
 
 const selectedSort = computed({
