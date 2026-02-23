@@ -296,6 +296,8 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
       return inFlight
     }
 
+    // TODO(analytics): This request is capped and only upper-bounded by timestampLte.
+    // Add timestampGte + limit+1 truncation detection to avoid silent undercounting in busy bounded ranges.
     const request = apolloClient!.query<CollectionAnalyticsMarketEventsData>({
       query: collectionAnalyticsMarketEvents,
       variables: {
