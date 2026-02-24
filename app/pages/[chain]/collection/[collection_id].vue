@@ -1,19 +1,28 @@
 <script setup lang="ts">
+import type { LocationQueryRaw } from 'vue-router'
 import type { SelectedTrait } from '@/components/trait/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { CHAINS } from '@kodadot1/static'
 import { TradeTypes } from '@/components/trade/types'
-import { useSortOptions } from '~/composables/useSortOptions'
 import { fetchOdaCollection } from '~/services/oda'
+import { normalizeRarityTotalItems } from '~/types/rarity'
 import { getSubscanAccountUrl } from '~/utils/format/address'
+
+const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
+type CollectionTab = typeof availableTabs[number]
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { chain: chainPrefix, collection_id } = route.params
 const { isCurrentAccount, isLogIn } = useAuth()
-const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
-type CollectionTab = typeof availableTabs[number]
+const {
+  sortOptions,
+  normalizeSortKeys,
+  buildOrderBy,
+  requiresListed,
+  applySortQuery,
+} = useSortOptions('collectionItems')
 
 const tabsItems = computed(() => [
   {
@@ -76,19 +85,18 @@ const { data } = await useLazyAsyncData(
 const collectionName = computed(() => data.value?.collection?.metadata?.name)
 const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.collection?.metadata?.banner || data.value?.collection?.metadata?.image)))
 const collectionRarityTotalItems = computed(() => {
-  const supply = data.value?.collection?.supply
-
-  if (supply === null || supply === undefined || unlimited(supply)) {
-    return null
-  }
-
-  const normalizedSupply = Number(supply)
-  return Number.isFinite(normalizedSupply) && normalizedSupply > 0
-    ? Math.trunc(normalizedSupply)
-    : null
+  return normalizeRarityTotalItems(data.value?.collection?.supply)
 })
 
-const { selectedSort, createQueryVariables } = useSortOptions()
+const selectedSortKeys = computed({
+  get: () => normalizeSortKeys(route.query.sort),
+  set: (value: string[]) => {
+    const query: LocationQueryRaw = { ...route.query }
+    applySortQuery(query, value)
+
+    router.replace({ query })
+  },
+})
 
 const filteredNftIds = ref<string[]>([])
 const selectedTraits = ref<SelectedTrait[]>([])
@@ -97,16 +105,19 @@ const gridKey = computed(() => {
   const serializedQuery = serializeQueryForKey(route.query, NFT_GRID_NON_FETCH_QUERY_KEYS)
 
   return [
-    selectedSort.value,
+    selectedSortKeys.value.join(','),
     filteredNftIds.value.join(','),
     serializedQuery,
   ].join('::')
 })
 
 const queryVariables = computed(() => {
-  const baseVariables = createQueryVariables([collection_id?.toString() ?? ''])
+  const baseVariables: Record<string, unknown> = {
+    collections: [collection_id?.toString() ?? ''],
+    orderBy: buildOrderBy(selectedSortKeys.value),
+  }
 
-  const searchFilters: Record<string, any>[] = []
+  const searchFilters: Record<string, unknown>[] = []
 
   if (selectedTraits.value.length > 0) {
     searchFilters.push({ id_in: filteredNftIds.value })
@@ -114,6 +125,16 @@ const queryVariables = computed(() => {
 
   const nftFilters = buildNftSearchFilters({ query: route.query })
   searchFilters.push(...nftFilters)
+
+  if (requiresListed(selectedSortKeys.value)) {
+    const hasPriceConstraint = searchFilters.some(
+      filter => Object.hasOwn(filter, 'price_gt') || Object.hasOwn(filter, 'price_gte'),
+    )
+
+    if (!hasPriceConstraint) {
+      searchFilters.unshift({ price_gt: '0' })
+    }
+  }
 
   if (searchFilters.length > 0) {
     return {
@@ -287,8 +308,9 @@ defineOgImageComponent('Frame', {
                 <div class="w-full md:w-auto flex items-center gap-2 md:ml-auto">
                   <ArtViewFilter />
                   <SortOptions
-                    v-model="selectedSort"
-                    class="w-full md:w-48"
+                    v-model="selectedSortKeys"
+                    :options="sortOptions"
+                    class="w-40"
                   />
                 </div>
               </div>

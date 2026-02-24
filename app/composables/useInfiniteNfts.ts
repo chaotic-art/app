@@ -70,14 +70,14 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
 
   // Transform display items for the template with proper typing
   const nfts = computed(() => {
-    return infiniteQuery.displayItems.value.map((item) => {
+    return infiniteQuery.displayItems.value.map((item, index) => {
       // Type guard for placeholder items
       if (item.isPlaceholder) {
         return {
           id: item.id,
           name: item.name,
-          tokenId: Math.floor(Math.random() * 1000) + 1,
-          collectionId: Math.floor(Math.random() * 100) + 1,
+          tokenId: index,
+          collectionId: index,
           chain: endpoint,
           image: item.image,
           isPlaceholder: true,

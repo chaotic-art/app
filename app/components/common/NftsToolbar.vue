@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import type { LocationQueryRaw } from 'vue-router'
+import type { SortQueryValue } from '~/utils/sort'
+import { getSingleQueryValue } from '~/utils/query'
+
 interface QueryState {
-  sort: { label: string, value: string }
+  sortKeys: string[]
   search: string
-  listed: { label: string, value: string }
+  listed: { label: string, value: string, disabled?: boolean }
   owned: boolean
 }
 
@@ -21,87 +25,119 @@ const route = useRoute()
 const router = useRouter()
 const { accountId } = useAuth()
 const { t } = useI18n()
+const {
+  sortOptions,
+  normalizeSortKeys,
+  buildOrderBy,
+  requiresListed,
+  applySortQuery,
+} = useSortOptions('exploreNfts')
 
-const sortOptions = [
-  { label: 'Recent', value: 'blockNumber_DESC' },
-  { label: 'Oldest', value: 'blockNumber_ASC' },
-  { label: 'A-Z', value: 'name_ASC' },
-  { label: 'Z-A', value: 'name_DESC' },
-  { label: t('explore.sortRarestFirst'), value: 'rarityPercentile_ASC' },
-  { label: t('explore.sortCommonFirst'), value: 'rarityPercentile_DESC' },
-]
+const listedOptions = computed(() => {
+  const unlistedDisabled = requiresListed(route.query.sort)
 
-const listedOptions = [
-  { label: 'All', value: '' },
-  { label: 'Listed', value: 'true' },
-  { label: 'Unlisted', value: 'false' },
-]
+  return [
+    { label: 'All', value: '' },
+    { label: 'Listed', value: 'true' },
+    { label: 'Unlisted', value: 'false', disabled: unlistedDisabled },
+  ]
+})
 
 const queryState = computed({
-  get: () => ({
-    sort: sortOptions.find(opt => opt.value === route.query.sort) || sortOptions[0] as QueryState['sort'],
-    search: route.query.search as string || '',
-    listed: listedOptions.find(opt => opt.value === route.query.listed) || listedOptions[0] as QueryState['listed'],
-    owned: route.query.owned === 'true',
-  }),
-  set: ({ sort, search, listed, owned }: { sort?: QueryState['sort'], search?: string, listed?: QueryState['listed'], owned?: boolean }) => {
-    const query = { ...route.query }
+  get: () => {
+    const sortKeys = normalizeSortKeys(route.query.sort)
+    const listedFromQuery = listedOptions.value.find(opt => opt.value === getSingleQueryValue(route.query.listed)) || listedOptions.value[0] as QueryState['listed']
+    const listed = requiresListed(sortKeys)
+      ? listedOptions.value.find(opt => opt.value === 'true') || listedOptions.value[0] as QueryState['listed']
+      : listedFromQuery
 
-    // Clean up default values
-    if (sort?.value === 'blockNumber_DESC')
-      delete query.sort
-    else if (sort)
-      query.sort = sort.value
+    return {
+      sortKeys,
+      search: getSingleQueryValue(route.query.search),
+      listed,
+      owned: getSingleQueryValue(route.query.owned) === 'true',
+    }
+  },
+  set: ({ sortKeys, search, listed, owned }: { sortKeys?: string[], search?: string, listed?: QueryState['listed'], owned?: boolean }) => {
+    const query: LocationQueryRaw = { ...route.query }
+    const nextSortKeys = applySortQuery(query, sortKeys ?? route.query.sort)
+    const listedValue = requiresListed(nextSortKeys) ? 'true' : listed?.value
 
-    if (!search)
+    if (!search) {
       delete query.search
-    else query.search = search
+    }
+    else {
+      query.search = search
+    }
 
-    if (listed?.value)
-      query.listed = listed.value
-    else
+    if (listedValue) {
+      query.listed = listedValue
+    }
+    else {
       delete query.listed
+    }
 
-    if (owned)
+    if (owned) {
       query.owned = owned.toString()
-    else
+    }
+    else {
       delete query.owned
+    }
 
     router.push({ query })
   },
 })
 
 function updateQueryState(updates: Partial<QueryState>) {
-  queryState.value = { ...queryState.value, ...updates }
+  const currentState = queryState.value
+  const nextState: QueryState = { ...currentState, ...updates }
 
-  const queryVariables = computeQueryVariables(queryState.value)
-  emit('update:queryVariables', queryVariables)
+  // If listed was only auto-forced by a price sort, reset back to All when leaving price sorts.
+  if (updates.sortKeys && !updates.listed) {
+    const currentSortRequiresListed = requiresListed(currentState.sortKeys)
+    const nextSortRequiresListed = requiresListed(nextState.sortKeys)
+
+    if (currentSortRequiresListed && !nextSortRequiresListed) {
+      nextState.listed = listedOptions.value.find(opt => opt.value === '') || listedOptions.value[0] as QueryState['listed']
+    }
+  }
+
+  queryState.value = nextState
 }
 
-function computeQueryVariables(queryState: QueryState) {
-  const orderBy = queryState.sort?.value || 'blockNumber_DESC'
-  const search = queryState.search
-  const listedVariables
-    = queryState.listed?.value === 'true'
-      ? { search: { price_gt: 0 } }
-      : queryState.listed?.value === 'false'
-        ? { price_isNull: true }
-        : {}
+function computeQueryVariables(state: QueryState) {
+  const selectedSortKeys = state.sortKeys
+  const orderBy = buildOrderBy(selectedSortKeys)
+  const search = state.search
+  const listedVariables: Record<string, unknown> = {}
+  const listedValue = state.listed?.value
+  const sortRequiresListed = requiresListed(selectedSortKeys)
 
-  const ownedVariables = props.hasOwnedFilter && queryState.owned && accountId.value
+  if (sortRequiresListed || listedValue === 'true') {
+    listedVariables.search = { price_gt: '0' }
+  }
+  else if (listedValue === 'false') {
+    listedVariables.price_isNull = true
+  }
+
+  const ownedVariables = props.hasOwnedFilter && state.owned && accountId.value
     ? { owner: accountId.value }
     : {}
 
   return {
     ...props.extraVariables,
-    orderBy: [orderBy],
+    orderBy,
     ...(search && { name: search }),
     ...listedVariables,
     ...ownedVariables,
   }
 }
 
-// Watch for changes in queryState and emit updated queryVariables
+function handleSortKeysUpdate(value: SortQueryValue) {
+  const nextSortKeys = normalizeSortKeys(value)
+  updateQueryState({ sortKeys: nextSortKeys })
+}
+
 watch(() => queryState.value, (newValue) => {
   const queryVariables = computeQueryVariables(newValue)
   emit('update:queryVariables', queryVariables)
@@ -110,7 +146,6 @@ watch(() => queryState.value, (newValue) => {
 
 <template>
   <div class="flex items-center gap-2 flex-wrap">
-    <!-- Chain Switcher -->
     <ChainSwitcher />
 
     <UInput
@@ -122,11 +157,15 @@ watch(() => queryState.value, (newValue) => {
     />
 
     <USelectMenu
-      :model-value="queryState.sort"
+      :model-value="queryState.sortKeys"
       :items="sortOptions"
-      placeholder="Sort By"
-      class="w-32"
-      @update:model-value="updateQueryState({ sort: $event })"
+      :placeholder="t('explore.sortBy')"
+      class="w-40"
+      :search-input="false"
+      value-key="value"
+      multiple
+      :ui="{ content: 'min-w-50 max-h-80 overflow-y-auto' }"
+      @update:model-value="handleSortKeysUpdate"
     />
 
     <USelectMenu
