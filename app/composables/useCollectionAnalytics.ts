@@ -236,12 +236,16 @@ function escapeCsvCell(value: string | number | null | undefined): string {
   }
 
   const normalized = String(value)
+  const firstNonWhitespace = normalized.trimStart().charAt(0)
+  const sanitized = /^[=+\-@]$/.test(firstNonWhitespace)
+    ? `'${normalized}`
+    : normalized
 
-  if (normalized.includes(',') || normalized.includes('"') || normalized.includes('\n')) {
-    return `"${normalized.replace(/"/g, '""')}"`
+  if (sanitized.includes(',') || sanitized.includes('"') || sanitized.includes('\n')) {
+    return `"${sanitized.replace(/"/g, '""')}"`
   }
 
-  return normalized
+  return sanitized
 }
 
 function toCsv(rows: Array<Array<string | number | null | undefined>>): string {
