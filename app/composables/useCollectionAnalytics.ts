@@ -287,6 +287,8 @@ function slugifyCollectionName(name: string | undefined): string {
 
 function toChartAmount(raw: string, decimals: number): number {
   const divisor = Number(10 ** decimals)
+  // Analytics values are expected to stay well below MAX_SAFE_INTEGER in this domain.
+  // If larger values become possible, switch to string-based decimal formatting.
   return Number(toBigInt(raw)) / divisor
 }
 

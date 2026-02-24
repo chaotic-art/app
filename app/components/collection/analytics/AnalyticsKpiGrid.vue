@@ -40,7 +40,7 @@ defineProps<{
         </p>
         <div class="text-xl md:text-2xl font-semibold tabular-nums">
           <Money
-            v-if="kpis.saleFloor !== null"
+            v-if="kpis.saleFloor != null"
             :value="kpis.saleFloor"
             inline
           />
