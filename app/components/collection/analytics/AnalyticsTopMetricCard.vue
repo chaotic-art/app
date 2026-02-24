@@ -77,17 +77,7 @@ const hasSeriesData = computed(() => {
   return chartSeries.value.some(point => (point.value ?? 0) > 0)
 })
 
-const metricColor = computed(() => {
-  if (props.kind === 'volume') {
-    return isDarkMode.value ? '#22C55E' : '#16A34A'
-  }
-
-  if (props.kind === 'floorPrice') {
-    return isDarkMode.value ? '#F43F5E' : '#E11D48'
-  }
-
-  return isDarkMode.value ? '#A3A3A3' : '#737373'
-})
+const metricColor = computed(() => isDarkMode.value ? '#22C55E' : '#16A34A')
 
 const chartData = computed(() => ({
   labels: chartSeries.value.map(point => point.label),
