@@ -240,8 +240,17 @@ const positiveListingMedian = computed(() => {
 })
 
 const regularSalesPoints = computed(() => props.salesPoints)
+const isSparseListingSample = computed(() => positiveListingPrices.value.length <= 3)
+const sortedListingPoints = computed(() => {
+  return [...props.listingPoints]
+    .sort((first, second) => first.timestamp.localeCompare(second.timestamp))
+})
 
 function isOutlierListing(point: AnalyticsListingPoint): boolean {
+  if (isSparseListingSample.value) {
+    return false
+  }
+
   const bounds = listingOutlierBounds.value
   if (bounds && (point.price < bounds.min || point.price > bounds.max)) {
     return true
@@ -252,26 +261,36 @@ function isOutlierListing(point: AnalyticsListingPoint): boolean {
     return true
   }
 
-  if (positiveListingPrices.value.length <= 3) {
-    const smallestPositive = positiveListingPrices.value[0]
-    const largestPositive = positiveListingPrices.value[positiveListingPrices.value.length - 1]
-    if (smallestPositive && largestPositive && (largestPositive / smallestPositive) >= 3) {
-      return point.price > 0
-    }
-  }
-
   return false
 }
 
-const regularListingPoints = computed(() => props.listingPoints.filter(point => !isOutlierListing(point)))
-const outlierListingPoints = computed(() => props.listingPoints.filter(point => isOutlierListing(point)))
+const regularListingPoints = computed(() => sortedListingPoints.value.filter(point => !isOutlierListing(point)))
+const outlierListingPoints = computed(() => sortedListingPoints.value.filter(point => isOutlierListing(point)))
+const outlierFallbackActive = computed(() => {
+  return hideOutliers.value
+    && sortedListingPoints.value.length > 0
+    && regularListingPoints.value.length === 0
+    && outlierListingPoints.value.length > 0
+})
+const hiddenOutlierCount = computed(() => {
+  if (!hideOutliers.value || outlierFallbackActive.value) {
+    return 0
+  }
+
+  return outlierListingPoints.value.length
+})
+const visibleListingCount = computed(() => {
+  return hideOutliers.value && !outlierFallbackActive.value
+    ? regularListingPoints.value.length
+    : sortedListingPoints.value.length
+})
+
 const visibleListingPoints = computed(() => {
-  if (hideOutliers.value) {
+  if (hideOutliers.value && !outlierFallbackActive.value) {
     return regularListingPoints.value
   }
 
-  return [...regularListingPoints.value, ...outlierListingPoints.value]
-    .sort((first, second) => first.timestamp.localeCompare(second.timestamp))
+  return sortedListingPoints.value
 })
 
 const hasData = computed(() => {
@@ -645,11 +664,19 @@ const chartOptions = computed<any>(() => {
           />
 
           <template #content>
-            <div class="p-3 min-w-40">
+            <div class="p-3 min-w-52 space-y-2">
               <label class="flex items-center gap-2 text-sm text-foreground">
                 <UCheckbox v-model="hideOutliers" />
                 <span>Hide Outliers</span>
               </label>
+
+              <p v-if="hiddenOutlierCount > 0" class="text-xs text-muted-foreground">
+                Showing {{ visibleListingCount }} of {{ sortedListingPoints.length }} listings.
+              </p>
+
+              <p v-if="outlierFallbackActive" class="text-xs text-muted-foreground">
+                Outlier filtering skipped to avoid an empty chart.
+              </p>
             </div>
           </template>
         </UPopover>
@@ -758,6 +785,9 @@ const chartOptions = computed<any>(() => {
 
     <p v-if="range === 'all' && allRangeCapped" class="mt-2 text-xs text-muted-foreground">
       Showing latest indexed range for performance.
+    </p>
+    <p v-if="outlierFallbackActive" class="mt-2 text-xs text-muted-foreground">
+      Showing all listings to avoid an empty chart.
     </p>
   </UCard>
 </template>
