@@ -120,26 +120,6 @@ const floorTimestampFormatter = computed(() => new Intl.DateTimeFormat(locale.va
   minute: '2-digit',
 }))
 
-watch(hoveredMarketPoint, () => {
-  previewImageErrored.value = false
-})
-
-watch(() => props.salesPoints, () => {
-  clearHoveredState()
-}, { deep: false })
-
-watch(() => props.listingPoints, () => {
-  clearHoveredState()
-}, { deep: false })
-
-watch(range, () => {
-  clearHoveredState()
-})
-
-watch(hideOutliers, () => {
-  clearHoveredState()
-})
-
 const previewName = computed(() => hoveredMarketPoint.value?.point.nft.name?.trim() || t('analytics.saleFloorTrend.untitledNft'))
 
 const previewImage = computed(() => {
@@ -636,6 +616,26 @@ const chartOptions = computed(() => {
       },
     },
   }
+})
+
+watch(hoveredMarketPoint, () => {
+  previewImageErrored.value = false
+})
+
+watch(() => props.salesPoints, () => {
+  clearHoveredState()
+}, { deep: false })
+
+watch(() => props.listingPoints, () => {
+  clearHoveredState()
+}, { deep: false })
+
+watch(range, () => {
+  clearHoveredState()
+})
+
+watch(hideOutliers, () => {
+  clearHoveredState()
 })
 </script>
 
