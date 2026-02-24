@@ -161,7 +161,7 @@ const chartOptions = computed(() => ({
         v-else-if="kind === 'sales'"
         class="text-4xl leading-none font-semibold tabular-nums"
       >
-        {{ value ?? 0 }}
+        {{ typeof value === 'number' && value > 0 ? value : '-' }}
       </div>
       <div v-else class="text-4xl leading-none font-semibold tabular-nums">
         <Money v-if="value !== null && value !== undefined" :value="value" inline />
