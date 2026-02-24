@@ -23,7 +23,7 @@ import {
   subYears,
 } from 'date-fns'
 import { collectionAnalyticsMarketEvents } from '~/graphql/queries/collections'
-import { formatDisplayNumber, formatRawAmount } from '~/utils/format/balance'
+import { formatDisplayNumber } from '~/utils/format/balance'
 
 interface UseCollectionAnalyticsOptions {
   collectionId: MaybeRef<string | undefined>
@@ -125,6 +125,46 @@ function toBigInt(value: string | number | null | undefined): bigint {
   catch {
     return BigInt(0)
   }
+}
+
+function formatRawAmountForExport(raw: string | number | null | undefined, decimals: number, fractionDigits = 4): string {
+  if (raw === null || raw === undefined) {
+    return '-'
+  }
+
+  const normalized = String(raw).trim()
+  if (!normalized) {
+    return '-'
+  }
+
+  if (!/^-?\d+$/.test(normalized)) {
+    const numeric = Number(normalized)
+    if (!Number.isFinite(numeric)) {
+      return '-'
+    }
+
+    return numeric.toLocaleString(undefined, { maximumFractionDigits: fractionDigits })
+  }
+
+  const negative = normalized.startsWith('-')
+  const digits = negative ? normalized.slice(1) : normalized
+  if (!digits) {
+    return '0'
+  }
+
+  const safeDecimals = Math.max(0, decimals)
+  if (safeDecimals === 0) {
+    return `${negative ? '-' : ''}${digits}`
+  }
+
+  const padded = digits.padStart(safeDecimals + 1, '0')
+  const integerPart = padded.slice(0, -safeDecimals) || '0'
+  const fractionPart = padded
+    .slice(-safeDecimals)
+    .slice(0, fractionDigits)
+    .replace(/0+$/g, '')
+
+  return `${negative ? '-' : ''}${integerPart}${fractionPart ? `.${fractionPart}` : ''}`
 }
 
 function safeIso(date: Date): string {
@@ -751,11 +791,11 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
       [
         range,
         kpis.value.currentFloor ?? '',
-        formatRawAmount(kpis.value.currentFloor, decimalsValue),
+        formatRawAmountForExport(kpis.value.currentFloor, decimalsValue),
         kpis.value.saleFloor ?? '',
-        formatRawAmount(kpis.value.saleFloor, decimalsValue),
+        formatRawAmountForExport(kpis.value.saleFloor, decimalsValue),
         kpis.value.volume,
-        formatRawAmount(kpis.value.volume, decimalsValue),
+        formatRawAmountForExport(kpis.value.volume, decimalsValue),
         kpis.value.sales,
         kpis.value.owners ?? '',
         generatedAtIso,
@@ -800,7 +840,7 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
           event.timestamp,
           Number.isNaN(eventDate.getTime()) ? '' : rangeBucketKey(eventDate, range),
           event.price,
-          formatRawAmount(event.price, decimalsValue),
+          formatRawAmountForExport(event.price, decimalsValue),
           event.nftId,
           event.nftName || '',
           event.nftImage || '',
@@ -818,7 +858,7 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
           event.timestamp,
           Number.isNaN(eventDate.getTime()) ? '' : rangeBucketKey(eventDate, range),
           event.price,
-          formatRawAmount(event.price, decimalsValue),
+          formatRawAmountForExport(event.price, decimalsValue),
           event.nftId,
           event.nftName || '',
           event.nftImage || '',
