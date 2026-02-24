@@ -62,7 +62,7 @@ defineProps<{
           {{ $t('analytics.kpi.salesWithRange', { range: range === 'all' ? $t('analytics.range.all') : range }) }}
         </p>
         <div class="text-xl md:text-2xl font-semibold tabular-nums">
-          {{ kpis.sales }}
+          {{ kpis.sales ?? '-' }}
         </div>
       </UCard>
 

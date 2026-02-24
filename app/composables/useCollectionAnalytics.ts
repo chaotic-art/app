@@ -523,11 +523,13 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
   })
 
   const saleFloor = computed<string | null>(() => {
-    if (!salesInRange.value.length) {
+    const positiveSales = salesInRange.value.filter(event => toBigInt(event.price) > BigInt(0))
+
+    if (!positiveSales.length) {
       return null
     }
 
-    const min = salesInRange.value
+    const min = positiveSales
       .map(event => toBigInt(event.price))
       .reduce((acc, current) => (current < acc ? current : acc))
 
