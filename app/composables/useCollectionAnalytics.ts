@@ -190,6 +190,7 @@ function normalizeMarketEventsRows(events: CollectionAnalyticsMarketEventsData['
 }
 
 function rangeLabel(date: Date, range: AnalyticsRange): string {
+  // TODO(analytics): Switch range labels to locale-aware Intl.DateTimeFormat.
   if (isHourlyRange(range)) {
     return format(date, 'HH:mm')
   }
