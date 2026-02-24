@@ -71,6 +71,8 @@ interface FloorTooltipState {
   price: number
 }
 
+const { locale, t } = useI18n()
+
 const rangeItems = computed<DropdownMenuItem[]>(() => [
   [
     { label: '1h', onSelect: () => (range.value = '1h') },
@@ -78,7 +80,7 @@ const rangeItems = computed<DropdownMenuItem[]>(() => [
     { label: '7d', onSelect: () => (range.value = '7d') },
     { label: '30d', onSelect: () => (range.value = '30d') },
     { label: '1y', onSelect: () => (range.value = '1y') },
-    { label: 'All', onSelect: () => (range.value = 'all') },
+    { label: t('analytics.range.all'), onSelect: () => (range.value = 'all') },
   ],
 ])
 
@@ -94,7 +96,6 @@ ChartJS.register(
 
 const { isDarkMode } = useTheme()
 const { chainSymbol, currentChain } = useChain()
-const { locale } = useI18n()
 const chartContainerRef = ref<HTMLElement | null>(null)
 const hoveredMarketPoint = ref<HoveredMarketPoint | null>(null)
 const hoveredFloor = ref<FloorTooltipState | null>(null)
@@ -139,7 +140,7 @@ watch(hideOutliers, () => {
   clearHoveredState()
 })
 
-const previewName = computed(() => hoveredMarketPoint.value?.point.nft.name?.trim() || 'Untitled NFT')
+const previewName = computed(() => hoveredMarketPoint.value?.point.nft.name?.trim() || t('analytics.saleFloorTrend.untitledNft'))
 
 const previewImage = computed(() => {
   const image = hoveredMarketPoint.value?.point.nft.image
@@ -167,7 +168,9 @@ const previewTimestamp = computed(() => {
 })
 
 const previewEventTypeLabel = computed(() => {
-  return hoveredMarketPoint.value?.eventType === 'LISTING' ? 'LISTING' : 'SALE'
+  return hoveredMarketPoint.value?.eventType === 'LISTING'
+    ? t('analytics.saleFloorTrend.listingEventLabel')
+    : t('analytics.saleFloorTrend.saleEventLabel')
 })
 
 const floorColor = computed(() => (isDarkMode.value ? '#3B82F6' : '#2563EB'))
@@ -320,7 +323,7 @@ function formatMetric(value: number | null | undefined): string {
 function formatSaleTimestamp(timestamp: string): string {
   const date = parseISO(timestamp)
   if (Number.isNaN(date.getTime())) {
-    return 'Unknown date'
+    return t('analytics.saleFloorTrend.unknownDate')
   }
 
   return saleTimestampFormatter.value.format(date)
@@ -529,7 +532,7 @@ const chartData = computed(() => ({
   datasets: [
     {
       type: 'line' as const,
-      label: `Floor (${chainSymbol.value})`,
+      label: `${t('analytics.saleFloorTrend.floor')} (${chainSymbol.value})`,
       data: props.points.map(point => ({ x: point.label, y: point.price })),
       borderColor: floorColor.value,
       backgroundColor: 'transparent',
@@ -543,7 +546,7 @@ const chartData = computed(() => ({
     },
     {
       type: 'scatter' as const,
-      label: `Sales (${chainSymbol.value})`,
+      label: `${t('analytics.saleFloorTrend.sales')} (${chainSymbol.value})`,
       data: regularSalesPoints.value.map(point => ({
         x: point.label,
         y: point.price,
@@ -561,7 +564,7 @@ const chartData = computed(() => ({
     },
     {
       type: 'scatter' as const,
-      label: `Listings (${chainSymbol.value})`,
+      label: `${t('analytics.saleFloorTrend.listings')} (${chainSymbol.value})`,
       data: visibleListingPoints.value.map(point => ({
         x: point.label,
         y: point.price,
@@ -640,7 +643,7 @@ const chartOptions = computed(() => {
   <UCard class="rounded-xl h-full">
     <div class="mb-3 flex items-start justify-between gap-2">
       <h3 class="text-base md:text-lg font-semibold">
-        Listing and Floor price
+        {{ t('analytics.saleFloorTrend.title') }}
       </h3>
 
       <div class="flex items-center gap-1">
@@ -650,9 +653,9 @@ const chartOptions = computed(() => {
             variant="ghost"
             size="xs"
             trailing-icon="i-heroicons-chevron-down"
-            aria-label="Set Listing and Floor price range"
+            :aria-label="t('analytics.saleFloorTrend.setRangeAria')"
           >
-            {{ range === 'all' ? 'All' : range }}
+            {{ range === 'all' ? t('analytics.range.all') : range }}
           </UButton>
         </UDropdownMenu>
 
@@ -662,22 +665,22 @@ const chartOptions = computed(() => {
             variant="ghost"
             size="xs"
             icon="i-heroicons-cog-6-tooth"
-            aria-label="Open chart settings"
+            :aria-label="t('analytics.saleFloorTrend.openChartSettingsAria')"
           />
 
           <template #content>
             <div class="p-3 min-w-52 space-y-2">
               <label class="flex items-center gap-2 text-sm text-foreground">
                 <UCheckbox v-model="hideOutliers" />
-                <span>Hide Outliers</span>
+                <span>{{ t('analytics.saleFloorTrend.hideOutliers') }}</span>
               </label>
 
               <p v-if="hiddenOutlierCount > 0" class="text-xs text-muted-foreground">
-                Showing {{ visibleListingCount }} of {{ sortedListingPoints.length }} listings.
+                {{ t('analytics.saleFloorTrend.showingListings', { visible: visibleListingCount, total: sortedListingPoints.length }) }}
               </p>
 
               <p v-if="outlierFallbackActive" class="text-xs text-muted-foreground">
-                Outlier filtering skipped to avoid an empty chart.
+                {{ t('analytics.saleFloorTrend.outlierFilteringSkipped') }}
               </p>
             </div>
           </template>
@@ -702,7 +705,7 @@ const chartOptions = computed(() => {
       <div>
         <UIcon name="i-heroicons-presentation-chart-line" class="w-10 h-10 mx-auto text-muted-foreground mb-2" />
         <p class="font-medium">
-          No sale floor data in selected range
+          {{ t('analytics.saleFloorTrend.noDataInSelectedRange') }}
         </p>
       </div>
     </div>
@@ -717,15 +720,15 @@ const chartOptions = computed(() => {
         <div class="flex flex-wrap justify-end gap-x-3 gap-y-1 rounded-md bg-background/70 px-2 py-1 text-[11px] text-muted-foreground backdrop-blur-sm">
           <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
             <span class="h-0.5 w-4 rounded" :style="{ backgroundColor: floorColor }" />
-            Floor
+            {{ t('analytics.saleFloorTrend.floor') }}
           </span>
           <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
             <span class="h-2.5 w-2.5 rounded-full border" :style="{ borderColor: salesColor }" />
-            Sales
+            {{ t('analytics.saleFloorTrend.sales') }}
           </span>
           <span class="inline-flex items-center gap-1.5 whitespace-nowrap">
             <span class="h-2.5 w-2.5 rounded-[2px] border" :style="{ borderColor: listingsColor }" />
-            Listings
+            {{ t('analytics.saleFloorTrend.listings') }}
           </span>
         </div>
       </div>
@@ -780,16 +783,16 @@ const chartOptions = computed(() => {
           {{ hoveredFloor.label }}
         </p>
         <p class="mt-2 text-sm tabular-nums text-foreground/90">
-          FLOOR: {{ formatMetric(hoveredFloor.price) }} {{ chainSymbol }}
+          {{ t('analytics.saleFloorTrend.floorPrefix') }}: {{ formatMetric(hoveredFloor.price) }} {{ chainSymbol }}
         </p>
       </div>
     </div>
 
     <p v-if="range === 'all' && allRangeCapped" class="mt-2 text-xs text-muted-foreground">
-      Showing latest indexed range for performance.
+      {{ t('analytics.common.showingLatestIndexedRange') }}
     </p>
     <p v-if="outlierFallbackActive" class="mt-2 text-xs text-muted-foreground">
-      Showing all listings to avoid an empty chart.
+      {{ t('analytics.saleFloorTrend.showingAllListingsToAvoidEmptyChart') }}
     </p>
   </UCard>
 </template>

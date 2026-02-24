@@ -33,6 +33,7 @@ ChartJS.register(
 )
 
 const { isDarkMode } = useTheme()
+const { t } = useI18n()
 
 const rangeItems = computed<DropdownMenuItem[]>(() => [
   [
@@ -41,7 +42,7 @@ const rangeItems = computed<DropdownMenuItem[]>(() => [
     { label: '7d', onSelect: () => emit('update:range', '7d') },
     { label: '30d', onSelect: () => emit('update:range', '30d') },
     { label: '1y', onSelect: () => emit('update:range', '1y') },
-    { label: 'All', onSelect: () => emit('update:range', 'all') },
+    { label: t('analytics.range.all'), onSelect: () => emit('update:range', 'all') },
   ],
 ])
 
@@ -144,10 +145,10 @@ const chartOptions = computed(() => ({
           variant="ghost"
           size="xs"
           trailing-icon="i-heroicons-chevron-down"
-          :aria-label="`Set ${title} range`"
+          :aria-label="t('analytics.topMetricCard.setMetricRangeAria', { metric: title })"
           :disabled="loading"
         >
-          {{ range === 'all' ? 'All' : range }}
+          {{ range === 'all' ? t('analytics.range.all') : range }}
         </UButton>
       </UDropdownMenu>
     </div>
@@ -183,7 +184,7 @@ const chartOptions = computed(() => ({
       </template>
 
       <p v-else class="pt-3 text-[11px] text-muted-foreground">
-        No data in range
+        {{ t('analytics.topMetricCard.noDataInRange') }}
       </p>
     </div>
   </UCard>

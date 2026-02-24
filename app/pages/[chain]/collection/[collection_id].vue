@@ -9,12 +9,13 @@ import { getSubscanAccountUrl } from '~/utils/format/address'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const { chain: chainPrefix, collection_id } = route.params
 const { isCurrentAccount, isLogIn } = useAuth()
 const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
 type CollectionTab = typeof availableTabs[number]
 
-const tabsItems = ref([
+const tabsItems = computed(() => [
   {
     label: 'Items',
     name: 'Items',
@@ -40,8 +41,8 @@ const tabsItems = ref([
     value: 'traits',
   },
   {
-    label: 'Analytics',
-    name: 'Analytics',
+    label: t('analytics.tabs.analytics'),
+    name: t('analytics.tabs.analytics'),
     slot: 'analytics',
     value: 'analytics',
   },

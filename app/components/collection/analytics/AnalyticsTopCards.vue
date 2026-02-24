@@ -19,12 +19,14 @@ const emit = defineEmits<{
   'update:salesRange': [range: AnalyticsRange]
   'update:floorRange': [range: AnalyticsRange]
 }>()
+
+const { t } = useI18n()
 </script>
 
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
     <AnalyticsTopMetricCard
-      title="Volume"
+      :title="t('analytics.topCards.volume')"
       kind="volume"
       :loading="volumeLoading"
       :value="volumeValue"
@@ -34,7 +36,7 @@ const emit = defineEmits<{
     />
 
     <AnalyticsTopMetricCard
-      title="Sales"
+      :title="t('analytics.topCards.sales')"
       kind="sales"
       :loading="salesLoading"
       :value="salesValue"
@@ -43,7 +45,7 @@ const emit = defineEmits<{
     />
 
     <AnalyticsTopMetricCard
-      title="Floor Price"
+      :title="t('analytics.topCards.floorPrice')"
       kind="floorPrice"
       :loading="floorLoading"
       :value="floorValue"

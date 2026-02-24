@@ -22,7 +22,7 @@ defineProps<{
     <template v-else>
       <UCard class="rounded-xl">
         <p class="text-xs text-muted-foreground mb-1.5">
-          Current Floor
+          {{ $t('analytics.kpi.currentFloor') }}
         </p>
         <div class="text-xl md:text-2xl font-semibold tabular-nums">
           <Money
@@ -36,7 +36,7 @@ defineProps<{
 
       <UCard class="rounded-xl">
         <p class="text-xs text-muted-foreground mb-1.5">
-          Sale Floor ({{ range === 'all' ? 'All' : range }})
+          {{ $t('analytics.kpi.saleFloorWithRange', { range: range === 'all' ? $t('analytics.range.all') : range }) }}
         </p>
         <div class="text-xl md:text-2xl font-semibold tabular-nums">
           <Money
@@ -50,7 +50,7 @@ defineProps<{
 
       <UCard class="rounded-xl">
         <p class="text-xs text-muted-foreground mb-1.5">
-          Volume ({{ range === 'all' ? 'All' : range }})
+          {{ $t('analytics.kpi.volumeWithRange', { range: range === 'all' ? $t('analytics.range.all') : range }) }}
         </p>
         <div class="text-xl md:text-2xl font-semibold tabular-nums">
           <Money :value="kpis.volume" inline />
@@ -59,7 +59,7 @@ defineProps<{
 
       <UCard class="rounded-xl">
         <p class="text-xs text-muted-foreground mb-1.5">
-          Sales ({{ range === 'all' ? 'All' : range }})
+          {{ $t('analytics.kpi.salesWithRange', { range: range === 'all' ? $t('analytics.range.all') : range }) }}
         </p>
         <div class="text-xl md:text-2xl font-semibold tabular-nums">
           {{ kpis.sales }}
@@ -68,7 +68,7 @@ defineProps<{
 
       <UCard class="rounded-xl">
         <p class="text-xs text-muted-foreground mb-1.5">
-          Owners
+          {{ $t('analytics.kpi.owners') }}
         </p>
         <div class="text-xl md:text-2xl font-semibold tabular-nums">
           {{ kpis.owners ?? '-' }}

@@ -26,6 +26,8 @@ const range = defineModel<AnalyticsRange>('range', {
   default: 'all',
 })
 
+const { t } = useI18n()
+
 const rangeItems = computed<DropdownMenuItem[]>(() => [
   [
     { label: '1h', onSelect: () => (range.value = '1h') },
@@ -33,7 +35,7 @@ const rangeItems = computed<DropdownMenuItem[]>(() => [
     { label: '7d', onSelect: () => (range.value = '7d') },
     { label: '30d', onSelect: () => (range.value = '30d') },
     { label: '1y', onSelect: () => (range.value = '1y') },
-    { label: 'All', onSelect: () => (range.value = 'all') },
+    { label: t('analytics.range.all'), onSelect: () => (range.value = 'all') },
   ],
 ])
 
@@ -116,7 +118,7 @@ const chartData = computed(() => ({
   datasets: [
     {
       type: 'line' as const,
-      label: `Moving Avg. Price (${chainSymbol.value})`,
+      label: `${t('analytics.trends.movingAveragePrice')} (${chainSymbol.value})`,
       data: movingAveragePricePoints.value,
       borderColor: isDarkMode.value ? '#3B82F6' : '#2563EB',
       backgroundColor: 'transparent',
@@ -132,7 +134,7 @@ const chartData = computed(() => ({
     },
     {
       type: 'bar' as const,
-      label: `Vol (${chainSymbol.value})`,
+      label: `${t('analytics.trends.volumeShort')} (${chainSymbol.value})`,
       data: props.points.map(point => point.volume),
       backgroundColor: isDarkMode.value ? 'rgba(163, 163, 163, 0.34)' : 'rgba(113, 113, 122, 0.25)',
       borderRadius: 3,
@@ -225,7 +227,7 @@ const chartOptions = computed(() => {
     <div class="mb-3 flex items-start justify-between gap-2">
       <div>
         <h3 class="text-base md:text-lg font-semibold">
-          Volume & Price
+          {{ t('analytics.trends.title') }}
         </h3>
       </div>
 
@@ -235,9 +237,9 @@ const chartOptions = computed(() => {
           variant="ghost"
           size="xs"
           trailing-icon="i-heroicons-chevron-down"
-          aria-label="Set Volume and Price range"
+          :aria-label="t('analytics.trends.setRangeAria')"
         >
-          {{ range === 'all' ? 'All' : range }}
+          {{ range === 'all' ? t('analytics.range.all') : range }}
         </UButton>
       </UDropdownMenu>
     </div>
@@ -259,7 +261,7 @@ const chartOptions = computed(() => {
       <div>
         <UIcon name="i-heroicons-chart-bar-square" class="w-10 h-10 mx-auto text-muted-foreground mb-2" />
         <p class="font-medium">
-          No data in selected range
+          {{ t('analytics.trends.noDataInSelectedRange') }}
         </p>
       </div>
     </div>
@@ -274,7 +276,7 @@ const chartOptions = computed(() => {
     </div>
 
     <p v-if="range === 'all' && allRangeCapped" class="mt-2 text-xs text-muted-foreground">
-      Showing latest indexed range for performance.
+      {{ t('analytics.common.showingLatestIndexedRange') }}
     </p>
   </UCard>
 </template>

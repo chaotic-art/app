@@ -10,6 +10,8 @@ const emit = defineEmits<{
   export: []
 }>()
 
+const { t } = useI18n()
+
 const range = defineModel<AnalyticsRange>('range', {
   default: 'all',
 })
@@ -20,7 +22,7 @@ const rangeOptions: Array<{ label: string, value: AnalyticsRange }> = [
   { label: '7d', value: '7d' },
   { label: '30d', value: '30d' },
   { label: '1y', value: '1y' },
-  { label: 'All', value: 'all' },
+  { label: t('analytics.range.all'), value: 'all' },
 ]
 </script>
 
@@ -34,7 +36,7 @@ const rangeOptions: Array<{ label: string, value: AnalyticsRange }> = [
       :disabled="loading"
       @click="emit('export')"
     >
-      Export
+      {{ t('analytics.toolbar.export') }}
     </UButton>
 
     <div class="inline-flex items-center rounded-lg border border-border bg-muted/20 p-1">
@@ -46,7 +48,7 @@ const rangeOptions: Array<{ label: string, value: AnalyticsRange }> = [
         size="xs"
         class="px-2.5"
         :disabled="loading"
-        :aria-label="`Set range ${item.label}`"
+        :aria-label="t('analytics.toolbar.setRangeAria', { range: item.label })"
         @click="range = item.value"
       >
         {{ item.label }}
@@ -55,6 +57,6 @@ const rangeOptions: Array<{ label: string, value: AnalyticsRange }> = [
   </div>
 
   <p v-if="range === 'all' && allRangeCapped" class="mt-2 text-xs text-muted-foreground">
-    Showing latest indexed range for performance.
+    {{ t('analytics.common.showingLatestIndexedRange') }}
   </p>
 </template>
