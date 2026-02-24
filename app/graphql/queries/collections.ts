@@ -7,7 +7,6 @@ export const collectionsSales = graphql(`
         collectionsSales: collectionEntities(where: {id_in: $ids}) {
             id
             sales: nfts(where: { events_some: { interaction_eq: BUY }, collection: { id_in: $ids } }) {
-                id
                 events(where: { interaction_eq: BUY }) {
                     id,
                     meta
@@ -21,29 +20,6 @@ export const collectionsSales = graphql(`
     }
 `)
 export type CollectionsSalesData = ResultOf<typeof collectionsSales>
-
-export const collectionAnalyticsSales = graphql(`
-  query collectionAnalyticsSales($id: String!, $limit: Int, $timestampGte: DateTime) {
-    sales: events(
-      limit: $limit
-      orderBy: [timestamp_DESC]
-      where: {
-        interaction_eq: BUY
-        timestamp_gte: $timestampGte
-        nft: { collection: { id_eq: $id } }
-      }
-    ) {
-      id
-      meta
-      caller
-      timestamp
-      nft {
-        id
-      }
-    }
-  }
-`)
-export type CollectionAnalyticsSalesData = ResultOf<typeof collectionAnalyticsSales>
 
 export const collectionAnalyticsMarketEvents = graphql(`
   query collectionAnalyticsMarketEvents($id: String!, $limit: Int, $timestampLte: DateTime) {
@@ -145,23 +121,3 @@ export const nftAttributesListByCollection = graphql(`
 `)
 
 export type NftAttributesListByCollectionData = ResultOf<typeof nftAttributesListByCollection>
-
-export const collectionAnalyticsNfts = graphql(`
-  query collectionAnalyticsNfts($id: String!, $limit: Int) {
-    nfts: nftEntities(where: { collection: { id_eq: $id }, burned_eq: false }, limit: $limit) {
-      id
-      rarityTier
-      rarityScore
-      rarityPercentile
-      rarityRank
-      meta {
-        attributes {
-          trait
-          value
-        }
-      }
-    }
-  }
-`)
-
-export type CollectionAnalyticsNftsData = ResultOf<typeof collectionAnalyticsNfts>

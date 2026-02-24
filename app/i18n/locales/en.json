@@ -77,13 +77,6 @@
       "export": "Export",
       "setRangeAria": "Set range {range}"
     },
-    "kpi": {
-      "currentFloor": "Current Floor",
-      "saleFloorWithRange": "Sale Floor ({range})",
-      "volumeWithRange": "Volume ({range})",
-      "salesWithRange": "Sales ({range})",
-      "owners": "Owners"
-    },
     "topCards": {
       "volume": "Volume",
       "sales": "Sales",

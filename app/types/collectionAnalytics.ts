@@ -1,5 +1,4 @@
 export type AnalyticsRange = '1h' | '1d' | '7d' | '30d' | '1y' | 'all'
-export type AnalyticsExportKind = 'zip_bundle'
 
 export interface AnalyticsKpis {
   currentFloor: number | string | null
