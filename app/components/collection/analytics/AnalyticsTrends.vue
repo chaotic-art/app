@@ -12,7 +12,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
-import { Bar } from 'vue-chartjs'
+import { Chart } from 'vue-chartjs'
 
 const props = defineProps<{
   points: AnalyticsTrendPoint[]
@@ -111,7 +111,7 @@ const hasData = computed(() => {
   return hasVolume || hasAvgPrice
 })
 
-const chartData = computed<any>(() => ({
+const chartData = computed(() => ({
   labels: props.points.map(point => point.label),
   datasets: [
     {
@@ -143,7 +143,7 @@ const chartData = computed<any>(() => ({
   ],
 }))
 
-const chartOptions = computed<any>(() => {
+const chartOptions = computed(() => {
   const textColor = isDarkMode.value ? 'rgba(255, 255, 255, 0.72)' : 'rgba(17, 24, 39, 0.72)'
   const gridColor = isDarkMode.value ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
 
@@ -266,7 +266,7 @@ const chartOptions = computed<any>(() => {
 
     <div v-else class="h-[320px] md:h-[360px]">
       <ClientOnly>
-        <Bar :data="chartData" :options="chartOptions" />
+        <Chart type="bar" :data="chartData" :options="chartOptions" />
         <template #fallback>
           <USkeleton class="h-[320px] md:h-[360px] w-full rounded-xl" />
         </template>

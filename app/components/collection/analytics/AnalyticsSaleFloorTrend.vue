@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
-import type { ActiveElement, ChartEvent, Chart as ChartInstance, TooltipItem } from 'chart.js'
+import type { ActiveElement, ChartData, ChartEvent, Chart as ChartInstance, TooltipItem } from 'chart.js'
 import type {
   AnalyticsListingPoint,
   AnalyticsPriceTrendPoint,
@@ -524,7 +524,7 @@ function handleChartHover(
   canvas.style.cursor = isInteractivePoint ? 'pointer' : 'default'
 }
 
-const chartData = computed<any>(() => ({
+const chartData = computed(() => ({
   labels: props.points.map(point => point.label),
   datasets: [
     {
@@ -582,7 +582,9 @@ const chartData = computed<any>(() => ({
   ],
 }))
 
-const chartOptions = computed<any>(() => {
+const chartDataForRender = computed(() => chartData.value as unknown as ChartData<'scatter'>)
+
+const chartOptions = computed(() => {
   const textColor = isDarkMode.value ? 'rgba(255, 255, 255, 0.72)' : 'rgba(17, 24, 39, 0.72)'
   const gridColor = isDarkMode.value ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)'
 
@@ -729,7 +731,7 @@ const chartOptions = computed<any>(() => {
       </div>
 
       <ClientOnly>
-        <Scatter :data="chartData" :options="chartOptions" />
+        <Scatter :data="chartDataForRender" :options="chartOptions" />
         <template #fallback>
           <USkeleton class="h-[320px] md:h-[360px] w-full rounded-xl" />
         </template>
