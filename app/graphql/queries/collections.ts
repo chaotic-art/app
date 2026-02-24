@@ -106,10 +106,6 @@ export const nftAttributesListByCollection = graphql(`
   query nftAttributesListByCollection($id: String!) {
     nfts: nftEntities(where: {collection: {id_eq: $id}, burned_eq: false }) {
       id
-      rarityTier
-      rarityScore
-      rarityPercentile
-      rarityRank
       meta {
         attributes {
           trait
