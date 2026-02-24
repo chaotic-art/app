@@ -8,6 +8,7 @@ import type {
   AnalyticsSalePricePoint,
   AnalyticsTrendPoint,
 } from '~/types/collectionAnalytics'
+import { useQuery } from '@tanstack/vue-query'
 import {
   eachDayOfInterval,
   eachHourOfInterval,
@@ -74,13 +75,6 @@ interface MarketEventsQueryResult {
   rows: AnalyticsMarketEventRow[]
   allRangeCapped: boolean
 }
-
-interface MarketEventsCacheEntry extends MarketEventsQueryResult {
-  expiresAt: number
-}
-
-const marketEventsCache = new Map<string, MarketEventsCacheEntry>()
-const marketEventsInFlight = new Map<string, Promise<MarketEventsQueryResult>>()
 
 function isHourlyRange(range: AnalyticsRange): boolean {
   return range === '1h' || range === '1d'
@@ -177,11 +171,6 @@ function toTimestampLte(range: AnalyticsRange): string | undefined {
   }
 
   return safeIso(rangeEnd(range, new Date()))
-}
-
-function marketEventsRequestKey(id: string, chain: string, range: AnalyticsRange): string {
-  const timestampLte = toTimestampLte(range) || 'none'
-  return `${chain}::${id}::${timestampLte}`
 }
 
 function normalizeMarketEventsRows(events: CollectionAnalyticsMarketEventsData['events'] | undefined): AnalyticsMarketEventRow[] {
@@ -317,37 +306,10 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
   const collectionId = computed(() => unref(options.collectionId))
   const selectedRange = computed(() => unref(options.range))
 
-  const salesLoading = ref(true)
-  const salesResolved = ref(false)
-  const salesError = ref<string | null>(null)
-  const allRangeCapped = ref(false)
-  const marketEventsRows = ref<AnalyticsMarketEventRow[]>([])
-  let salesRequestId = 0
-
   async function fetchMarketEvents(id: string, chain: string, range: AnalyticsRange): Promise<MarketEventsQueryResult> {
-    const key = marketEventsRequestKey(id, chain, range)
-    const now = Date.now()
-    const cached = marketEventsCache.get(key)
-
-    if (cached) {
-      if (cached.expiresAt > now) {
-        return {
-          rows: cached.rows,
-          allRangeCapped: cached.allRangeCapped,
-        }
-      }
-
-      marketEventsCache.delete(key)
-    }
-
-    const inFlight = marketEventsInFlight.get(key)
-    if (inFlight) {
-      return inFlight
-    }
-
     // TODO(analytics): This request is capped and only upper-bounded by timestampLte.
     // Add timestampGte + limit+1 truncation detection to avoid silent undercounting in busy bounded ranges.
-    const request = apolloClient!.query<CollectionAnalyticsMarketEventsData>({
+    const { data } = await apolloClient!.query<CollectionAnalyticsMarketEventsData>({
       query: collectionAnalyticsMarketEvents,
       variables: {
         id,
@@ -358,81 +320,95 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
         endpoint: chain,
       },
       fetchPolicy: 'network-only',
-    }).then(({ data }) => {
-      const rows = normalizeMarketEventsRows(data?.events)
-      const result = {
-        rows,
-        allRangeCapped: range === 'all' && rows.length >= MAX_MARKET_EVENTS,
-      }
-
-      marketEventsCache.set(key, {
-        ...result,
-        expiresAt: Date.now() + ANALYTICS_QUERY_CACHE_TTL_MS,
-      })
-
-      return result
-    }).finally(() => {
-      marketEventsInFlight.delete(key)
     })
 
-    marketEventsInFlight.set(key, request)
-    return request
+    const rows = normalizeMarketEventsRows(data?.events)
+
+    return {
+      rows,
+      allRangeCapped: range === 'all' && rows.length >= MAX_MARKET_EVENTS,
+    }
   }
 
-  watch([collectionId, currentChain, selectedRange], async ([id, chain, range]) => {
-    if (!import.meta.client) {
+  const analyticsQueryEnabled = computed(() => {
+    return import.meta.client
+      && Boolean(apolloClient)
+      && Boolean(collectionId.value)
+  })
+
+  const analyticsQuery = useQuery<MarketEventsQueryResult>({
+    queryKey: ['collection-analytics-market-events', collectionId, currentChain, selectedRange],
+    queryFn: () => fetchMarketEvents(collectionId.value!, currentChain.value, selectedRange.value),
+    enabled: analyticsQueryEnabled,
+    staleTime: ANALYTICS_QUERY_CACHE_TTL_MS,
+  })
+
+  const localRangeSwitchLoading = ref(false)
+
+  watch(selectedRange, () => {
+    if (!import.meta.client || !analyticsQueryEnabled.value) {
       return
     }
 
-    const requestId = ++salesRequestId
+    localRangeSwitchLoading.value = true
+  })
+
+  watchEffect(() => {
+    if (!localRangeSwitchLoading.value) {
+      return
+    }
+
+    if (!analyticsQuery.isFetching.value && !analyticsQuery.isPending.value) {
+      localRangeSwitchLoading.value = false
+    }
+  })
+
+  watch(() => analyticsQuery.error.value, (error) => {
+    if (!error || !analyticsQueryEnabled.value) {
+      return
+    }
+
+    console.error('Failed to fetch collection analytics sales:', error)
+  })
+
+  const marketEventsRows = computed<AnalyticsMarketEventRow[]>(() => {
+    return analyticsQuery.data.value?.rows ?? []
+  })
+
+  const allRangeCapped = computed(() => {
+    return analyticsQuery.data.value?.allRangeCapped ?? false
+  })
+
+  const salesLoading = computed(() => {
+    if (!import.meta.client) {
+      return true
+    }
+
+    if (!analyticsQueryEnabled.value) {
+      return false
+    }
+
+    const initialLoading = analyticsQuery.isPending.value && !analyticsQuery.data.value
+    return initialLoading || localRangeSwitchLoading.value
+  })
+
+  const salesError = computed<string | null>(() => {
+    if (!import.meta.client) {
+      return null
+    }
 
     if (!apolloClient) {
-      salesLoading.value = false
-      salesResolved.value = true
-      salesError.value = 'Analytics client is not available.'
-      return
+      return 'Analytics client is not available.'
     }
 
-    if (!id) {
-      salesLoading.value = false
-      salesResolved.value = true
-      salesError.value = null
-      marketEventsRows.value = []
-      allRangeCapped.value = false
-      return
+    if (!collectionId.value) {
+      return null
     }
 
-    salesLoading.value = true
-    salesResolved.value = false
-    salesError.value = null
-
-    try {
-      const result = await fetchMarketEvents(id, chain, range)
-
-      if (requestId !== salesRequestId) {
-        return
-      }
-
-      marketEventsRows.value = result.rows
-      allRangeCapped.value = result.allRangeCapped
-    }
-    catch (error) {
-      if (requestId !== salesRequestId) {
-        return
-      }
-
-      console.error('Failed to fetch collection analytics sales:', error)
-      salesError.value = 'Unable to load sales data right now.'
-      marketEventsRows.value = []
-      allRangeCapped.value = false
-    }
-    finally {
-      if (requestId === salesRequestId) {
-        salesLoading.value = false
-        salesResolved.value = true
-      }
-    }
-  }, { immediate: true })
+    return analyticsQuery.isError.value
+      ? 'Unable to load sales data right now.'
+      : null
+  })
 
   const salesRows = computed<AnalyticsSaleRow[]>(() => {
     return marketEventsRows.value
@@ -764,7 +740,7 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
     }))
   })
 
-  const loading = computed(() => salesLoading.value || !salesResolved.value)
+  const loading = computed(() => salesLoading.value)
 
   function exportAnalytics(): void {
     void exportAnalyticsBundle()
