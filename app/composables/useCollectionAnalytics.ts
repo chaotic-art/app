@@ -375,6 +375,8 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
       return
     }
 
+    const requestId = ++salesRequestId
+
     if (!apolloClient) {
       salesLoading.value = false
       salesResolved.value = true
@@ -394,7 +396,6 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
     salesLoading.value = true
     salesResolved.value = false
     salesError.value = null
-    const requestId = ++salesRequestId
 
     try {
       const result = await fetchMarketEvents(id, chain, range)
