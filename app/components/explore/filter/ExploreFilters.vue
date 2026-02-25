@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SelectedTrait } from '~/components/trait/types'
+import type { ExploreFilterScope } from '~/stores/preferences'
 import { useWindowSize, whenever } from '@vueuse/core'
 import { countExploreActiveFilters } from '~/composables/useExploreFilterToggleState'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
@@ -9,6 +10,7 @@ type PriceBy = 'token' | 'usd'
 
 const props = defineProps<{
   collectionId?: string
+  filterScope?: ExploreFilterScope
 }>()
 
 const emit = defineEmits<{
@@ -45,7 +47,7 @@ const max = ref(REASONABLE_MAX_CAP)
 const priceRange = ref<[number, number]>([min.value, max.value])
 const lastSale = ref((route.query.last_sale as string) || '')
 const rarityPercentileRange = ref<[number, number]>(getNormalizedRarityPercentileRange())
-const { exploreSidebarCollapsed: sidebarCollapsed } = storeToRefs(usePreferencesStore())
+const { sidebarCollapsed } = useExploreFilterToggleState(props.filterScope)
 
 const isMobile = computed(() => width.value < 768)
 const tokenPrice = computed(() => Number(getCurrentTokenValue(chainSymbol.value as Token)) || 0)

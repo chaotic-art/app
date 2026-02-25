@@ -1,4 +1,5 @@
 type ShoppingCartMode = 'shopping-cart' | 'buy-now'
+export type ExploreFilterScope = 'explore' | 'collection'
 
 interface ConfirmPurchaseModal {
   open: boolean
@@ -12,7 +13,10 @@ export const usePreferencesStore = defineStore('preferences', () => {
   const completePurchaseModal = ref<ConfirmPurchaseModal>({ open: false, mode: 'shopping-cart' })
   const makeOfferModalOpen = ref(false)
   const artViewFilter = ref(false)
-  const exploreSidebarCollapsed = ref(false)
+  const exploreSidebarCollapsed = ref<Record<ExploreFilterScope, boolean>>({
+    explore: false,
+    collection: false,
+  })
 
   return {
     walletConnectModalOpen,
@@ -23,4 +27,8 @@ export const usePreferencesStore = defineStore('preferences', () => {
     artViewFilter,
     exploreSidebarCollapsed,
   }
+}, {
+  persist: {
+    pick: ['exploreSidebarCollapsed'],
+  },
 })

@@ -1,3 +1,4 @@
+import type { ExploreFilterScope } from '~/stores/preferences'
 import { hasQueryFilterValue } from '~/utils/query'
 
 interface ExploreActiveFiltersState {
@@ -14,9 +15,13 @@ export function countExploreActiveFilters({
   return Number(hasPriceFilter) + Number(hasLastSaleFilter) + Number(hasRarityFilter)
 }
 
-export function useExploreFilterToggleState() {
+export function useExploreFilterToggleState(scope: ExploreFilterScope = 'explore') {
   const route = useRoute()
-  const { exploreSidebarCollapsed: sidebarCollapsed } = storeToRefs(usePreferencesStore())
+  const { exploreSidebarCollapsed } = storeToRefs(usePreferencesStore())
+  const sidebarCollapsed = computed({
+    get: () => exploreSidebarCollapsed.value[scope] ?? false,
+    set: value => exploreSidebarCollapsed.value[scope] = value,
+  })
 
   const activeFiltersCount = computed(() => {
     return countExploreActiveFilters({
