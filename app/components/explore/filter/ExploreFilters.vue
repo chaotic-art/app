@@ -10,7 +10,7 @@ type PriceBy = 'token' | 'usd'
 
 const props = defineProps<{
   collectionId?: string
-  filterScope?: ExploreFilterScope
+  filterScope: ExploreFilterScope
 }>()
 
 const emit = defineEmits<{

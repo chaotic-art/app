@@ -15,11 +15,11 @@ export function countExploreActiveFilters({
   return Number(hasPriceFilter) + Number(hasLastSaleFilter) + Number(hasRarityFilter)
 }
 
-export function useExploreFilterToggleState(scope: ExploreFilterScope = 'explore') {
+export function useExploreFilterToggleState(scope: ExploreFilterScope) {
   const route = useRoute()
   const { exploreSidebarCollapsed } = storeToRefs(usePreferencesStore())
   const sidebarCollapsed = computed({
-    get: () => exploreSidebarCollapsed.value[scope] ?? false,
+    get: () => exploreSidebarCollapsed.value[scope],
     set: value => exploreSidebarCollapsed.value[scope] = value,
   })
 

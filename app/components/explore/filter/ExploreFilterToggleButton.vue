@@ -2,7 +2,7 @@
 import type { ExploreFilterScope } from '~/stores/preferences'
 
 const props = defineProps<{
-  filterScope?: ExploreFilterScope
+  filterScope: ExploreFilterScope
 }>()
 
 const { sidebarCollapsed, openFilters, closeFilters, activeFiltersCount } = useExploreFilterToggleState(props.filterScope)
