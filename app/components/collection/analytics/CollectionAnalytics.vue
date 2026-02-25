@@ -93,6 +93,9 @@ const combinedAllRangeCapped = computed(() => globalAnalytics.allRangeCapped.val
     />
 
     <AnalyticsTopCards
+      v-model:volume-range="volumeCardRange"
+      v-model:sales-range="salesCardRange"
+      v-model:floor-range="floorCardRange"
       :volume-loading="volumeCardAnalytics.loading.value"
       :sales-loading="salesCardAnalytics.loading.value"
       :floor-loading="floorCardAnalytics.loading.value"
@@ -100,12 +103,6 @@ const combinedAllRangeCapped = computed(() => globalAnalytics.allRangeCapped.val
       :sales-value="salesCardAnalytics.kpis.value.sales"
       :floor-value="floorCardAnalytics.kpis.value.currentFloor"
       :series="topCardSeries"
-      :volume-range="volumeCardRange"
-      :sales-range="salesCardRange"
-      :floor-range="floorCardRange"
-      @update:volume-range="volumeCardRange = $event"
-      @update:sales-range="salesCardRange = $event"
-      @update:floor-range="floorCardRange = $event"
     />
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">

@@ -16,14 +16,11 @@ const props = defineProps<{
   title: string
   value: string | number | null | undefined
   series?: AnalyticsMiniSeriesPoint[]
-  range: AnalyticsRange
   loading: boolean
   kind: TopMetricKind
 }>()
 
-const emit = defineEmits<{
-  'update:range': [range: AnalyticsRange]
-}>()
+const range = defineModel<AnalyticsRange>('range', { required: true })
 
 ChartJS.register(
   CategoryScale,
@@ -37,12 +34,12 @@ const { t } = useI18n()
 
 const rangeItems = computed<DropdownMenuItem[]>(() => [
   [
-    { label: '1h', onSelect: () => emit('update:range', '1h') },
-    { label: '1d', onSelect: () => emit('update:range', '1d') },
-    { label: '7d', onSelect: () => emit('update:range', '7d') },
-    { label: '30d', onSelect: () => emit('update:range', '30d') },
-    { label: '1y', onSelect: () => emit('update:range', '1y') },
-    { label: t('analytics.range.all'), onSelect: () => emit('update:range', 'all') },
+    { label: '1h', onSelect: () => (range.value = '1h') },
+    { label: '1d', onSelect: () => (range.value = '1d') },
+    { label: '7d', onSelect: () => (range.value = '7d') },
+    { label: '30d', onSelect: () => (range.value = '30d') },
+    { label: '1y', onSelect: () => (range.value = '1y') },
+    { label: t('analytics.range.all'), onSelect: () => (range.value = 'all') },
   ],
 ])
 

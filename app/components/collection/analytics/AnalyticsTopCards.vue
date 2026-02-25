@@ -9,16 +9,11 @@ defineProps<{
   salesValue: number
   floorValue: string | number | null | undefined
   series: AnalyticsTopCardSeries
-  volumeRange: AnalyticsRange
-  salesRange: AnalyticsRange
-  floorRange: AnalyticsRange
 }>()
 
-const emit = defineEmits<{
-  'update:volumeRange': [range: AnalyticsRange]
-  'update:salesRange': [range: AnalyticsRange]
-  'update:floorRange': [range: AnalyticsRange]
-}>()
+const volumeRange = defineModel<AnalyticsRange>('volumeRange', { required: true })
+const salesRange = defineModel<AnalyticsRange>('salesRange', { required: true })
+const floorRange = defineModel<AnalyticsRange>('floorRange', { required: true })
 
 const { t } = useI18n()
 </script>
@@ -26,32 +21,29 @@ const { t } = useI18n()
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
     <AnalyticsTopMetricCard
+      v-model:range="volumeRange"
       :title="t('analytics.topCards.volume')"
       kind="volume"
       :loading="volumeLoading"
       :value="volumeValue"
       :series="series.volume"
-      :range="volumeRange"
-      @update:range="emit('update:volumeRange', $event)"
     />
 
     <AnalyticsTopMetricCard
+      v-model:range="salesRange"
       :title="t('analytics.topCards.sales')"
       kind="sales"
       :loading="salesLoading"
       :value="salesValue"
-      :range="salesRange"
-      @update:range="emit('update:salesRange', $event)"
     />
 
     <AnalyticsTopMetricCard
+      v-model:range="floorRange"
       :title="t('analytics.topCards.floorPrice')"
       kind="floorPrice"
       :loading="floorLoading"
       :value="floorValue"
       :series="series.floorPrice"
-      :range="floorRange"
-      @update:range="emit('update:floorRange', $event)"
     />
   </div>
 </template>
