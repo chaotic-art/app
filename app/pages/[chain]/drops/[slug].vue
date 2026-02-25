@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { t } from 'try'
 import { fetchOdaCollection } from '~/services/oda'
 
 const dropStore = useDropStore()
@@ -11,7 +12,12 @@ onUnmounted(() => dropStore.reset())
 const { params } = useRoute()
 
 const dropData = await $fetch('/api/genart/list', { query: { alias: params.slug?.toString() ?? '' } })
-const collectionData = await fetchOdaCollection(params.chain?.toString() as AssetHubChain, dropData?.data[0]?.collection ?? '')
+const [ok, err, collectionDataResult] = await t(fetchOdaCollection(params.chain?.toString() as AssetHubChain, dropData?.data[0]?.collection ?? ''))
+const collectionData = ok ? collectionDataResult : { metadata: undefined, claimed: undefined }
+if (!ok) {
+  const errMessage = err instanceof Error ? err.message : String(err)
+  console.error('Error fetching ODA collection', errMessage)
+}
 const drop = {
   ...dropData,
   metadata: {
