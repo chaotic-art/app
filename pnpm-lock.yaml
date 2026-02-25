@@ -74,6 +74,9 @@ importers:
       chart.js:
         specifier: ^4.5.1
         version: 4.5.1
+      client-zip:
+        specifier: ^2.5.0
+        version: 2.5.0
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -5661,6 +5664,9 @@ packages:
   cli-spinners@3.3.0:
     resolution: {integrity: sha512-/+40ljC3ONVnYIttjMWrlL51nItDAbBrq2upN8BPyvGU/2n5Oxw3tbNwORCaNuNqLJnxGqOfjUuhsv7l5Q4IsQ==}
     engines: {node: '>=18.20'}
+
+  client-zip@2.5.0:
+    resolution: {integrity: sha512-ydG4nDZesbFurnNq0VVCp/yyomIBh+X/1fZPI/P24zbnG4dtC4tQAfI5uQsomigsUMeiRO2wiTPizLWQh+IAyQ==}
 
   clipboardy@4.0.0:
     resolution: {integrity: sha512-5mOlNS0mhX0707P2I0aZ2V/cmHUEO/fL7VFLqszkhUsxt7RwnmrInf/eEQKlf5GzvYeHIjT+Ov1HRfNmymlG0w==}
@@ -19095,6 +19101,8 @@ snapshots:
   cli-spinners@2.9.2: {}
 
   cli-spinners@3.3.0: {}
+
+  client-zip@2.5.0: {}
 
   clipboardy@4.0.0:
     dependencies:

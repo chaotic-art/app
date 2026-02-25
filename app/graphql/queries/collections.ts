@@ -21,6 +21,36 @@ export const collectionsSales = graphql(`
 `)
 export type CollectionsSalesData = ResultOf<typeof collectionsSales>
 
+export const collectionAnalyticsMarketEvents = graphql(`
+  query collectionAnalyticsMarketEvents($id: String!, $limit: Int, $timestampLte: DateTime) {
+    events(
+      limit: $limit
+      orderBy: [timestamp_DESC]
+      where: {
+        interaction_in: [BUY, LIST, UNLIST]
+        timestamp_lte: $timestampLte
+        nft: { collection: { id_eq: $id } }
+      }
+    ) {
+      id
+      interaction
+      meta
+      caller
+      timestamp
+      nft {
+        id
+        name
+        image
+        meta {
+          image
+          name
+        }
+      }
+    }
+  }
+`)
+export type CollectionAnalyticsMarketEventsData = ResultOf<typeof collectionAnalyticsMarketEvents>
+
 // top collections
 export const topCollections = graphql(`
     query topCollections(

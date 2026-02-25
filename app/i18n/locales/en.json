@@ -63,6 +63,55 @@
     "viewMore": "View More",
     "volume": "Volume"
   },
+  "analytics": {
+    "tabs": {
+      "analytics": "Analytics"
+    },
+    "range": {
+      "all": "All"
+    },
+    "common": {
+      "showingLatestIndexedRange": "Showing latest indexed range for performance."
+    },
+    "toolbar": {
+      "export": "Export",
+      "setRangeAria": "Set range {range}"
+    },
+    "topCards": {
+      "volume": "Volume",
+      "sales": "Sales",
+      "floorPrice": "Floor Price"
+    },
+    "topMetricCard": {
+      "setMetricRangeAria": "Set {metric} range",
+      "noDataInRange": "No data in range"
+    },
+    "trends": {
+      "title": "Volume & Price",
+      "setRangeAria": "Set Volume and Price range",
+      "noDataInSelectedRange": "No data in selected range",
+      "movingAveragePrice": "Moving Avg. Price",
+      "volumeShort": "Vol"
+    },
+    "saleFloorTrend": {
+      "title": "Listing and Floor Price",
+      "setRangeAria": "Set Listing and Floor Price range",
+      "openChartSettingsAria": "Open chart settings",
+      "hideOutliers": "Hide Outliers",
+      "showingListings": "Showing {visible} of {total} listings.",
+      "outlierFilteringSkipped": "Outlier filtering skipped to avoid an empty chart.",
+      "noDataInSelectedRange": "No sale floor data in selected range",
+      "showingAllListingsToAvoidEmptyChart": "Showing all listings to avoid an empty chart.",
+      "untitledNft": "Untitled NFT",
+      "unknownDate": "Unknown date",
+      "listingEventLabel": "LISTING",
+      "saleEventLabel": "SALE",
+      "floor": "Floor",
+      "sales": "Sales",
+      "listings": "Listings",
+      "floorPrefix": "FLOOR"
+    }
+  },
   "footer": {
     "becomeArtist": "Become artist on Polkadot",
     "getInTouch": "Get In Touch"

@@ -8,8 +8,12 @@ import { fetchOdaCollection } from '~/services/oda'
 import { normalizeRarityTotalItems } from '~/types/rarity'
 import { getSubscanAccountUrl } from '~/utils/format/address'
 
+const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
+type CollectionTab = typeof availableTabs[number]
+
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const { chain: chainPrefix, collection_id } = route.params
 const { isCurrentAccount, isLogIn } = useAuth()
 const {
@@ -20,7 +24,7 @@ const {
   applySortQuery,
 } = useSortOptions('collectionItems')
 
-const tabsItems = ref([
+const tabsItems = computed(() => [
   {
     label: 'Items',
     name: 'Items',
@@ -45,13 +49,20 @@ const tabsItems = ref([
     slot: 'traits',
     value: 'traits',
   },
+  {
+    label: t('analytics.tabs.analytics'),
+    name: t('analytics.tabs.analytics'),
+    slot: 'analytics',
+    value: 'analytics',
+  },
 ])
 
 const activeTab = computed({
   get() {
-    return (route.query.tab as string) || 'items'
+    const tab = route.query.tab?.toString()
+    return (availableTabs.includes(tab as CollectionTab) ? tab : 'items') as CollectionTab
   },
-  set(tab) {
+  set(tab: string) {
     router.replace({
       query: { ...route.query, tab },
     })
@@ -325,6 +336,14 @@ defineOgImageComponent('Frame', {
         </template>
         <template #traits>
           <TraitOverview :collection-id="collection_id?.toString() ?? ''" :collection-name="collectionName" />
+        </template>
+        <template #analytics>
+          <CollectionAnalytics
+            :collection-id="collection_id?.toString() ?? ''"
+            :collection-name="collectionName"
+            :floor-price="data?.collection?.floor"
+            :owners-count="data?.collection?.uniqueOwnersCount ?? null"
+          />
         </template>
       </UTabs>
     </div>

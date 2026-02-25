@@ -48,6 +48,16 @@ export function formatAmountWithRound(value: string | number | bigint, tokenDeci
   )
 }
 
+export function formatDisplayNumber(value: number | null | undefined, fractionDigits = 6): string {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return '-'
+  }
+
+  return value.toLocaleString(undefined, {
+    maximumFractionDigits: fractionDigits,
+  })
+}
+
 export function toNative(value: number, decimals: number): number {
   return Math.trunc(value * 10 ** decimals)
 }

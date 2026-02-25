@@ -43,6 +43,7 @@
     "@vueuse/core": "^13.9.0",
     "@wagmi/vue": "^0.4.15",
     "chart.js": "^4.5.1",
+    "client-zip": "^2.5.0",
     "date-fns": "^4.1.0",
     "dedot": "^0.14.1",
     "gql.tada": "^1.8.11",
