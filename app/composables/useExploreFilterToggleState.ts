@@ -19,7 +19,7 @@ export function useExploreFilterToggleState(scope: ExploreFilterScope) {
   const route = useRoute()
   const { exploreSidebarCollapsed } = storeToRefs(usePreferencesStore())
   const sidebarCollapsed = computed({
-    get: () => exploreSidebarCollapsed.value[scope],
+    get: () => exploreSidebarCollapsed.value[scope] ?? false,
     set: value => exploreSidebarCollapsed.value[scope] = value,
   })
 
