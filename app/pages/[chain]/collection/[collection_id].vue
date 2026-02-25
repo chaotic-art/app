@@ -301,7 +301,9 @@ defineOgImageComponent('Frame', {
             @update:selected-traits="handleSelectedTraitsUpdate"
           >
             <div class="space-y-6">
-              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <StickyToolbarWrapper
+                row-class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+              >
                 <div class="w-full md:w-auto flex items-center justify-start">
                   <ExploreFilterToggleButton filter-scope="collection" />
                 </div>
@@ -314,7 +316,7 @@ defineOgImageComponent('Frame', {
                     class="w-40"
                   />
                 </div>
-              </div>
+              </StickyToolbarWrapper>
 
               <!-- Items Grid -->
               <LazyNftsGrid

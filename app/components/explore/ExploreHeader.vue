@@ -35,7 +35,9 @@ function handleTypeChange(type: string) {
     </div>
 
     <!-- Controls Row -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+    <StickyToolbarWrapper
+      row-class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
+    >
       <!-- Left Side - Chain and Type Controls -->
       <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <!-- Type Toggle -->
@@ -60,6 +62,6 @@ function handleTypeChange(type: string) {
       <div class="flex items-center gap-3 flex-wrap">
         <slot name="controls" />
       </div>
-    </div>
+    </StickyToolbarWrapper>
   </div>
 </template>
