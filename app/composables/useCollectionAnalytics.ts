@@ -380,7 +380,7 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
     return analyticsQuery.data.value?.allRangeCapped ?? false
   })
 
-  const salesLoading = computed(() => {
+  const loading = computed(() => {
     if (!import.meta.client) {
       return true
     }
@@ -741,8 +741,6 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
     }))
   })
 
-  const loading = computed(() => salesLoading.value)
-
   function exportAnalytics(): void {
     void exportAnalyticsBundle()
   }
@@ -883,7 +881,6 @@ export function useCollectionAnalytics(options: UseCollectionAnalyticsOptions) {
     floorPriceMiniSeries,
     salePricePoints,
     salesError,
-    salesLoading,
     trendPoints,
     volumeMiniSeries,
   }
