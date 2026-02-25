@@ -1,5 +1,11 @@
 <script setup lang="ts">
-const { sidebarCollapsed, openFilters, closeFilters, activeFiltersCount } = useExploreFilterToggleState()
+import type { ExploreFilterScope } from '~/stores/preferences'
+
+const props = defineProps<{
+  filterScope: ExploreFilterScope
+}>()
+
+const { sidebarCollapsed, openFilters, closeFilters, activeFiltersCount } = useExploreFilterToggleState(props.filterScope)
 
 const icon = computed(() =>
   sidebarCollapsed.value ? 'i-heroicons-funnel' : 'i-heroicons-chevron-double-left',

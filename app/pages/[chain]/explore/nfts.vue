@@ -55,7 +55,7 @@ const mergedQueryVariables = computed(() => {
   <UContainer class="px-4 md:px-6">
     <ExploreHeader>
       <template #left-controls>
-        <ExploreFilterToggleButton />
+        <ExploreFilterToggleButton filter-scope="explore" />
       </template>
 
       <template #controls>
@@ -67,7 +67,7 @@ const mergedQueryVariables = computed(() => {
     </ExploreHeader>
 
     <!-- Grid Content for NFTs -->
-    <ExploreFilters class="my-8">
+    <ExploreFilters class="my-8" filter-scope="explore">
       <NftsGrid
         :key="JSON.stringify(mergedQueryVariables)"
         :search="mergedQueryVariables.name || ''"

@@ -295,6 +295,7 @@ defineOgImageComponent('Frame', {
           <!-- Items Section -->
           <ExploreFilters
             class="mt-2"
+            filter-scope="collection"
             :collection-id="collection_id?.toString() ?? ''"
             @update:nft-ids="handleNftIdsUpdate"
             @update:selected-traits="handleSelectedTraitsUpdate"
@@ -302,7 +303,7 @@ defineOgImageComponent('Frame', {
             <div class="space-y-6">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div class="w-full md:w-auto flex items-center justify-start">
-                  <ExploreFilterToggleButton />
+                  <ExploreFilterToggleButton filter-scope="collection" />
                 </div>
 
                 <div class="w-full md:w-auto flex items-center gap-2 md:ml-auto">
