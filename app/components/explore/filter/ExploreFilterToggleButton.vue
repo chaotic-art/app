@@ -14,9 +14,13 @@ const icon = computed(() =>
   isMobile.value || sidebarCollapsed.value ? 'i-heroicons-funnel' : 'i-heroicons-chevron-double-left',
 )
 
-const tooltipText = computed(() =>
-  sidebarCollapsed.value ? 'explore.showFilters' : 'explore.hideFilters',
-)
+const tooltipText = computed(() => {
+  if (isMobile.value) {
+    return mobileModalOpen.value ? 'explore.hideFilters' : 'explore.showFilters'
+  }
+
+  return sidebarCollapsed.value ? 'explore.showFilters' : 'explore.hideFilters'
+})
 
 function toggleFilters() {
   if (isMobile.value) {
