@@ -2,6 +2,7 @@
 import type { LocationQueryRaw } from 'vue-router'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { isAssetHubChain } from '~/utils/chain'
+import { STICKY_MOBILE_TOOLBAR_ROW_CLASS, STICKY_MOBILE_TOOLBAR_SEARCH_CLASS } from '~/utils/exploreToolbar'
 import { getSingleQueryValue } from '~/utils/query'
 
 // Validate chain parameter
@@ -21,6 +22,7 @@ useSeoMeta({
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
+const { isMobileViewport } = useViewport()
 const {
   sortOptions,
   normalizeSortKeys,
@@ -65,27 +67,36 @@ const gridKey = computed(() => `${queryVariables.value.orderBy.join(',')}::${que
 <template>
   <UContainer class="px-4 md:px-6">
     <ExploreHeader>
-      <template #controls>
-        <!-- Chain Switcher -->
-        <ChainSwitcher />
+      <template #controls="{ isFixed }">
+        <div
+          class="flex items-center gap-2"
+          :class="isFixed && isMobileViewport ? STICKY_MOBILE_TOOLBAR_ROW_CLASS : 'flex-wrap'"
+        >
+          <ChainSwitcher
+            :show-label="!(isFixed && isMobileViewport)"
+            :compact="isFixed && isMobileViewport"
+          />
 
-        <UInput
-          :model-value="queryState.search"
-          placeholder="Search collections..."
-          class="w-48"
-          icon="i-heroicons-magnifying-glass"
-          @update:model-value="queryState = { ...queryState, search: $event }"
-        />
-        <USelectMenu
-          :model-value="queryState.sortKeys"
-          :items="sortOptions"
-          :placeholder="t('explore.sortBy')"
-          class="w-40"
-          :search-input="false"
-          value-key="value"
-          multiple
-          @update:model-value="queryState = { ...queryState, sortKeys: normalizeSortKeys($event) }"
-        />
+          <UInput
+            :model-value="queryState.search"
+            placeholder="Search collections..."
+            :class="isFixed && isMobileViewport ? STICKY_MOBILE_TOOLBAR_SEARCH_CLASS : 'w-48'"
+            icon="i-heroicons-magnifying-glass"
+            @update:model-value="queryState = { ...queryState, search: $event }"
+          />
+
+          <USelectMenu
+            v-if="!(isFixed && isMobileViewport)"
+            :model-value="queryState.sortKeys"
+            :items="sortOptions"
+            :placeholder="t('explore.sortBy')"
+            class="w-40"
+            :search-input="false"
+            value-key="value"
+            multiple
+            @update:model-value="queryState = { ...queryState, sortKeys: normalizeSortKeys($event) }"
+          />
+        </div>
       </template>
     </ExploreHeader>
 

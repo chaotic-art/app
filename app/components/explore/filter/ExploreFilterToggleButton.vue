@@ -5,17 +5,29 @@ const props = defineProps<{
   filterScope: ExploreFilterScope
 }>()
 
+const mobileModalOpen = defineModel<boolean>('mobileModalOpen', { default: false })
+
 const { sidebarCollapsed, openFilters, closeFilters, activeFiltersCount } = useExploreFilterToggleState(props.filterScope)
+const { isMobileViewport: isMobile } = useViewport()
 
 const icon = computed(() =>
-  sidebarCollapsed.value ? 'i-heroicons-funnel' : 'i-heroicons-chevron-double-left',
+  isMobile.value || sidebarCollapsed.value ? 'i-heroicons-funnel' : 'i-heroicons-chevron-double-left',
 )
 
-const tooltipText = computed(() =>
-  sidebarCollapsed.value ? 'explore.showFilters' : 'explore.hideFilters',
-)
+const tooltipText = computed(() => {
+  if (isMobile.value) {
+    return mobileModalOpen.value ? 'explore.hideFilters' : 'explore.showFilters'
+  }
+
+  return sidebarCollapsed.value ? 'explore.showFilters' : 'explore.hideFilters'
+})
 
 function toggleFilters() {
+  if (isMobile.value) {
+    mobileModalOpen.value = true
+    return
+  }
+
   if (sidebarCollapsed.value) {
     openFilters()
   }
@@ -27,7 +39,7 @@ function toggleFilters() {
 
 <template>
   <ClientOnly>
-    <div class="hidden md:block">
+    <div>
       <UTooltip :text="$t(tooltipText)">
         <UButton
           :icon="icon"

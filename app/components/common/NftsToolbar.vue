@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
 import type { SortQueryValue } from '~/utils/sort'
+import { STICKY_MOBILE_TOOLBAR_ROW_CLASS, STICKY_MOBILE_TOOLBAR_SEARCH_CLASS } from '~/utils/exploreToolbar'
 import { getSingleQueryValue } from '~/utils/query'
 
 interface QueryState {
@@ -13,8 +14,10 @@ interface QueryState {
 const props = withDefaults(defineProps<{
   extraVariables?: Record<string, any>
   hasOwnedFilter?: boolean
+  stickySearchOnly?: boolean
 }>(), {
   extraVariables: () => ({}),
+  stickySearchOnly: false,
 })
 
 const emit = defineEmits<{
@@ -145,49 +148,57 @@ watch(() => queryState.value, (newValue) => {
 </script>
 
 <template>
-  <div class="flex items-center gap-2 flex-wrap">
-    <ChainSwitcher />
+  <div
+    class="flex items-center gap-2"
+    :class="props.stickySearchOnly ? STICKY_MOBILE_TOOLBAR_ROW_CLASS : 'flex-wrap'"
+  >
+    <ChainSwitcher
+      :show-label="!props.stickySearchOnly"
+      :compact="props.stickySearchOnly"
+    />
 
     <UInput
       :model-value="queryState.search"
       placeholder="Search NFTs..."
-      class="w-48"
+      :class="props.stickySearchOnly ? STICKY_MOBILE_TOOLBAR_SEARCH_CLASS : 'w-48'"
       icon="i-heroicons-magnifying-glass"
       @update:model-value="updateQueryState({ search: $event })"
     />
 
-    <USelectMenu
-      :model-value="queryState.sortKeys"
-      :items="sortOptions"
-      :placeholder="t('explore.sortBy')"
-      class="w-40"
-      :search-input="false"
-      value-key="value"
-      multiple
-      :ui="{ content: 'min-w-50 max-h-80 overflow-y-auto' }"
-      @update:model-value="handleSortKeysUpdate"
-    />
+    <template v-if="!props.stickySearchOnly">
+      <USelectMenu
+        :model-value="queryState.sortKeys"
+        :items="sortOptions"
+        :placeholder="t('explore.sortBy')"
+        class="w-40"
+        :search-input="false"
+        value-key="value"
+        multiple
+        :ui="{ content: 'min-w-50 max-h-80 overflow-y-auto' }"
+        @update:model-value="handleSortKeysUpdate"
+      />
 
-    <USelectMenu
-      :model-value="queryState.listed"
-      :items="listedOptions"
-      placeholder="Listed"
-      class="w-26"
-      :search-input="false"
-      @update:model-value="updateQueryState({ listed: $event })"
-    />
+      <USelectMenu
+        :model-value="queryState.listed"
+        :items="listedOptions"
+        placeholder="Listed"
+        class="w-26"
+        :search-input="false"
+        @update:model-value="updateQueryState({ listed: $event })"
+      />
 
-    <UButton
-      v-if="hasOwnedFilter"
-      :variant="queryState.owned ? 'solid' : 'outline'"
-      :color="queryState.owned ? 'primary' : 'neutral'"
-      class="px-4 h-8"
-      @click="updateQueryState({ owned: !queryState.owned })"
-    >
-      Owned
-      <template #trailing>
-        <UIcon v-if="queryState.owned" name="i-heroicons-check" />
-      </template>
-    </UButton>
+      <UButton
+        v-if="hasOwnedFilter"
+        :variant="queryState.owned ? 'solid' : 'outline'"
+        :color="queryState.owned ? 'primary' : 'neutral'"
+        class="px-4 h-8"
+        @click="updateQueryState({ owned: !queryState.owned })"
+      >
+        Owned
+        <template #trailing>
+          <UIcon v-if="queryState.owned" name="i-heroicons-check" />
+        </template>
+      </UButton>
+    </template>
   </div>
 </template>

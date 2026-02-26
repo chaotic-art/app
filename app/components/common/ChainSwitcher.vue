@@ -2,14 +2,18 @@
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { chainSpec } from '~/utils/chain'
 
-interface Props {
-  /**
-   * Show label text before the switcher
-   */
-  showLabel?: boolean
-}
-
-const { showLabel = true } = defineProps<Props>()
+withDefaults(
+  defineProps<{
+    /** Show label text before the switcher */
+    showLabel?: boolean
+    /** Compact trigger mode for constrained spaces */
+    compact?: boolean
+  }>(),
+  {
+    showLabel: true,
+    compact: false,
+  },
+)
 
 const route = useRoute()
 const router = useRouter()
@@ -24,7 +28,6 @@ const chainOptions = [
       src: '/token/dot.svg',
       alt: chainSpec.ahp.name,
     },
-    tokenSymbol: chainSpec.ahp.tokenSymbol,
   },
   {
     value: 'ahk' as AssetHubChain,
@@ -33,7 +36,6 @@ const chainOptions = [
       src: '/token/ksm.svg',
       alt: chainSpec.ahk.name,
     },
-    tokenSymbol: chainSpec.ahk.tokenSymbol,
   },
 ]
 
@@ -67,18 +69,29 @@ function handleChainChange(newChain: AssetHubChain) {
 <template>
   <div class="flex items-center gap-2">
     <span
-      v-if="showLabel"
+      v-if="showLabel && !compact"
       class="text-sm font-medium text-gray-600 dark:text-gray-400"
     >
       Chain:
     </span>
 
     <USelectMenu
+      :class="compact ? 'w-11' : undefined"
       :model-value="currentChain"
       :items="chainOptions"
+      :search-input="false"
+      :content="compact ? { align: 'end', side: 'bottom', sideOffset: 8 } : { side: 'bottom', sideOffset: 8 }"
+      :ui="compact ? { content: 'min-w-44' } : {}"
       value-key="value"
       :avatar="selectedChain?.avatar"
       @update:model-value="handleChainChange($event)"
-    />
+    >
+      <template #item="{ item }">
+        <div class="flex items-center gap-2">
+          <img :src="item.avatar.src" :alt="item.avatar.alt" class="size-4 rounded-full">
+          <span class="whitespace-nowrap">{{ item.label }}</span>
+        </div>
+      </template>
+    </USelectMenu>
   </div>
 </template>

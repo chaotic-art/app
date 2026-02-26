@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import type { SelectedTrait } from '~/components/trait/types'
 import type { ExploreFilterScope } from '~/stores/preferences'
-import { useWindowSize, whenever } from '@vueuse/core'
+import { whenever } from '@vueuse/core'
 import { countExploreActiveFilters } from '~/composables/useExploreFilterToggleState'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
 import { parseQueryNumber } from '~/utils/query'
 
 type PriceBy = 'token' | 'usd'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   collectionId?: string
   filterScope: ExploreFilterScope
-}>()
+  showMobileTrigger?: boolean
+}>(), {
+  showMobileTrigger: true,
+})
 
 const emit = defineEmits<{
   'update:nft-ids': [nftIds: string[]]
@@ -24,7 +27,7 @@ const route = useRoute()
 const router = useRouter()
 const { chainSymbol, decimals: tokenDecimals } = useChain()
 const { getCurrentTokenValue } = useFiatStore()
-const { width } = useWindowSize()
+const { isMobileViewport: isMobile } = useViewport()
 
 const isModalOpen = defineModel('modalOpen', { type: Boolean, default: false })
 
@@ -49,7 +52,6 @@ const lastSale = ref((route.query.last_sale as string) || '')
 const rarityPercentileRange = ref<[number, number]>(getNormalizedRarityPercentileRange())
 const { sidebarCollapsed } = useExploreFilterToggleState(props.filterScope)
 
-const isMobile = computed(() => width.value < 768)
 const tokenPrice = computed(() => Number(getCurrentTokenValue(chainSymbol.value as Token)) || 0)
 const loading = computed(() => tokenPrice.value === 0)
 
@@ -178,6 +180,7 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
     <ClientOnly>
       <template v-if="isMobile">
         <UButton
+          v-if="props.showMobileTrigger"
           class="w-full"
           variant="outline"
           size="lg"

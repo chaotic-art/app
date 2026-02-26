@@ -19,6 +19,8 @@ useSeoMeta({
 const { isLogIn } = useAuth()
 const route = useRoute()
 const { chain } = route.params as { chain: AssetHubChain }
+const isMobileFiltersOpen = ref(false)
+const { isMobileViewport } = useViewport()
 
 const queryVariables = ref<Record<string, any>>({})
 
@@ -55,19 +57,28 @@ const mergedQueryVariables = computed(() => {
   <UContainer class="px-4 md:px-6">
     <ExploreHeader>
       <template #left-controls>
-        <ExploreFilterToggleButton filter-scope="explore" />
+        <ExploreFilterToggleButton
+          v-model:mobile-modal-open="isMobileFiltersOpen"
+          filter-scope="explore"
+        />
       </template>
 
-      <template #controls>
+      <template #controls="{ isFixed }">
         <NftsToolbar
           :has-owned-filter="isLogIn"
+          :sticky-search-only="isFixed && isMobileViewport"
           @update:query-variables="queryVariables = $event"
         />
       </template>
     </ExploreHeader>
 
     <!-- Grid Content for NFTs -->
-    <ExploreFilters class="my-8" filter-scope="explore">
+    <ExploreFilters
+      v-model:modal-open="isMobileFiltersOpen"
+      class="my-8"
+      filter-scope="explore"
+      :show-mobile-trigger="false"
+    >
       <NftsGrid
         :key="JSON.stringify(mergedQueryVariables)"
         :search="mergedQueryVariables.name || ''"

@@ -35,11 +35,17 @@ function handleTypeChange(type: string) {
     </div>
 
     <!-- Controls Row -->
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+    <StickyToolbarWrapper
+      v-slot="{ isFixed }"
+      row-class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 max-md:[&.fixed]:flex-row max-md:[&.fixed]:items-center max-md:[&.fixed]:justify-between"
+    >
       <!-- Left Side - Chain and Type Controls -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div
+        class="flex flex-row items-center gap-3 sm:gap-4"
+        :class="{ 'max-md:[.fixed_&]:hidden': !$slots['left-controls'] }"
+      >
         <!-- Type Toggle -->
-        <div class="flex bg-accent rounded-full p-1">
+        <div class="flex bg-accent rounded-full p-1 max-md:[.fixed_&]:hidden">
           <UButton
             v-for="type in typeOptions"
             :key="type"
@@ -57,9 +63,9 @@ function handleTypeChange(type: string) {
       </div>
 
       <!-- Right Side - Slot for page-specific controls -->
-      <div class="flex items-center gap-3 flex-wrap">
-        <slot name="controls" />
+      <div class="flex items-center gap-3 flex-wrap max-md:[.fixed_&]:ml-auto max-md:[.fixed_&]:flex-1 max-md:[.fixed_&]:min-w-0">
+        <slot name="controls" :is-fixed="isFixed" />
       </div>
-    </div>
+    </StickyToolbarWrapper>
   </div>
 </template>
