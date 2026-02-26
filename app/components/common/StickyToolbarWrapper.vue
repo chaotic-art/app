@@ -59,7 +59,7 @@ const fixedStyle = computed(() => {
         ]"
         :style="fixedStyle"
       >
-        <slot />
+        <slot :is-fixed="isFixed" />
       </div>
     </div>
   </div>

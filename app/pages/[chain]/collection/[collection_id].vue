@@ -100,6 +100,7 @@ const selectedSortKeys = computed({
 
 const filteredNftIds = ref<string[]>([])
 const selectedTraits = ref<SelectedTrait[]>([])
+const isCollectionFiltersOpen = ref(false)
 
 const gridKey = computed(() => {
   const serializedQuery = serializeQueryForKey(route.query, NFT_GRID_NON_FETCH_QUERY_KEYS)
@@ -294,21 +295,26 @@ defineOgImageComponent('Frame', {
         <template #items>
           <!-- Items Section -->
           <ExploreFilters
+            v-model:modal-open="isCollectionFiltersOpen"
             class="mt-2"
             filter-scope="collection"
             :collection-id="collection_id?.toString() ?? ''"
+            :show-mobile-trigger="false"
             @update:nft-ids="handleNftIdsUpdate"
             @update:selected-traits="handleSelectedTraitsUpdate"
           >
             <div class="space-y-6">
               <StickyToolbarWrapper
-                row-class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                row-class="flex flex-row items-center justify-between gap-3 md:gap-4"
               >
-                <div class="w-full md:w-auto flex items-center justify-start">
-                  <ExploreFilterToggleButton filter-scope="collection" />
+                <div class="w-auto flex items-center justify-start">
+                  <ExploreFilterToggleButton
+                    v-model:mobile-modal-open="isCollectionFiltersOpen"
+                    filter-scope="collection"
+                  />
                 </div>
 
-                <div class="w-full md:w-auto flex items-center gap-2 md:ml-auto">
+                <div class="w-auto flex items-center gap-2 ml-auto">
                   <ArtViewFilter />
                   <SortOptions
                     v-model="selectedSortKeys"
