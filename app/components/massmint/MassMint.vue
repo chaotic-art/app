@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { NFT, NFTToMint } from './types'
-import type { TemplateFormat } from './utils'
 import type { StepConfig } from '~/components/common/Stepper.vue'
+import type { NFT, NFTToMint } from '~/components/massmint/types'
+import type { TemplateFormat } from '~/components/massmint/utils'
 import { LazyReviewMassMintModal } from '#components'
 import { useQuery } from '@tanstack/vue-query'
 import CommonStepper from '~/components/common/Stepper.vue'
+import EditPanel from '~/components/massmint/EditPanel.vue'
+import MassMintUploadStep from '~/components/massmint/MassMintUploadStep.vue'
+import OverviewTable from '~/components/massmint/OverviewTable.vue'
+import UploadDescription from '~/components/massmint/upload/UploadDescription.vue'
+import { convertNftsToMap, generateTemplateContent } from '~/components/massmint/utils'
 import { blockchains } from '~/composables/create/useCollectionForm'
 import { useMassMint } from '~/composables/massmint/useMassMint'
 import { useMassMintForm } from '~/composables/massmint/useMassMintForm'
-import EditPanel from './EditPanel.vue'
-import MassMintUploadStep from './MassMintUploadStep.vue'
-import OverviewTable from './OverviewTable.vue'
-import UploadDescription from './upload/UploadDescription.vue'
-import { convertNftsToMap, generateTemplateContent } from './utils'
 
 // State
 const NFTS = ref<{ [nftId: string]: NFT }>({})
@@ -208,7 +208,7 @@ const templateDownloadItems = [
 
 function onMediaZipLoaded(data: { validFiles: NFT[], areAllFilesValid: boolean }) {
   NFTS.value = convertNftsToMap(data.validFiles) as { [nftId: string]: NFT }
-  mediaLoaded.value = true
+  mediaLoaded.value = data.areAllFilesValid && data.validFiles.length > 0
 }
 
 function onDescriptionLoaded(entries: Record<string, any>) {
@@ -662,7 +662,7 @@ function applySharedDescriptionToAll() {
                 <div class="flex flex-col">
                   <span class="font-medium">Attribute Deposit</span>
                   <span class="text-xs text-muted-foreground">
-                    {{ attributeDeposit }} × attributes
+                    <Money :value="attributeDeposit" inline :chain="state.blockchain" hide-unit />× attributes
                   </span>
                 </div>
                 <Money :value="attributeDepositTotal" inline :chain="state.blockchain" />

@@ -1,4 +1,4 @@
-import type { NFT } from './types'
+import type { NFT } from '~/components/massmint/types'
 
 export type TemplateFormat = 'json' | 'csv' | 'txt'
 
@@ -23,14 +23,24 @@ export function generateTemplateContent(format: TemplateFormat, nfts: NFT[]): st
   }
 
   if (format === 'csv') {
+    const csvEscape = (value: string) => {
+      const escaped = value.replace(/"/g, '""')
+      return /[",\n\r]/.test(value) ? `"${escaped}"` : escaped
+    }
     const header = 'file,name,description,attributes,price'
     const attributesCsvExample = 'color:white;expression:happy'
     const rows = nfts.map((nft, index) => {
       const file = nft.file?.name || ''
       if (index === 0) {
-        return `${file},Art #1,Description for the Art #1,${attributesCsvExample},1`
+        return [
+          csvEscape(file),
+          csvEscape('Art #1'),
+          csvEscape('Description for the Art #1'),
+          csvEscape(attributesCsvExample),
+          csvEscape('1'),
+        ].join(',')
       }
-      return `${file},,,,`
+      return `${csvEscape(file)},,,,`
     })
     return [header, ...rows].join('\n')
   }
@@ -55,7 +65,10 @@ export function generateTemplateContent(format: TemplateFormat, nfts: NFT[]): st
 export function convertNftsToMap<T extends object>(
   items: T[],
 ): Record<string, T & { id: number }> {
-  return items
-    .map((item, i) => ({ ...item, id: i + 1 } as T & { id: number }))
-    .reduce((acc, nft) => ({ ...acc, [nft.id]: nft }), {} as Record<string, T & { id: number }>)
+  const result: Record<string, T & { id: number }> = {}
+  items.forEach((item, i) => {
+    const nft = { ...item, id: i + 1 } as T & { id: number }
+    result[String(nft.id)] = nft
+  })
+  return result
 }
