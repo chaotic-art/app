@@ -3,7 +3,6 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { NftRarity } from '~/types/rarity'
 
 interface Props {
-  search?: string
   variables?: Record<string, any>
   noItemsFoundMessage?: string
   gridClass?: string
@@ -15,7 +14,6 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   variables: () => ({}),
-  search: '',
   gridClass: 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6',
   noItemsFoundMessage: 'Try adjusting your search or filters to see more results.',
   showRarity: false,
@@ -35,7 +33,6 @@ const {
 } = useInfiniteNfts({
   pageSize: 42,
   distance: 300,
-  search: props.search,
   variables: props.variables,
   endpoint: props.prefix,
 })

@@ -28,6 +28,7 @@ const route = useRoute()
 const router = useRouter()
 const { accountId } = useAuth()
 const { t } = useI18n()
+const { buildNftSearchConstraints } = useSearchFilters()
 const {
   sortOptions,
   normalizeSortKeys,
@@ -111,17 +112,19 @@ function updateQueryState(updates: Partial<QueryState>) {
 function computeQueryVariables(state: QueryState) {
   const selectedSortKeys = state.sortKeys
   const orderBy = buildOrderBy(selectedSortKeys)
-  const search = state.search
-  const listedVariables: Record<string, unknown> = {}
   const listedValue = state.listed?.value
   const sortRequiresListed = requiresListed(selectedSortKeys)
+  const listedMode = listedValue === 'true'
+    ? 'listed'
+    : listedValue === 'false'
+      ? 'unlisted'
+      : 'all'
 
-  if (sortRequiresListed || listedValue === 'true') {
-    listedVariables.search = { price_gt: '0' }
-  }
-  else if (listedValue === 'false') {
-    listedVariables.price_isNull = true
-  }
+  const searchConstraints = buildNftSearchConstraints({
+    phrase: state.search,
+    listedMode,
+    forceListed: sortRequiresListed,
+  })
 
   const ownedVariables = props.hasOwnedFilter && state.owned && accountId.value
     ? { owner: accountId.value }
@@ -130,8 +133,7 @@ function computeQueryVariables(state: QueryState) {
   return {
     ...props.extraVariables,
     orderBy,
-    ...(search && { name: search }),
-    ...listedVariables,
+    ...searchConstraints,
     ...ownedVariables,
   }
 }

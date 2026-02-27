@@ -15,6 +15,7 @@ const sortOptions = [
 
 const route = useRoute()
 const router = useRouter()
+const { buildKeywordClause } = useSearchFilters()
 
 const { chain } = route.params as { chain: AssetHubChain }
 
@@ -40,15 +41,17 @@ const queryState = computed({
   },
 })
 
-const queryVariables = computed(() => ({
-  orderBy: queryState.value.sort?.value || 'blockNumber_DESC',
-  search: [
-    {
-      name_containsInsensitive: queryState.value.search,
-      issuer_eq: props.issuer,
-    },
-  ],
-}))
+const queryVariables = computed(() => {
+  const keywordFilter = buildKeywordClause(queryState.value.search)
+
+  return {
+    orderBy: queryState.value.sort?.value || 'blockNumber_DESC',
+    search: [
+      { issuer_eq: props.issuer },
+      ...(keywordFilter ? [keywordFilter] : []),
+    ],
+  }
+})
 </script>
 
 <template>
@@ -73,7 +76,7 @@ const queryVariables = computed(() => ({
     <!-- Grid Content -->
     <div class="my-8">
       <CollectionsGrid
-        :key="queryVariables.orderBy + queryVariables.search[0]?.name_containsInsensitive"
+        :key="`${queryVariables.orderBy}-${queryState.search}`"
         :variables="queryVariables"
         :prefix="chain"
         @total-count-change="$emit('totalCountChange', $event)"

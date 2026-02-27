@@ -23,6 +23,7 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { isMobileViewport } = useViewport()
+const { buildKeywordClause } = useSearchFilters()
 const {
   sortOptions,
   normalizeSortKeys,
@@ -52,14 +53,14 @@ const queryState = computed({
   },
 })
 
-const queryVariables = computed(() => ({
-  orderBy: buildOrderBy(queryState.value.sortKeys),
-  search: [
-    {
-      name_containsInsensitive: queryState.value.search,
-    },
-  ],
-}))
+const queryVariables = computed(() => {
+  const keywordFilter = buildKeywordClause(queryState.value.search)
+
+  return {
+    orderBy: buildOrderBy(queryState.value.sortKeys),
+    search: keywordFilter ? [keywordFilter] : [],
+  }
+})
 
 const gridKey = computed(() => `${queryVariables.value.orderBy.join(',')}::${queryState.value.search}`)
 </script>

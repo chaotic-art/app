@@ -15,6 +15,7 @@ enum SearchBarTab {
 
 const router = useRouter()
 const { currentChain } = useChain()
+const { buildKeywordClause } = useSearchFilters()
 
 const searchInputRef = ref<HTMLInputElement>()
 const searchDropdownRef = ref<HTMLDivElement>()
@@ -58,6 +59,7 @@ const debouncedSearch = useDebounceFn(async (query: string) => {
   try {
     // Search collections using existing GraphQL query
     const { $apolloClient } = useNuxtApp()
+    const collectionKeywordFilter = buildKeywordClause(query)
 
     const [collectionsResult, nftsResult, usersResult] = await Promise.all([
       // Search collections
@@ -66,7 +68,7 @@ const debouncedSearch = useDebounceFn(async (query: string) => {
         variables: {
           first: 10,
           offset: 0,
-          search: [{ name_containsInsensitive: query }],
+          search: collectionKeywordFilter ? [collectionKeywordFilter] : [],
           orderBy: ['blockNumber_DESC'],
           denyList: getDenyList(currentChain.value) || [],
         },

@@ -81,7 +81,6 @@ const mergedQueryVariables = computed(() => {
     >
       <NftsGrid
         :key="JSON.stringify(mergedQueryVariables)"
-        :search="mergedQueryVariables.name || ''"
         :variables="mergedQueryVariables"
         :prefix="chain"
       />

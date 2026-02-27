@@ -10,7 +10,6 @@ type NftEntity = ExploreNftsData['tokenEntities'][0]
 interface UseInfiniteNftsOptions {
   pageSize?: number
   distance?: number
-  search?: string
   owner?: string
   issuer?: string
   variables?: Record<string, any> // Allow any additional GraphQL variables
@@ -21,7 +20,6 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
   const {
     pageSize = 40,
     distance = 300,
-    search = '',
     owner,
     issuer,
     variables = {},
@@ -57,7 +55,6 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
     distance,
     variables: {
       denyList: getDenyList(endpoint) || [], // TODO: handle asset hub chains
-      name: search || undefined,
       owner: owner || undefined,
       issuer: issuer || undefined,
       ...variables,
