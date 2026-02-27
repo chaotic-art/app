@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'mediaZipReordered', payload: { validFiles: NFT[], areAllFilesValid: boolean }): void
-  (e: 'mediaZipLoaded', payload: { validFiles: any[], areAllFilesValid: boolean }): void
+  (e: 'mediaZipLoaded', payload: { validFiles: NFT[], areAllFilesValid: boolean }): void
   (e: 'deleteNft', nft: NFT): void
   (e: 'next'): void
 }>()
@@ -116,6 +116,8 @@ function onNext() {
           <div class="flex items-center gap-1 rounded-md border border-border bg-muted/40 p-1">
             <button
               type="button"
+              aria-label="Grid view"
+              :aria-pressed="fileViewMode === 'grid'"
               class="inline-flex h-8 w-8 items-center justify-center rounded-md text-xs"
               :class="fileViewMode === 'grid' ? 'bg-background shadow-sm' : 'text-muted-foreground'"
               @click="setFileViewMode('grid')"
@@ -127,6 +129,8 @@ function onNext() {
             </button>
             <button
               type="button"
+              aria-label="List view"
+              :aria-pressed="fileViewMode === 'list'"
               class="inline-flex h-8 w-8 items-center justify-center rounded-md text-xs"
               :class="fileViewMode === 'list' ? 'bg-background shadow-sm' : 'text-muted-foreground'"
               @click="setFileViewMode('list')"
@@ -192,6 +196,7 @@ function onNext() {
 
               <button
                 type="button"
+                aria-label="Delete file"
                 class="inline-flex h-7 w-7 items-center justify-center rounded-md text-xs text-muted-foreground hover:text-destructive"
                 @click="emit('deleteNft', nft)"
               >
@@ -251,6 +256,7 @@ function onNext() {
                   </span>
                   <button
                     type="button"
+                    aria-label="Delete file"
                     class="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded hover:text-destructive"
                     @click="emit('deleteNft', nft)"
                   >
