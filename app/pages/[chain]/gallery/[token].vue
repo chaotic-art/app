@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import { t } from 'try'
 import { fetchOdaToken } from '~/services/oda'
 
 const CONTAINER_ID = 'nft-img-container'
@@ -30,7 +31,12 @@ const {
   fetchRarity: true,
 })
 
-const odaTokenData = await fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value)
+const [ok, err, odaTokenDataResult] = await t(fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value))
+const odaTokenData = ok ? odaTokenDataResult : { metadata: null, price: null, owner: null }
+if (!ok) {
+  const errMessage = err instanceof Error ? err.message : String(err)
+  console.error('Error fetching ODA token', errMessage)
+}
 const item = {
   ...odaTokenData,
   metadata: {
@@ -47,7 +53,7 @@ useSeoMeta({
 defineOgImage({
   component: 'Gallery',
   props: {
-    title: item.metadata.name,
+    title: item.metadata?.name,
     image: item.metadata?.image,
     network: chainSpec[chainPrefix.value].name,
     symbol: chainSpec[chainPrefix.value].tokenSymbol,
