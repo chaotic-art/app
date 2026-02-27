@@ -42,10 +42,6 @@ function handleClick(index: number) {
   <div class="flex items-center justify-center gap-2">
     <template v-for="(step, index) in steps" :key="index">
       <button
-        type="button"
-        :aria-label="step.label || `Step ${index + 1}`"
-        :aria-current="isCurrent(index) ? 'step' : undefined"
-        :aria-disabled="!isClickable(index) && !isCurrent(index)"
         class="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200"
         :class="{
           'bg-primary text-white': isCurrent(index),
