@@ -8,6 +8,10 @@ describe('useSearchFilters', () => {
     expect(buildKeywordClause('')).toBeUndefined()
   })
 
+  it('returns undefined keyword clause for whitespace-only phrase', () => {
+    expect(buildKeywordClause('   ')).toBeUndefined()
+  })
+
   it('builds OR keyword clause across name and metadata description', () => {
     expect(buildKeywordClause('freak')).toEqual({
       OR: [
@@ -19,6 +23,15 @@ describe('useSearchFilters', () => {
 
   it('keeps phrase search intact without token splitting', () => {
     expect(buildKeywordClause('blue red')).toEqual({
+      OR: [
+        { name_containsInsensitive: 'blue red' },
+        { meta: { description_containsInsensitive: 'blue red' } },
+      ],
+    })
+  })
+
+  it('trims surrounding whitespace before building keyword clause', () => {
+    expect(buildKeywordClause('  blue red  ')).toEqual({
       OR: [
         { name_containsInsensitive: 'blue red' },
         { meta: { description_containsInsensitive: 'blue red' } },
@@ -63,6 +76,15 @@ describe('useSearchFilters', () => {
   it('returns listed constraint without keyword when phrase is empty', () => {
     expect(buildNftSearchConstraints({
       phrase: '',
+      listedMode: 'listed',
+    })).toEqual({
+      search: { price_gt: '0' },
+    })
+  })
+
+  it('returns listed constraint without keyword when phrase is whitespace', () => {
+    expect(buildNftSearchConstraints({
+      phrase: '   ',
       listedMode: 'listed',
     })).toEqual({
       search: { price_gt: '0' },

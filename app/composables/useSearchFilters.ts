@@ -15,14 +15,16 @@ interface NftSearchConstraints {
 
 export function useSearchFilters() {
   function buildKeywordClause(phrase: string): WhereFilter | undefined {
-    if (!phrase) {
+    const normalizedPhrase = phrase.trim()
+
+    if (!normalizedPhrase) {
       return undefined
     }
 
     return {
       OR: [
-        { name_containsInsensitive: phrase },
-        { meta: { description_containsInsensitive: phrase } },
+        { name_containsInsensitive: normalizedPhrase },
+        { meta: { description_containsInsensitive: normalizedPhrase } },
       ],
     }
   }
