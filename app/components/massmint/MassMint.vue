@@ -67,14 +67,15 @@ const numMissingPrices = computed(() => {
   return (Object.values(NFTS.value) as NFT[]).filter(nft => nft.price === undefined || nft.price === 0).length
 })
 
+const transactionFee = computed(() => itemDeposit.value * numOfValidNFTs.value)
+
 const itemDepositTotal = computed(() => itemDeposit.value * numOfValidNFTs.value)
 const metadataDepositTotal = computed(() => metadataDeposit.value * numOfValidNFTs.value)
-const attributeDepositTotal = computed(() =>
-  (Object.values(NFTS.value) as NFT[]).reduce(
-    (sum, nft) => sum + (nft.attributes?.length || 0) * attributeDeposit.value,
-    0,
-  ),
-)
+const totalAttribute = computed(() => (Object.values(NFTS.value) as NFT[]).reduce(
+  (sum, nft) => sum + (nft.attributes?.length || 0),
+  0,
+))
+const attributeDepositTotal = computed(() => totalAttribute.value * attributeDeposit.value)
 
 const estimatedCostOpen = ref(true)
 const steps = [
@@ -662,10 +663,14 @@ function applySharedDescriptionToAll() {
                 <div class="flex flex-col">
                   <span class="font-medium">Attribute Deposit</span>
                   <span class="text-xs text-muted-foreground">
-                    {{ attributeDeposit }} × attributes
+                    <Money :value="attributeDeposit" inline :chain="state.blockchain" hide-unit /> × {{ totalAttribute }}
                   </span>
                 </div>
                 <Money :value="attributeDepositTotal" inline :chain="state.blockchain" />
+              </div>
+              <div class="flex items-center justify-between gap-4 text-sm">
+                <span class="font-medium">Estimated Transaction Fee</span>
+                <Money :value="transactionFee" inline :chain="state.blockchain" />
               </div>
               <div class="flex items-center justify-between gap-4 border-t border-border pt-2 text-sm">
                 <span class="font-semibold">Total Deposit</span>
@@ -673,7 +678,7 @@ function applySharedDescriptionToAll() {
               </div>
             </div>
             <p class="mt-3 text-xs text-muted-foreground">
-              Deposits are refundable when items are burned. Network fees (~0.001 DOT) are charged separately per transaction.
+              Deposits are refundable when items are burned. Network fees are charged separately per transaction.
             </p>
           </div>
         </div>
