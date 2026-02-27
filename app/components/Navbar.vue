@@ -64,7 +64,7 @@ function handleCreateNft() {
 
 function handleMassMint() {
   isCreateModalOpen.value = false
-  router.push('/massmint/onboarding')
+  router.push('/massmint')
 }
 
 function handleAirdrop() {

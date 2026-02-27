@@ -70,7 +70,7 @@ function updateEntry(entry: Record<string, unknown>, line: string) {
     entry.price = price
     entry.currency = currency
   }
-  else if (fieldName === 'attributes') {
+  else if (fieldName === 'attributes' && fieldValue) {
     entry.attributes = JSON.parse(fieldValue)
   }
   else {
