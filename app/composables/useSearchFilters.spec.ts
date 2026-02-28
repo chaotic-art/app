@@ -73,6 +73,20 @@ describe('useSearchFilters', () => {
     })
   })
 
+  it('builds all + keyword with only keyword search clause', () => {
+    expect(buildNftSearchConstraints({
+      phrase: 'freak',
+      listedMode: 'all',
+    })).toEqual({
+      search: {
+        OR: [
+          { name_containsInsensitive: 'freak' },
+          { meta: { description_containsInsensitive: 'freak' } },
+        ],
+      },
+    })
+  })
+
   it('returns listed constraint without keyword when phrase is empty', () => {
     expect(buildNftSearchConstraints({
       phrase: '',
@@ -82,6 +96,13 @@ describe('useSearchFilters', () => {
     })
   })
 
+  it('returns no constraints for all mode when phrase is empty', () => {
+    expect(buildNftSearchConstraints({
+      phrase: '',
+      listedMode: 'all',
+    })).toEqual({})
+  })
+
   it('returns listed constraint without keyword when phrase is whitespace', () => {
     expect(buildNftSearchConstraints({
       phrase: '   ',
@@ -89,6 +110,13 @@ describe('useSearchFilters', () => {
     })).toEqual({
       search: { price_gt: '0' },
     })
+  })
+
+  it('returns no constraints for all mode when phrase is whitespace', () => {
+    expect(buildNftSearchConstraints({
+      phrase: '   ',
+      listedMode: 'all',
+    })).toEqual({})
   })
 
   it('forceListed overrides unlisted mode', () => {
