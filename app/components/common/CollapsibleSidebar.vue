@@ -48,7 +48,7 @@ const isFixed = computed(() => hasScrolledPastTarget.value && fitsInViewport.val
 <template>
   <div
     ref="containerRef"
-    class="shrink-0 transition-all duration-300 ease-in-out"
+    class="shrink-0"
     :style="{
       width: isCollapsed ? collapsedWidth : expandedWidth,
       minWidth: isCollapsed ? collapsedWidth : expandedWidth,
@@ -62,8 +62,10 @@ const isFixed = computed(() => hasScrolledPastTarget.value && fitsInViewport.val
 
     <aside
       ref="sidebarRef"
-      class="bg-background-muted border border-border rounded-xl h-fit transition-all duration-300 ease-in-out overflow-hidden"
+      class="h-fit overflow-hidden relative z-10"
       :class="{
+        'bg-background-muted border border-border rounded-xl': !isCollapsed,
+        'border-transparent bg-transparent rounded-none pointer-events-none': isCollapsed,
         'sticky top-4': !sticky,
         'fixed top-[100px]': isFixed,
       }"
