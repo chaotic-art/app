@@ -53,6 +53,7 @@
     "generativeArtDrops": "Generative Art Drops",
     "pastDrops": "Past Art Drops",
     "mintDropError": "Error encountered, please retry. {0}",
+    "mintDropAlreadyExists": "This item was already minted by someone else. Please refresh the page and try again.",
     "youSuccessfullyClaimedNft": "You successfully minted {0} NFT",
     "amountMintedSuccessfully": "{0} NFTs minted successfully",
     "artBy": "{0} By",

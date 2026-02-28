@@ -19,7 +19,7 @@ export default function useDropMint() {
   const txHash = ref<string>()
   const isError = ref(false)
 
-  const { massGenerate, clearMassMint } = useDropMassmint()
+  const { massGenerate, clearMassMint, isChaoticOwner } = useDropMassmint()
   const { status, resolveStatus, initTransactionLoader, isLoading: isTransactionLoading } = useTransactionStatus()
 
   const transaction = computed(() => ({
@@ -109,8 +109,19 @@ export default function useDropMint() {
           }
 
           if (event.type === 'txBestBlocksState' && event.found && !event.ok) {
-            const errorType = event.events.find(e => e.type === 'System' && e.value.type === 'ExtrinsicFailed')?.value.value.dispatch_error.type
-            errorMessage($i18n.t('drop.mintDropError', [errorType || 'Something went wrong']))
+            const failed = event.events.find(e => e.type === 'System' && e.value.type === 'ExtrinsicFailed')
+            const dispatchError = failed?.value?.value?.dispatch_error as { type?: string, value?: { type?: string, value?: { type?: string } } } | undefined
+            const isAlreadyExists = dispatchError?.type === 'Module'
+              && dispatchError?.value?.type === 'Nfts'
+              && dispatchError?.value?.value?.type === 'AlreadyExists'
+
+            if (isAlreadyExists) {
+              warningMessage($i18n.t('drop.mintDropAlreadyExists'))
+            }
+            else {
+              const errorType = dispatchError?.type ?? 'Something went wrong'
+              errorMessage($i18n.t('drop.mintDropError', [errorType]))
+            }
             isError.value = true
             stopMint()
             return
@@ -144,7 +155,7 @@ export default function useDropMint() {
 
   async function submitMints() {
     try {
-      updateGenartMetadata()
+      updateGenartMetadata(isChaoticOwner.value)
 
       loading.value = false
     }
