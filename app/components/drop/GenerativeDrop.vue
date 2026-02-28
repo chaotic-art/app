@@ -132,24 +132,28 @@ const dropStartRelativeTime = computed(() => {
 
           <!-- stats section -->
           <div class="border p-4 md:p-6 rounded-2xl border-border mt-4">
-            <div class="flex items-center justify-between gap-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
+              <!-- Price & info block -->
               <div class="flex flex-col min-w-0">
                 <p class="font-serif font-medium text-2xl md:text-3xl italic shrink-0">
                   {{ drop.isFree ? 'Free' : formattedTokenPrice }}
                 </p>
-                <div class="flex items-center gap-2 text-sm text-gray-500">
+                <div class="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                   <span v-if="!drop.isFree">{{ usdPrice }} USD</span>
-                  <span v-if="!drop.isFree" class="font-medium text-muted-foreground">·</span>
+                  <span v-if="!drop.isFree" class="font-medium">·</span>
                   <DropMintedCounter :drop="drop" />
                 </div>
               </div>
 
-              <div class="flex items-center gap-2 md:gap-3 shrink-0">
+              <!-- Controls: quantity + mint button -->
+              <div class="flex items-center gap-2 md:gap-3 shrink-0 w-full md:w-auto">
                 <UInputNumber
                   v-if="!drop?.isMintedOut"
                   v-model="amountToMint"
                   size="xl"
-                  class="w-28" :min="1" :ui="{
+                  class="w-24 md:w-28"
+                  :min="1"
+                  :ui="{
                     base: 'rounded-full',
                   }"
                 />
@@ -157,6 +161,7 @@ const dropStartRelativeTime = computed(() => {
                   :drop="drop"
                   is-drop-page
                   size="xl"
+                  class="flex-1 md:flex-initial"
                 />
               </div>
             </div>
