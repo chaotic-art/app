@@ -1,4 +1,4 @@
-export function updateGenartMetadata() {
+export function updateGenartMetadata(isChaoticOwner = true) {
   const { drop } = useDrop()
   const { toMintNFTs, mintingSession } = storeToRefs(useDropStore())
 
@@ -9,6 +9,7 @@ export function updateGenartMetadata() {
         chain: drop.value.chain,
         collection: drop.value.collection,
         nft: item.nft.toString(),
+        isChaoticOwner,
       },
     })
 

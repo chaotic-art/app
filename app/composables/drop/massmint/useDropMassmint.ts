@@ -1,27 +1,23 @@
 import type { ToMassmintNFT } from './types'
-import { generateIdAssethub, setDyndataUrl } from '@/services/dyndata'
+import { setDyndataUrl } from '@/services/dyndata'
 import { createLogger } from '@/utils/logger'
+import { useNextItemId } from '~/composables/onchain/useNextItemId'
 
 export default () => {
   const { currentChain } = useChain()
+  const { getNextItemId, isChaoticOwner } = useNextItemId()
   const dropStore = useDropStore()
   const { drop, amountToMint, toMintNFTs, loading } = storeToRefs(dropStore)
   const logger = createLogger('massmint')
 
-  // ensure tokenIds are unique on single user session
   const tokenIds = ref<number[]>([])
   const populateTokenIds = async () => {
-    for (const _ of Array.from({ length: amountToMint.value })) {
-      const tokenId = await generateIdAssethub(Number.parseInt(drop.value.collection), currentChain.value)
-
-      if (!tokenIds.value.includes(tokenId)) {
-        tokenIds.value.push(tokenId)
-      }
-    }
-
-    if (tokenIds.value.length < amountToMint.value) {
-      await populateTokenIds()
-    }
+    const collectionId = Number.parseInt(drop.value.collection)
+    const nextId = await getNextItemId(currentChain.value, collectionId)
+    tokenIds.value = Array.from(
+      { length: amountToMint.value },
+      (_, i) => nextId + i,
+    )
   }
 
   const clearMassMint = () => {
@@ -68,5 +64,6 @@ export default () => {
   return {
     massGenerate,
     clearMassMint,
+    isChaoticOwner,
   }
 }
