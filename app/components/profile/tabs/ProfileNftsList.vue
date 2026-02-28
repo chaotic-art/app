@@ -20,9 +20,6 @@ const { currentChain } = useChain()
     <div class="my-8">
       <NftsGrid
         :key="JSON.stringify(queryVariables)"
-        :search="queryVariables.name || ''"
-        :owner="queryVariables.owner"
-        :issuer="queryVariables.issuer"
         :variables="queryVariables"
         :prefix="currentChain"
         @total-count-change="$emit('totalCountChange', $event)"
