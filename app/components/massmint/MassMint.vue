@@ -340,12 +340,18 @@ function applySharedDescriptionToAll() {
     return
   }
 
+  const nftsToUpdate = nfts.filter((nft) => !nft.description || !nft.description.trim())
+  if (nftsToUpdate.length === 0) {
+    warningMessage('All items already have a description.')
+    return
+  }
+
   const next: { [id: string]: NFT } = { ...NFTS.value }
-  nfts.forEach((nft) => {
+  nftsToUpdate.forEach((nft) => {
     next[nft.id] = { ...nft, description: text }
   })
   NFTS.value = next
-  successMessage(`Applied shared description to ${nfts.length} item(s).`)
+  successMessage(`Applied shared description to ${nftsToUpdate.length} item(s).`)
 }
 </script>
 
