@@ -10,8 +10,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'mediaZipReordered', payload: { validFiles: NFT[], areAllFilesValid: boolean }): void
-  (e: 'mediaZipLoaded', payload: { validFiles: NFT[], areAllFilesValid: boolean }): void
+  (e: 'mediaZipReordered', payload: { validFiles: NFT[] }): void
+  (e: 'mediaZipLoaded', payload: { validFiles: NFT[] }): void
   (e: 'deleteNft', nft: NFT): void
   (e: 'next'): void
 }>()
@@ -60,7 +60,7 @@ function onMediaDrop(targetIndex: number) {
     {},
   )
 
-  emit('mediaZipReordered', { validFiles: Object.values(reorderedMap), areAllFilesValid: true })
+  emit('mediaZipReordered', { validFiles: Object.values(reorderedMap) })
 
   draggingMediaIndex.value = null
 }

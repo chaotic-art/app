@@ -207,7 +207,7 @@ const templateDownloadItems = [
   { label: 'Download as TXT', icon: 'i-heroicons-document', onSelect: () => downloadMetadataTemplate('txt') },
 ]
 
-function onMediaZipLoaded(data: { validFiles: NFT[], areAllFilesValid: boolean }) {
+function onMediaZipLoaded(data: { validFiles: NFT[] }) {
   NFTS.value = convertNftsToMap(data.validFiles) as { [nftId: string]: NFT }
   mediaLoaded.value = true
 }
@@ -340,7 +340,7 @@ function applySharedDescriptionToAll() {
     return
   }
 
-  const nftsToUpdate = nfts.filter((nft) => !nft.description || !nft.description.trim())
+  const nftsToUpdate = nfts.filter(nft => !nft.description || !nft.description.trim())
   if (nftsToUpdate.length === 0) {
     warningMessage('All items already have a description.')
     return

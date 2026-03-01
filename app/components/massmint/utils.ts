@@ -57,5 +57,8 @@ export function convertNftsToMap<T extends object>(
 ): Record<string, T & { id: number }> {
   return items
     .map((item, i) => ({ ...item, id: i + 1 } as T & { id: number }))
-    .reduce((acc, nft) => ({ ...acc, [nft.id]: nft }), {} as Record<string, T & { id: number }>)
+    .reduce((acc, nft) => {
+      acc[nft.id] = nft
+      return acc
+    }, {} as Record<string, T & { id: number }>)
 }
