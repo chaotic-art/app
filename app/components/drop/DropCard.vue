@@ -2,6 +2,7 @@
 import type { DropItem } from '@/types'
 import type { GenartDropItem } from '~/types/genart'
 import { useMintedDropsStore } from '@/stores/dropsMinted'
+import ImageMedia from '~/components/common/ImageMedia.vue'
 import { getDropAttributes, isTBA } from './utils'
 
 const props = defineProps<{
@@ -42,11 +43,11 @@ onBeforeMount(async () => {
       </div>
     </div>
 
-    <img
+    <ImageMedia
       :src="sanitizeIpfsUrl(formattedDrop?.image) || '/placeholder.jpg'"
       :alt="formattedDrop?.name || drop.alias"
       class="aspect-square w-full object-cover"
-    >
+    />
 
     <div class="p-3 md:p-4">
       <p class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
