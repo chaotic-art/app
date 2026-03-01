@@ -21,6 +21,7 @@ const route = useRoute()
 const { chain } = route.params as { chain: AssetHubChain }
 const isMobileFiltersOpen = ref(false)
 const { isMobileViewport } = useViewport()
+const { viewMode: nftViewMode, gridClass: nftGridClass } = useNftViewMode('explore')
 
 const queryVariables = ref<Record<string, any>>({})
 
@@ -68,7 +69,13 @@ const mergedQueryVariables = computed(() => {
           :has-owned-filter="isLogIn"
           :sticky-search-only="isFixed && isMobileViewport"
           @update:query-variables="queryVariables = $event"
-        />
+        >
+          <template #trailing>
+            <div :class="isFixed && isMobileViewport ? 'max-md:order-first' : undefined">
+              <NftViewModeSelector scope="explore" />
+            </div>
+          </template>
+        </NftsToolbar>
       </template>
     </ExploreHeader>
 
@@ -82,6 +89,8 @@ const mergedQueryVariables = computed(() => {
       <NftsGrid
         :key="JSON.stringify(mergedQueryVariables)"
         :variables="mergedQueryVariables"
+        :grid-class="nftGridClass"
+        :view-mode="nftViewMode"
         :prefix="chain"
       />
     </ExploreFilters>
