@@ -24,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits(['totalCountChange'])
+const { isMobileViewport } = useViewport()
 
 // Use the NFTs infinite query composable
 const {
@@ -60,6 +61,7 @@ function getRarity(nft: { rarity?: NftRarity | null }): NftRarity | null {
 }
 
 const hideMediaInfo = computed(() => props.viewMode === 'art')
+const compactMediaInfo = computed(() => props.viewMode === 'compact' && isMobileViewport.value)
 </script>
 
 <template>
@@ -88,6 +90,7 @@ const hideMediaInfo = computed(() => props.viewMode === 'art')
           :current-owner="nft.currentOwner"
           :hide-hover-action="hideHoverAction"
           :hide-media-info="hideMediaInfo"
+          :compact-media-info="compactMediaInfo"
           :show-rarity="showRarity"
           :rarity="getRarity(nft)"
         />

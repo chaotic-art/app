@@ -13,6 +13,7 @@ const props = defineProps<{
   currentOwner?: string | null
   hideHoverAction?: boolean
   hideMediaInfo?: boolean
+  compactMediaInfo?: boolean
   showRarity?: boolean
   rarity?: NftRarity | null
 }>()
@@ -232,20 +233,39 @@ watchEffect(() => {
         </div>
 
         <!-- Card Content -->
-        <div v-if="!hideMediaInfo" class="p-3 md:p-4">
+        <div
+          v-if="!hideMediaInfo"
+          :class="compactMediaInfo ? 'p-2 md:p-4' : 'p-3 md:p-4'"
+        >
           <div class="mb-2 flex items-center justify-between gap-2">
-            <h3 class="min-w-0 flex-1 font-bold text-base md:text-lg text-gray-900 dark:text-white line-clamp-1" :title="name || token?.metadata?.name || 'Untitled NFT'">
+            <h3
+              class="min-w-0 flex-1 font-bold text-gray-900 dark:text-white line-clamp-1"
+              :class="compactMediaInfo ? 'text-sm' : 'text-base md:text-lg'"
+              :title="name || token?.metadata?.name || 'Untitled NFT'"
+            >
               {{ name || token?.metadata?.name || 'Untitled NFT' }}
             </h3>
 
             <RarityRankChip
-              v-if="hasRarity"
+              v-if="hasRarity && !compactMediaInfo"
               :rarity="rarity"
             />
           </div>
 
+          <div v-if="compactMediaInfo" class="mt-2">
+            <div v-if="isPriceLoading" class="h-5 flex items-center">
+              <USkeleton class="h-4 w-20 rounded" />
+            </div>
+            <div v-else-if="price" class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+              {{ price }}
+            </div>
+            <div v-else>
+              <span class="text-xs font-medium text-gray-600 dark:text-gray-300">No price set</span>
+            </div>
+          </div>
+
           <!-- Price Section -->
-          <div class="flex items-center justify-between mt-3">
+          <div v-else class="flex items-center justify-between mt-3">
             <div class="flex flex-col gap-1">
               <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">
                 Price
@@ -283,7 +303,7 @@ watchEffect(() => {
           </div>
 
           <!-- Owner Section -->
-          <div class="mt-3 pt-3 border-t border-gray-100 dark:border-neutral-700">
+          <div v-if="!compactMediaInfo" class="mt-3 pt-3 border-t border-gray-100 dark:border-neutral-700">
             <div class="flex items-center gap-2">
               <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">Owner</span>
               <UserInfo
