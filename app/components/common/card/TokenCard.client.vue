@@ -12,6 +12,7 @@ const props = defineProps<{
   price?: string | null
   currentOwner?: string | null
   hideHoverAction?: boolean
+  hideMediaInfo?: boolean
   showRarity?: boolean
   rarity?: NftRarity | null
 }>()
@@ -72,18 +73,14 @@ const {
 const actionCartStore = useActionCartStore()
 const route = useRoute()
 const { isCurrentAccount } = useAuth()
-const { artViewFilter } = storeToRefs(usePreferencesStore())
 
 const imageStatus = ref<'card' | 'normal' | 'fallback'>('card')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
 const isAirdropRoute = computed(() => route.name?.toString().includes('airdrop-select'))
-const isCollectionRoute = computed(() => route.name?.toString().includes('chain-collection-collection_id'))
 const canAddToActionCart = computed(() => (isProfileRoute.value || isAirdropRoute.value) && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
 
-const isArtViewEnabled = computed(() => route.query.art_view?.toString() === 'true' || artViewFilter.value)
-const hideMediaInfo = computed(() => isArtViewEnabled.value && isCollectionRoute.value)
 const rarity = computed(() => props.rarity ?? null)
 
 const hasRarity = computed(() => {

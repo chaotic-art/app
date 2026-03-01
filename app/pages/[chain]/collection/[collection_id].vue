@@ -101,6 +101,7 @@ const selectedSortKeys = computed({
 const filteredNftIds = ref<string[]>([])
 const selectedTraits = ref<SelectedTrait[]>([])
 const isCollectionFiltersOpen = ref(false)
+const { viewMode: nftViewMode, gridClass: nftGridClass } = useNftViewMode('collection')
 
 const gridKey = computed(() => {
   const serializedQuery = serializeQueryForKey(route.query, NFT_GRID_NON_FETCH_QUERY_KEYS)
@@ -315,12 +316,12 @@ defineOgImageComponent('Frame', {
                 </div>
 
                 <div class="w-auto flex items-center gap-2 ml-auto">
-                  <ArtViewFilter />
                   <SortOptions
                     v-model="selectedSortKeys"
                     :options="sortOptions"
                     class="w-40"
                   />
+                  <NftViewModeSelector scope="collection" />
                 </div>
               </StickyToolbarWrapper>
 
@@ -328,7 +329,8 @@ defineOgImageComponent('Frame', {
               <LazyNftsGrid
                 :key="gridKey"
                 :variables="queryVariables"
-                grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
+                :grid-class="nftGridClass"
+                :view-mode="nftViewMode"
                 no-items-found-message="This collection doesn't have any items yet."
                 :prefix="chain"
                 :rarity-total-items="collectionRarityTotalItems"

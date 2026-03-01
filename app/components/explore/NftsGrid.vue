@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { NftViewMode } from '~/stores/preferences'
 import type { NftRarity } from '~/types/rarity'
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   gridClass?: string
   prefix?: AssetHubChain
   hideHoverAction?: boolean
+  viewMode?: NftViewMode
   showRarity?: boolean
   rarityTotalItems?: number | null
 }
@@ -16,6 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
   variables: () => ({}),
   gridClass: 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6',
   noItemsFoundMessage: 'Try adjusting your search or filters to see more results.',
+  viewMode: 'grid',
   showRarity: false,
   rarityTotalItems: null,
 })
@@ -55,6 +58,8 @@ function getRarity(nft: { rarity?: NftRarity | null }): NftRarity | null {
     rarityTotalItems: props.rarityTotalItems,
   }
 }
+
+const hideMediaInfo = computed(() => props.viewMode === 'art')
 </script>
 
 <template>
@@ -82,6 +87,7 @@ function getRarity(nft: { rarity?: NftRarity | null }): NftRarity | null {
           :price="nft.price"
           :current-owner="nft.currentOwner"
           :hide-hover-action="hideHoverAction"
+          :hide-media-info="hideMediaInfo"
           :show-rarity="showRarity"
           :rarity="getRarity(nft)"
         />

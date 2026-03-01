@@ -202,5 +202,7 @@ watch(() => queryState.value, (newValue) => {
         </template>
       </UButton>
     </template>
+
+    <slot name="trailing" />
   </div>
 </template>
