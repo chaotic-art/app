@@ -53,6 +53,11 @@ const queryState = computed({
   },
 })
 
+const { input: searchInput, onInput: handleSearchUpdate } = useDebouncedSyncedInput(
+  computed(() => queryState.value.search),
+  search => queryState.value = { ...queryState.value, search },
+)
+
 const queryVariables = computed(() => {
   const keywordFilter = buildKeywordClause(queryState.value.search)
 
@@ -79,11 +84,11 @@ const gridKey = computed(() => `${queryVariables.value.orderBy.join(',')}::${que
           />
 
           <UInput
-            :model-value="queryState.search"
+            :model-value="searchInput"
             placeholder="Search collections..."
             :class="isFixed && isMobileViewport ? STICKY_MOBILE_TOOLBAR_SEARCH_CLASS : 'w-48'"
             icon="i-heroicons-magnifying-glass"
-            @update:model-value="queryState = { ...queryState, search: $event }"
+            @update:model-value="handleSearchUpdate($event)"
           />
 
           <USelectMenu
