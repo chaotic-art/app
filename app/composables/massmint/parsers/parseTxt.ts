@@ -70,8 +70,14 @@ function updateEntry(entry: Record<string, unknown>, line: string) {
     entry.price = price
     entry.currency = currency
   }
-  else if (fieldName === 'attributes') {
-    entry.attributes = JSON.parse(fieldValue)
+  else if (fieldName === 'attributes' && fieldValue) {
+    try {
+      entry.attributes = JSON.parse(fieldValue)
+    }
+    catch {
+      console.error('Invalid attributes JSON in TXT metadata block')
+      entry.attributes = {}
+    }
   }
   else {
     entry[fieldName] = fieldValue
