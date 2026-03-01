@@ -42,7 +42,11 @@ onBeforeMount(async () => {
       </div>
     </div>
 
-    <img :src="sanitizeIpfsUrl(formattedDrop?.image)" :alt="formattedDrop?.name" class="aspect-square w-full object-cover">
+    <img
+      :src="sanitizeIpfsUrl(formattedDrop?.image) || '/placeholder.jpg'"
+      :alt="formattedDrop?.name || drop.alias"
+      class="aspect-square w-full object-cover"
+    >
 
     <div class="p-3 md:p-4">
       <p class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
