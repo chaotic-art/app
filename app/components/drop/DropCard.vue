@@ -16,6 +16,7 @@ const { decimals, chainSymbol, currentChain } = useChain()
 const shouldShowDrop = computed(() =>
   props.showMinted || (formattedDrop.value && !formattedDrop.value.isMintedOut),
 )
+const isDropLoading = computed(() => !formattedDrop.value)
 const isUnlimited = computed(() => formattedDrop.value?.max && formattedDrop.value.max >= Number.MAX_SAFE_INTEGER)
 const usdPrice = computed(() => tokenToUsd(Number(formattedDrop.value?.price), decimals.value, chainSymbol.value))
 
@@ -50,7 +51,10 @@ onBeforeMount(async () => {
     />
 
     <div class="p-3 md:p-4">
-      <p class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
+      <div v-if="isDropLoading" class="mb-1 md:mb-2">
+        <USkeleton class="h-6 w-2/4 rounded" />
+      </div>
+      <p v-else class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
         {{ formattedDrop?.name }}
       </p>
 
@@ -60,7 +64,10 @@ onBeforeMount(async () => {
           <div class="flex items-center gap-1 text-xs text-gray-500">
             <span class="font-medium">Minted</span>
           </div>
-          <div class="flex items-center gap-1 font-mono">
+          <div v-if="isDropLoading" class="h-5 flex items-center">
+            <USkeleton class="h-4 w-20 rounded" />
+          </div>
+          <div v-else class="flex items-center gap-1 font-mono">
             <span class="text-sm font-semibold text-[var(--text-color)]">{{ formattedDrop?.minted }}</span>
             <span class="text-xs text-gray-400">/</span>
             <UIcon v-if="isUnlimited" name="mdi:infinity" class="text-sm text-gray-600" />
@@ -74,7 +81,10 @@ onBeforeMount(async () => {
             Price
           </div>
           <div class="flex items-center gap-1">
-            <UBadge v-if="isTBA(formattedDrop?.price)" label="TBA" size="sm" color="neutral" variant="soft" />
+            <div v-if="isDropLoading" class="h-5 flex items-center">
+              <USkeleton class="h-5 w-16 rounded" />
+            </div>
+            <UBadge v-else-if="isTBA(formattedDrop?.price)" label="TBA" size="sm" color="neutral" variant="soft" />
             <div v-else-if="Number(formattedDrop?.price)" class="flex items-baseline gap-1">
               <span class="text-sm font-semibold text-[var(--text-color)]">{{ usdPrice }}</span>
               <span class="text-xs text-gray-500">USD</span>
