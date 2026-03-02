@@ -109,6 +109,11 @@ function updateQueryState(updates: Partial<QueryState>) {
   queryState.value = nextState
 }
 
+const { input: searchInput, onInput: handleSearchUpdate } = useDebouncedSyncedInput(
+  computed(() => queryState.value.search),
+  search => updateQueryState({ search }),
+)
+
 function computeQueryVariables(state: QueryState) {
   const selectedSortKeys = state.sortKeys
   const orderBy = buildOrderBy(selectedSortKeys)
@@ -160,11 +165,11 @@ watch(() => queryState.value, (newValue) => {
     />
 
     <UInput
-      :model-value="queryState.search"
+      :model-value="searchInput"
       placeholder="Search NFTs..."
       :class="props.stickySearchOnly ? STICKY_MOBILE_TOOLBAR_SEARCH_CLASS : 'w-48'"
       icon="i-heroicons-magnifying-glass"
-      @update:model-value="updateQueryState({ search: $event })"
+      @update:model-value="handleSearchUpdate($event)"
     />
 
     <template v-if="!props.stickySearchOnly">
