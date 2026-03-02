@@ -18,6 +18,7 @@ const hasDropData = computed(() => formattedDrop.value !== undefined)
 const shouldShowDrop = computed(() =>
   isDropLoading.value
   || props.showMinted
+  || (!isDropLoading.value && !hasDropData.value)
   || (hasDropData.value && !formattedDrop.value?.isMintedOut),
 )
 const isUnlimited = computed(() => formattedDrop.value?.max && formattedDrop.value.max >= Number.MAX_SAFE_INTEGER)
