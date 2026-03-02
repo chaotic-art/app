@@ -6,7 +6,7 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'zipLoaded', data: { validFiles: any[], areAllFilesValid: boolean }): void
+  (e: 'zipLoaded', data: { validFiles: any[] }): void
 }
 
 withDefaults(defineProps<Props>(), {
@@ -43,7 +43,6 @@ async function onFileSelected(file?: File) {
       const zipFilePath = URL.createObjectURL(blob)
 
       const {
-        allValid,
         loading: loadingZip,
         validFiles,
         warnings,
@@ -64,7 +63,6 @@ async function onFileSelected(file?: File) {
           showCheckmark.value = true
           emit('zipLoaded', {
             validFiles: validFiles.value,
-            areAllFilesValid: allValid.value,
           })
 
           URL.revokeObjectURL(zipFilePath)
@@ -80,7 +78,6 @@ async function onFileSelected(file?: File) {
     console.error('Invalid file type.')
     emit('zipLoaded', {
       validFiles: [],
-      areAllFilesValid: false,
     })
   }
 }
