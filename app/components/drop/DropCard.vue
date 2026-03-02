@@ -13,7 +13,7 @@ const props = defineProps<{
 const formattedDrop = ref<DropItem>()
 const { decimals, chainSymbol, currentChain } = useChain()
 
-const isDropLoading = computed(() => !formattedDrop.value)
+const isDropLoading = ref(true)
 const shouldShowDrop = computed(() =>
   isDropLoading.value || props.showMinted || !formattedDrop.value?.isMintedOut,
 )
@@ -21,10 +21,18 @@ const isUnlimited = computed(() => formattedDrop.value?.max && formattedDrop.val
 const usdPrice = computed(() => tokenToUsd(Number(formattedDrop.value?.price), decimals.value, chainSymbol.value))
 
 onBeforeMount(async () => {
-  formattedDrop.value = await getDropAttributes(props.drop.alias)
+  try {
+    formattedDrop.value = await getDropAttributes(props.drop.alias)
 
-  if (formattedDrop.value?.isMintedOut) {
-    useMintedDropsStore().addMintedDrop(formattedDrop.value)
+    if (formattedDrop.value?.isMintedOut) {
+      useMintedDropsStore().addMintedDrop(formattedDrop.value)
+    }
+  }
+  catch {
+    formattedDrop.value = undefined
+  }
+  finally {
+    isDropLoading.value = false
   }
 })
 </script>
