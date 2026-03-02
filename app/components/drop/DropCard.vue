@@ -14,8 +14,11 @@ const formattedDrop = ref<DropItem>()
 const { decimals, chainSymbol, currentChain } = useChain()
 
 const isDropLoading = ref(true)
+const hasDropData = computed(() => formattedDrop.value !== undefined)
 const shouldShowDrop = computed(() =>
-  isDropLoading.value || props.showMinted || !formattedDrop.value?.isMintedOut,
+  isDropLoading.value
+  || props.showMinted
+  || (hasDropData.value && !formattedDrop.value?.isMintedOut),
 )
 const isUnlimited = computed(() => formattedDrop.value?.max && formattedDrop.value.max >= Number.MAX_SAFE_INTEGER)
 const usdPrice = computed(() => tokenToUsd(Number(formattedDrop.value?.price), decimals.value, chainSymbol.value))
@@ -62,8 +65,11 @@ onBeforeMount(async () => {
       <div v-if="isDropLoading" class="mb-1 md:mb-2">
         <USkeleton class="h-6 w-2/4 rounded" />
       </div>
-      <p v-else class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
+      <p v-else-if="hasDropData" class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
         {{ formattedDrop?.name }}
+      </p>
+      <p v-else class="font-bold text-base md:text-lg mb-1 md:mb-2 line-clamp-2">
+        {{ drop.alias }}
       </p>
 
       <div class="flex items-center justify-between mt-3">
@@ -75,11 +81,16 @@ onBeforeMount(async () => {
           <div v-if="isDropLoading" class="h-5 flex items-center">
             <USkeleton class="h-4 w-20 rounded" />
           </div>
-          <div v-else class="flex items-center gap-1 font-mono">
+          <div v-else-if="hasDropData" class="flex items-center gap-1 font-mono">
             <span class="text-sm font-semibold text-[var(--text-color)]">{{ formattedDrop?.minted }}</span>
             <span class="text-xs text-gray-400">/</span>
             <UIcon v-if="isUnlimited" name="mdi:infinity" class="text-sm text-gray-600" />
             <span v-else class="text-sm text-gray-600">{{ formattedDrop?.max }}</span>
+          </div>
+          <div v-else class="flex items-center gap-1 font-mono">
+            <span class="text-sm text-gray-600">N/A</span>
+            <span class="text-xs text-gray-400">/</span>
+            <span class="text-sm text-gray-600">N/A</span>
           </div>
         </div>
 
@@ -92,12 +103,13 @@ onBeforeMount(async () => {
             <div v-if="isDropLoading" class="h-5 flex items-center">
               <USkeleton class="h-5 w-16 rounded" />
             </div>
-            <UBadge v-else-if="isTBA(formattedDrop?.price)" label="TBA" size="sm" color="neutral" variant="soft" />
-            <div v-else-if="Number(formattedDrop?.price)" class="flex items-baseline gap-1">
+            <UBadge v-else-if="hasDropData && isTBA(formattedDrop?.price)" label="TBA" size="sm" color="neutral" variant="soft" />
+            <div v-else-if="hasDropData && Number(formattedDrop?.price)" class="flex items-baseline gap-1">
               <span class="text-sm font-semibold text-[var(--text-color)]">{{ usdPrice }}</span>
               <span class="text-xs text-gray-500">USD</span>
             </div>
-            <UBadge v-else label="Free" size="sm" color="success" variant="soft" />
+            <UBadge v-else-if="hasDropData" label="Free" size="sm" color="success" variant="soft" />
+            <UBadge v-else label="N/A" size="sm" color="neutral" variant="soft" />
           </div>
         </div>
       </div>
