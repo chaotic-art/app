@@ -13,10 +13,10 @@ const props = defineProps<{
 const formattedDrop = ref<DropItem>()
 const { decimals, chainSymbol, currentChain } = useChain()
 
-const shouldShowDrop = computed(() =>
-  props.showMinted || (formattedDrop.value && !formattedDrop.value.isMintedOut),
-)
 const isDropLoading = computed(() => !formattedDrop.value)
+const shouldShowDrop = computed(() =>
+  isDropLoading.value || props.showMinted || !formattedDrop.value?.isMintedOut,
+)
 const isUnlimited = computed(() => formattedDrop.value?.max && formattedDrop.value.max >= Number.MAX_SAFE_INTEGER)
 const usdPrice = computed(() => tokenToUsd(Number(formattedDrop.value?.price), decimals.value, chainSymbol.value))
 
