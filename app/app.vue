@@ -2,11 +2,19 @@
 const fiatStore = useFiatStore()
 const runtimeConfig = useRuntimeConfig()
 const route = useRoute()
+const requestURL = useRequestURL()
 
 const canonicalHref = computed(() => {
-  const siteUrl = runtimeConfig.public.siteUrl.trim().replace(/\/+$/, '')
+  const configuredSiteUrl = String(runtimeConfig.public.siteUrl ?? '').trim().replace(/\/+$/, '')
+  const fallbackOrigin = requestURL.origin.trim().replace(/\/+$/, '')
+  const base = configuredSiteUrl || fallbackOrigin
 
-  return new URL(route.path || '/', `${siteUrl}/`).toString()
+  try {
+    return base ? new URL(route.path || '/', `${base}/`).toString() : (route.path || '/')
+  }
+  catch {
+    return route.path || '/'
+  }
 })
 
 useHead(() => ({
