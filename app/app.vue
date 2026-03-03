@@ -6,7 +6,7 @@ const route = useRoute()
 const canonicalHref = computed(() => {
   const siteUrl = runtimeConfig.public.siteUrl.trim().replace(/\/+$/, '')
 
-  return new URL(route.path || '/', `${siteUrl.value}/`).toString()
+  return new URL(route.path || '/', `${siteUrl}/`).toString()
 })
 
 useHead(() => ({
