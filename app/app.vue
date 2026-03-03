@@ -3,12 +3,9 @@ const fiatStore = useFiatStore()
 const runtimeConfig = useRuntimeConfig()
 const route = useRoute()
 
-const siteUrl = computed(() => {
-  const rawUrl = runtimeConfig.public.siteUrl
-  return rawUrl.replace(/\/+$/, '')
-})
-
 const canonicalHref = computed(() => {
+  const siteUrl = runtimeConfig.public.siteUrl.trim().replace(/\/+$/, '')
+
   return new URL(route.path || '/', `${siteUrl.value}/`).toString()
 })
 
