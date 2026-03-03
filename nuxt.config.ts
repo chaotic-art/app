@@ -1,4 +1,4 @@
-const publicSiteUrl = import.meta.env.NUXT_PUBLIC_SITE_URL || 'https://chaotic.art'
+import { publicSiteUrl } from './env'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
