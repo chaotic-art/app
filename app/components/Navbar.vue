@@ -43,6 +43,12 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
       label: 'Create',
       onSelect: () => isCreateModalOpen.value = true,
     },
+    ...(accountId.value
+      ? [{
+          label: 'Studio',
+          to: `/${routePrefix.value}/studio`,
+        }]
+      : []),
   ],
 ].map(item => item.map(i => ({
   ...i,
