@@ -1,4 +1,4 @@
-import { publicSiteUrl } from './env'
+import { env } from './env'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -17,7 +17,7 @@ export default defineNuxtConfig({
 
   site: {
     name: 'Chaotic Labs',
-    url: publicSiteUrl,
+    url: env.client.siteUrl,
     indexable: true,
   },
 
@@ -70,11 +70,8 @@ export default defineNuxtConfig({
   ],
 
   runtimeConfig: {
-    falAiApiKey: import.meta.env.FAL_AI_API_KEY || '',
-    public: {
-      reownProjectId: import.meta.env.REOWN_CONNECT_PROJECT_ID || 'b56e18d47c72ab683b10814fe9495694',
-      siteUrl: publicSiteUrl,
-    },
+    ...env.server,
+    public: env.client,
   },
 
   pinia: {
