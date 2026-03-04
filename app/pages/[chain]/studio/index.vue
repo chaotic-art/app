@@ -18,7 +18,7 @@ const route = useRoute()
 const router = useRouter()
 const { accountId } = useAuth()
 
-const { chain } = route.params as { chain: AssetHubChain }
+const chain = computed(() => route.params.chain as AssetHubChain)
 
 const queryVariables = computed(() => {
   if (!accountId.value)
@@ -29,7 +29,7 @@ const queryVariables = computed(() => {
   }
 })
 
-const gridKey = computed(() => (accountId.value ? `studio-${chain}-${accountId.value}` : `studio-${chain}-anon`))
+const gridKey = computed(() => accountId.value ? `studio-${chain.value}-${accountId.value}` : `studio-${chain.value}-anon`)
 
 function goToCreateCollection() {
   router.push('/create/collection')
