@@ -27,6 +27,17 @@ const itemCount = computed(() => collection.value?.claimed ?? '0')
 const studioIndexPath = computed(() => `/${currentChain.value}/studio`)
 const collectionPagePath = computed(() => `/${currentChain.value}/collection/${collectionId.value}`)
 
+const overlay = useOverlay()
+const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
+
+function handleDestroyCollection() {
+  destroyCollectionModal.open({
+    collectionId: collectionId.value,
+    collectionName: collectionName.value,
+    chain: currentChain.value,
+  })
+}
+
 // TODO: Add relevant nav items pages
 const navItems: StudioNavItem[] = [
   // { id: 'preview' as const, label: 'Preview', icon: 'i-heroicons:eye' },
@@ -59,6 +70,7 @@ function setTab(tab: (typeof validTabs)[number]) {
         :nav-items="navItems"
         :collection-page-path="collectionPagePath"
         @select-tab="(tab) => setTab(tab as (typeof validTabs)[number])"
+        @delete-collection="handleDestroyCollection"
       />
 
       <main class="flex-1 min-w-0 overflow-auto p-6 md:p-8">

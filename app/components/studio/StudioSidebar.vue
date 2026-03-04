@@ -30,9 +30,9 @@ const { prefix } = usePrefix()
     aria-label="Collection sidebar"
   >
     <!-- Collection identity -->
-    <div class="flex flex-col items-start gap-3 mb-6">
+    <div class="flex items-center gap-3 mb-6">
       <div
-        class="size-20 rounded-xl overflow-hidden bg-muted border border-border shrink-0 flex items-center justify-center"
+        class="w-12 h-12 rounded-xl overflow-hidden bg-muted border border-border shrink-0 flex items-center justify-center"
       >
         <img
           v-if="collectionImage"
@@ -47,15 +47,14 @@ const { prefix } = usePrefix()
           class="w-10 h-10 text-muted"
         />
       </div>
-      <div class="min-w-0 w-full">
-        <div class="font-semibold text-foreground truncate">
+      <div class="min-w-0 flex-1">
+        <div class="font-bold text-foreground truncate">
           {{ collectionName }}
         </div>
-        <div class="flex items-center gap-2  text-sm text-muted mt-0.5">
+        <div class="flex items-center gap-2 text-sm text-muted mt-0.5">
           {{ itemCount }} items
-
           <span
-            class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted"
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted"
           >
             {{ prefix }}
           </span>
