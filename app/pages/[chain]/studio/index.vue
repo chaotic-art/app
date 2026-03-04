@@ -74,13 +74,12 @@ function goToCreateCollection() {
       <NavbarWallet />
     </div>
 
-    <!-- Connected: grid of my collections (view-only cards) -->
     <div v-else class="space-y-8">
       <CollectionsGrid
         :key="gridKey"
         :variables="queryVariables"
         :prefix="chain"
-        card-action-variant="view-only"
+        card-action-variant="studio-mode"
       />
     </div>
   </UContainer>

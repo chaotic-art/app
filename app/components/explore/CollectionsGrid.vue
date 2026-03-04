@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
 
-type CardActionVariant = 'link' | 'view-only'
+type CardActionVariant = 'link' | 'studio-mode'
 
 interface Props {
   variables?: Record<string, any>
