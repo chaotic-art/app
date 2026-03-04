@@ -52,7 +52,7 @@ const { prefix } = usePrefix()
           {{ collectionName }}
         </div>
         <div class="flex items-center gap-2  text-sm text-muted mt-0.5">
-          {{ itemCount }} items owned
+          {{ itemCount }} items
 
           <span
             class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-muted text-muted"
