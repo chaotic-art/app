@@ -3,7 +3,7 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 import { fetchOdaCollection } from '~/services/oda'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
-type ActionVariant = 'link' | 'view-only'
+type ActionVariant = 'link' | 'studio-mode'
 
 interface Props {
   item: ReturnType<typeof useInfiniteCollections>['collections']['value'][number]
@@ -214,15 +214,21 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <div class="px-4 pb-4">
+        <div class="px-4 pb-4 flex gap-3">
           <UButton
             :to="`/${prefix}/collection/${item.id}`"
             variant="outline"
             color="neutral"
-            block
-            class="border border-border"
+            class="flex-1 border border-border"
           >
             View
+          </UButton>
+          <UButton
+            :to="`/${prefix}/studio/${item.id}`"
+            color="neutral"
+            class="flex-1"
+          >
+            Manage
           </UButton>
         </div>
       </div>
