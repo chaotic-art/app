@@ -46,9 +46,11 @@ export default defineEventHandler(async (event): Promise<FalSubscribeResult> => 
     return result
   }
   catch (error) {
+    console.error('FAL mixed-image route error:', error)
+
     throw createError({
       statusCode: 502,
-      statusMessage: `Failed to generate mixed image: ${(error as Error)?.message || 'Unknown error'}`,
+      statusMessage: 'Failed to generate mixed image',
     })
   }
 })
