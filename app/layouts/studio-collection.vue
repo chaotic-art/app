@@ -26,6 +26,18 @@ const collectionImage = computed(() => collection.value?.metadata?.image)
 const itemCount = computed(() => collection.value?.claimed ?? '0')
 const studioIndexPath = computed(() => `/${currentChain.value}/studio`)
 const collectionPagePath = computed(() => `/${currentChain.value}/collection/${collectionId.value}`)
+const massMintPath = computed(() => `/${currentChain.value}/studio/${collectionId.value}/massmint`)
+
+const overlay = useOverlay()
+const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
+
+function handleDestroyCollection() {
+  destroyCollectionModal.open({
+    collectionId: collectionId.value,
+    collectionName: collectionName.value,
+    chain: currentChain.value,
+  })
+}
 
 const overlay = useOverlay()
 const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
@@ -54,7 +66,7 @@ function setTab(tab: (typeof validTabs)[number]) {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-background">
+  <div class="h-screen flex flex-col bg-background overflow-hidden">
     <StudioHeader
       :studio-index-path="studioIndexPath"
       :collection-name="collectionName"
@@ -69,6 +81,7 @@ function setTab(tab: (typeof validTabs)[number]) {
         :current-tab="currentTab"
         :nav-items="navItems"
         :collection-page-path="collectionPagePath"
+        :mass-mint-path="massMintPath"
         @select-tab="(tab) => setTab(tab as (typeof validTabs)[number])"
         @delete-collection="handleDestroyCollection"
       />
