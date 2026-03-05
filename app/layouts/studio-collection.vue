@@ -11,14 +11,20 @@ const router = useRouter()
 const { currentChain } = useChain()
 
 const validTabs = ['preview', 'details', 'items'] as const
+
+const tabLabels: Record<string, string> = {
+  massmint: 'Mass Mint',
+  preview: 'Preview',
+  details: 'Details',
+  items: 'Items',
+}
+
 const collectionId = computed(() => route.params.collection_id as string)
 const { collection } = useOdaCollection(collectionId)
 
 const currentTab = computed(() => {
-  const tab = route.params.tab as string
-  return validTabs.includes(tab as (typeof validTabs)[number])
-    ? (tab as (typeof validTabs)[number])
-    : ''
+  const pathSegment = route.path.split('/').filter(Boolean).pop()
+  return (pathSegment && tabLabels[pathSegment]) ?? ''
 })
 
 const collectionName = computed(() => collection.value?.metadata?.name ?? 'Collection')
@@ -27,17 +33,6 @@ const itemCount = computed(() => collection.value?.claimed ?? '0')
 const studioIndexPath = computed(() => `/${currentChain.value}/studio`)
 const collectionPagePath = computed(() => `/${currentChain.value}/collection/${collectionId.value}`)
 const massMintPath = computed(() => `/${currentChain.value}/studio/${collectionId.value}/massmint`)
-
-const overlay = useOverlay()
-const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
-
-function handleDestroyCollection() {
-  destroyCollectionModal.open({
-    collectionId: collectionId.value,
-    collectionName: collectionName.value,
-    chain: currentChain.value,
-  })
-}
 
 const overlay = useOverlay()
 const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
