@@ -1,4 +1,4 @@
-import { publicSiteUrl } from './env'
+import { publicEnv } from './env.public'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -17,7 +17,7 @@ export default defineNuxtConfig({
 
   site: {
     name: 'Chaotic Labs',
-    url: publicSiteUrl,
+    url: publicEnv.siteUrl,
     indexable: true,
   },
 
@@ -70,11 +70,9 @@ export default defineNuxtConfig({
   ],
 
   runtimeConfig: {
-    public: {
-      reownProjectId: import.meta.env.REOWN_CONNECT_PROJECT_ID || 'b56e18d47c72ab683b10814fe9495694',
-      falAiApiKey: import.meta.env.FAL_AI_API_KEY,
-      siteUrl: publicSiteUrl,
-    },
+    // Keep private config empty in source and override via NUXT_* at runtime.
+    falAiApiKey: '',
+    public: publicEnv,
   },
 
   pinia: {

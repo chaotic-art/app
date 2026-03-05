@@ -1,9 +1,8 @@
-import { fal } from '@fal-ai/client'
-import { $fetch } from 'ofetch'
+import { $fetch as $ofetch } from 'ofetch'
 
 const MONICA_GENERATE_URL = 'https://monica.im'
 
-const api = $fetch.create({ baseURL: '', retry: 3 })
+const api = $ofetch.create({ baseURL: '', retry: 3 })
 
 interface GenerateRoastResponse {
   status: 'done' | 'streaming'
@@ -56,22 +55,12 @@ export async function waitForXRoastGenerationComplete(username: string) {
 }
 
 export async function generateMixedImageByFalAi(imageUrl: string) {
-  fal.config({
-    credentials: useRuntimeConfig().public.falAiApiKey,
+  const result = await $fetch('/api/fal/mixed-image', {
+    method: 'POST',
+    body: {
+      imageUrl,
+    },
   })
 
-  const result: {
-    data: {
-      images: { url: string }[]
-    }
-  } = await fal.subscribe('fal-ai/nano-banana/edit', {
-    input: {
-      prompt: 'Overlay a generative wireframe mesh across key surfaces of the subject--whether figurative or abstract--using grid lines that dynamically adopt colors from the image itself, prioritizing midtones or highlights for contrast. Introduce a secondary warped mesh element, resembling a topographically distorted layer, floating above or interwoven with the form to create a sense of architectural tension and controlled chaos. Use a deep black or navy background to enhance dimensionality. Preserve clarity in core contours or focal regions, allowing the mesh to define structure without overwhelming identity or form. The result should evoke a futuristic, surreal, and procedurally inspired aesthetic.',
-      image_urls: [`${window.location.origin}/card/card_generate_bg.png`, imageUrl],
-      num_images: 1,
-      output_format: 'jpeg',
-    },
-    logs: true,
-  })
   return result
 }
