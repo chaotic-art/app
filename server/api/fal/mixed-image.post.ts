@@ -1,4 +1,4 @@
-import { fal } from '@fal-ai/client'
+import { createFalClient } from '@fal-ai/client'
 import { object, pipe, string, url } from 'valibot'
 import { vValidateBody } from '~~/server/utils/endpoint'
 
@@ -27,12 +27,10 @@ export default defineEventHandler(async (event): Promise<FalSubscribeResult> => 
 
   const baseOrigin = runtimeConfig.public.siteUrl
 
-  fal.config({
-    credentials: runtimeConfig.falAiApiKey,
-  })
+  const falClient = createFalClient({ credentials: runtimeConfig.falAiApiKey })
 
   try {
-    const result = await fal.subscribe('fal-ai/nano-banana/edit', {
+    const result = await falClient.subscribe('fal-ai/nano-banana/edit', {
       input: {
         prompt: MIXED_IMAGE_PROMPT,
         image_urls: [`${baseOrigin}/card/card_generate_bg.png`, imageUrl],
