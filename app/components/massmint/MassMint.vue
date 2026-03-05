@@ -2,6 +2,7 @@
 import type { StepConfig } from '~/components/common/Stepper.vue'
 import type { NFT, NFTToMint } from '~/components/massmint/types'
 import type { TemplateFormat } from '~/components/massmint/utils'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import { LazyReviewMassMintModal } from '#components'
 import { useQuery } from '@tanstack/vue-query'
 import CommonStepper from '~/components/common/Stepper.vue'
@@ -13,6 +14,20 @@ import { convertNftsToMap, generateTemplateContent } from '~/components/massmint
 import { blockchains } from '~/composables/create/useCollectionForm'
 import { useMassMint } from '~/composables/massmint/useMassMint'
 import { useMassMintForm } from '~/composables/massmint/useMassMintForm'
+
+const props = withDefaults(
+  defineProps<{
+    collectionId?: string
+    blockchain?: AssetHubChain
+  }>(),
+  { collectionId: undefined, blockchain: undefined },
+)
+
+const studioOptions = computed(() =>
+  props.collectionId && props.blockchain
+    ? { collectionId: props.collectionId, blockchain: props.blockchain }
+    : undefined,
+)
 
 // State
 const NFTS = ref<{ [nftId: string]: NFT }>({})
@@ -26,7 +41,7 @@ const { getBalance } = useBalances()
 const reviewMassMintModal = overlay.create(LazyReviewMassMintModal)
 
 // Form and minting composables
-const { state, collections, collectionsLoading } = useMassMintForm()
+const { state, collections, collectionsLoading, isStudioContext } = useMassMintForm(studioOptions)
 const { massMint, progress, isLoading: isMinting } = useMassMint()
 const { itemDeposit, metadataDeposit, attributeDeposit, existentialDeposit } = useDeposit(computed(() => state.blockchain))
 const selectedCollection = computed(() => state.collection)
@@ -78,38 +93,48 @@ const totalAttribute = computed(() => (Object.values(NFTS.value) as NFT[]).reduc
 const attributeDepositTotal = computed(() => totalAttribute.value * attributeDeposit.value)
 
 const estimatedCostOpen = ref(true)
-const steps = [
-  { id: 1, title: 'Collection', description: 'Choose chain and collection' },
-  { id: 2, title: 'Upload', description: 'Upload media files' },
-  { id: 3, title: 'Metadata', description: 'Prepare and upload metadata file' },
-  { id: 4, title: 'Review', description: 'Check items and estimated cost' },
-  { id: 5, title: 'Mint', description: 'Submit your mass mint transaction' },
-] as const
+const steps = computed(() =>
+  isStudioContext.value
+    ? [
+        { id: 1, title: 'Upload', description: 'Upload media files' },
+        { id: 2, title: 'Metadata', description: 'Prepare and upload metadata file' },
+        { id: 3, title: 'Review', description: 'Check items and estimated cost' },
+        { id: 4, title: 'Mint', description: 'Submit your mass mint transaction' },
+      ] as const
+    : [
+        { id: 1, title: 'Collection', description: 'Choose chain and collection' },
+        { id: 2, title: 'Upload', description: 'Upload media files' },
+        { id: 3, title: 'Metadata', description: 'Prepare and upload metadata file' },
+        { id: 4, title: 'Review', description: 'Check items and estimated cost' },
+        { id: 5, title: 'Mint', description: 'Submit your mass mint transaction' },
+      ] as const,
+)
 
-const stepConfig: StepConfig[] = [
-  { label: 'Collection', icon: 'i-heroicons-folder' },
-  { label: 'Upload', icon: 'i-heroicons-arrow-up-tray' },
-  { label: 'Metadata', icon: 'i-heroicons-document-text' },
-  { label: 'Review', icon: 'i-heroicons-clipboard-document-list' },
-  { label: 'Mint', icon: 'i-heroicons-sparkles' },
-]
+const stepConfig = computed<StepConfig[]>(() =>
+  isStudioContext.value
+    ? [
+        { label: 'Upload', icon: 'i-heroicons-arrow-up-tray' },
+        { label: 'Metadata', icon: 'i-heroicons-document-text' },
+        { label: 'Review', icon: 'i-heroicons-clipboard-document-list' },
+        { label: 'Mint', icon: 'i-heroicons-sparkles' },
+      ]
+    : [
+        { label: 'Collection', icon: 'i-heroicons-folder' },
+        { label: 'Upload', icon: 'i-heroicons-arrow-up-tray' },
+        { label: 'Metadata', icon: 'i-heroicons-document-text' },
+        { label: 'Review', icon: 'i-heroicons-clipboard-document-list' },
+        { label: 'Mint', icon: 'i-heroicons-sparkles' },
+      ],
+)
 
 const currentStep = ref<number>(1)
+const stepCount = computed(() => steps.value.length)
 
 const stepperCompletedSteps = computed(() =>
   Array.from({ length: Math.max(0, currentStep.value - 1) }, (_, i) => i),
 )
 
-const stepperMaxStepReached = computed(() => {
-  let max = 0
-  for (let i = 0; i < steps.length; i++) {
-    if (canNavigateTo(i + 1))
-      max = i
-  }
-  return max
-})
-
-const canGoToUploadStep = computed(() => !!selectedCollection.value)
+const canGoToUploadStep = computed(() => isStudioContext.value || !!selectedCollection.value)
 const canGoToMetadataStep = computed(
   () => !!selectedCollection.value && mediaLoaded.value,
 )
@@ -120,7 +145,19 @@ const canGoToMintStep = computed(
   () => canGoToReviewStep.value && hasEnoughBalance.value,
 )
 
+const stepperMaxStepReached = computed(() => {
+  let max = 0
+  for (let i = 0; i < stepCount.value; i++) {
+    if (canNavigateTo(i + 1))
+      max = i
+  }
+  return max
+})
+
 function canNavigateTo(stepId: number) {
+  if (stepId > stepCount.value) {
+    return false
+  }
   if (stepId <= currentStep.value) {
     return true
   }
@@ -145,7 +182,7 @@ function canNavigateTo(stepId: number) {
 }
 
 function goToStep(stepId: number) {
-  if (stepId < 1 || stepId > steps.length) {
+  if (stepId < 1 || stepId > stepCount.value) {
     return
   }
 
@@ -368,9 +405,8 @@ function applySharedDescriptionToAll() {
       />
     </section>
 
-    <!-- Step 1: Collection -->
     <section
-      v-if="currentStep === 1"
+      v-if="!isStudioContext && currentStep === 1"
       class="border border-border rounded-lg shadow-sm"
     >
       <div class="space-y-4 p-6">
@@ -433,7 +469,7 @@ function applySharedDescriptionToAll() {
 
       <div class="flex items-center justify-between border-t border-border px-6 py-4">
         <span class="text-sm text-muted-foreground">
-          Step 1 of 5 · Select a chain and collection to continue.
+          Step 1 of {{ stepCount }} · Select a chain and collection to continue.
         </span>
         <UButton
           size="sm"
@@ -445,9 +481,8 @@ function applySharedDescriptionToAll() {
       </div>
     </section>
 
-    <!-- Step 2: Upload media -->
     <MassMintUploadStep
-      v-else-if="currentStep === 2"
+      v-else-if="(isStudioContext && currentStep === 1) || (!isStudioContext && currentStep === 2)"
       :selected-collection="state.collection || undefined"
       :nfts="NFTS"
       :media-loaded="mediaLoaded"
@@ -458,9 +493,8 @@ function applySharedDescriptionToAll() {
       @next="goNextStep"
     />
 
-    <!-- Step 3: Metadata -->
     <section
-      v-else-if="currentStep === 3"
+      v-else-if="(isStudioContext && currentStep === 2) || (!isStudioContext && currentStep === 3)"
       class="border border-border rounded-lg shadow-sm"
     >
       <div class="space-y-4 p-6">
@@ -559,9 +593,8 @@ function applySharedDescriptionToAll() {
       </div>
     </section>
 
-    <!-- Step 4: Review -->
     <section
-      v-else-if="currentStep === 4"
+      v-else-if="(isStudioContext && currentStep === 3) || (!isStudioContext && currentStep === 4)"
       class="border border-border rounded-lg shadow-sm"
     >
       <div class="space-y-6 p-6">
@@ -708,9 +741,8 @@ function applySharedDescriptionToAll() {
       </div>
     </section>
 
-    <!-- Step 5: Mint -->
     <section
-      v-else-if="currentStep === 5"
+      v-else-if="(isStudioContext && currentStep === 4) || (!isStudioContext && currentStep === 5)"
       class="border border-border rounded-lg shadow-sm"
     >
       <div class="space-y-6 p-6">
@@ -770,7 +802,7 @@ function applySharedDescriptionToAll() {
           Back
         </UButton>
         <span class="text-xs text-muted-foreground">
-          Step 5 of 5
+          Step {{ currentStep }} of {{ stepCount }}
         </span>
       </div>
     </section>

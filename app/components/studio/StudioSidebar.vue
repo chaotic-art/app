@@ -14,6 +14,7 @@ defineProps<{
   currentTab: string
   navItems: StudioNavItem[]
   collectionPagePath: string
+  massMintPath: string
 }>()
 
 const emit = defineEmits<{
@@ -26,7 +27,7 @@ const { prefix } = usePrefix()
 
 <template>
   <aside
-    class="shrink-0 w-64 border-r border-border bg-background flex flex-col py-6 px-4"
+    class="shrink-0 w-64 h-full min-h-0 overflow-hidden border-r border-border bg-background flex flex-col py-6 px-4"
     aria-label="Collection sidebar"
   >
     <!-- Collection identity -->
@@ -79,6 +80,7 @@ const { prefix } = usePrefix()
 
     <!-- Mass Mint -->
     <UButton
+      :to="massMintPath"
       icon="i-heroicons-sparkles"
       color="primary"
       size="md"
