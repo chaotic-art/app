@@ -25,8 +25,7 @@ export default defineEventHandler(async (event): Promise<FalSubscribeResult> => 
     })
   }
 
-  const requestOrigin = getRequestURL(event).origin
-  const baseOrigin = requestOrigin || runtimeConfig.public.siteUrl
+  const baseOrigin = runtimeConfig.public.siteUrl
 
   fal.config({
     credentials: runtimeConfig.falAiApiKey,
