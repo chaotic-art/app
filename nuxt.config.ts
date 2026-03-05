@@ -1,4 +1,4 @@
-import { env } from './env'
+import { publicEnv } from './env.public'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -17,7 +17,7 @@ export default defineNuxtConfig({
 
   site: {
     name: 'Chaotic Labs',
-    url: env.client.siteUrl,
+    url: publicEnv.siteUrl,
     indexable: true,
   },
 
@@ -70,8 +70,9 @@ export default defineNuxtConfig({
   ],
 
   runtimeConfig: {
-    ...env.server,
-    public: env.client,
+    // Keep private config empty in source and override via NUXT_* at runtime.
+    falAiApiKey: '',
+    public: publicEnv,
   },
 
   pinia: {
