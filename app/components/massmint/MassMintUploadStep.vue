@@ -273,10 +273,7 @@ function onNext() {
       </div>
     </div>
 
-    <div class="flex items-center justify-between border-t border-border px-6 py-4">
-      <span class="text-sm text-muted-foreground">
-        Step 2 of 5 · Upload media files to continue.
-      </span>
+    <div class="flex items-center justify-end border-t border-border px-6 py-4">
       <UButton
         size="sm"
         :disabled="!canGoToMetadataStep"
