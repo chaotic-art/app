@@ -3,7 +3,7 @@ import { literal, object, optional, pipe, safeParse, string, transform, union, u
 
 const DEFAULT_SITE_URL = 'https://chaotic.art'
 const DEFAULT_REOWN_PROJECT_ID = 'b56e18d47c72ab683b10814fe9495694'
-const DEFAULT_SITE_INDEXABLE = true
+const DEFAULT_SITE_INDEXABLE = false
 
 const publicEnvSchema = object({
   SITE_URL: optional(pipe(string(), url())),
