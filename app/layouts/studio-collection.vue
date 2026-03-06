@@ -22,10 +22,12 @@ const tabLabels: Record<string, string> = {
 const collectionId = computed(() => route.params.collection_id as string)
 const { collection } = useOdaCollection(collectionId)
 
-const currentTab = computed(() => {
+const currentTabId = computed(() => {
   const pathSegment = route.path.split('/').filter(Boolean).pop()
-  return (pathSegment && tabLabels[pathSegment]) ?? ''
+  return pathSegment && tabLabels[pathSegment] ? pathSegment : ''
 })
+
+const currentTabLabel = computed(() => tabLabels[currentTabId.value] ?? currentTabId.value)
 
 const collectionName = computed(() => collection.value?.metadata?.name ?? 'Collection')
 const collectionImage = computed(() => collection.value?.metadata?.image)
@@ -65,7 +67,7 @@ function setTab(tab: (typeof validTabs)[number]) {
     <StudioHeader
       :studio-index-path="studioIndexPath"
       :collection-name="collectionName"
-      :current-tab="currentTab"
+      :current-tab="currentTabLabel"
     />
 
     <div class="flex flex-1 min-h-0">
@@ -73,7 +75,7 @@ function setTab(tab: (typeof validTabs)[number]) {
         :collection-name="collectionName"
         :collection-image="collectionImage"
         :item-count="itemCount"
-        :current-tab="currentTab"
+        :current-tab="currentTabId"
         :nav-items="navItems"
         :collection-page-path="collectionPagePath"
         :mass-mint-path="massMintPath"
