@@ -18,7 +18,7 @@ export default defineNuxtConfig({
   site: {
     name: 'Chaotic Labs',
     url: publicEnv.siteUrl,
-    indexable: true,
+    indexable: publicEnv.siteIndexable,
   },
 
   seo: {
