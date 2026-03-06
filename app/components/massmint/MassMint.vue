@@ -155,26 +155,28 @@ const stepperMaxStepReached = computed(() => {
 })
 
 function canNavigateTo(stepId: number) {
-  if (stepId > stepCount.value) {
+  if (stepId < 1 || stepId > stepCount.value) {
     return false
   }
-  if (stepId <= currentStep.value) {
+  const logicalStepId = isStudioContext.value ? stepId + 1 : stepId
+  const currentLogical = isStudioContext.value ? currentStep.value + 1 : currentStep.value
+  if (logicalStepId <= currentLogical) {
     return true
   }
 
-  if (stepId === 2) {
+  if (logicalStepId === 2) {
     return canGoToUploadStep.value
   }
 
-  if (stepId === 3) {
+  if (logicalStepId === 3) {
     return canGoToMetadataStep.value
   }
 
-  if (stepId === 4) {
+  if (logicalStepId === 4) {
     return canGoToReviewStep.value
   }
 
-  if (stepId === 5) {
+  if (logicalStepId === 5) {
     return canGoToMintStep.value
   }
 

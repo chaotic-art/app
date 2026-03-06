@@ -7,7 +7,7 @@ export interface StudioNavItem {
   icon: string
 }
 
-defineProps<{
+const props = defineProps<{
   collectionName: string
   collectionImage?: string
   itemCount: string
@@ -21,6 +21,12 @@ const emit = defineEmits<{
   selectTab: [tab: string]
   deleteCollection: []
 }>()
+
+const imageLoadFailed = ref(false)
+
+watch(() => props.collectionImage, () => {
+  imageLoadFailed.value = false
+})
 
 const { prefix } = usePrefix()
 </script>
@@ -36,11 +42,11 @@ const { prefix } = usePrefix()
         class="w-12 h-12 rounded-xl overflow-hidden bg-muted border border-border shrink-0 flex items-center justify-center"
       >
         <img
-          v-if="collectionImage"
+          v-if="collectionImage && !imageLoadFailed"
           :src="sanitizeIpfsUrl(collectionImage)"
           :alt="`${collectionName} collection`"
           class="w-full h-full object-cover"
-          @error="(e) => { const el = (e.target as HTMLImageElement); if (el) el.style.display = 'none' }"
+          @error="imageLoadFailed = true"
         >
         <UIcon
           v-else
