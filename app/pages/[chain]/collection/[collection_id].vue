@@ -6,7 +6,6 @@ import { CHAINS } from '@kodadot1/static'
 import { TradeTypes } from '@/components/trade/types'
 import { fetchOdaCollection } from '~/services/oda'
 import { normalizeRarityTotalItems } from '~/types/rarity'
-import { getSubscanAccountUrl } from '~/utils/format/address'
 
 const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
 type CollectionTab = typeof availableTabs[number]
@@ -83,7 +82,6 @@ const { data } = await useLazyAsyncData(
 )
 
 const collectionName = computed(() => data.value?.collection?.metadata?.name)
-const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.collection?.metadata?.banner || data.value?.collection?.metadata?.image)))
 const collectionRarityTotalItems = computed(() => {
   return normalizeRarityTotalItems(data.value?.collection?.supply)
 })
@@ -196,99 +194,16 @@ defineOgImageComponent('Frame', {
 <template>
   <UContainer class="px-4 md:px-6 pb-6">
     <div>
-      <!-- Banner Section -->
-      <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">
-        <div
-          class="absolute inset-0 w-full h-full bg-muted"
-          :style="bannerUrl ? {
-            backgroundImage: `url('${bannerUrl}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          } : {}"
-        />
-
-        <div class="relative flex items-center px-8 py-8 z-10">
-          <div class="flex flex-col items-center">
-            <div class="w-36 h-36 rounded-xl overflow-hidden bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-4 border-white dark:border-gray-900 shadow-xl">
-              <img
-                v-if="data?.collection?.metadata?.image"
-                :src="sanitizeIpfsUrl(data.collection.metadata.image)"
-                :alt="data.collection.metadata.name || 'Collection'"
-                class="w-full h-full object-cover"
-              >
-              <div
-                v-else
-                class="w-full h-full flex items-center justify-center"
-              >
-                <UIcon name="i-heroicons-photo" class="w-12 h-12 text-gray-400" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="w-full">
-        <div class="flex justify-between flex-col md:flex-row gap-12">
-          <div class="flex flex-col flex-1">
-            <div class="my-4">
-              <div class="flex items-center justify-between mb-2">
-                <div class="text-2xl font-bold">
-                  {{ data?.collection?.metadata?.name || `Collection #${collection_id}` }}
-                </div>
-                <UButton
-                  v-if="isOwner"
-                  color="error"
-                  variant="outline"
-                  icon="i-heroicons-trash"
-                  @click="handleDestroyCollection"
-                >
-                  Delete Collection
-                </UButton>
-              </div>
-              <div v-if="data?.drops?.data[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
-                <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" class="min-w-0" />
-                <UButton
-                  :to="getSubscanAccountUrl((data?.drops?.data[0]?.creator || data?.collection?.owner) ?? '', chain)"
-                  target="_blank"
-                  variant="outline"
-                >
-                  Subscan
-                </UButton>
-                <UButton
-                  v-if="data?.drops?.data[0]?.alias"
-                  :to="`/${chain}/drops/${data.drops.data[0].alias}`"
-                  icon="i-heroicons-sparkles"
-                  variant="outline"
-                >
-                  View Drop: {{ data?.collection?.metadata?.name }}
-                </UButton>
-              </div>
-            </div>
-
-            <!-- Description -->
-            <MarkdownPreview
-              v-if="data?.collection?.metadata?.description"
-              :source="data.collection.metadata.description"
-            />
-          </div>
-
-          <!-- Quick Stats -->
-          <div class="pt-4 w-auto md:w-60 space-y-3">
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-500 dark:text-gray-400">Minted</span>
-              <span class="font-medium text-gray-900 dark:text-white">{{ data?.collection?.claimed || 0 }} / {{ unlimited(data?.collection?.supply) ? '∞' : data?.collection?.supply || 0 }}</span>
-            </div>
-
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-500 dark:text-gray-400">Floor Price</span>
-              <span class="font-medium text-gray-900 dark:text-white">
-                <Money v-if="data?.collection?.floor" inline :value="data?.collection?.floor" />
-                <span v-else class="text-gray-400 dark:text-gray-500">–</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CollectionHeader
+        :collection="data?.collection ?? null"
+        :collection-id="collection_id?.toString() ?? ''"
+        :chain="chain"
+        :creator="data?.drops?.data[0]?.creator"
+        :drop-alias="data?.drops?.data[0]?.alias"
+        :show-delete-button="true"
+        :is-owner="Boolean(isOwner)"
+        @delete="handleDestroyCollection"
+      />
 
       <USeparator class="my-12" />
 

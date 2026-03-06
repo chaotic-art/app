@@ -77,7 +77,7 @@ const { prefix } = usePrefix()
         :variant="currentTab === item.id ? 'soft' : 'ghost'"
         color="neutral"
         size="sm"
-        class="w-full justify-start font-medium"
+        class="w-full justify-start font-medium rounded-md"
         @click="emit('selectTab', item.id)"
       >
         {{ item.label }}
