@@ -13,6 +13,14 @@ definePageMeta({
     )
   },
 })
+
+const route = useRoute()
+const { currentChain } = useChain()
+
+await navigateTo({
+  path: `/${currentChain.value}/studio/${route.params.collection_id}/preview`,
+  replace: true,
+})
 </script>
 
 <template>

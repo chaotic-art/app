@@ -47,7 +47,7 @@ function handleDestroyCollection() {
 
 // TODO: Add relevant nav items pages
 const navItems: StudioNavItem[] = [
-  // { id: 'preview' as const, label: 'Preview', icon: 'i-heroicons:eye' },
+  { id: 'preview' as const, label: 'Preview', icon: 'i-heroicons:eye' },
   // { id: 'details' as const, label: 'Details', icon: 'i-heroicons-cog-6-tooth' },
   // { id: 'items' as const, label: 'Items', icon: 'i-heroicons-squares-2x2' },
 ]
