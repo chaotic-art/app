@@ -2,6 +2,7 @@
 import type { SupportedChain } from '~/plugins/sdk.client'
 import type { OnchainCollection } from '~/services/oda'
 import { getSubscanAccountUrl } from '~/utils/format/address'
+import { sanitizeIpfsUrl, toOriginalContentUrl } from '~/utils/ipfs'
 import { unlimited } from '~/utils/math'
 
 const props = withDefaults(
