@@ -23,26 +23,6 @@ export default defineNuxtConfig({
 
   sitemap: {
     exclude: ['/settings', '/test-signer'],
-  },
-
-  seo: {
-    meta: {
-      title: 'Chaotic Labs',
-      description: 'Your Polkadot NFT Marketplace',
-      themeColor: [
-        { content: '#18181b', media: '(prefers-color-scheme: dark)' },
-        { content: 'white', media: '(prefers-color-scheme: light)' },
-      ],
-      twitterCreator: '@chaoticlabs',
-      twitterSite: '@chaoticlabs',
-      author: 'Chaotic Labs',
-      colorScheme: 'dark light',
-      applicationName: 'Chaotic Labs',
-    },
-  },
-
-  sitemap: {
-    exclude: ['/settings', '/test-signer'],
     sitemaps: {
       pages: {
         includeAppSources: true,
@@ -64,6 +44,22 @@ export default defineNuxtConfig({
       drops: {
         sources: ['/api/__sitemap__/drops'],
       },
+    },
+  },
+
+  seo: {
+    meta: {
+      title: 'Chaotic Labs',
+      description: 'Your Polkadot NFT Marketplace',
+      themeColor: [
+        { content: '#18181b', media: '(prefers-color-scheme: dark)' },
+        { content: 'white', media: '(prefers-color-scheme: light)' },
+      ],
+      twitterCreator: '@chaoticlabs',
+      twitterSite: '@chaoticlabs',
+      author: 'Chaotic Labs',
+      colorScheme: 'dark light',
+      applicationName: 'Chaotic Labs',
     },
   },
 
