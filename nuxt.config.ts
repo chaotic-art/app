@@ -21,6 +21,10 @@ export default defineNuxtConfig({
     indexable: true,
   },
 
+  sitemap: {
+    exclude: ['/settings', '/test-signer'],
+  },
+
   seo: {
     meta: {
       title: 'Chaotic Labs',
