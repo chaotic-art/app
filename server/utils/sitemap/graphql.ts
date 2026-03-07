@@ -1,8 +1,10 @@
+import type { SupportedChain } from '~~/app/plugins/sdk.client'
+
 import { $fetch } from 'ofetch'
 
 import { dotHubDenyList, ksmHubDenyList, URLS } from '~~/app/utils/constants'
 
-export type SitemapChain = 'ahp' | 'ahk'
+export type SitemapChain = Extract<SupportedChain, 'ahp' | 'ahk'>
 
 const DENY_LISTS: Record<SitemapChain, string[]> = {
   ahk: ksmHubDenyList,
