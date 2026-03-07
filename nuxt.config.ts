@@ -26,14 +26,6 @@ export default defineNuxtConfig({
     sitemaps: {
       pages: {
         includeAppSources: true,
-        exclude: [
-          '/ahp/collection/**',
-          '/ahk/collection/**',
-          '/ahp/gallery/**',
-          '/ahk/gallery/**',
-          '/ahp/drops/**',
-          '/ahk/drops/**',
-        ],
       },
       collections: {
         sources: ['/api/__sitemap__/collections'],
