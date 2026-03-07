@@ -21,11 +21,6 @@ export default defineNuxtConfig({
     indexable: true,
   },
 
-  routeRules: {
-    '/settings': { robots: false },
-    '/test-signer': { robots: false },
-  },
-
   sitemap: {
     exclude: ['/settings', '/test-signer'],
   },

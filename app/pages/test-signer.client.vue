@@ -3,6 +3,7 @@ import { Binary } from 'polkadot-api'
 
 definePageMeta({
   title: 'Test Signer',
+  robots: false,
 })
 
 type SupportedChain = 'ahp' | 'ahk' | 'dot' | 'ksm'
