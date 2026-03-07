@@ -23,6 +23,28 @@ export default defineNuxtConfig({
 
   sitemap: {
     exclude: ['/settings', '/test-signer'],
+    sitemaps: {
+      pages: {
+        includeAppSources: true,
+        exclude: [
+          '/ahp/collection/**',
+          '/ahk/collection/**',
+          '/ahp/gallery/**',
+          '/ahk/gallery/**',
+          '/ahp/drops/**',
+          '/ahk/drops/**',
+        ],
+      },
+      collections: {
+        sources: ['/api/__sitemap__/collections'],
+      },
+      nfts: {
+        sources: ['/api/__sitemap__/nfts'],
+      },
+      drops: {
+        sources: ['/api/__sitemap__/drops'],
+      },
+    },
   },
 
   seo: {
