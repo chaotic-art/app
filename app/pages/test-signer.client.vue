@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Binary } from 'polkadot-api'
 
+definePageMeta({
+  title: 'Test Signer',
+})
+
 type SupportedChain = 'ahp' | 'ahk' | 'dot' | 'ksm'
 
 const { $sdk } = useNuxtApp()
