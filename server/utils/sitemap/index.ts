@@ -3,6 +3,7 @@ import type { SitemapUrl } from '#sitemap/types'
 import type { SitemapChain } from './graphql'
 
 export const SITEMAP_CHAINS: SitemapChain[] = ['ahp', 'ahk']
+export const DROPS_SITEMAP_CHAINS: SitemapChain[] = ['ahp']
 
 export function createSitemapUrl(loc: string, lastmod?: string): SitemapUrl | null {
   if (!loc.startsWith('/')) {

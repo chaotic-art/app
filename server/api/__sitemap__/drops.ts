@@ -5,7 +5,7 @@ import type { GenartDropItem } from '~/types/genart'
 import { $fetch } from 'ofetch'
 
 import { GENART_WORKERS_URL } from '~~/server/utils/endpoint'
-import { createSitemapUrl, dedupeSitemapUrls, getErrorMessage, SITEMAP_CHAINS } from '~~/server/utils/sitemap'
+import { createSitemapUrl, dedupeSitemapUrls, DROPS_SITEMAP_CHAINS, getErrorMessage } from '~~/server/utils/sitemap'
 
 interface GenArtDropsResponse {
   data?: GenartDropItem[]
@@ -36,7 +36,7 @@ async function fetchDropUrlsForChain(chain: SitemapChain): Promise<SitemapUrl[]>
 
 export default defineSitemapEventHandler(async () => {
   const urls = await Promise.all(
-    SITEMAP_CHAINS.map(async (chain) => {
+    DROPS_SITEMAP_CHAINS.map(async (chain) => {
       try {
         return await fetchDropUrlsForChain(chain)
       }
