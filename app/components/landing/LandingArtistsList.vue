@@ -15,9 +15,9 @@ const { currentChain } = useChain()
 <template>
   <section class="py-16 bg-muted">
     <UContainer>
-      <div class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 px-4 text-center md:text-left text-foreground">
+      <h2 class="text-2xl md:text-[50px] font-serif italic font-medium mb-4 md:mb-8 px-4 text-center md:text-left text-foreground">
         {{ $t('artist.curated') }} <span class="text-ring">&lt;</span>{{ $t('artist.all') }}<span class="text-ring">&gt;</span>
-      </div>
+      </h2>
       <ClientOnly>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 px-4 md:px-0">
           <NuxtLink
