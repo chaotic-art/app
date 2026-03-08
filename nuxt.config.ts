@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   },
 
   site: {
-    name: 'Chaotic Labs',
+    name: 'Chaotic',
     url: publicEnv.siteUrl,
     indexable: publicEnv.siteIndexable,
   },
@@ -41,17 +41,17 @@ export default defineNuxtConfig({
 
   seo: {
     meta: {
-      title: 'Chaotic Labs',
-      description: 'Your Polkadot NFT Marketplace',
+      title: 'Chaotic | Polkadot NFT Marketplace for Generative Art',
+      description: 'Create, collect, and sell Polkadot NFTs on Chaotic. Explore curated generative art drops and experimental AI collections.',
       themeColor: [
         { content: '#18181b', media: '(prefers-color-scheme: dark)' },
         { content: 'white', media: '(prefers-color-scheme: light)' },
       ],
-      twitterCreator: '@chaoticlabs',
-      twitterSite: '@chaoticlabs',
-      author: 'Chaotic Labs',
+      twitterCreator: '@ChaoticApp',
+      twitterSite: '@ChaoticApp',
+      author: 'Chaotic',
       colorScheme: 'dark light',
-      applicationName: 'Chaotic Labs',
+      applicationName: 'Chaotic',
     },
   },
 
