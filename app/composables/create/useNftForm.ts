@@ -20,7 +20,7 @@ export interface UseNftFormOptions {
   fixedBlockchain?: MaybeRefOrGetter<AssetHubChain | undefined>
 }
 
-export function useNftForm(options?: UseNftFormOptions) {
+export function useNftForm(options?: MaybeRefOrGetter<UseNftFormOptions | undefined>) {
   const opts = computed(() => toValue(options))
   const fixedCollectionId = computed<string | undefined>(() => toValue(opts.value?.fixedCollectionId))
   const fixedBlockchain = computed<AssetHubChain | undefined>(() => toValue(opts.value?.fixedBlockchain))
