@@ -1,7 +1,9 @@
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import type { MaybeRefOrGetter } from 'vue'
 import type { AssetHubChain } from '~/plugins/sdk.client'
 import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
+import { toValue } from 'vue'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { pinDirectory, pinJson } from '~/services/storage'
 import { toNative } from '~/utils/format/balance'
@@ -13,7 +15,17 @@ interface Property {
   value: string
 }
 
-export function useNftForm() {
+export interface UseNftFormOptions {
+  fixedCollectionId?: MaybeRefOrGetter<string | undefined>
+  fixedBlockchain?: MaybeRefOrGetter<AssetHubChain | undefined>
+}
+
+export function useNftForm(options?: MaybeRefOrGetter<UseNftFormOptions | undefined>) {
+  const opts = computed(() => toValue(options))
+  const fixedCollectionId = computed<string | undefined>(() => toValue(opts.value?.fixedCollectionId))
+  const fixedBlockchain = computed<AssetHubChain | undefined>(() => toValue(opts.value?.fixedBlockchain))
+  const isCollectionFixed = computed(() => Boolean(fixedCollectionId.value))
+  const isBlockchainFixed = computed(() => Boolean(fixedBlockchain.value))
   const { mintNft, userCollection, userBalance } = useNftPallets()
   const { open } = useTransactionModal()
 
@@ -25,7 +37,7 @@ export function useNftForm() {
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
   const isWalletConnected = computed(() => Boolean(getConnectedSubAccount.value?.address))
 
-  // Form state
+  // Form state (blockchain may be overwritten when fixedBlockchain is set)
   const state = reactive({
     name: '',
     description: '',
@@ -38,6 +50,12 @@ export function useNftForm() {
     price: 0,
     nsfw: false,
   })
+
+  // Keep blockchain in sync when fixed
+  watch(fixedBlockchain, (chain) => {
+    if (chain)
+      state.blockchain = chain
+  }, { immediate: true })
 
   // Fetch user collections dynamically
   const collections = ref<Array<{ label: string, value: string, name: string, description: string, image: string }>>([])
@@ -64,22 +82,27 @@ export function useNftForm() {
     if (!isWalletConnected.value)
       return
 
+    const chain: AssetHubChain = fixedBlockchain.value ?? state.blockchain
+    if (fixedBlockchain.value)
+      state.blockchain = chain
+
     collectionsLoading.value = true
     isFetchingBalance.value = true
-    state.collection = ''
+    if (!isCollectionFixed.value)
+      state.collection = ''
 
     try {
-      const { name, tokenDecimals, tokenSymbol } = chainSpec[state.blockchain]
+      const { name, tokenDecimals, tokenSymbol } = chainSpec[chain]
       balance.symbol = tokenSymbol
       balance.decimals = tokenDecimals
       balance.name = name
 
       // fetch user balance
-      balance.userBalance = await userBalance(state.blockchain)
+      balance.userBalance = await userBalance(chain)
       balance.userBalanceFormatted = formatBalance(balance.userBalance, { decimals: tokenDecimals, symbol: tokenSymbol })
 
       // fetch user collections
-      const userCollections = await userCollection(state.blockchain)
+      const userCollections = await userCollection(chain)
       collections.value = userCollections
         .filter((collection): collection is NonNullable<typeof collection> => Boolean(collection && collection.id))
         .map(collection => ({
@@ -89,6 +112,11 @@ export function useNftForm() {
           description: collection.description,
           image: collection.image,
         }))
+
+      // When collection is fixed, set it after collections are loaded
+      const fixedId = fixedCollectionId.value
+      if (isCollectionFixed.value && fixedId)
+        state.collection = fixedId
     }
     catch (error) {
       console.error('Error fetching collections:', error)
@@ -424,6 +452,8 @@ export function useNftForm() {
     balance,
     isEstimatingFee,
     isFetchingBalance,
+    isCollectionFixed,
+    isBlockchainFixed,
 
     // Functions
     validate,

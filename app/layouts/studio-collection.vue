@@ -14,6 +14,7 @@ const validTabs = ['preview', 'details', 'items'] as const
 
 const tabLabels: Record<string, string> = {
   massmint: 'Mass Mint',
+  nftmint: 'Create NFT',
   preview: 'Preview',
   details: 'Details',
   items: 'Items',
@@ -35,6 +36,7 @@ const itemCount = computed(() => collection.value?.claimed ?? '0')
 const studioIndexPath = computed(() => `/${currentChain.value}/studio`)
 const collectionPagePath = computed(() => `/${currentChain.value}/collection/${collectionId.value}`)
 const massMintPath = computed(() => `/${currentChain.value}/studio/${collectionId.value}/massmint`)
+const nftMintPath = computed(() => `/${currentChain.value}/studio/${collectionId.value}/nftmint`)
 
 const overlay = useOverlay()
 const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
@@ -79,6 +81,7 @@ function setTab(tab: (typeof validTabs)[number]) {
         :nav-items="navItems"
         :collection-page-path="collectionPagePath"
         :mass-mint-path="massMintPath"
+        :nft-mint-path="nftMintPath"
         @select-tab="(tab) => setTab(tab as (typeof validTabs)[number])"
         @delete-collection="handleDestroyCollection"
       />

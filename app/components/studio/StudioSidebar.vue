@@ -15,6 +15,7 @@ const props = defineProps<{
   navItems: StudioNavItem[]
   collectionPagePath: string
   massMintPath: string
+  nftMintPath: string
 }>()
 
 const emit = defineEmits<{
@@ -83,6 +84,17 @@ const { prefix } = usePrefix()
         {{ item.label }}
       </UButton>
     </nav>
+
+    <UButton
+      :to="nftMintPath"
+      icon="i-heroicons-plus"
+      :variant="currentTab === 'nftmint' ? 'soft' : 'outline'"
+      color="neutral"
+      size="md"
+      class="w-full justify-center mb-2"
+    >
+      Create NFT
+    </UButton>
 
     <!-- Mass Mint -->
     <UButton
