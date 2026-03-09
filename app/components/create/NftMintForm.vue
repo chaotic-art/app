@@ -52,7 +52,7 @@ const hasInsufficientFunds = computed(() => balance.total !== 0n && balance.user
 const isReady = computed(() => balance.total !== 0n && !isLoading.value && !hasInsufficientFunds.value)
 
 const isSubmitDisabled = computed(() => {
-  return !isWalletConnected.value || hasInsufficientFunds.value || isLoading.value
+  return !isWalletConnected.value || hasInsufficientFunds.value || isLoading.value || !isReady.value
 })
 
 const submitButtonText = computed(() => {
