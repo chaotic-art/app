@@ -53,7 +53,7 @@ function handleDestroyCollection() {
 const navItems: StudioNavItem[] = [
   { id: 'preview' as const, label: 'Preview', icon: 'i-heroicons:eye' },
   { id: 'details' as const, label: 'Details', icon: 'i-heroicons-cog-6-tooth' },
-  // { id: 'items' as const, label: 'Items', icon: 'i-heroicons-squares-2x2' },
+  { id: 'items' as const, label: 'Items', icon: 'i-heroicons-squares-2x2' },
 ]
 
 function setTab(tab: (typeof validTabs)[number]) {
