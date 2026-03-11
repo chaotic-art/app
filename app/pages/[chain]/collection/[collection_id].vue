@@ -2,10 +2,10 @@
 import type { LocationQueryRaw } from 'vue-router'
 import type { SelectedTrait } from '@/components/trait/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import { CHAINS } from '@kodadot1/static'
 import { TradeTypes } from '@/components/trade/types'
 import { fetchOdaCollection } from '~/services/oda'
 import { normalizeRarityTotalItems } from '~/types/rarity'
+import { chainSpec } from '~/utils/chain'
 
 const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
 type CollectionTab = typeof availableTabs[number]
@@ -72,12 +72,12 @@ const chain = computed(() => chainPrefix as AssetHubChain)
 const { data } = await useLazyAsyncData(
   `collection:${chain.value}:${collection_id}`,
   async () => {
-    const [collection, drops] = await Promise.all([
-      fetchOdaCollection(chain.value, collection_id?.toString() ?? ''),
+    const [collectionResult, drops] = await Promise.all([
+      fetchOdaCollection(chain.value, collection_id?.toString() ?? '').catch(() => null),
       $fetch('/api/genart/list', { query: { collection: collection_id?.toString() ?? '' } }),
     ])
 
-    return { collection, drops }
+    return { collection: collectionResult ?? null, drops }
   },
 )
 
@@ -173,7 +173,7 @@ function handleSelectedTraitsUpdate(traits: SelectedTrait[]) {
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && chain in CHAINS
+    return typeof chain === 'string' && chain in chainSpec
   },
 })
 

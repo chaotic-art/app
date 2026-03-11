@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OnchainCollection } from '~/services/oda'
 import { getSubscanAccountUrl } from '~/utils/format/address'
 import { sanitizeIpfsUrl, toOriginalContentUrl } from '~/utils/ipfs'
@@ -9,7 +9,7 @@ const props = withDefaults(
   defineProps<{
     collection: OnchainCollection | null
     collectionId: string
-    chain: SupportedChain
+    chain: AssetHubChain
     /** Optional override for owner (e.g. drops creator). Falls back to collection.owner */
     creator?: string
     /** Optional drop alias for "View Drop" button */
@@ -38,8 +38,33 @@ const bannerUrl = computed(() => {
   return raw ? toOriginalContentUrl(sanitizeIpfsUrl(raw)) : ''
 })
 
-const ownerAddress = computed(
+const ownerFromProps = computed(
   () => props.creator || props.collection?.owner,
+)
+
+// Fallback: when ODA/drops fail, fetch collection owner from chain so creator + Subscan always show
+const ownerFromChain = ref<string | null>(null)
+onMounted(async () => {
+  if (ownerFromProps.value || !props.collectionId)
+    return
+  const collectionId = Number(props.collectionId)
+  if (Number.isNaN(collectionId))
+    return
+  try {
+    const { $sdk } = useNuxtApp()
+    const api = $sdk(props.chain).api
+    const collection = await api.query.Nfts.Collection.getValue(collectionId)
+    if (collection?.owner) {
+      ownerFromChain.value = collection.owner.toString()
+    }
+  }
+  catch {
+    // ignore
+  }
+})
+
+const ownerAddress = computed(
+  () => ownerFromProps.value || ownerFromChain.value,
 )
 </script>
 
