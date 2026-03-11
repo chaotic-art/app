@@ -7,7 +7,7 @@ import { TradeTypes } from '@/components/trade/types'
 import { fetchOdaCollection } from '~/services/oda'
 import { normalizeRarityTotalItems } from '~/types/rarity'
 
-const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
+const availableTabs = ['items', 'activity', 'offers', 'swaps', 'traits', 'analytics'] as const
 type CollectionTab = typeof availableTabs[number]
 
 const route = useRoute()
@@ -29,6 +29,12 @@ const tabsItems = computed(() => [
     name: 'Items',
     slot: 'items',
     value: 'items',
+  },
+  {
+    label: 'Activity',
+    name: 'Activity',
+    slot: 'activity',
+    value: 'activity',
   },
   {
     label: 'Offers',
@@ -253,6 +259,9 @@ defineOgImageComponent('Frame', {
               />
             </div>
           </ExploreFilters>
+        </template>
+        <template #activity>
+          <ProfileActivity :collection-id="collection_id?.toString() ?? ''" />
         </template>
         <template #offers>
           <CollectionTrades :trade-type="TradeTypes.Offer" />
