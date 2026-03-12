@@ -25,6 +25,7 @@ export function useSearchFilters() {
       OR: [
         { name_containsInsensitive: normalizedPhrase },
         { meta: { description_containsInsensitive: normalizedPhrase } },
+        { normalizedAttributes_some: { value_containsInsensitive: normalizedPhrase } },
       ],
     }
   }

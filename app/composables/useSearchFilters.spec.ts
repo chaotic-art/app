@@ -12,11 +12,12 @@ describe('useSearchFilters', () => {
     expect(buildKeywordClause('   ')).toBeUndefined()
   })
 
-  it('builds OR keyword clause across name and metadata description', () => {
+  it('builds OR keyword clause across name, metadata description, and normalized attribute value', () => {
     expect(buildKeywordClause('freak')).toEqual({
       OR: [
         { name_containsInsensitive: 'freak' },
         { meta: { description_containsInsensitive: 'freak' } },
+        { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
       ],
     })
   })
@@ -26,6 +27,7 @@ describe('useSearchFilters', () => {
       OR: [
         { name_containsInsensitive: 'blue red' },
         { meta: { description_containsInsensitive: 'blue red' } },
+        { normalizedAttributes_some: { value_containsInsensitive: 'blue red' } },
       ],
     })
   })
@@ -35,6 +37,7 @@ describe('useSearchFilters', () => {
       OR: [
         { name_containsInsensitive: 'blue red' },
         { meta: { description_containsInsensitive: 'blue red' } },
+        { normalizedAttributes_some: { value_containsInsensitive: 'blue red' } },
       ],
     })
   })
@@ -51,6 +54,7 @@ describe('useSearchFilters', () => {
             OR: [
               { name_containsInsensitive: 'freak' },
               { meta: { description_containsInsensitive: 'freak' } },
+              { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
             ],
           },
         ],
@@ -67,6 +71,7 @@ describe('useSearchFilters', () => {
         OR: [
           { name_containsInsensitive: 'freak' },
           { meta: { description_containsInsensitive: 'freak' } },
+          { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
         ],
       },
       price_isNull: true,
@@ -82,6 +87,7 @@ describe('useSearchFilters', () => {
         OR: [
           { name_containsInsensitive: 'freak' },
           { meta: { description_containsInsensitive: 'freak' } },
+          { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
         ],
       },
     })
@@ -132,6 +138,7 @@ describe('useSearchFilters', () => {
             OR: [
               { name_containsInsensitive: 'freak' },
               { meta: { description_containsInsensitive: 'freak' } },
+              { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
             ],
           },
         ],
