@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
-  extraVariables?: Partial<Record<'owner' | 'issuer', string>>
+  extraVariables?: Partial<Record<'owner' | 'issuer' | 'collections', string | string[]>>
+  hideChainSwitcher?: boolean
 }>()
 
 defineEmits(['totalCountChange'])
@@ -14,6 +15,7 @@ const { currentChain } = useChain()
 <template>
   <div class="mt-4">
     <NftsToolbar
+      :hide-chain-switcher="hideChainSwitcher"
       class="w-full md:w-fit md:ml-auto"
       :extra-variables="props.extraVariables"
       @update:query-variables="queryVariables = $event"

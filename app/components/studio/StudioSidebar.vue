@@ -29,7 +29,7 @@ watch(() => props.collectionImage, () => {
   imageLoadFailed.value = false
 })
 
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 </script>
 
 <template>
@@ -64,7 +64,7 @@ const { prefix } = usePrefix()
           <span
             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted"
           >
-            {{ prefix }}
+            {{ currentChain }}
           </span>
         </div>
       </div>

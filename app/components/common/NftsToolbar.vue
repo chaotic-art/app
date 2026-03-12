@@ -14,10 +14,12 @@ interface QueryState {
 const props = withDefaults(defineProps<{
   extraVariables?: Record<string, any>
   hasOwnedFilter?: boolean
+  hideChainSwitcher?: boolean
   stickySearchOnly?: boolean
 }>(), {
   extraVariables: () => ({}),
   stickySearchOnly: false,
+  hideChainSwitcher: false,
 })
 
 const emit = defineEmits<{
@@ -160,6 +162,7 @@ watch(() => queryState.value, (newValue) => {
     :class="props.stickySearchOnly ? STICKY_MOBILE_TOOLBAR_ROW_CLASS : 'flex-wrap'"
   >
     <ChainSwitcher
+      v-if="!props.hideChainSwitcher"
       :show-label="!props.stickySearchOnly"
       :compact="props.stickySearchOnly"
     />
