@@ -37,11 +37,10 @@ const { collection } = useOdaCollection(collectionId)
       :collection-id="collectionId"
       :collection="collection ?? null"
     />
-    <p
-      v-else
-      class="text-muted capitalize"
-    >
-      {{ tab }}
-    </p>
+    <StudioCollectionItems
+      v-else-if="tab === 'items'"
+      :collection-id="collectionId"
+      :chain="currentChain"
+    />
   </div>
 </template>
