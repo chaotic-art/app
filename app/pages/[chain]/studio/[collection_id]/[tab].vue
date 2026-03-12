@@ -40,7 +40,6 @@ const { collection } = useOdaCollection(collectionId)
     <StudioCollectionItems
       v-else-if="tab === 'items'"
       :collection-id="collectionId"
-      :chain="currentChain"
     />
   </div>
 </template>
