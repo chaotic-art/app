@@ -88,6 +88,8 @@ function setTab(tab: (typeof validTabs)[number]) {
 
       <main class="flex-1 min-w-0 overflow-auto p-6 md:p-8">
         <slot />
+        <LazyActionCart />
+        <ScrollToTop />
       </main>
     </div>
   </div>

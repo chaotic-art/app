@@ -78,9 +78,8 @@ const { isCurrentAccount } = useAuth()
 const imageStatus = ref<'card' | 'normal' | 'fallback'>('card')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
-const isProfileRoute = computed(() => route.name?.toString().includes('chain-u-id'))
-const isAirdropRoute = computed(() => route.name?.toString().includes('airdrop-select'))
-const canAddToActionCart = computed(() => (isProfileRoute.value || isAirdropRoute.value) && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
+const isActionCartAvailableRoute = computed(() => ['chain-u-id', 'airdrop-select', 'chain-studio-collection_id-tab'].some(r => (route.name?.toString())?.includes(r)))
+const canAddToActionCart = computed(() => isActionCartAvailableRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
 
 const rarity = computed(() => props.rarity ?? null)
 
