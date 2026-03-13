@@ -12,7 +12,7 @@ const { data: drops } = await useFetch('/api/genart/list', {
 </script>
 
 <template>
-  <UContainer>
+  <UContainer class="pb-16">
     <h1 class="text-2xl md:text-4xl font-medium font-serif italic mb-6 md:mb-10 text-center md:text-left px-4 md:px-0">
       {{ $t('drop.generativeArtDrops') }}
     </h1>
