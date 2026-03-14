@@ -263,10 +263,6 @@ watch(
           v-model="sidebarCollapsed"
           sticky
         >
-          <div class="p-3 border-b border-border">
-            <FilterHeader />
-          </div>
-
           <div class="p-3 overflow-y-auto max-h-[calc(100vh-300px)]">
             <FilterContent
               v-model:listed-mode="listedMode"
