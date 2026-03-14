@@ -153,7 +153,7 @@ onMounted(async () => {
               />
             </template>
             <template #properties>
-              <div class="bg-background rounded-xl border border-border overflow-hidden">
+              <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
                 <UTable
                   v-if="properties.length"
                   :data="properties"

@@ -123,7 +123,7 @@ function exportToCsv() {
       <!-- Summary Cards and Controls -->
       <div class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-background border border-border rounded-xl p-6">
+          <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
             <div class="text-sm text-muted-foreground mb-1">
               Total Traits
             </div>
@@ -132,7 +132,7 @@ function exportToCsv() {
             </div>
           </div>
 
-          <div class="bg-background border border-border rounded-xl p-6">
+          <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
             <div class="text-sm text-muted-foreground mb-1">
               Total Values
             </div>
@@ -142,7 +142,7 @@ function exportToCsv() {
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-background border border-border rounded-xl">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700">
           <div class="flex flex-wrap items-center justify-between gap-2 w-full">
             <div class="flex flex-wrap items-center gap-2">
               <span class="text-sm font-medium text-muted-foreground">View Mode:</span>
@@ -200,7 +200,7 @@ function exportToCsv() {
             </span>
           </div>
 
-          <div class="bg-background rounded-xl border border-border overflow-hidden">
+          <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden">
             <UTable
               :data="traits"
               :columns="columns"
@@ -229,7 +229,7 @@ function exportToCsv() {
             </div>
           </div>
 
-          <div class="bg-background rounded-xl border border-border p-6">
+          <div class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6">
             <ClientOnly>
               <TraitDistributionChart
                 :trait-type="traitType"
