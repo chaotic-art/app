@@ -45,7 +45,10 @@ export function useSortOptions(context: SortContext) {
     return sortKeysToQueryValueForContext(normalizeSortKeys(selectedSortKeys), defaultSortKey)
   }
 
-  function applySortQuery(query: LocationQueryRaw, selectedSortKeys: SortQueryValue): string[] {
+  function resolveSortQuery(
+    query: LocationQueryRaw,
+    selectedSortKeys: SortQueryValue,
+  ): { query: LocationQueryRaw, sortKeys: string[] } {
     const existingSort = query.sort
     const hasExplicitSortInQuery = Array.isArray(existingSort)
       ? existingSort.some(sortValue => typeof sortValue === 'string' && sortValue.length > 0)
@@ -60,13 +63,21 @@ export function useSortOptions(context: SortContext) {
     const sortQueryValue = sortKeysToQueryValue(nextSortKeys)
 
     if (sortQueryValue === undefined) {
-      delete query.sort
-    }
-    else {
-      query.sort = sortQueryValue
+      const { sort: _sort, ...nextQuery } = query
+
+      return {
+        query: nextQuery,
+        sortKeys: nextSortKeys,
+      }
     }
 
-    return nextSortKeys
+    return {
+      query: {
+        ...query,
+        sort: sortQueryValue,
+      },
+      sortKeys: nextSortKeys,
+    }
   }
 
   return {
@@ -74,6 +85,6 @@ export function useSortOptions(context: SortContext) {
     normalizeSortKeys,
     buildOrderBy,
     requiresListed,
-    applySortQuery,
+    resolveSortQuery,
   }
 }
