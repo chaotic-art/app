@@ -36,6 +36,7 @@
     "@paraport/vue": "0.2.1",
     "@pinia/nuxt": "0.11.1",
     "@polkadot/util-crypto": "^13.5.7",
+    "@posthog/nuxt": "^1.5.84",
     "@reown/appkit": "^1.8.12",
     "@reown/appkit-adapter-wagmi": "^1.8.17",
     "@tanstack/vue-query": "^5.83.0",
