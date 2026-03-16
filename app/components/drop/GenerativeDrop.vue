@@ -40,7 +40,10 @@ const dropStartRelativeTime = computed(() => {
           <UBadge class="rounded-full bg-gray-100 text-black" icon="i-heroicons-star">
             Featured
           </UBadge>
-          <UBadge class="rounded-full bg-gray-100 text-black" icon="i-token-polkadot">
+          <UBadge class="rounded-full bg-gray-100 text-black">
+            <template #leading>
+              <img src="/token/dot-near-black.svg" alt="" class="size-4" aria-hidden="true">
+            </template>
             Polkadot
           </UBadge>
         </div>
