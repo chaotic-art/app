@@ -1,8 +1,19 @@
+import process from 'node:process'
 import { publicEnv } from './env.public'
+
+const posthogProjectId = process.env.POSTHOG_PROJECT_ID || ''
+const posthogPersonalApiKey = process.env.POSTHOG_PERSONAL_API_KEY || ''
+const posthogEnabled = Boolean(publicEnv.posthogPublicKey)
+const posthogSourcemapsEnabled = process.env.NODE_ENV === 'production'
+  && posthogEnabled
+  && Boolean(posthogProjectId)
+  && Boolean(posthogPersonalApiKey)
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  sourcemap: true,
+  sourcemap: {
+    client: 'hidden',
+  },
   experimental: {
     appManifest: false,
   },
@@ -75,6 +86,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
+    ...(posthogEnabled ? ['@posthog/nuxt'] : []),
     '@nuxt/ui',
     '@nuxt/eslint',
     '@nuxt/fonts',
@@ -86,6 +98,34 @@ export default defineNuxtConfig({
     '@nuxtjs/seo',
     'nuxt-svgo',
   ],
+
+  nitro: {
+    rollupConfig: {
+      output: {
+        sourcemapExcludeSources: false,
+      },
+    },
+  },
+
+  posthogConfig: posthogEnabled
+    ? {
+        publicKey: publicEnv.posthogPublicKey,
+        host: publicEnv.posthogHost,
+        clientConfig: {
+          capture_exceptions: true,
+        },
+        serverConfig: {
+          enableExceptionAutocapture: true,
+        },
+        sourcemaps: posthogSourcemapsEnabled
+          ? {
+              enabled: true,
+              projectId: posthogProjectId,
+              personalApiKey: posthogPersonalApiKey,
+            }
+          : undefined,
+      }
+    : undefined,
 
   runtimeConfig: {
     // Keep private config empty in source and override via NUXT_* at runtime.

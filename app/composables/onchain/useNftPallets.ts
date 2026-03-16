@@ -278,6 +278,99 @@ export function useNftPallets() {
     })
   }
 
+  interface UpdateCollectionParams {
+    chain: AssetHubChain
+    collectionId: number
+    type: TxType
+    metadataUri?: string
+    royalty?: number
+  }
+
+  async function updateCollection({
+    chain,
+    collectionId,
+    type,
+    metadataUri,
+    royalty,
+  }: UpdateCollectionParams) {
+    if (!getConnectedSubAccount.value?.address) {
+      throw new Error('No address found')
+    }
+
+    const api = $sdk(chain).api
+    await api.compatibilityToken
+
+    const calls = []
+
+    if (metadataUri) {
+      calls.push(
+        api.tx.Nfts.set_collection_metadata({
+          collection: collectionId,
+          data: Binary.fromText(metadataUri),
+        }).decodedCall,
+      )
+    }
+
+    if (royalty !== undefined) {
+      calls.push(
+        api.tx.Nfts.set_attribute({
+          collection: collectionId,
+          maybe_item: undefined,
+          namespace: { type: 'CollectionOwner', value: undefined },
+          key: Binary.fromText('royalty'),
+          value: Binary.fromText(royalty.toString()),
+        }).decodedCall,
+      )
+      calls.push(
+        api.tx.Nfts.set_attribute({
+          collection: collectionId,
+          maybe_item: undefined,
+          namespace: { type: 'CollectionOwner', value: undefined },
+          key: Binary.fromText('recipient'),
+          value: Binary.fromText(getConnectedSubAccount.value.address),
+        }).decodedCall,
+      )
+    }
+
+    if (calls.length === 0) {
+      return type === 'estimate' ? 0n : undefined
+    }
+
+    const transaction = api.tx.Utility.batch_all({ calls })
+
+    if (type === 'estimate') {
+      const estimatedFees = await transaction.getEstimatedFees(getConnectedSubAccount.value.address)
+      return estimatedFees
+    }
+
+    const signer = await getConnectedSubAccount.value.signer
+    if (!signer) {
+      throw new Error('No signer found')
+    }
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.block.hash.toString()
+          result.value = {
+            type: 'collection',
+            id: collectionId.toString(),
+            name: '',
+            description: '',
+            image: '',
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('error', err)
+        error.value = err
+      },
+    })
+  }
+
   async function userBalance(chain: SupportedChain) {
     if (!getConnectedSubAccount.value?.address) {
       // throw new Error('No address found')
@@ -1205,6 +1298,7 @@ export function useNftPallets() {
 
   return {
     createCollection,
+    updateCollection,
     mintNft,
     listNfts,
     userCollection,

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
+import type { ListedFilterMode } from '~/composables/useSearchFilters'
 import type { SortQueryValue } from '~/utils/sort'
 import { STICKY_MOBILE_TOOLBAR_ROW_CLASS, STICKY_MOBILE_TOOLBAR_SEARCH_CLASS } from '~/utils/exploreToolbar'
 import { getSingleQueryValue } from '~/utils/query'
@@ -7,17 +8,18 @@ import { getSingleQueryValue } from '~/utils/query'
 interface QueryState {
   sortKeys: string[]
   search: string
-  listed: { label: string, value: string, disabled?: boolean }
   owned: boolean
 }
 
 const props = withDefaults(defineProps<{
   extraVariables?: Record<string, any>
   hasOwnedFilter?: boolean
+  hideChainSwitcher?: boolean
   stickySearchOnly?: boolean
 }>(), {
   extraVariables: () => ({}),
   stickySearchOnly: false,
+  hideChainSwitcher: false,
 })
 
 const emit = defineEmits<{
@@ -29,56 +31,37 @@ const router = useRouter()
 const { accountId } = useAuth()
 const { t } = useI18n()
 const { buildNftSearchConstraints } = useSearchFilters()
+const { listedMode, resolveListedForSort } = useExploreNftStatusFilter()
 const {
   sortOptions,
   normalizeSortKeys,
   buildOrderBy,
-  requiresListed,
-  applySortQuery,
+  resolveSortQuery,
 } = useSortOptions('exploreNfts')
-
-const listedOptions = computed(() => {
-  const unlistedDisabled = requiresListed(route.query.sort)
-
-  return [
-    { label: 'All', value: '' },
-    { label: 'Listed', value: 'true' },
-    { label: 'Unlisted', value: 'false', disabled: unlistedDisabled },
-  ]
-})
 
 const queryState = computed({
   get: () => {
     const sortKeys = normalizeSortKeys(route.query.sort)
-    const listedFromQuery = listedOptions.value.find(opt => opt.value === getSingleQueryValue(route.query.listed)) || listedOptions.value[0] as QueryState['listed']
-    const listed = requiresListed(sortKeys)
-      ? listedOptions.value.find(opt => opt.value === 'true') || listedOptions.value[0] as QueryState['listed']
-      : listedFromQuery
 
     return {
       sortKeys,
       search: getSingleQueryValue(route.query.search),
-      listed,
       owned: getSingleQueryValue(route.query.owned) === 'true',
     }
   },
-  set: ({ sortKeys, search, listed, owned }: { sortKeys?: string[], search?: string, listed?: QueryState['listed'], owned?: boolean }) => {
-    const query: LocationQueryRaw = { ...route.query }
-    const nextSortKeys = applySortQuery(query, sortKeys ?? route.query.sort)
-    const listedValue = requiresListed(nextSortKeys) ? 'true' : listed?.value
+  set: ({ sortKeys, search, owned }: { sortKeys?: string[], search?: string, owned?: boolean }) => {
+    let query: LocationQueryRaw = { ...route.query }
+    const currentSortKeys = normalizeSortKeys(route.query.sort)
+    const nextSortState = resolveSortQuery(query, sortKeys ?? route.query.sort)
+    const nextSortKeys = nextSortState.sortKeys
+
+    query = resolveListedForSort(nextSortState.query, currentSortKeys, nextSortKeys)
 
     if (!search) {
       delete query.search
     }
     else {
       query.search = search
-    }
-
-    if (listedValue) {
-      query.listed = listedValue
-    }
-    else {
-      delete query.listed
     }
 
     if (owned) {
@@ -95,17 +78,6 @@ const queryState = computed({
 function updateQueryState(updates: Partial<QueryState>) {
   const currentState = queryState.value
   const nextState: QueryState = { ...currentState, ...updates }
-
-  // If listed was only auto-forced by a price sort, reset back to All when leaving price sorts.
-  if (updates.sortKeys && !updates.listed) {
-    const currentSortRequiresListed = requiresListed(currentState.sortKeys)
-    const nextSortRequiresListed = requiresListed(nextState.sortKeys)
-
-    if (currentSortRequiresListed && !nextSortRequiresListed) {
-      nextState.listed = listedOptions.value.find(opt => opt.value === '') || listedOptions.value[0] as QueryState['listed']
-    }
-  }
-
   queryState.value = nextState
 }
 
@@ -114,21 +86,13 @@ const { input: searchInput, onInput: handleSearchUpdate } = useDebouncedSyncedIn
   search => updateQueryState({ search }),
 )
 
-function computeQueryVariables(state: QueryState) {
+function computeQueryVariables(state: QueryState, activeListedMode: ListedFilterMode) {
   const selectedSortKeys = state.sortKeys
   const orderBy = buildOrderBy(selectedSortKeys)
-  const listedValue = state.listed?.value
-  const sortRequiresListed = requiresListed(selectedSortKeys)
-  const listedMode = listedValue === 'true'
-    ? 'listed'
-    : listedValue === 'false'
-      ? 'unlisted'
-      : 'all'
 
   const searchConstraints = buildNftSearchConstraints({
     phrase: state.search,
-    listedMode,
-    forceListed: sortRequiresListed,
+    listedMode: activeListedMode,
   })
 
   const ownedVariables = props.hasOwnedFilter && state.owned && accountId.value
@@ -148,9 +112,10 @@ function handleSortKeysUpdate(value: SortQueryValue) {
   updateQueryState({ sortKeys: nextSortKeys })
 }
 
-watch(() => queryState.value, (newValue) => {
-  const queryVariables = computeQueryVariables(newValue)
-  emit('update:queryVariables', queryVariables)
+const queryVariables = computed(() => computeQueryVariables(queryState.value, listedMode.value))
+
+watch(queryVariables, (newValue) => {
+  emit('update:queryVariables', newValue)
 }, { immediate: true, deep: true })
 </script>
 
@@ -160,6 +125,7 @@ watch(() => queryState.value, (newValue) => {
     :class="props.stickySearchOnly ? STICKY_MOBILE_TOOLBAR_ROW_CLASS : 'flex-wrap'"
   >
     <ChainSwitcher
+      v-if="!props.hideChainSwitcher"
       :show-label="!props.stickySearchOnly"
       :compact="props.stickySearchOnly"
     />
@@ -184,16 +150,6 @@ watch(() => queryState.value, (newValue) => {
         :ui="{ content: 'min-w-50 max-h-80 overflow-y-auto' }"
         @update:model-value="handleSortKeysUpdate"
       />
-
-      <USelectMenu
-        :model-value="queryState.listed"
-        :items="listedOptions"
-        placeholder="Listed"
-        class="w-26"
-        :search-input="false"
-        @update:model-value="updateQueryState({ listed: $event })"
-      />
-
       <UButton
         v-if="hasOwnedFilter"
         :variant="queryState.owned ? 'solid' : 'outline'"

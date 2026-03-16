@@ -7,7 +7,7 @@ import { TradeTypes } from '@/components/trade/types'
 import { fetchOdaCollection } from '~/services/oda'
 import { normalizeRarityTotalItems } from '~/types/rarity'
 
-const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
+const availableTabs = ['items', 'activity', 'offers', 'swaps', 'traits', 'analytics'] as const
 type CollectionTab = typeof availableTabs[number]
 
 const route = useRoute()
@@ -19,9 +19,10 @@ const {
   sortOptions,
   normalizeSortKeys,
   buildOrderBy,
-  requiresListed,
-  applySortQuery,
+  resolveSortQuery,
 } = useSortOptions('collectionItems')
+const { buildNftSearchConstraints } = useSearchFilters()
+const { listedMode, resolveListedForSort } = useExploreNftStatusFilter('collectionItems')
 
 const tabsItems = computed(() => [
   {
@@ -47,6 +48,12 @@ const tabsItems = computed(() => [
     name: 'Traits',
     slot: 'traits',
     value: 'traits',
+  },
+  {
+    label: 'Activity',
+    name: 'Activity',
+    slot: 'activity',
+    value: 'activity',
   },
   {
     label: t('analytics.tabs.analytics'),
@@ -89,8 +96,12 @@ const collectionRarityTotalItems = computed(() => {
 const selectedSortKeys = computed({
   get: () => normalizeSortKeys(route.query.sort),
   set: (value: string[]) => {
-    const query: LocationQueryRaw = { ...route.query }
-    applySortQuery(query, value)
+    let query: LocationQueryRaw = { ...route.query }
+    const currentSortKeys = normalizeSortKeys(route.query.sort)
+    const nextSortState = resolveSortQuery(query, value)
+    const nextSortKeys = nextSortState.sortKeys
+
+    query = resolveListedForSort(nextSortState.query, currentSortKeys, nextSortKeys)
 
     router.replace({ query })
   },
@@ -118,6 +129,9 @@ const queryVariables = computed(() => {
   }
 
   const searchFilters: Record<string, unknown>[] = []
+  const listedConstraints = buildNftSearchConstraints({
+    listedMode: listedMode.value,
+  })
 
   if (selectedTraits.value.length > 0) {
     searchFilters.push({ id_in: filteredNftIds.value })
@@ -126,14 +140,12 @@ const queryVariables = computed(() => {
   const nftFilters = buildNftSearchFilters({ query: route.query })
   searchFilters.push(...nftFilters)
 
-  if (requiresListed(selectedSortKeys.value)) {
-    const hasPriceConstraint = searchFilters.some(
-      filter => Object.hasOwn(filter, 'price_gt') || Object.hasOwn(filter, 'price_gte'),
-    )
+  if (listedConstraints.search) {
+    searchFilters.unshift(listedConstraints.search as Record<string, unknown>)
+  }
 
-    if (!hasPriceConstraint) {
-      searchFilters.unshift({ price_gt: '0' })
-    }
+  if (listedConstraints.price_isNull) {
+    baseVariables.price_isNull = listedConstraints.price_isNull
   }
 
   if (searchFilters.length > 0) {
@@ -253,6 +265,9 @@ defineOgImageComponent('Frame', {
               />
             </div>
           </ExploreFilters>
+        </template>
+        <template #activity>
+          <ProfileActivity :collection-id="collection_id?.toString() ?? ''" />
         </template>
         <template #offers>
           <CollectionTrades :trade-type="TradeTypes.Offer" />

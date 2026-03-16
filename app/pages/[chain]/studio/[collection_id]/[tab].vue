@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CollectionHeader from '~/components/collection/CollectionHeader.vue'
 import { isAssetHubChain } from '~/utils/chain'
 
 const validTabs = ['preview', 'details', 'items'] as const
@@ -31,11 +32,14 @@ const { collection } = useOdaCollection(collectionId)
       :collection-id="collectionId"
       :chain="currentChain"
     />
-    <p
-      v-else
-      class="text-muted capitalize"
-    >
-      {{ tab }}
-    </p>
+    <StudioCollectionDetails
+      v-else-if="tab === 'details'"
+      :collection-id="collectionId"
+      :collection="collection ?? null"
+    />
+    <StudioCollectionItems
+      v-else-if="tab === 'items'"
+      :collection-id="collectionId"
+    />
   </div>
 </template>

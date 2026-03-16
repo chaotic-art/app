@@ -28,7 +28,7 @@ const {
   sortOptions,
   normalizeSortKeys,
   buildOrderBy,
-  applySortQuery,
+  resolveSortQuery,
 } = useSortOptions('exploreCollections')
 
 const { chain } = route.params as { chain: AssetHubChain }
@@ -39,8 +39,8 @@ const queryState = computed({
     search: getSingleQueryValue(route.query.search),
   }),
   set: ({ sortKeys, search }: { sortKeys?: string[], search?: string }) => {
-    const query: LocationQueryRaw = { ...route.query }
-    applySortQuery(query, sortKeys ?? route.query.sort)
+    let query: LocationQueryRaw = { ...route.query }
+    query = resolveSortQuery(query, sortKeys ?? route.query.sort).query
 
     if (!search) {
       delete query.search
