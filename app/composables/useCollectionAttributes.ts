@@ -4,7 +4,9 @@ import { nftAttributesListByCollection } from '~/graphql/queries/collections'
 
 interface NftWithAttributes {
   id?: string
+  name?: string | null
   meta?: {
+    image?: string | null
     attributes?: Property[]
   }
 }
@@ -162,6 +164,7 @@ export function useCollectionAttributes({ collectionId }: { collectionId: Comput
   }
 
   return {
+    nftsList,
     getAttributeRarity,
     loading,
     attributesRarityMaps,
