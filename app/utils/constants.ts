@@ -24,8 +24,8 @@ export const URLS = {
     nftStorage: 'https://ipos.chaotic.art',
   },
   graphql: {
-    ahk: 'http://localhost:4350/graphql',
-    ahp: 'http://localhost:4350/graphql',
+    ahk: 'https://chaotic-ahk.stellate.sh/',
+    ahp: 'https://chaotic-ahp.stellate.sh/',
   },
   providers: {
     coingecko: 'https://api.coingecko.com/api/v3',
