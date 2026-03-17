@@ -28,7 +28,7 @@ const {
 
 function parseSn(id?: string) {
   const parts = String(id ?? '').split('-')
-  const tokenId = parts.length > 1 ? Number(parts[1]) : Number.NaN
+  const tokenId = Number(parts.at(-1))
   return Number.isFinite(tokenId) ? tokenId : 0
 }
 
