@@ -59,7 +59,7 @@ const { input: searchInput, onInput: handleSearchUpdate } = useDebouncedSyncedIn
 )
 
 const queryVariables = computed(() => {
-  const keywordFilter = buildKeywordClause(queryState.value.search)
+  const keywordFilter = buildKeywordClause(queryState.value.search, { scope: 'collections' })
 
   return {
     orderBy: buildOrderBy(queryState.value.sortKeys),
