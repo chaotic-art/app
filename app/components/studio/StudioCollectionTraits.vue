@@ -18,7 +18,7 @@ interface NftRow {
 }
 
 const props = defineProps<Props>()
-
+const search = ref('')
 const {
   loading,
   nftsList,
@@ -68,6 +68,20 @@ const rows = computed<NftRow[]>(() => {
   return base
 })
 
+const filteredRows = computed(() => {
+  const q = search.value.trim().toLowerCase()
+  if (!q) {
+    return rows.value
+  }
+
+  return rows.value.filter((r) => {
+    if (String(r.sn).includes(q) || r.name.toLowerCase().includes(q)) {
+      return true
+    }
+    return r.properties.some(p => p.trait.toLowerCase().includes(q) || p.value.toLowerCase().includes(q))
+  })
+})
+
 const columns = [
   {
     accessorKey: 'sn',
@@ -96,6 +110,14 @@ const columns = [
           Traits Overview
         </div>
       </div>
+
+      <UInput
+        v-model="search"
+        icon="i-heroicons-magnifying-glass"
+        placeholder="Search SN, name, or traits"
+        class="w-full sm:w-80"
+        aria-label="Search collection NFTs"
+      />
     </div>
 
     <div v-if="loading" class="flex items-center justify-center py-12">
@@ -115,7 +137,7 @@ const columns = [
     <div v-else class="space-y-4">
       <div class="rounded-xl border border-border bg-background overflow-hidden">
         <UTable
-          :data="rows"
+          :data="filteredRows"
           :columns="columns"
           class="w-full max-h-[80vh]"
           sticky
