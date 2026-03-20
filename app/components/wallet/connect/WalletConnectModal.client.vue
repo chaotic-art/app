@@ -1,18 +1,31 @@
 <script setup lang="ts">
 import type { SubstrateWalletSource } from '@/utils/wallet/substrate/types'
 import { whenever } from '@vueuse/core'
-import { formatSubAccounts } from '@/utils/wallet'
-import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
+import { useConnection, useConnectors } from '@wagmi/vue'
+import { formatEvmAccounts, formatSubAccounts } from '@/utils/wallet'
 
 const emit = defineEmits(['close'])
 const isModalOpen = defineModel<boolean>({ required: true })
 
 const { t } = useI18n()
+const accountStore = useAccountStore()
 const subWalletStore = useSubWalletStore()
 const walletStore = useWalletStore()
 const walletManager = useWalletManager()
+const connection = useConnection()
+const connectors = useConnectors()
 
 const { stage, wallets } = storeToRefs(walletStore)
+const currentEvmConnection = computed(() => {
+  if (!connection.connector.value || !connection.addresses.value?.length) {
+    return
+  }
+
+  return {
+    accounts: connection.addresses.value,
+    connector: connection.connector.value,
+  }
+})
 
 const walletStates = computed<Record<string, WalletState>>(() => {
   return wallets.value.reduce((acc, wallet) => {
@@ -73,7 +86,7 @@ function initWalletWatchers() {
   watchForSubWalletStoreAccountsChanges()
 
   // evm
-  // watchForAuthorizedEvmWallets()
+  watchForEvmConnectionsChanges()
 }
 
 function getSubWalletExtensions(): WalletExtension[] {
@@ -93,13 +106,19 @@ function getSubWalletExtensions(): WalletExtension[] {
 }
 
 function getEvmWalletExtensions(): WalletExtension[] {
-  return [
-    {
-      ...REOWN_WALLET_CONFIG,
+  return connectors.value
+    .filter(connector => connector.id !== 'injected')
+    .map(connector => ({
+      id: connector.id,
+      name: connector.name,
+      icon: connector.icon ?? '/partners/logo-evm.svg',
+      url: '',
+      source: connector.id,
+      installed: true,
+      vm: 'EVM',
       accounts: [],
       state: WalletStates.Idle,
-    },
-  ]
+    }))
 }
 
 function getWalletExtensions(): WalletExtension[] {
@@ -166,36 +185,52 @@ function watchForAuthorizedSubWallets() {
   }, { immediate: true })
 }
 
-// Disabled after #559
-// function watchForAuthorizedEvmWallets() {
-//   const { accounts, wallet } = useReown()
+function watchForEvmConnectionsChanges() {
+  watch(currentEvmConnection, async (liveConnection) => {
+    const evmWallets = wallets.value.filter(wallet => wallet.vm === 'EVM')
+    const activeWalletId = liveConnection?.connector.id
 
-//   watch([
-//     accounts,
-//     wallet,
-//     computed(() => wallets.value.find(wallet => wallet.id === REOWN_WALLET_CONFIG.id)),
-//   ], ([accountsState, wallet, extension]) => {
-//     if (!accountsState || !extension || !wallet) {
-//       return
-//     }
+    for (const wallet of evmWallets) {
+      const isActiveWallet = wallet.id === activeWalletId
 
-//     const accounts = formatEvmAccounts({ extension, wallet, accounts: accountsState })
+      if (!isActiveWallet) {
+        if (wallet.accounts.length > 0 || wallet.state === WalletStates.Connected) {
+          walletStore.updateWallet(wallet.id, {
+            accounts: [],
+            state: WalletStates.Idle,
+          })
+        }
 
-//     const toConnect = extension.state === WalletStates.Authorized
-//     const accountsChanged = !areArraysEqual(accounts.map(account => account.id), extension.accounts.map(account => account.id)) && extension.state === WalletStates.Connected
+        if (walletStore.isWalletAccountSelected(wallet)) {
+          walletStore.setSelectedAccount('EVM', '')
+          await accountStore.clearAuth('EVM')
+        }
 
-//     if (!toConnect && !accountsChanged) {
-//       return
-//     }
+        continue
+      }
 
-//     walletStore.updateWallet(extension.id, {
-//       state: WalletStates.Connected,
-//       accounts,
-//     })
-//   }, {
-//     immediate: true,
-//   })
-// }
+      if (!liveConnection) {
+        continue
+      }
+
+      const accounts = formatEvmAccounts({
+        accounts: liveConnection.accounts.map(address => ({ address })),
+        extension: wallet,
+      })
+
+      const currentAccountIds = wallet.accounts.map(account => account.id)
+      const nextAccountIds = accounts.map(account => account.id)
+      const accountsChanged = JSON.stringify(currentAccountIds) !== JSON.stringify(nextAccountIds)
+
+      if (wallet.state !== WalletStates.Connected || accountsChanged) {
+        walletStore.updateWallet(wallet.id, {
+          accounts,
+          state: WalletStates.Connected,
+        })
+      }
+    }
+  }, { immediate: true })
+}
 
 whenever(
   () => subWalletStore.injectionStatus !== 'checking',

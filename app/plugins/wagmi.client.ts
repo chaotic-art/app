@@ -1,47 +1,29 @@
-import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { base } from '@reown/appkit/networks'
-import { reconnect } from '@wagmi/core'
-import { WagmiPlugin } from '@wagmi/vue'
-
-const networks = [base] // TODO: temporary hardcoded network, we need to add more networks
-
-const metadata = {
-  name: 'Chaotic',
-  description: 'Chaotic - Generative Art Marketplace',
-  url: 'https://chaotic.art',
-  icons: ['https://avatars.githubusercontent.com/u/179229932?s=200&v=4'],
-}
+import type { Chain } from 'viem'
+import { cookieStorage, createConfig, createStorage, http, WagmiPlugin } from '@wagmi/vue'
+import { injected } from '@wagmi/vue/connectors'
+import { chainsForWagmi as networks } from '~/utils/viem'
 
 export interface WagmiPluginProvide {
-  adapter: WagmiAdapter
-  projectId: string
-  networks: typeof networks
-  metadata: typeof metadata
+  config: ReturnType<typeof createConfig>
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const buildWagmiAdapter = (projectId: string) => {
-    return new WagmiAdapter({
-      networks: networks as never,
-      projectId,
-    })
-  }
+  const config = createConfig({
+    chains: networks as [Chain, ...Chain[]],
+    connectors: [injected()],
+    ssr: true,
+    storage: createStorage({
+      storage: cookieStorage,
+    }),
+    transports: Object.fromEntries(networks.map(chain => [chain.id, http()])),
+  })
 
-  const projectId = useRuntimeConfig().public.reownProjectId
-
-  const adapter = buildWagmiAdapter(projectId)
-
-  nuxtApp.vueApp.use(WagmiPlugin, { config: adapter.wagmiConfig })
-
-  reconnect(adapter.wagmiConfig)
+  nuxtApp.vueApp.use(WagmiPlugin, { config })
 
   return {
     provide: {
       wagmi: {
-        adapter,
-        projectId,
-        networks,
-        metadata,
+        config,
       } satisfies WagmiPluginProvide,
     },
   }
