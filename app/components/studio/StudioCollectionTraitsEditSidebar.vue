@@ -55,7 +55,7 @@ function close() {
 
 async function confirmEdit() {
   const row = props.nft
-  if (!row || validEditProperties.value.length === 0) {
+  if (!row) {
     return
   }
   submitting.value = true
@@ -189,7 +189,7 @@ async function confirmEdit() {
             </UButton>
             <UButton
               class="flex-1"
-              :disabled="submitting || validEditProperties.length === 0"
+              :disabled="submitting"
               :loading="submitting"
               @click="confirmEdit"
             >
