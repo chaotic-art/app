@@ -559,6 +559,84 @@ export function useNftPallets() {
     }
   }
 
+  interface UpdateItemAttributesParams {
+    chain: AssetHubChain
+    collectionId: number
+    itemId: number
+    properties: Property[]
+    metadataUri?: string
+  }
+
+  async function getItemMetadataUri(chain: AssetHubChain, collectionId: number, itemId: number): Promise<string | null> {
+    const api = $sdk(chain).api
+    const meta = await api.query.Nfts.ItemMetadataOf.getValue(collectionId, itemId)
+    return meta?.data?.asText() ?? null
+  }
+
+  async function updateItemAttributes({
+    chain,
+    collectionId,
+    itemId,
+    properties,
+    metadataUri: newMetadataUri,
+  }: UpdateItemAttributesParams) {
+    const { signer } = await getAccountSigner()
+    const api = $sdk(chain).api
+
+    const validProperties = properties.filter(p => p.trait.trim() && p.value.trim())
+    const calls = [] as Parameters<typeof api.tx.Utility.batch_all>[0]['calls']
+
+    if (newMetadataUri) {
+      calls.push(api.tx.Nfts.set_metadata({
+        collection: collectionId,
+        item: itemId,
+        data: Binary.fromText(newMetadataUri),
+      }).decodedCall)
+    }
+
+    validProperties.forEach((property) => {
+      const _txAttribute = api.tx.Nfts.set_attribute({
+        collection: collectionId,
+        maybe_item: itemId,
+        namespace: {
+          type: 'CollectionOwner',
+          value: undefined,
+        },
+        key: Binary.fromText(property.trait),
+        value: Binary.fromText(property.value),
+      })
+      calls.push(_txAttribute.decodedCall)
+    })
+
+    if (calls.length === 0) {
+      throw new Error('At least one trait and value is required')
+    }
+
+    open.value = true
+    const transaction = api.tx.Utility.batch_all({ calls })
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+          result.value = {
+            type: 'update_attributes',
+            collectionId: String(collectionId),
+            itemId,
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Update attributes error:', err)
+        error.value = err
+      },
+    })
+  }
+
   async function listNfts({
     nfts,
     chain,
@@ -1300,6 +1378,8 @@ export function useNftPallets() {
     createCollection,
     updateCollection,
     mintNft,
+    getItemMetadataUri,
+    updateItemAttributes,
     listNfts,
     userCollection,
     userBalance,
