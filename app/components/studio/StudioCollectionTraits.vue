@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { TableColumn } from '@nuxt/ui'
+import type { NftTraitsEditRow } from '~/components/studio/StudioCollectionTraitsEditSidebar.vue'
+import { h, resolveComponent } from 'vue'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 interface Props {
@@ -10,20 +13,25 @@ interface NftTraitProperty {
   value: string
 }
 
-interface NftRow {
-  sn: number
-  image?: string | null
-  name: string
-  properties: Array<{ trait: string, value: string }>
-}
-
 const props = defineProps<Props>()
 const search = ref('')
 const {
   loading,
   nftsList,
+  refetch,
 } = useCollectionAttributes({
   collectionId: computed(() => props.collectionId),
+})
+
+const { onSuccess } = useTransactionModal()
+
+const sidebarOpen = ref(false)
+const editingRow = ref<NftTraitsEditRow | null>(null)
+
+watch(sidebarOpen, (v) => {
+  if (!v) {
+    editingRow.value = null
+  }
 })
 
 function parseSn(id?: string) {
@@ -54,14 +62,14 @@ function normalizeProperties(attrs?: NftTraitProperty[]) {
   return out
 }
 
-const rows = computed<NftRow[]>(() => {
+const rows = computed<NftTraitsEditRow[]>(() => {
   const base = (nftsList.value ?? []).map((nft) => {
     return {
       sn: parseSn(nft.id),
       image: nft.meta?.image ?? null,
       name: (nft.name?.trim() || 'Untitled NFT'),
       properties: normalizeProperties(nft.meta?.attributes as NftTraitProperty[] | undefined),
-    } satisfies NftRow
+    } satisfies NftTraitsEditRow
   })
 
   base.sort((a, b) => a.sn - b.sn)
@@ -82,7 +90,16 @@ const filteredRows = computed(() => {
   })
 })
 
-const columns = [
+function openEditSidebar(row: NftTraitsEditRow) {
+  editingRow.value = row
+  sidebarOpen.value = true
+}
+
+onSuccess('update_attributes', () => {
+  refetch()
+})
+
+const columns: TableColumn<NftTraitsEditRow>[] = [
   {
     accessorKey: 'sn',
     header: '#',
@@ -98,6 +115,21 @@ const columns = [
   {
     accessorKey: 'properties',
     header: 'Properties',
+  },
+  {
+    id: 'actions',
+    header: '',
+    cell: ({ row }) =>
+      h('div', { class: 'py-2' }, [
+        h(resolveComponent('UButton'), {
+          'variant': 'ghost',
+          'color': 'neutral',
+          'size': 'sm',
+          'icon': 'i-heroicons-pencil-square',
+          'aria-label': 'Edit traits',
+          'onClick': () => openEditSidebar(row.original),
+        }),
+      ]),
   },
 ]
 </script>
@@ -177,5 +209,11 @@ const columns = [
         </UTable>
       </div>
     </div>
+
+    <StudioCollectionTraitsEditSidebar
+      v-model:open="sidebarOpen"
+      :collection-id="collectionId"
+      :nft="editingRow"
+    />
   </div>
 </template>
