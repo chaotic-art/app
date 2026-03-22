@@ -106,19 +106,21 @@ function getSubWalletExtensions(): WalletExtension[] {
 }
 
 function getEvmWalletExtensions(): WalletExtension[] {
-  return connectors.value
-    .filter(connector => connector.id !== 'injected')
-    .map(connector => ({
-      id: connector.id,
-      name: connector.name,
-      icon: connector.icon ?? '/partners/logo-evm.svg',
-      url: '',
-      source: connector.id,
-      installed: true,
-      vm: 'EVM',
-      accounts: [],
-      state: WalletStates.Idle,
-    }))
+  const evmConnectors = connectors.value.filter(connector => connector.type === 'injected')
+  const discoveredConnectors = evmConnectors.filter(connector => connector.id !== 'injected')
+  const visibleConnectors = discoveredConnectors.length ? discoveredConnectors : evmConnectors
+
+  return visibleConnectors.map(connector => ({
+    id: connector.id,
+    name: connector.name,
+    icon: connector.icon ?? '/partners/logo-evm.svg',
+    url: '',
+    source: connector.id,
+    installed: true,
+    vm: 'EVM',
+    accounts: [],
+    state: WalletStates.Idle,
+  }))
 }
 
 function getWalletExtensions(): WalletExtension[] {
