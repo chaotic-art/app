@@ -158,6 +158,16 @@ interface CreateSwapParams {
   type?: TxType
 }
 
+interface BulkUpdateItemsAttributesParams {
+  chain: AssetHubChain
+  collectionId: number
+  items: Array<{
+    itemId: number
+    properties: Property[]
+    metadataUri: string
+  }>
+}
+
 export type SwapSurchargeDirection = 'Send' | 'Receive'
 
 export interface SwapSurcharge { amount: string, direction: SwapSurchargeDirection }
@@ -632,6 +642,73 @@ export function useNftPallets() {
       },
       error: (err) => {
         console.error('Update attributes error:', err)
+        error.value = err
+      },
+    })
+  }
+
+  async function bulkUpdateItemsAttributes({
+    chain,
+    collectionId,
+    items,
+  }: BulkUpdateItemsAttributesParams) {
+    if (items.length === 0) {
+      throw new Error('No updates to submit')
+    }
+
+    const { signer } = await getAccountSigner()
+    const api = $sdk(chain).api
+    const calls = [] as Parameters<typeof api.tx.Utility.batch_all>[0]['calls']
+
+    for (const item of items) {
+      const validProperties = item.properties.filter(p => p.trait.trim() && p.value.trim())
+      calls.push(
+        api.tx.Nfts.set_metadata({
+          collection: collectionId,
+          item: item.itemId,
+          data: Binary.fromText(item.metadataUri),
+        }).decodedCall,
+      )
+      validProperties.forEach((property) => {
+        calls.push(
+          api.tx.Nfts.set_attribute({
+            collection: collectionId,
+            maybe_item: item.itemId,
+            namespace: {
+              type: 'CollectionOwner',
+              value: undefined,
+            },
+            key: Binary.fromText(property.trait),
+            value: Binary.fromText(property.value),
+          }).decodedCall,
+        )
+      })
+    }
+
+    if (calls.length === 0) {
+      throw new Error('No updates to submit')
+    }
+
+    open.value = true
+    const transaction = api.tx.Utility.batch_all({ calls })
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+          result.value = {
+            type: 'bulk_update_attributes',
+            collectionId: String(collectionId),
+            itemIds: items.map(i => i.itemId),
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Bulk update attributes error:', err)
         error.value = err
       },
     })
@@ -1380,6 +1457,7 @@ export function useNftPallets() {
     mintNft,
     getItemMetadataUri,
     updateItemAttributes,
+    bulkUpdateItemsAttributes,
     listNfts,
     userCollection,
     userBalance,
