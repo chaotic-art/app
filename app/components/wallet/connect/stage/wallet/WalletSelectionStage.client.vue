@@ -21,7 +21,7 @@ const filteredInstalledWallets = computed(() => {
   if (activeTab.value === 'All') {
     return installedWallets.value
   }
-  return ACTIVE_TAB_VM_MAP[activeTab.value]
+  return installedWallets.value.filter(wallet => wallet.vm === ACTIVE_TAB_VM_MAP[activeTab.value])
 })
 
 async function processWalletExtensions(extensions: WalletExtension[], connectOnly: boolean): Promise<boolean> {
