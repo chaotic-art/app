@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { formatSubAccounts } from '@/utils/wallet'
-import { REOWN_WALLET_CONFIG } from '@/utils/wallet/evm/config'
+import type { EvmWalletAccount } from '@/utils/wallet'
+import { useConnect, useConnections, useConnectors } from '@wagmi/vue'
+import { formatEvmAccounts, formatSubAccounts } from '@/utils/wallet'
+import { chainsForWagmi } from '~/utils/viem'
 
 const walletStore = useWalletStore()
 const { wallets } = storeToRefs(walletStore)
 const subWalletStore = useSubWalletStore()
+const connectors = useConnectors()
+const connections = useConnections()
+const { mutateAsync: connectAsync } = useConnect()
 
 const queuedWallets = computed(() => wallets.value.filter(wallet =>
   wallet.state === WalletStates.AuthorizationQueued
@@ -14,27 +19,6 @@ const queuedWallets = computed(() => wallets.value.filter(wallet =>
 
 const currentExtensionId = ref<string | undefined>(queuedWallets.value[0]?.id)
 const currentExtension = computed<WalletExtension | undefined>(() => queuedWallets.value.find(wallet => wallet.id === currentExtensionId.value))
-
-const { openModal, isReady: isReownReady } = useReown({
-  onWalletChange: (wallet) => {
-    const extension = currentExtension.value
-
-    if (!extension || !wallet) {
-      return
-    }
-
-    if (extension.id !== REOWN_WALLET_CONFIG.id) {
-      return
-    }
-
-    setWalletAuthorized(extension)
-  },
-  onModalOpenChange: (open) => {
-    if (!open && currentExtension.value && currentExtension.value.state !== WalletStates.Connected) {
-      setWalletConnectionFailed(currentExtension.value)
-    }
-  },
-})
 
 async function initSubAuthorization(extension: WalletExtension): Promise<WalletAccount[]> {
   const { accounts } = await subWalletStore.connectWallet(extension.source as any)
@@ -67,8 +51,43 @@ function setWalletAuthorized(extension: WalletExtension, accounts?: WalletAccoun
   currentExtensionId.value = queuedWallets.value[0]?.id
 }
 
-async function initEvmAuth() {
-  openModal()
+function setWalletConnected(extension: WalletExtension, accounts: WalletAccount[]) {
+  walletStore.updateWallet(extension.id, {
+    accounts,
+    isSelected: true,
+    state: WalletStates.Connected,
+  })
+
+  currentExtensionId.value = queuedWallets.value[0]?.id
+}
+
+async function initEvmAuthorization(extension: WalletExtension) {
+  const connector = connectors.value.find(connector => connector.id === extension.id)
+  const liveConnection = connections.value.find(connection => connection.connector.id === extension.id)
+
+  if (!connector) {
+    setWalletConnectionFailed(extension)
+    return
+  }
+
+  let accounts: EvmWalletAccount[] = []
+
+  if (!liveConnection) {
+    const connectedData = await connectAsync({
+      chainId: chainsForWagmi[0]?.id,
+      connector,
+    })
+
+    accounts = connectedData.accounts.map(address => ({ address }))
+  }
+  else {
+    accounts = liveConnection.accounts.map(address => ({ address }))
+  }
+
+  setWalletConnected(extension, formatEvmAccounts({
+    accounts,
+    extension,
+  }))
 }
 
 async function initExtensionAuthorization(extension: WalletExtension) {
@@ -85,7 +104,7 @@ async function initExtensionAuthorization(extension: WalletExtension) {
       }
     }
     else {
-      await initEvmAuth()
+      await initEvmAuthorization(extension)
     }
   }
   catch {
@@ -112,11 +131,7 @@ function handleRetry(extension: WalletExtension) {
   initExtensionAuthorization(extension)
 }
 
-watch([currentExtension, isReownReady], ([extension, isReady]) => {
-  if (!isReady) {
-    return
-  }
-
+watch(currentExtension, (extension) => {
   handleQueue(extension)
 }, { immediate: true })
 </script>
