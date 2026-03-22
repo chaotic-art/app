@@ -5,6 +5,7 @@ import { pinJson } from '~/services/storage'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
 export interface NftTraitsEditRow {
+  id: string
   sn: number
   image?: string | null
   name: string

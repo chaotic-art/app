@@ -12,6 +12,15 @@ type ViewMode = 'table' | 'charts'
 
 const props = defineProps<Props>()
 
+const route = useRoute()
+const bulkEditStudioTo = computed(() => {
+  const chain = typeof route.params.chain === 'string' ? route.params.chain : ''
+  if (!chain || !props.collectionId) {
+    return ''
+  }
+  return `/${chain}/studio/${props.collectionId}/traits?bulk=1`
+})
+
 const { attributesRarityMaps, traitCounts, loading } = useCollectionAttributes({
   collectionId: computed(() => props.collectionId),
 })
@@ -158,13 +167,23 @@ function exportToCsv() {
                 </UButton>
               </div>
             </div>
-            <UButton
-              icon="i-heroicons-arrow-down-tray"
-              variant="outline"
-              @click="exportToCsv"
-            >
-              Export to CSV
-            </UButton>
+            <div class="flex flex-wrap items-center gap-2">
+              <UButton
+                v-if="bulkEditStudioTo"
+                :to="bulkEditStudioTo"
+                icon="i-heroicons-document-pencil"
+                variant="outline"
+              >
+                Bulk Edit
+              </UButton>
+              <UButton
+                icon="i-heroicons-arrow-down-tray"
+                variant="outline"
+                @click="exportToCsv"
+              >
+                Export to CSV
+              </UButton>
+            </div>
           </div>
 
           <div v-if="viewMode === 'charts'" class="flex items-center gap-2">
