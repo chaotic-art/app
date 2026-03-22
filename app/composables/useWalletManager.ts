@@ -24,7 +24,6 @@ export function useWalletSidebar() {
 
 export default function useWalletManager() {
   const walletStore = useWalletStore()
-  const { accountId } = useAuth()
   const { selectedAccounts, getUserConnectedWallets } = storeToRefs(walletStore)
   const accountStore = useAccountStore()
   const disconnectEvent = createEventHook<void>()
@@ -71,7 +70,7 @@ export default function useWalletManager() {
   }
 
   whenever(
-    () => !accountId.value,
+    () => getUserConnectedWallets.value.length === 0,
     () => disconnectEvent.trigger(),
     { flush: 'sync' },
   )
