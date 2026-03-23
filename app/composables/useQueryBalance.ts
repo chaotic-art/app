@@ -7,12 +7,12 @@ export default function ({ enabled = ref(true) }: { enabled?: Ref<boolean> } = {
   const { existentialDeposit } = useDeposit(currentChain)
 
   const { data, isPending: isLoading } = useQuery({
-    queryKey: ['wallet-balance', computed(() => getConnectedSubAccount.value?.address)],
+    queryKey: ['wallet-balance', currentChain, computed(() => getConnectedSubAccount.value?.address)],
     queryFn: () => {
       return getConnectedSubAccount.value
         ? getBalance({
             address: getConnectedSubAccount.value.address,
-            prefix: currentChain.value,
+            chain: currentChain.value,
           })
         : Promise.resolve(null)
     },

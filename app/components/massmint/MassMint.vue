@@ -63,7 +63,7 @@ const { data: balanceData } = useQuery({
   queryFn: () => {
     return getBalance({
       address: accountId.value,
-      prefix: state.blockchain,
+      chain: state.blockchain,
     })
   },
 })
