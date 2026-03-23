@@ -33,7 +33,7 @@ const { data: balance } = useQuery({
   queryFn: async () => {
     const response = await getBalance({
       address: accountId.value,
-      prefix: currentChain.value,
+      chain: currentChain.value,
     })
 
     return response.balance
