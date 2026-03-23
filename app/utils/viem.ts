@@ -1,4 +1,4 @@
-import type { Address, Chain } from 'viem'
+import type { Chain } from 'viem'
 import { createPublicClient, defineChain, http as viemHttp } from 'viem'
 
 export const CHAIN_POLKADOT_TESTNET = {

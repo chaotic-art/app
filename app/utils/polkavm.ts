@@ -1,5 +1,5 @@
 import type { SmartContractKey } from '~/utils/viem'
-import { CHAIN_POLKADOT_TESTNET, getContractAddress, getPublicClient } from '~/utils/viem'
+import { CHAIN_POLKADOT_TESTNET, getPublicClient } from '~/utils/viem'
 
 export const POLKAVM_TEST_CHAINS = [
   {
