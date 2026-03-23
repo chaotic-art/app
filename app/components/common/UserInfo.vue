@@ -7,15 +7,18 @@ const props = withDefaults(
     avatarSize?: number
     transparentBackground?: boolean
     customName?: boolean
+    openProfileOnClick?: boolean
   }>(),
   {
     address: '',
     avatarSize: 40,
     customName: false,
     transparentBackground: false,
+    openProfileOnClick: true,
   },
 )
 
+const NuxtLink = resolveComponent('NuxtLink')
 const { currentChain } = useChain()
 
 const { profile: profileFromAddress } = useFetchProfile(
@@ -23,12 +26,24 @@ const { profile: profileFromAddress } = useFetchProfile(
 )
 
 const name = computed(() => profileFromAddress.value?.name || shortenAddress(props.address))
+
+const linkComponent = computed(() => props.openProfileOnClick ? NuxtLink : 'div')
+const linkProps = computed(() => props.openProfileOnClick ? { to: `/${currentChain.value}/u/${props.address}` } : {})
 </script>
 
 <template>
-  <NuxtLink :to="`/${currentChain}/u/${address}`" class="flex items-center gap-2 rounded-full w-fit min-w-0 bg-secondary hover:bg-border" :class="{ 'bg-transparent!': transparentBackground, 'px-2 py-1.5': !transparentBackground }">
+  <component
+    :is="linkComponent"
+    v-bind="linkProps"
+    class="flex items-center gap-2 rounded-full w-fit min-w-0 bg-secondary hover:bg-border"
+    :class="{
+      'bg-transparent!': transparentBackground,
+      'px-2 py-1.5': !transparentBackground,
+      'cursor-pointer': props.openProfileOnClick,
+    }"
+  >
     <ProfileAvatar :address="address" :size="avatarSize" />
     <slot name="name" :address-name="name" :description="profileFromAddress?.description" />
     <span v-if="!customName" class="text-ellipsis overflow-hidden whitespace-nowrap">{{ name }}</span>
-  </NuxtLink>
+  </component>
 </template>

@@ -97,6 +97,22 @@ export interface DestroyCollectionTransactionResult {
   collectionId: number
 }
 
+export interface UpdateAttributesTransactionResult {
+  type: 'update_attributes'
+  collectionId: string
+  itemId: number
+  hash: string
+  prefix: AssetHubChain
+}
+
+export interface BulkUpdateAttributesTransactionResult {
+  type: 'bulk_update_attributes'
+  collectionId: string
+  itemIds: number[]
+  hash: string
+  prefix: AssetHubChain
+}
+
 type TransactionResult
   = CollectionCategory
     | NftCategory
@@ -109,6 +125,8 @@ type TransactionResult
     | CancelSwapTransactionResult
     | CreateSwapTransactionResult
     | DestroyCollectionTransactionResult
+    | UpdateAttributesTransactionResult
+    | BulkUpdateAttributesTransactionResult
 
 // Transaction status progression:
 // 1. status.value = 'signed'

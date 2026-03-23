@@ -10,7 +10,7 @@ const route = useRoute()
 const router = useRouter()
 const { currentChain } = useChain()
 
-const validTabs = ['preview', 'details', 'items'] as const
+const validTabs = ['preview', 'details', 'items', 'traits'] as const
 
 const tabLabels: Record<string, string> = {
   massmint: 'Mass Mint',
@@ -18,6 +18,7 @@ const tabLabels: Record<string, string> = {
   preview: 'Preview',
   details: 'Details',
   items: 'Items',
+  traits: 'Traits',
 }
 
 const collectionId = computed(() => route.params.collection_id as string)
@@ -54,6 +55,7 @@ const navItems: StudioNavItem[] = [
   { id: 'preview' as const, label: 'Preview', icon: 'i-heroicons:eye' },
   { id: 'details' as const, label: 'Details', icon: 'i-heroicons-cog-6-tooth' },
   { id: 'items' as const, label: 'Items', icon: 'i-heroicons-squares-2x2' },
+  { id: 'traits' as const, label: 'Traits', icon: 'i-heroicons-tag' },
 ]
 
 function setTab(tab: (typeof validTabs)[number]) {

@@ -158,6 +158,16 @@ interface CreateSwapParams {
   type?: TxType
 }
 
+interface BulkUpdateItemsAttributesParams {
+  chain: AssetHubChain
+  collectionId: number
+  items: Array<{
+    itemId: number
+    properties: Property[]
+    metadataUri: string
+  }>
+}
+
 export type SwapSurchargeDirection = 'Send' | 'Receive'
 
 export interface SwapSurcharge { amount: string, direction: SwapSurchargeDirection }
@@ -557,6 +567,151 @@ export function useNftPallets() {
       signer,
       address: account.address,
     }
+  }
+
+  interface UpdateItemAttributesParams {
+    chain: AssetHubChain
+    collectionId: number
+    itemId: number
+    properties: Property[]
+    metadataUri?: string
+  }
+
+  async function getItemMetadataUri(chain: AssetHubChain, collectionId: number, itemId: number): Promise<string | null> {
+    const api = $sdk(chain).api
+    const meta = await api.query.Nfts.ItemMetadataOf.getValue(collectionId, itemId)
+    return meta?.data?.asText() ?? null
+  }
+
+  async function updateItemAttributes({
+    chain,
+    collectionId,
+    itemId,
+    properties,
+    metadataUri: newMetadataUri,
+  }: UpdateItemAttributesParams) {
+    const { signer } = await getAccountSigner()
+    const api = $sdk(chain).api
+
+    const validProperties = properties.filter(p => p.trait.trim() && p.value.trim())
+    const calls = [] as Parameters<typeof api.tx.Utility.batch_all>[0]['calls']
+
+    if (newMetadataUri) {
+      calls.push(api.tx.Nfts.set_metadata({
+        collection: collectionId,
+        item: itemId,
+        data: Binary.fromText(newMetadataUri),
+      }).decodedCall)
+    }
+
+    validProperties.forEach((property) => {
+      const _txAttribute = api.tx.Nfts.set_attribute({
+        collection: collectionId,
+        maybe_item: itemId,
+        namespace: {
+          type: 'CollectionOwner',
+          value: undefined,
+        },
+        key: Binary.fromText(property.trait),
+        value: Binary.fromText(property.value),
+      })
+      calls.push(_txAttribute.decodedCall)
+    })
+
+    if (calls.length === 0) {
+      throw new Error('At least one trait and value is required')
+    }
+
+    open.value = true
+    const transaction = api.tx.Utility.batch_all({ calls })
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+          result.value = {
+            type: 'update_attributes',
+            collectionId: String(collectionId),
+            itemId,
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Update attributes error:', err)
+        error.value = err
+      },
+    })
+  }
+
+  async function bulkUpdateItemsAttributes({
+    chain,
+    collectionId,
+    items,
+  }: BulkUpdateItemsAttributesParams) {
+    if (items.length === 0) {
+      throw new Error('No updates to submit')
+    }
+
+    const { signer } = await getAccountSigner()
+    const api = $sdk(chain).api
+    const calls = [] as Parameters<typeof api.tx.Utility.batch_all>[0]['calls']
+
+    for (const item of items) {
+      const validProperties = item.properties.filter(p => p.trait.trim() && p.value.trim())
+      calls.push(
+        api.tx.Nfts.set_metadata({
+          collection: collectionId,
+          item: item.itemId,
+          data: Binary.fromText(item.metadataUri),
+        }).decodedCall,
+      )
+      validProperties.forEach((property) => {
+        calls.push(
+          api.tx.Nfts.set_attribute({
+            collection: collectionId,
+            maybe_item: item.itemId,
+            namespace: {
+              type: 'CollectionOwner',
+              value: undefined,
+            },
+            key: Binary.fromText(property.trait),
+            value: Binary.fromText(property.value),
+          }).decodedCall,
+        )
+      })
+    }
+
+    if (calls.length === 0) {
+      throw new Error('No updates to submit')
+    }
+
+    open.value = true
+    const transaction = api.tx.Utility.batch_all({ calls })
+
+    transaction.signSubmitAndWatch(signer).subscribe({
+      next: (event) => {
+        status.value = event.type
+
+        if (event.type === 'txBestBlocksState' && event.found) {
+          hash.value = event.txHash.toString()
+          result.value = {
+            type: 'bulk_update_attributes',
+            collectionId: String(collectionId),
+            itemIds: items.map(i => i.itemId),
+            hash: hash.value,
+            prefix: chain,
+          }
+        }
+      },
+      error: (err) => {
+        console.error('Bulk update attributes error:', err)
+        error.value = err
+      },
+    })
   }
 
   async function listNfts({
@@ -1300,6 +1455,9 @@ export function useNftPallets() {
     createCollection,
     updateCollection,
     mintNft,
+    getItemMetadataUri,
+    updateItemAttributes,
+    bulkUpdateItemsAttributes,
     listNfts,
     userCollection,
     userBalance,

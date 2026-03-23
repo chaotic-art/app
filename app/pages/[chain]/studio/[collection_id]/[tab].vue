@@ -2,7 +2,7 @@
 import CollectionHeader from '~/components/collection/CollectionHeader.vue'
 import { isAssetHubChain } from '~/utils/chain'
 
-const validTabs = ['preview', 'details', 'items'] as const
+const validTabs = ['preview', 'details', 'items', 'traits'] as const
 
 definePageMeta({
   layout: 'studio-collection',
@@ -39,6 +39,10 @@ const { collection } = useOdaCollection(collectionId)
     />
     <StudioCollectionItems
       v-else-if="tab === 'items'"
+      :collection-id="collectionId"
+    />
+    <StudioCollectionTraits
+      v-else-if="tab === 'traits'"
       :collection-id="collectionId"
     />
   </div>
