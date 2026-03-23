@@ -18,6 +18,7 @@ const props = withDefaults(
   },
 )
 
+const NuxtLink = resolveComponent('NuxtLink')
 const { currentChain } = useChain()
 
 const { profile: profileFromAddress } = useFetchProfile(
@@ -26,8 +27,8 @@ const { profile: profileFromAddress } = useFetchProfile(
 
 const name = computed(() => profileFromAddress.value?.name || shortenAddress(props.address))
 
-const linkComponent = computed(() => props.openProfileOnClick ? 'NuxtLink' : 'div')
-const linkProps = computed(() => props.openProfileOnClick ? { to: `/${currentChain}/u/${props.address}` } : {})
+const linkComponent = computed(() => props.openProfileOnClick ? NuxtLink : 'div')
+const linkProps = computed(() => props.openProfileOnClick ? { to: `/${currentChain.value}/u/${props.address}` } : {})
 </script>
 
 <template>
@@ -38,6 +39,7 @@ const linkProps = computed(() => props.openProfileOnClick ? { to: `/${currentCha
     :class="{
       'bg-transparent!': transparentBackground,
       'px-2 py-1.5': !transparentBackground,
+      'cursor-pointer': props.openProfileOnClick,
     }"
   >
     <ProfileAvatar :address="address" :size="avatarSize" />
