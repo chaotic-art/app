@@ -5,7 +5,6 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 import { TradeTypes } from '@/components/trade/types'
 import { fetchOdaCollection } from '~/services/oda'
 import { normalizeRarityTotalItems } from '~/types/rarity'
-import { chainSpec } from '~/utils/chain'
 
 const availableTabs = ['items', 'activity', 'offers', 'swaps', 'traits', 'analytics'] as const
 type CollectionTab = typeof availableTabs[number]
@@ -185,7 +184,7 @@ function handleSelectedTraitsUpdate(traits: SelectedTrait[]) {
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && chain in chainSpec
+    return typeof chain === 'string' && isSupportedChain(chain)
   },
 })
 

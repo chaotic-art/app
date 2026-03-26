@@ -1,6 +1,6 @@
-import type { Prefix } from '@kodadot1/static'
+import type { Chain } from '@/types'
 import { formatBalance } from 'dedot/utils'
-import { chainToPrecisionMap, prefixToChainMap } from '@/types'
+import { chainToPrecisionMap } from '@/utils/chain'
 
 export function checkInvalidBalanceFilter(value: number) {
   if (value === Infinity) {
@@ -26,15 +26,15 @@ function roundAmount(value: string, limit?: number, disableFilter?: boolean) {
     : roundTo(value, limit)
 }
 
-export function formatAmountWithRound(value: string | number | bigint, tokenDecimals: number, roundBy?: number | Prefix) {
+export function formatAmountWithRound(value: string | number | bigint, tokenDecimals: number, roundBy?: number | Chain) {
   let round: number | undefined
-  let roundByPrefix = false
+  let roundByChain = false
 
   if (typeof roundBy === 'string') {
-    const prefix = roundBy as Prefix
-    if (prefix && isEvm(prefix)) {
-      roundByPrefix = true
-      round = chainToPrecisionMap[prefixToChainMap[prefix]]
+    const chain = roundBy
+    if (chain && isEvmChainAccount(chain)) {
+      roundByChain = true
+      round = chainToPrecisionMap[chain]
     }
   }
   else {
@@ -44,7 +44,7 @@ export function formatAmountWithRound(value: string | number | bigint, tokenDeci
   return roundAmount(
     formatBalance(checkInvalidBalanceFilter(Number(value)), { decimals: tokenDecimals, withAll: true }),
     round === 0 ? round : round || 4,
-    roundByPrefix ? false : round === undefined,
+    roundByChain ? false : round === undefined,
   )
 }
 

@@ -12,8 +12,7 @@ function getDefaultAccount(): AccountVm {
 }
 
 export const useAccountStore = defineStore('account', () => {
-  const { currentChain } = useChain()
-  const { vm } = useVm()
+  const { currentChain, vm } = useChain()
 
   const loading = ref(false)
   const accounts = ref<Record<ChainVM, AccountVm>>({

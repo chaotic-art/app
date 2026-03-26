@@ -1,14 +1,19 @@
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { Chain } from '~/types'
 import { decodeAddress, encodeAddress, isEvmAddress } from 'dedot/utils'
+import { isEvmChain } from '~/utils/chain'
 
 export function formatAddress({
   address,
-  prefix,
+  chain,
 }: {
   address: string
-  prefix: SupportedChain
+  chain: Chain
 }) {
-  return encodeAddress(address, chainSpec[prefix as SupportedChain].ss58Format)
+  if (isEvmChain(chain)) {
+    return address
+  }
+
+  return encodeAddress(address, chainSpec[chain].ss58Format)
 }
 
 export function isValidSubstrateAddress(address: string): boolean {
@@ -21,12 +26,12 @@ export function isValidSubstrateAddress(address: string): boolean {
   }
 }
 
-export function getss58AddressByPrefix(address: string, prefix: SupportedChain) {
+export function getss58AddressByPrefix(address: string, chain: Chain) {
   try {
     if (isEvmAddress(address)) {
       return address
     }
-    const ss58Format = chainSpec[prefix as SupportedChain].ss58Format
+    const ss58Format = chainSpec[chain].ss58Format
     const decodedAddress = decodeAddress(address)
     return encodeAddress(decodedAddress, ss58Format)
   }
