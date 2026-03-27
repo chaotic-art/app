@@ -1,52 +1,61 @@
 import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
-import type { Chain, ChainVm, EvmChain } from '~/types/chain'
+import type { Chain, ChainVm, EvmChain, SubstrateChain } from '~/types/chain'
 
-interface ChainSpec {
+interface BaseChainSpec {
   name: string
   tokenSymbol: string
   tokenDecimals: number
-  ss58Format?: number
   vm: ChainVm
 }
 
-// this is static config. for substrate onchain data use getChainSpec() from utils/api/substrate.ts
-export const chainSpec: Record<Chain, ChainSpec> = {
-  // substrate
-  'ahp': {
+type ChainSpec = BaseChainSpec | SubstrateChainSpec
+
+interface SubstrateChainSpec extends BaseChainSpec {
+  ss58Format: number
+}
+
+export const substrateChainSpec: Record<SubstrateChain, SubstrateChainSpec> = {
+  ahp: {
     name: 'Polkadot Asset Hub',
     tokenDecimals: 10,
     tokenSymbol: 'DOT',
     ss58Format: 0,
     vm: 'SUB',
   },
-  'ahk': {
+  ahk: {
     name: 'Kusama Asset Hub',
     tokenDecimals: 12,
     tokenSymbol: 'KSM',
     ss58Format: 2,
     vm: 'SUB',
   },
-  'ahpas': {
+  ahpas: {
     name: 'Paseo Asset Hub',
     tokenDecimals: 10,
     tokenSymbol: 'PAS',
     ss58Format: 0,
     vm: 'SUB',
   },
-  'dot': {
+  dot: {
     name: 'Polkadot',
     tokenDecimals: 10,
     tokenSymbol: 'DOT',
     ss58Format: 0,
     vm: 'SUB',
   },
-  'ksm': {
+  ksm: {
     name: 'Kusama',
     tokenDecimals: 12,
     tokenSymbol: 'KSM',
     ss58Format: 2,
     vm: 'SUB',
   },
+}
+
+// this is static config. for substrate onchain data use getChainSpec() from utils/api/substrate.ts
+export const chainSpec: Record<Chain, ChainSpec> = {
+  // substrate
+  ...substrateChainSpec,
 
   // polkadot hub (contracts) chains
   'polkadot': {

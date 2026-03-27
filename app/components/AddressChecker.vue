@@ -44,11 +44,16 @@ const details = computed<{ title: string, description: string }>(() => {
 })
 
 function getAddressCheck(address: string): AddressCheckResult {
+  // TODO: add evm support
+  if (!ss58Format.value) {
+    return { valid: false }
+  }
+
   if (isValidAddressByss58Format(address, ss58Format.value)) {
     return { valid: true }
   }
 
-  const checks = chains.map(chain => isValidAddressByss58Format(address, chainSpec[chain].ss58Format))
+  const checks = chains.map(chain => isValidAddressByss58Format(address, substrateChainSpec[chain].ss58Format))
 
   if (checks.some(Boolean)) {
     const chain = chains[chains.findIndex(Boolean)]
@@ -71,7 +76,7 @@ function getAddressCheck(address: string): AddressCheckResult {
 function change() {
   emit('change', formatAddress({
     address: props.address,
-    prefix: currentChain.value,
+    chain: currentChain.value,
   }))
   showSuccess.value = true
 }
