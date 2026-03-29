@@ -45,7 +45,7 @@ const details = computed<{ title: string, description: string }>(() => {
 
 function getAddressCheck(address: string): AddressCheckResult {
   // TODO: add evm support
-  if (!ss58Format.value) {
+  if (ss58Format.value === undefined) {
     return { valid: false }
   }
 
