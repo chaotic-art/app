@@ -1,6 +1,6 @@
 import type { Swap, TradeNftItem, TradeType } from '@/components/trade/types'
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { AssetHubChain } from '~/types/chain'
 import { TradeTypes } from '@/components/trade/types'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { fetchOdaCollection, fetchOdaToken } from '~/services/oda'

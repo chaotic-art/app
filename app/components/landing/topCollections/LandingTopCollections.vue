@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
 import TopCollectionsCard from './TopCollectionsCard.vue'
 import { useTopCollections } from './utils/useTopCollections'
 
 const limit = 12
-const { prefix } = usePrefix()
-const { data } = useTopCollections(limit)
+const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
+const { data } = useTopCollections(limit, chain)
 const fiatStore = useFiatStore()
 
 onMounted(() => {
@@ -24,7 +26,7 @@ onMounted(() => {
         <TopCollectionsCard v-for="(collection, i) in data" :key="i" :collection="collection" />
       </div>
       <div class="flex justify-center mt-6 md:mt-8">
-        <UButton :to="`/${prefix}/explore/collectibles`" class="rounded-full" variant="outline">
+        <UButton :to="`/${currentChain}/explore/collectibles`" class="rounded-full" variant="outline">
           {{ $t('collection.viewMore') }}
         </UButton>
       </div>

@@ -1,4 +1,4 @@
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 
 export interface GenartDropItem {
   alias: string

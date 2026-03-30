@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ExploreNftsData } from '~/graphql/queries/explore'
+import type { AssetHubChain } from '~/types/chain'
 import { useDebounceFn } from '@vueuse/core'
 import { exploreNfts } from '~/graphql/queries/explore'
 
@@ -18,6 +19,7 @@ interface Token {
 
 const { $apolloClient } = useNuxtApp()
 const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const input = ref<Token>()
 const items = ref<Token[]>([])
@@ -39,7 +41,7 @@ async function onSearch(searchKey: string = '') {
       orderBy: ['blockNumber_DESC'],
       search: search as any,
     },
-    context: { endpoint: currentChain.value },
+    context: { endpoint: chain.value },
   })
 
   items.value = data.tokenEntities.map(token => ({

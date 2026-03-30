@@ -32,7 +32,7 @@ export function formatAmountWithRound(value: string | number | bigint, tokenDeci
 
   if (typeof roundBy === 'string') {
     const chain = roundBy
-    if (chain && isEvmChainAccount(chain)) {
+    if (chain && isEvmChain(chain)) {
       roundByChain = true
       round = chainToPrecisionMap[chain]
     }

@@ -1,4 +1,5 @@
-import type { AssetHubApi, AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubApi } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 
 export function getOfferCollectionId(chain: AssetHubChain) {
   switch (chain) {

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { MakingOfferItem } from '@/components/trade/types'
+import type { AssetHubChain } from '~/types/chain'
 import { useQuery } from '@tanstack/vue-query'
 import { highestOfferByCollectionId } from '@/graphql/queries/trades'
 
@@ -15,10 +16,17 @@ const makeOfferStore = useMakingOfferStore()
 const { $apolloClient } = useNuxtApp()
 const { doAfterLogin } = useDoAfterlogin()
 const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const { data: collectionOfferData } = useQuery({
-  queryKey: ['highestOfferByCollectionId', collectionId],
-  queryFn: () => $apolloClient.query({ query: highestOfferByCollectionId, variables: { id: collectionId.value } }),
+  queryKey: ['highestOfferByCollectionId', collectionId, chain],
+  queryFn: () => {
+    return $apolloClient.query({
+      query: highestOfferByCollectionId,
+      variables: { id: collectionId.value },
+      context: { endpoint: chain.value },
+    })
+  },
 })
 
 const { collection } = useOdaCollection(collectionId)
@@ -36,7 +44,7 @@ function openOfferModal() {
     id: crypto.randomUUID(),
     name: $i18n.t('offer.anyNftFromCollection'),
     highestOffer: highestOfferPrice.value,
-    chain: currentChain.value,
+    chain: chain.value,
     collection: {
       ...collection.value,
       id: collectionId.value,

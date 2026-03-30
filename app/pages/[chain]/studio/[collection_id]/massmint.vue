@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
 import { MassMint } from '~/components/massmint'
 import { isAssetHubChain } from '~/utils/chain'
 
@@ -15,14 +16,13 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { currentChain } = useChain()
-
+const chain = computed(() => route.params.chain as AssetHubChain)
 const collectionId = computed(() => route.params.collection_id as string)
 </script>
 
 <template>
   <MassMint
     :collection-id="collectionId"
-    :blockchain="currentChain"
+    :blockchain="chain"
   />
 </template>

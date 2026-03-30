@@ -33,7 +33,7 @@ const data = ref<Event[]>([])
 const tmpData = ref<Event[]>([])
 const page = ref(1)
 const itemsPerPage = ref(10)
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 
 const pageData = computed(() => {
   const start = (page.value - 1) * itemsPerPage.value
@@ -203,7 +203,7 @@ watch(() => props.events, () => {
         <div class="flex-1 overflow-hidden">
           <div class="flex items-center">
             <nuxt-link
-              :to="`/${prefix}/gallery/${row.original.item.id}`"
+              :to="`/${currentChain}/gallery/${row.original.item.id}`"
               class="h-[50px]"
             >
               <CartItemDetails

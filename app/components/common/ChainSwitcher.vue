@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
-import { chainSpec } from '~/utils/chain'
+import type { AssetHubChain } from '~/types/chain'
+import { chainConfig } from '~/utils/chain'
 
 withDefaults(
   defineProps<{
@@ -23,18 +23,18 @@ const { currentChain } = useChain()
 const chainOptions = [
   {
     value: 'ahp' as AssetHubChain,
-    label: chainSpec.ahp.name,
+    label: chainConfig.ahp.name,
     avatar: {
       src: '/token/dot.svg',
-      alt: chainSpec.ahp.name,
+      alt: chainConfig.ahp.name,
     },
   },
   {
     value: 'ahk' as AssetHubChain,
-    label: chainSpec.ahk.name,
+    label: chainConfig.ahk.name,
     avatar: {
       src: '/token/ksm.svg',
-      alt: chainSpec.ahk.name,
+      alt: chainConfig.ahk.name,
     },
   },
 ]
@@ -77,7 +77,7 @@ function handleChainChange(newChain: AssetHubChain) {
 
     <USelectMenu
       :class="compact ? 'w-11' : undefined"
-      :model-value="currentChain"
+      :model-value="selectedChain?.value"
       :items="chainOptions"
       :search-input="false"
       :content="compact ? { align: 'end', side: 'bottom', sideOffset: 8 } : { side: 'bottom', sideOffset: 8 }"

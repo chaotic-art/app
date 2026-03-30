@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { isValidAddressByss58Format } from '~/utils/format/address'
 
 const props = defineProps<{ address: string }>()
@@ -14,7 +14,7 @@ interface AddressCheckResult {
   value?: string
 }
 
-const chains = ['ahk', 'ahp'] as SupportedChain[]
+const chains: AssetHubChain[] = ['ahk', 'ahp']
 
 const showSuccess = ref(false)
 const addressCheck = ref<AddressCheckResult>()
@@ -53,15 +53,15 @@ function getAddressCheck(address: string): AddressCheckResult {
     return { valid: true }
   }
 
-  const checks = chains.map(chain => isValidAddressByss58Format(address, substrateChainSpec[chain].ss58Format))
+  const checks = chains.map(chain => isValidAddressByss58Format(address, substrateChainConfig[chain].ss58Format))
 
   if (checks.some(Boolean)) {
-    const chain = chains[chains.findIndex(Boolean)]
+    const chain = chains[checks.findIndex(Boolean)]
 
-    return { valid: false, wrongAddressType: 'wrongChain', value: chainSpec[chain!].tokenSymbol }
+    return { valid: false, wrongAddressType: 'wrongChain', value: chainConfig[chain!].tokenSymbol }
   }
 
-  const isValidGeneric = isValidAddressByss58Format(props.address, 42)
+  const isValidGeneric = isValidAddressByss58Format(address, 42)
 
   if (isValidGeneric) {
     return { valid: false, wrongAddressType: 'wrongChain', value: 'generic' }

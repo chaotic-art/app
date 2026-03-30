@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { isAssetHubChain } from '~/utils/chain'
 
 // Validate chain parameter
@@ -91,7 +91,7 @@ const mergedQueryVariables = computed(() => {
         :variables="mergedQueryVariables"
         :grid-class="nftGridClass"
         :view-mode="nftViewMode"
-        :prefix="chain"
+        :chain="chain"
       />
     </ExploreFilters>
     <ScrollToTop />

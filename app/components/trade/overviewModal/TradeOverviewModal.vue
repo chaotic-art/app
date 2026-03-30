@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ExecTxParams, OverviewMode, TradeDetailedToken } from './utils'
 import type { TradeNftItem, TradeType } from '@/components/trade/types'
+import type { AssetHubChain } from '~/types/chain'
 import { useQuery } from '@tanstack/vue-query'
 import { whenever } from '@vueuse/core'
 import ModalIdentityItem from '@/components/common/ModalIdentityItem.vue'
@@ -69,16 +70,17 @@ const selectedSendItemId = ref<string>()
 const session = ref<string>()
 
 const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 const { accountId } = useAuth()
 
 const { mode, isIncomingTrade } = useIsTradeOverview(computed(() => props.trade))
-const { data: sendItem } = useQuery({
+const { data: sendItem } = useQuery<TradeDetailedToken | null>({
   queryKey: ['send-item', selectedSendItemId],
   queryFn: async () => {
     if (!selectedSendItemId.value) {
       return null
     }
-    return await fetchTradeDetailedToken(selectedSendItemId.value, currentChain.value)
+    return await fetchTradeDetailedToken(selectedSendItemId.value, chain.value)
   },
 })
 
@@ -114,11 +116,11 @@ const { data: nft, isLoading: nftLoading } = useQuery<TradeNFTs | null>({
     }
 
     const promises = [
-      fetchTradeDetailedToken(trade.value.offered.id, currentChain.value),
+      fetchTradeDetailedToken(trade.value.offered.id, chain.value),
     ]
 
     if (trade.value.desired) {
-      promises.push(fetchTradeDetailedToken(trade.value.desired.id, currentChain.value))
+      promises.push(fetchTradeDetailedToken(trade.value.desired.id, chain.value))
     }
 
     const [offered, desired] = await Promise.all(promises)
@@ -153,7 +155,7 @@ function execTransaction() {
 
   const params: ExecTxParams = {
     trade: trade.value,
-    chain: currentChain.value,
+    chain: chain.value,
     sendItem: trade.value.desired?.sn || sendItem.value?.sn as string,
   }
 

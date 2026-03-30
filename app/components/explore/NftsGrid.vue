@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { OdaChain } from '~/services/oda'
 import type { NftViewMode } from '~/stores/preferences'
 import type { NftRarity } from '~/types/rarity'
+import { getAssetHubChain } from '@/utils/chain'
 
 interface Props {
   variables?: Record<string, any>
   noItemsFoundMessage?: string
   gridClass?: string
-  prefix?: AssetHubChain
+  chain: OdaChain
   hideHoverAction?: boolean
   viewMode?: NftViewMode
   showRarity?: boolean
@@ -25,6 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['totalCountChange'])
 const { isMobileViewport } = useViewport()
+const endpoint = computed(() => getAssetHubChain(props.chain))
 
 // Use the NFTs infinite query composable
 const {
@@ -38,7 +40,7 @@ const {
   pageSize: 42,
   distance: 300,
   variables: props.variables,
-  endpoint: props.prefix,
+  endpoint: endpoint.value,
 })
 
 onMounted(async () => {
@@ -68,7 +70,7 @@ const compactMediaInfo = computed(() => props.viewMode === 'compact' && isMobile
   <div class="space-y-8">
     <!-- Grid Content -->
     <div :class="props.gridClass">
-      <template v-for="nft in nfts" :key="nft.isPlaceholder ? nft.id : `${prefix}-${nft.collectionId}-${nft.tokenId}-${nft.image}`">
+      <template v-for="nft in nfts" :key="nft.isPlaceholder ? nft.id : `${chain}-${nft.collectionId}-${nft.tokenId}-${nft.image}`">
         <div
           v-if="nft.isPlaceholder"
           class="relative border border-gray-300 dark:border-neutral-700 rounded-xl overflow-hidden"
@@ -83,7 +85,7 @@ const compactMediaInfo = computed(() => props.viewMode === 'compact' && isMobile
           v-else
           :token-id="nft.tokenId"
           :collection-id="nft.collectionId"
-          :chain="nft.chain"
+          :chain="chain"
           :image="nft.image"
           :name="nft.name"
           :price="nft.price"

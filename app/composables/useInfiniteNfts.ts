@@ -1,9 +1,9 @@
 import type { ExploreNftsData } from '~/graphql/queries/explore'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import type { NftRarity } from '~/types/rarity'
 import { exploreNfts } from '~/graphql/queries/explore'
 import { isRarityTier } from '~/types/rarity'
-import { getDenyList } from '~/utils/prefix'
+import { getDenyList } from '~/utils/chain'
 
 type NftEntity = ExploreNftsData['tokenEntities'][0]
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SwapSurcharge } from '@/composables/onchain/useNftPallets'
+import type { AssetHubChain } from '~/types/chain'
 import { fetchOdaToken } from '~/services/oda'
 import SurchargeTag from './SurchargeTag.vue'
 
@@ -15,13 +16,14 @@ const image = ref()
 const animationUrl = ref()
 
 const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const itemPath = computed(() => `/${currentChain.value}/gallery/${props.item?.id}`)
 
 async function getItem(id: string): Promise<ItemMedia> {
   const [collectionId = '', tokenId = ''] = id.split('-')
 
-  const nft = await fetchOdaToken(currentChain.value, collectionId, tokenId).catch(() => null)
+  const nft = await fetchOdaToken(chain.value, collectionId, tokenId).catch(() => null)
 
   if (!nft?.metadata) {
     return {
@@ -30,7 +32,7 @@ async function getItem(id: string): Promise<ItemMedia> {
     }
   }
 
-  const { api } = $sdk(currentChain.value)
+  const { api } = $sdk(chain.value)
 
   const meta = await api.query.Nfts.ItemMetadataOf.getValue(Number(collectionId), Number(tokenId))
   const metadataUri = meta?.data.asText()

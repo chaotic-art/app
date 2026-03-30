@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import { useMintedDropsStore } from '@/stores/dropsMinted'
+import { isAssetHubChain } from '@/utils/chain'
+
+definePageMeta({
+  validate: async (route) => {
+    const { chain } = route.params
+    return typeof chain === 'string' && isAssetHubChain(chain)
+  },
+})
 
 const mintedDrops = useMintedDropsStore()
 const sortedMintedDrops = computed(() => mintedDrops.sortedMintedDrops)

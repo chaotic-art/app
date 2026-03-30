@@ -1,6 +1,6 @@
 import type { HighestNftOffer, MakingOfferItem } from '~/components/trade/types'
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { AssetHubChain } from '~/types/chain'
 import { LazyBurnModal, LazyTransferModal } from '#components'
 
 interface UseCartActionsParams {
@@ -18,8 +18,6 @@ interface UseCartActionsParams {
 export function useCartActions({ collection, price, chain, owner, token, collectionId, tokenId, mimeType, highestOffer }: UseCartActionsParams) {
   const { isCurrentAccount } = useAuth()
   const { doAfterLogin } = useDoAfterlogin()
-  const { currentChain } = useChain()
-
   const actionCartStore = useActionCartStore()
   const shoppingCartStore = useShoppingCartStore()
   const listingCartStore = useListingCartStore()
@@ -200,7 +198,7 @@ export function useCartActions({ collection, price, chain, owner, token, collect
       return
     }
 
-    const swap = swapStore.createSwap(token.value.owner!, currentChain.value, {
+    const swap = swapStore.createSwap(token.value.owner!, chain, {
       desired: [{
         id: id.value,
         collectionId,

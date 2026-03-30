@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { TokenToSwap } from '~/composables/onchain/useNftPallets'
+import type { AssetHubChain } from '~/types/chain'
 import { SwapStep } from '@/components/swap/types'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
 const router = useRouter()
 const { $i18n } = useNuxtApp()
 const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 const { accountId } = useAuth()
 const { createSwap } = useNftPallets()
 const { onSuccess } = useTransactionModal()
@@ -39,7 +41,7 @@ function submit() {
     desired: swap.value.desired.map(toTokenToSwap),
     duration: swap.value.duration,
     surcharge: surcharge.value,
-    chain: currentChain.value,
+    chain: chain.value,
     type: 'submit',
   })
 }

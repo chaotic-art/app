@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
 import type { HighestNftOffer } from '../trade/types'
-import type { AssetHubChain } from '~/plugins/sdk.client'
-import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { OdaChain, OdaToken, OnchainCollection } from '~/services/oda'
 import type { NftRarity } from '~/types/rarity'
 import { t } from 'try'
+import { getAssetHubChain } from '@/utils/chain'
 import { refreshOdaTokenMetadata } from '~/services/oda'
 
 interface Props {
   tokenData: OdaToken | null
   collection: OnchainCollection | null
-  chain: AssetHubChain
+  chain: OdaChain
   collectionId: string
   tokenId: string
   owner?: string
@@ -21,12 +21,15 @@ interface Props {
   mimeType: string
   rarity?: NftRarity | null
   highestOffer: HighestNftOffer | null
+  canInteract?: boolean
 }
 
 const props = defineProps<Props>()
 
 const toast = useToast()
 const { decimals, chainSymbol } = useChain()
+const actionChain = computed(() => getAssetHubChain(props.chain))
+const disabledAction = computed(() => false)
 
 // collection owner for genart
 const genartCreator = ref('')
@@ -70,18 +73,27 @@ async function handleRefreshMetadata() {
   }
 }
 
+function doNothing() {}
+
 // burn action
-const { canBurn, burnNow, canTransfer, transferNow } = useCartActions({
-  tokenId: Number(props.tokenId),
-  collectionId: Number(props.collectionId),
-  chain: props.chain,
-  token: computed(() => props.tokenData),
-  collection: computed(() => props.collection),
-  owner: computed(() => props.owner || null),
-  price: computed(() => props.price || null),
-  mimeType: computed(() => props.mimeType),
-  highestOffer: computed(() => props.highestOffer),
-})
+const cartActions = actionChain.value
+  ? useCartActions({
+      tokenId: Number(props.tokenId),
+      collectionId: Number(props.collectionId),
+      chain: actionChain.value,
+      token: computed(() => props.tokenData),
+      collection: computed(() => props.collection),
+      owner: computed(() => props.owner || null),
+      price: computed(() => props.price || null),
+      mimeType: computed(() => props.mimeType),
+      highestOffer: computed(() => props.highestOffer),
+    })
+  : {
+      canBurn: disabledAction,
+      burnNow: doNothing,
+      canTransfer: disabledAction,
+      transferNow: doNothing,
+    }
 
 const { shareOnX } = useSocialShare()
 
@@ -110,19 +122,19 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
     ],
   ]
 
-  if (canTransfer.value) {
+  if (props.canInteract && actionChain.value && cartActions.canTransfer.value) {
     items[0]?.push({
       label: 'Transfer',
       icon: 'i-heroicons-paper-airplane',
-      onSelect: transferNow,
+      onSelect: cartActions.transferNow,
     })
   }
 
-  if (canBurn.value) {
+  if (props.canInteract && actionChain.value && cartActions.canBurn.value) {
     items[0]?.push({
       label: 'Burn',
       icon: 'i-heroicons-fire',
-      onSelect: burnNow,
+      onSelect: cartActions.burnNow,
     })
   }
 

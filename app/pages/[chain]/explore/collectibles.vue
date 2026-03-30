@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { isAssetHubChain } from '~/utils/chain'
 import { STICKY_MOBILE_TOOLBAR_ROW_CLASS, STICKY_MOBILE_TOOLBAR_SEARCH_CLASS } from '~/utils/exploreToolbar'
 import { getSingleQueryValue } from '~/utils/query'
@@ -111,7 +111,7 @@ const gridKey = computed(() => `${queryVariables.value.orderBy.join(',')}::${que
       <CollectionsGrid
         :key="gridKey"
         :variables="queryVariables"
-        :prefix="chain"
+        :chain="chain"
       />
     </div>
     <ScrollToTop />

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { Chain, EvmChain, SubstrateChain } from '~/types/chain'
 import { formatBalance } from 'dedot/utils'
 
 interface WalletSidebarBalanceRow {
@@ -14,10 +14,9 @@ interface WalletSidebarBalanceRow {
 
 const { getConnectedEvmAccount, getConnectedSubAccount } = storeToRefs(useWalletStore())
 const { currentChain } = useChain()
-const { usePolkaVmTestnet } = useFeatureFlags()
 const { getBalance } = useBalances()
 
-const mainNet: Exclude<SupportedChain, 'ahpas'>[] = ['dot', 'ksm', 'ahp', 'ahk']
+const mainNet: Exclude<SubstrateChain, 'ahpas'>[] = ['dot', 'ksm', 'ahp', 'ahk']
 const balances = ref<Array<WalletSidebarBalanceRow | null>>([])
 const isLoading = ref(false)
 const fetchRun = ref(0)
@@ -25,12 +24,12 @@ const fetchRun = ref(0)
 const expectedBalanceCount = computed(() =>
   (getConnectedSubAccount.value ? mainNet.length : 0) + (getConnectedEvmAccount.value ? 1 : 0),
 )
-const polkaVmBalanceChain = computed<SupportedChain>(() => {
-  if (usePolkaVmTestnet.value) {
-    return 'ahpas'
+const polkaVmChain = computed<EvmChain>(() => {
+  if (currentChain.value === 'polkadot-testnet') {
+    return 'polkadot-testnet'
   }
 
-  return currentChain.value === 'ahk' ? 'ahk' : 'ahp'
+  return currentChain.value === 'ahk' || currentChain.value === 'kusama' ? 'kusama' : 'polkadot'
 })
 
 const isEmpty = computed(() => !isLoading.value && balances.value.filter(Boolean).length === 0)
@@ -61,7 +60,7 @@ function handleAddFunds() {
 }
 
 function toWalletSidebarBalanceRow(
-  chainId: SupportedChain,
+  chainId: Chain,
   balance: Awaited<ReturnType<typeof getBalance>>,
 ): WalletSidebarBalanceRow {
   const freeBalance = balance.balance.toString()
@@ -120,12 +119,12 @@ watch(
         }
 
         try {
-          const balance = await getBalance({ address: evmAddress, chain: polkaVmBalanceChain.value })
+          const balance = await getBalance({ address: evmAddress, chain: polkaVmChain.value })
           if (cancelled || currentRun !== fetchRun.value) {
             return
           }
 
-          balances.value[mainNet.length] = toWalletSidebarBalanceRow(polkaVmBalanceChain.value, balance)
+          balances.value[mainNet.length] = toWalletSidebarBalanceRow(polkaVmChain.value, balance)
         }
         catch (error) {
           console.error('Failed to load PolkaVM balance:', error)

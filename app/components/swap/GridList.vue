@@ -30,7 +30,7 @@ const query = computed(() => ({ ...extraQuery.value, search: { ...props.query, .
       :key="JSON.stringify(query)"
       :grid-class="`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${step !== SwapStep.REVIEW ? 'xl:grid-cols-4' : ''} gap-4`"
       :variables="query"
-      :prefix="swap.chain"
+      :chain="swap.chain"
       :hide-hover-action="!selectable ? true : stepItems.length === MAX_AMOUNT_OF_SWAP_ITEMS"
     >
       <template

@@ -1,26 +1,39 @@
-import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
-import type { Chain, ChainVm, EvmChain, SubstrateChain } from '~/types/chain'
+import type { AssetHubChain, Chain, ChainVm, EvmChain, SubstrateChain } from '~/types/chain'
+import { dotHubDenyList, ksmHubDenyList } from '@/utils/constants'
 
-interface BaseChainSpec {
+interface BaseChainConfig {
+  indexerChain?: AssetHubChain
   name: string
+  substrateSourceChain: SubstrateChain
   tokenSymbol: string
   tokenDecimals: number
   vm: ChainVm
+  permissions: {
+    interact: boolean
+  }
 }
 
-type ChainSpec = BaseChainSpec | SubstrateChainSpec
-
-interface SubstrateChainSpec extends BaseChainSpec {
+interface SubstrateChainConfig extends BaseChainConfig {
+  vm: 'SUB'
   ss58Format: number
 }
 
-export const substrateChainSpec: Record<SubstrateChain, SubstrateChainSpec> = {
+interface EvmChainConfig extends BaseChainConfig {
+  vm: 'EVM'
+}
+
+type ChainConfig = SubstrateChainConfig | EvmChainConfig
+
+export const substrateChainConfig: Record<SubstrateChain, SubstrateChainConfig> = {
   ahp: {
     name: 'Polkadot Asset Hub',
     tokenDecimals: 10,
     tokenSymbol: 'DOT',
     ss58Format: 0,
     vm: 'SUB',
+    permissions: { interact: true },
+    substrateSourceChain: 'ahp',
+    indexerChain: 'ahp',
   },
   ahk: {
     name: 'Kusama Asset Hub',
@@ -28,13 +41,19 @@ export const substrateChainSpec: Record<SubstrateChain, SubstrateChainSpec> = {
     tokenSymbol: 'KSM',
     ss58Format: 2,
     vm: 'SUB',
+    permissions: { interact: true },
+    indexerChain: 'ahk',
+    substrateSourceChain: 'ahk',
   },
   ahpas: {
-    name: 'Paseo Asset Hub',
+    substrateSourceChain: 'ahpas',
     tokenDecimals: 10,
     tokenSymbol: 'PAS',
     ss58Format: 0,
     vm: 'SUB',
+    permissions: { interact: true },
+    indexerChain: 'ahpas',
+    name: 'Paseo Asset Hub',
   },
   dot: {
     name: 'Polkadot',
@@ -42,6 +61,8 @@ export const substrateChainSpec: Record<SubstrateChain, SubstrateChainSpec> = {
     tokenSymbol: 'DOT',
     ss58Format: 0,
     vm: 'SUB',
+    permissions: { interact: false },
+    substrateSourceChain: 'dot',
   },
   ksm: {
     name: 'Kusama',
@@ -49,13 +70,17 @@ export const substrateChainSpec: Record<SubstrateChain, SubstrateChainSpec> = {
     tokenSymbol: 'KSM',
     ss58Format: 2,
     vm: 'SUB',
+    permissions: { interact: false },
+    substrateSourceChain: 'ksm',
   },
 }
 
-// this is static config. for substrate onchain data use getChainSpec() from utils/api/substrate.ts
-export const chainSpec: Record<Chain, ChainSpec> = {
-  // substrate
-  ...substrateChainSpec,
+// This registry currently mixes static chain metadata with app-level routing/source mappings.
+// If it keeps growing, split pure onchain/spec data from higher-level chain config.
+// For substrate onchain runtime data, use getChainSpec() from utils/api/substrate.ts.
+export const chainConfig: Record<Chain, ChainConfig> = {
+  // substrate-backed chains
+  ...substrateChainConfig,
 
   // polkadot hub (contracts) chains
   'polkadot': {
@@ -63,18 +88,27 @@ export const chainSpec: Record<Chain, ChainSpec> = {
     tokenDecimals: 18,
     tokenSymbol: 'DOT',
     vm: 'EVM',
+    permissions: { interact: false },
+    indexerChain: 'ahp',
+    substrateSourceChain: 'ahp',
   },
   'kusama': {
     name: 'Kusama Asset Hub',
     tokenDecimals: 18,
     tokenSymbol: 'KSM',
     vm: 'EVM',
+    permissions: { interact: false },
+    indexerChain: 'ahk',
+    substrateSourceChain: 'ahk',
   },
   'polkadot-testnet': {
     name: 'Polkadot TestNet',
     tokenDecimals: 18,
     tokenSymbol: 'PAS',
     vm: 'EVM',
+    permissions: { interact: false },
+    indexerChain: 'ahpas',
+    substrateSourceChain: 'ahpas',
   },
 }
 
@@ -83,12 +117,55 @@ export function isAssetHubChain(chain: string): chain is AssetHubChain {
   return ['ahp', 'ahk', 'ahpas'].includes(chain as AssetHubChain)
 }
 
-export function isEvmChain(chain: Chain): chain is EvmChain {
-  return chainSpec[chain].vm === 'EVM'
+export function isChain(chain: string): chain is Chain {
+  return chain in chainConfig
 }
 
-export function isSupportedChain(chain: string): chain is SupportedChain {
-  return chain in chainSpec
+export function isEvmChain(chain: Chain): chain is EvmChain {
+  return chainConfig[chain].vm === 'EVM'
+}
+
+export function isSubstrateChain(chain: Chain): chain is SubstrateChain {
+  return chain in substrateChainConfig
+}
+
+export function isOdaChain(chain: Chain): chain is AssetHubChain | EvmChain {
+  return chain !== 'dot' && chain !== 'ksm'
+}
+
+export function getSubstrateSourceChain(chain: Chain): SubstrateChain {
+  return chainConfig[chain].substrateSourceChain
+}
+
+export function getAssetHubChain(chain: Chain): AssetHubChain | undefined {
+  return chainConfig[chain].indexerChain
+}
+
+export function getIndexerChain(chain: Chain): AssetHubChain | undefined {
+  return chainConfig[chain].indexerChain
+}
+
+export function canInteract(chain: Chain): boolean {
+  return chainConfig[chain].permissions.interact
+}
+
+export function getGraphqlEndpointChain(chain: Chain): AssetHubChain | undefined {
+  return getIndexerChain(chain)
+}
+
+export function getDenyList(chain: AssetHubChain): string[] | undefined {
+  switch (chain) {
+    case 'ahk':
+      return ksmHubDenyList
+    case 'ahp':
+      return dotHubDenyList
+    default:
+      return undefined
+  }
+}
+
+export function isSubstrateChainName(chain: string): chain is SubstrateChain {
+  return chain in substrateChainConfig
 }
 
 export const chainToPrecisionMap: Record<Chain, number> = {

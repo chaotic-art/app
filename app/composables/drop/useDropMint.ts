@@ -1,4 +1,5 @@
 import type { TxInBestBlocksFound } from 'polkadot-api'
+import type { AssetHubChain } from '~/types/chain'
 import { Binary } from 'polkadot-api'
 import useDropMassmint from '@/composables/drop/massmint/useDropMassmint'
 import { updateGenartMetadata } from '@/composables/drop/useGenerativeDropMint'
@@ -9,7 +10,7 @@ export default function useDropMint() {
   const { doAfterLogin } = useDoAfterlogin()
   const { $i18n, $sdk } = useNuxtApp()
   const { accountId } = useAuth()
-  const { prefix } = usePrefix()
+  const { currentChain } = useChain()
 
   const { getConnectedSubAccount } = storeToRefs(useWalletStore())
   const dropStore = useDropStore()
@@ -53,7 +54,7 @@ export default function useDropMint() {
   }
 
   async function executeSubTransaction() {
-    const api = $sdk(prefix.value).api
+    const api = $sdk(currentChain.value as AssetHubChain).api
     const collectionId = drop.value?.collection
     const price = drop.value?.price || null
 

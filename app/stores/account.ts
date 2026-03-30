@@ -30,7 +30,7 @@ export const useAccountStore = defineStore('account', () => {
     }
 
     try {
-      return formatAddress({ address: accounts.value[vm.value].address, prefix: currentChain.value })
+      return formatAddress({ address: accounts.value[vm.value].address, chain: currentChain.value })
     }
     catch {
       return undefined

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ActionButton } from './ActionButtons.vue'
 import type { TransactionStatus } from '@/composables/useTransactionStatus'
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 
 export interface ShareProp {
   disabled?: boolean
@@ -21,7 +21,7 @@ const props = defineProps<{
   txHash?: string
   share: ShareProp
   actionButtons: ActionButtonsProp
-  chain?: SupportedChain
+  chain: AssetHubChain
 }>()
 
 function handleSecondaryActionClick() {

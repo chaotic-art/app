@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { AssetHubChain } from '~/plugins/sdk.client'
-import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { OdaChain, OdaToken, OnchainCollection } from '~/services/oda'
 import { TradeTypes } from '@/components/trade/types'
 import TokenCard from '~/components/common/card/TokenCard.client.vue'
 import TokenActivity from '~/components/gallery/TokenActivity.vue'
@@ -10,10 +9,11 @@ import { tokenEntries } from '~/utils/api/substrate.nft-pallets'
 interface Props {
   tokenData: OdaToken | null
   collection: OnchainCollection | null
-  chain: AssetHubChain
+  chain: OdaChain
   collectionId: string
   tokenId: string
   mimeType?: string
+  canInteract?: boolean
 }
 
 interface PropertyRow {
@@ -25,19 +25,9 @@ interface PropertyRow {
 const props = defineProps<Props>()
 const route = useRoute()
 const router = useRouter()
+const assetHubChain = computed(() => getAssetHubChain(props.chain))
 
 const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
-
-const activeTab = computed({
-  get() {
-    return (route.query.tab as string) || 'activity'
-  },
-  set(tab) {
-    router.replace({
-      query: { ...route.query, tab },
-    })
-  },
-})
 
 const { getAttributeRarity } = useCollectionAttributes({
   collectionId: computed(() => props.collectionId),
@@ -77,25 +67,29 @@ const propertiesColumns: TableColumn<PropertyRow>[] = [
   },
 ]
 
-const tabsItems = ref([
+const tabsItems = computed(() => [
   {
     label: 'Activity',
     name: 'Activity',
     slot: 'activity',
     value: 'activity',
   },
-  {
-    label: 'Offers',
-    name: 'Offers',
-    slot: 'offers',
-    value: 'offers',
-  },
-  {
-    label: 'Swaps',
-    name: 'Swaps',
-    slot: 'swaps',
-    value: 'swaps',
-  },
+  ...(props.canInteract
+    ? [
+        {
+          label: 'Offers',
+          name: 'Offers',
+          slot: 'offers',
+          value: 'offers',
+        },
+        {
+          label: 'Swaps',
+          name: 'Swaps',
+          slot: 'swaps',
+          value: 'swaps',
+        },
+      ]
+    : []),
   {
     label: 'Properties',
     name: 'Properties',
@@ -104,10 +98,27 @@ const tabsItems = ref([
   },
 ])
 
+const activeTab = computed({
+  get() {
+    const visibleTabs = tabsItems.value.map(item => item.value)
+    const tab = route.query.tab as string | undefined
+    return tab && visibleTabs.includes(tab) ? tab : 'activity'
+  },
+  set(tab) {
+    router.replace({
+      query: { ...route.query, tab },
+    })
+  },
+})
+
 onMounted(async () => {
+  if (!assetHubChain.value) {
+    return
+  }
+
   try {
     const entries = await tokenEntries({
-      prefix: props.chain,
+      chain: assetHubChain.value,
       collectionId: Number(props.collectionId),
       max: 6,
       excludeTokenId: Number(props.tokenId),
@@ -131,22 +142,25 @@ onMounted(async () => {
           <UTabs v-model="activeTab" :items="tabsItems" :ui="{ root: 'gap-6' }" size="sm">
             <template #activity>
               <TokenActivity
-                :chain="chain"
+                v-if="assetHubChain"
+                :chain="assetHubChain"
                 :collection-id="collectionId"
                 :token-id="tokenId"
               />
             </template>
-            <template #offers>
+            <template v-if="canInteract" #offers>
               <TokenTrades
-                :chain="chain"
+                v-if="assetHubChain"
+                :chain="assetHubChain"
                 :collection-id="collectionId"
                 :token-id="tokenId"
                 :type="TradeTypes.Offer"
               />
             </template>
-            <template #swaps>
+            <template v-if="canInteract" #swaps>
               <TokenTrades
-                :chain="chain"
+                v-if="assetHubChain"
+                :chain="assetHubChain"
                 :collection-id="collectionId"
                 :token-id="tokenId"
                 :type="TradeTypes.Swap"
@@ -181,7 +195,7 @@ onMounted(async () => {
                   <!-- Chain -->
                   <div class="flex justify-between items-center">
                     <span class="text-sm text-muted-foreground">Chain</span>
-                    <span class="text-sm font-medium capitalize">{{ chainSpec[chain].name }}</span>
+                    <span class="text-sm font-medium capitalize">{{ chainConfig[chain].name }}</span>
                   </div>
 
                   <!-- Token ID -->

@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import type { AssetHubChain } from '~/types/chain'
+
 const props = defineProps<{
   collectionId: string
 }>()
@@ -12,7 +14,7 @@ const { currentChain } = useChain()
 const { collection } = useOdaCollection(collectionId)
 
 function onCreateCollectionSwapClick() {
-  const swap = swapStore.createSwap(collectionId.value, currentChain.value, {
+  const swap = swapStore.createSwap(collectionId.value, currentChain.value as AssetHubChain, {
     isCollectionSwap: true,
     desired: [
       {

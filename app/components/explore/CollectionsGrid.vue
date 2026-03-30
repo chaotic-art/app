@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 
 type CardActionVariant = 'link' | 'studio-mode'
 
 interface Props {
   variables?: Record<string, any>
-  prefix?: AssetHubChain
+  chain?: AssetHubChain
   cardActionVariant?: CardActionVariant
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variables: () => ({}),
-  prefix: 'ahp',
+  chain: 'ahp',
   cardActionVariant: 'link',
 })
 
@@ -29,7 +29,7 @@ const {
   pageSize: 40,
   distance: 300,
   variables: props.variables,
-  endpoint: props.prefix,
+  endpoint: props.chain,
 })
 
 onMounted(async () => {
@@ -49,7 +49,7 @@ watch(totalCount, (newCount) => {
         v-for="item in collections"
         :key="item.id"
         :item="item"
-        :prefix="prefix"
+        :chain="chain"
         :action-variant="cardActionVariant"
         :is-loading="isInitialLoading && collections.length === 0"
       />

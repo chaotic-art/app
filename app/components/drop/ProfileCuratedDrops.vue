@@ -5,11 +5,11 @@ const props = defineProps<{
   id: string
 }>()
 
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 
 const { data: drops, pending } = await useFetch('/api/genart/list', {
   query: {
-    chain: [prefix.value],
+    chain: [currentChain.value],
     creator: props.id,
   },
 })

@@ -4,8 +4,8 @@ import { onClickOutside, useDebounceFn } from '@vueuse/core'
 import { isEvmAddress } from 'dedot/utils'
 import { exploreCollections, exploreNfts } from '@/graphql/queries/explore'
 import { searchProfiles } from '@/services/profile'
-import { getss58AddressByPrefix } from '@/utils/account'
-import { getDenyList } from '@/utils/prefix'
+import { getSs58AddressByChain } from '@/utils/account'
+import { getDenyList, getGraphqlEndpointChain } from '@/utils/chain'
 
 enum SearchBarTab {
   Collections = 'collections',
@@ -15,6 +15,7 @@ enum SearchBarTab {
 
 const router = useRouter()
 const { currentChain } = useChain()
+const graphqlEndpoint = computed(() => getGraphqlEndpointChain(currentChain.value))
 const { buildKeywordClause } = useSearchFilters()
 
 const searchInputRef = ref<HTMLInputElement>()
@@ -47,7 +48,7 @@ const nfts = ref<{
 const users = ref<Profile[]>([])
 
 const debouncedSearch = useDebounceFn(async (query: string) => {
-  if (!query.trim()) {
+  if (!query.trim() || !graphqlEndpoint.value) {
     collections.value = []
     nfts.value = []
     users.value = []
@@ -70,9 +71,9 @@ const debouncedSearch = useDebounceFn(async (query: string) => {
           offset: 0,
           search: collectionKeywordFilter ? [collectionKeywordFilter] : [],
           orderBy: ['blockNumber_DESC'],
-          denyList: getDenyList(currentChain.value) || [],
+          denyList: getDenyList(graphqlEndpoint.value) || [],
         },
-        context: { endpoint: currentChain.value },
+        context: { endpoint: graphqlEndpoint.value },
       }),
 
       // Search NFTs
@@ -83,9 +84,9 @@ const debouncedSearch = useDebounceFn(async (query: string) => {
           offset: 0,
           name: query,
           orderBy: ['blockNumber_DESC'],
-          denyList: getDenyList(currentChain.value) || [],
+          denyList: getDenyList(graphqlEndpoint.value) || [],
         },
-        context: { endpoint: currentChain.value },
+        context: { endpoint: graphqlEndpoint.value },
       }),
 
       searchProfiles(query, 10, 0),
@@ -110,7 +111,7 @@ const debouncedSearch = useDebounceFn(async (query: string) => {
     // Process users
     users.value = usersResult?.data.filter(user => !isEvmAddress(user.address)).map(user => ({
       ...user,
-      address: getss58AddressByPrefix(user.address, currentChain.value),
+      address: getSs58AddressByChain(user.address, currentChain.value),
     })) || []
   }
   catch (error) {

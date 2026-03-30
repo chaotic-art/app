@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { MakingOfferItem } from '../types'
 import type { TxType } from '~/composables/onchain/useNftPallets'
+import type { AssetHubChain } from '~/types/chain'
 import { whenever } from '@vueuse/core'
 import { formatBalance } from 'dedot/utils'
 import ModalIdentityItem from '@/components/common/ModalIdentityItem.vue'
@@ -26,6 +27,7 @@ const { itemsInChain: items, hasInvalidOfferPrices, count } = storeToRefs(offerS
 const { decimals, chainSymbol } = useChain()
 const { $i18n, $apolloClient, $sdk } = useNuxtApp()
 const { createOffer } = useNftPallets()
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const offeredItem = ref<string>()
 
@@ -73,7 +75,7 @@ function createOfferTx(items: MakingOfferItem[], type: TxType) {
       offeredItem: offeredItem.value ? Number(offeredItem.value) : undefined,
       duration: item.offerExpiration || DEFAULT_OFFER_EXPIRATION_DURATION,
     })),
-    chain: currentChain.value,
+    chain: chain.value,
     type,
   })
 }
@@ -95,7 +97,7 @@ function onClose() {
 }
 
 async function fetchUnusedOfferCollectionTokens(collectionId: string): Promise<string[]> {
-  const { api } = $sdk(currentChain.value)
+  const { api } = $sdk(chain.value)
 
   try {
     const { data: { offers: items } } = await $apolloClient.query({
@@ -111,6 +113,9 @@ async function fetchUnusedOfferCollectionTokens(collectionId: string): Promise<s
             },
           },
         },
+      },
+      context: {
+        endpoint: chain.value,
       },
     })
 
@@ -177,7 +182,7 @@ useModalIsOpenTracker({
       })
 
     offeredItem.value = undefined
-    const unusedOfferedItems = await fetchUnusedOfferCollectionTokens(String(getOfferCollectionId(currentChain.value)))
+    const unusedOfferedItems = await fetchUnusedOfferCollectionTokens(String(getOfferCollectionId(chain.value)))
     offeredItem.value = unusedOfferedItems[0]
   },
 })

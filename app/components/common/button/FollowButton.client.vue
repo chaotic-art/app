@@ -2,7 +2,7 @@
 import type { ButtonProps } from '@nuxt/ui'
 import { useElementHover } from '@vueuse/core'
 import { follow, isFollowing, unfollow } from '@/services/profile'
-import { getss58AddressByPrefix } from '@/utils/account'
+import { getSs58AddressByChain } from '@/utils/account'
 
 export interface ButtonConfig {
   label: string
@@ -153,7 +153,7 @@ watch(accountId, () => {
 <template>
   <div ref="buttonRef">
     <UButton
-      v-if="!accountId || getss58AddressByPrefix(accountId, currentChain) !== getss58AddressByPrefix(target, currentChain)"
+      v-if="!accountId || getSs58AddressByChain(accountId, currentChain) !== getSs58AddressByChain(target, currentChain)"
       :loading="loading"
       variant="outline"
       :icon="buttonConfig.icon"

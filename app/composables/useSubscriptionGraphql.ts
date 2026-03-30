@@ -1,6 +1,6 @@
 import type { DocumentNode } from 'graphql'
 import type { ResultOf, VariablesOf } from '~/graphql/client'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import isEqual from 'lodash/isEqual'
 
 export default function useSubscriptionGraphql<
@@ -17,7 +17,7 @@ export default function useSubscriptionGraphql<
   disabled,
   immediate = true,
 }: {
-  chain?: AssetHubChain
+  chain: MaybeRefOrGetter<AssetHubChain>
   query: TDoc
   variables?: TVariables
   onChange: (data: { data: TData }) => void
@@ -26,9 +26,8 @@ export default function useSubscriptionGraphql<
   disabled?: ComputedRef<boolean>
   immediate?: boolean
 }) {
-  const { currentChain } = useChain()
   const { $apolloClient } = useNuxtApp()
-  const endpoint = chain || currentChain.value
+  const endpoint = computed(() => toValue(chain))
 
   if (disabled?.value) {
     return () => {}
@@ -40,13 +39,17 @@ export default function useSubscriptionGraphql<
   const isPolling = ref(false)
 
   async function pollData() {
+    if (!endpoint.value) {
+      return
+    }
+
     try {
       const { data } = await $apolloClient.query<TData, any>({
         query,
         variables: variables as any,
         fetchPolicy: 'network-only',
         context: {
-          endpoint,
+          endpoint: endpoint.value,
         },
       })
 

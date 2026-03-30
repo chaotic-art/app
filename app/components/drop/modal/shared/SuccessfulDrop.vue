@@ -9,12 +9,12 @@ const props = defineProps<{
 
 const { $i18n } = useNuxtApp()
 const { add: toast } = useToast()
-const { prefix } = usePrefix()
 const { accountId } = useAuth()
 const { toMintNFTs } = storeToRefs(useDropStore())
 
 const txHash = computed(() => props.mintingSession.txHash ?? '')
 const singleMint = computed(() => props.mintingSession.items.length === 1)
+const resultChain = computed(() => props.mintingSession.items[0]!.chain)
 const mintedNft = computed<MintedNFT | undefined>(
   () => props.mintingSession.items[0],
 )
@@ -55,7 +55,7 @@ const nftPath = computed(
     : '',
 )
 const nftFullUrl = computed(() => `${window.location.origin}${nftPath.value}`)
-const userProfilePath = computed(() => `/${prefix.value}/u/${accountId.value}`)
+const userProfilePath = computed(() => `/${resultChain.value}/u/${accountId.value}`)
 
 const getItemSn = (name: string) => `#${name.split('#')[1]}`
 
@@ -92,6 +92,7 @@ function handleViewNft() {
     :tx-hash="txHash"
     :share="share"
     :status="mintingSession.status"
+    :chain="resultChain"
     :action-buttons="actionButtons"
   >
     <SuccessfulItemsMedia

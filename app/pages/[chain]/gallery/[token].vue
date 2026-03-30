@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import { t } from 'try'
 import { fetchOdaToken } from '~/services/oda'
 
 const CONTAINER_ID = 'nft-img-container'
 
-const { token, chain } = useRoute().params
-const chainPrefix = computed(() => chain?.toString() as AssetHubChain)
+const route = useRoute()
+const { currentChain, assetHubChain, canInteract: canInteractOnChain } = useChain()
+const { token } = route.params
+
 const [collectionId, tokenId] = token?.toString().split('-') ?? []
 
 const safeCollectionId = computed(() => collectionId?.toString() ?? '')
@@ -27,11 +28,11 @@ const {
 } = useToken({
   tokenId: Number(tokenId),
   collectionId: Number(collectionId),
-  chain: chainPrefix.value,
+  chain: currentChain.value,
   fetchRarity: true,
 })
 
-const [ok, err, odaTokenDataResult] = await t(fetchOdaToken(chainPrefix.value, safeCollectionId.value, safeTokenId.value))
+const [ok, err, odaTokenDataResult] = await t(fetchOdaToken(currentChain.value, safeCollectionId.value, safeTokenId.value))
 const odaTokenData = ok ? odaTokenDataResult : { metadata: null, price: null, owner: null }
 if (!ok) {
   const errMessage = err instanceof Error ? err.message : String(err)
@@ -55,8 +56,8 @@ defineOgImage({
   props: {
     title: item.metadata?.name,
     image: item.metadata?.image,
-    network: chainSpec[chainPrefix.value].name,
-    symbol: chainSpec[chainPrefix.value].tokenSymbol,
+    network: chainConfig[currentChain.value].name,
+    symbol: chainConfig[currentChain.value].tokenSymbol,
   },
 })
 
@@ -66,6 +67,13 @@ const tokenMetadata = computed(() => {
   }
 
   return tokenData.value
+})
+
+definePageMeta({
+  validate: async (route) => {
+    const { chain } = route.params
+    return typeof chain === 'string' && isChain(chain) && isOdaChain(chain)
+  },
 })
 </script>
 
@@ -90,7 +98,7 @@ const tokenMetadata = computed(() => {
           <GalleryDetails
             :token-data="tokenMetadata"
             :collection="collection"
-            :chain="chainPrefix"
+            :chain="currentChain"
             :collection-id="safeCollectionId"
             :token-id="safeTokenId"
             :owner="owner || undefined"
@@ -101,12 +109,14 @@ const tokenMetadata = computed(() => {
             :rarity="rarity"
             :price="BigInt(price ?? '0')"
             :mime-type="mimeType"
+            :can-interact="canInteractOnChain"
           />
           <GalleryItemActions
+            v-if="canInteractOnChain && assetHubChain"
             class="mt-6"
             :token-data="tokenData"
             :collection="collection"
-            :chain="chainPrefix"
+            :chain="assetHubChain"
             :collection-id="Number(safeCollectionId)"
             :token-id="Number(safeTokenId)"
             :owner="owner"
@@ -119,14 +129,16 @@ const tokenMetadata = computed(() => {
 
     <!-- Additional Content -->
     <GalleryAdditionalContent
+      v-if="assetHubChain"
       :token-data="tokenMetadata"
       :collection="collection"
-      :chain="chainPrefix"
+      :chain="currentChain"
       :collection-id="safeCollectionId"
       :token-id="safeTokenId"
       :mime-type="mimeType || undefined"
+      :can-interact="canInteractOnChain"
     />
 
-    <LazyMakeOfferModal />
+    <LazyMakeOfferModal v-if="canInteractOnChain" />
   </div>
 </template>

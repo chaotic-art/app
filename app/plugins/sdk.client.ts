@@ -31,59 +31,40 @@ const config = {
   },
 }
 
-export type SupportedChain = keyof typeof config
-
-export type AssetHubChain = Extract<SupportedChain, 'ahp' | 'ahk' | 'ahpas'>
-export type UnsupportedChain = 'base' | 'ahw'
-export type Chain = SupportedChain | UnsupportedChain
+export type SupportedPapiChain = keyof typeof config
 
 // Mapped type for API return types
 type ApiMap = {
-  [K in SupportedChain]: TypedApi<typeof config[K]['descriptor']>
+  [K in SupportedPapiChain]: TypedApi<typeof config[K]['descriptor']>
 }
 
-export type AssetHubApi = ApiMap[AssetHubChain]
+type AssetHubPapiChain = Extract<SupportedPapiChain, 'ahp' | 'ahk' | 'ahpas'>
+
+export type AssetHubApi = ApiMap[AssetHubPapiChain]
 
 const DEFAULT_CHAIN = 'ahp' as const
-const UNSUPPORTED_CHAINS: UnsupportedChain[] = ['base', 'ahw']
-
-function getEffectiveChain(chain: Chain): SupportedChain {
-  if (UNSUPPORTED_CHAINS.includes(chain as UnsupportedChain)) {
-    console.warn(`Unsupported chain: ${chain}. Using ${DEFAULT_CHAIN} as fallback.`)
-    return DEFAULT_CHAIN
-  }
-
-  if (!(chain in config)) {
-    console.warn(`Chain ${chain} not found in config. Using ${DEFAULT_CHAIN} as fallback.`)
-    return DEFAULT_CHAIN
-  }
-
-  return chain as SupportedChain
-}
 
 // Generic function for supported chains
-function sdk<T extends SupportedChain>(chain: T): { api: ApiMap[T], client: PolkadotClient }
-// Overload for unsupported chains and default case
-function sdk(chain?: UnsupportedChain | SupportedChain): { api: ApiMap['ahp'], client: PolkadotClient }
+function sdk<T extends SupportedPapiChain>(chain: T): { api: ApiMap[T], client: PolkadotClient }
+// Overload for default case
+function sdk(): { api: ApiMap['ahp'], client: PolkadotClient }
 // Implementation
-function sdk(chain: Chain = DEFAULT_CHAIN) {
-  const effectiveChain = getEffectiveChain(chain)
-
+function sdk(chain: SupportedPapiChain = DEFAULT_CHAIN) {
   // Get or create client state
-  const clients = useState<Partial<Record<SupportedChain, PolkadotClient>>>('sdk-clients', () => ({}))
+  const clients = useState<Partial<Record<SupportedPapiChain, PolkadotClient>>>('sdk-clients', () => ({}))
 
   // Create client if it doesn't exist
-  if (!clients.value[effectiveChain]) {
+  if (!clients.value[chain]) {
     const rpcStore = useRpcProviderStore()
-    const selectedEndpoint = rpcStore.getProvider(effectiveChain)
-    clients.value[effectiveChain] = createClient(
+    const selectedEndpoint = rpcStore.getProvider(chain)
+    clients.value[chain] = createClient(
       withPolkadotSdkCompat(getWsProvider({ endpoints: [selectedEndpoint] })),
     )
   }
 
   return {
-    api: clients.value[effectiveChain]!.getTypedApi(config[effectiveChain].descriptor),
-    client: clients.value[effectiveChain]!,
+    api: clients.value[chain]!.getTypedApi(config[chain].descriptor),
+    client: clients.value[chain]!,
   }
 }
 

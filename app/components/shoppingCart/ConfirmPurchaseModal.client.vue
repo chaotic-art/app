@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { useQuery } from '@tanstack/vue-query'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 

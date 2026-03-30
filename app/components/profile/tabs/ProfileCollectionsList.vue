@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 
 const props = defineProps<{
   issuer: string
@@ -83,7 +83,7 @@ const queryVariables = computed(() => {
       <CollectionsGrid
         :key="`${queryVariables.orderBy}-${queryState.search}`"
         :variables="queryVariables"
-        :prefix="chain"
+        :chain="chain"
         @total-count-change="$emit('totalCountChange', $event)"
       />
     </div>
