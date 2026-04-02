@@ -26,14 +26,34 @@ const collectionData = reactive({
 
 const imageStatus = ref<'normal' | 'placeholder'>('normal')
 
-const isPlaceholder = computed(() => imageStatus.value === 'placeholder' || !props.item.image)
+const isPlaceholder = computed(() => props.item.isPlaceholder || imageStatus.value === 'placeholder' || !props.item.image)
 
-onMounted(async () => {
-  const collection = await fetchOdaCollection(props.chain, props.item.id)
-  collectionData.floor = collection.floor ?? 0
-  collectionData.items = Number(collection.claimed)
-  collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
-})
+function reset() {
+  collectionData.floor = 0
+  collectionData.items = 0
+  collectionData.uniqueOwners = 0
+}
+
+watch(
+  () => [props.chain, props.item.id, props.item.isPlaceholder] as const,
+  async ([chain, id, placeholder]) => {
+    if (placeholder) {
+      reset()
+      return
+    }
+
+    try {
+      const collection = await fetchOdaCollection(chain, id)
+      collectionData.floor = collection.floor ?? 0
+      collectionData.items = Number(collection.claimed)
+      collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
+    }
+    catch {
+      reset()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
