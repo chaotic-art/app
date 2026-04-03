@@ -6,6 +6,7 @@ import type { NftRarity } from '~/types/rarity'
 import { t } from 'try'
 import { getAssetHubChain } from '@/utils/chain'
 import { refreshOdaTokenMetadata } from '~/services/oda'
+import { parseAssetHubTokenId } from '~/utils/nft'
 
 interface Props {
   tokenData: OdaToken | null
@@ -29,6 +30,7 @@ const props = defineProps<Props>()
 const toast = useToast()
 const { decimals, chainSymbol } = useChain()
 const actionChain = computed(() => getAssetHubChain(props.chain))
+const parsedTokenId = computed(() => parseAssetHubTokenId(props.collectionId, props.tokenId))
 const disabledAction = computed(() => false)
 
 // collection owner for genart
@@ -76,10 +78,10 @@ async function handleRefreshMetadata() {
 function doNothing() {}
 
 // burn action
-const cartActions = actionChain.value
+const cartActions = actionChain.value && parsedTokenId.value
   ? useCartActions({
-      tokenId: Number(props.tokenId),
-      collectionId: Number(props.collectionId),
+      tokenId: parsedTokenId.value.tokenId,
+      collectionId: parsedTokenId.value.collectionId,
       chain: actionChain.value,
       token: computed(() => props.tokenData),
       collection: computed(() => props.collection),

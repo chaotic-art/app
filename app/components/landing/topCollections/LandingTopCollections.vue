@@ -23,7 +23,7 @@ onMounted(() => {
     </h2>
     <div class="">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-        <TopCollectionsCard v-for="(collection, i) in data" :key="i" :collection="collection" />
+        <TopCollectionsCard v-for="(collection, i) in data" :key="i" :collection="collection" :chain="chain" />
       </div>
       <div class="flex justify-center mt-6 md:mt-8">
         <UButton :to="`/${currentChain}/explore/collectibles`" class="rounded-full" variant="outline">

@@ -3,10 +3,11 @@ import type { OdaChain } from '~/services/oda'
 import type { NftRarity } from '~/types/rarity'
 import { canInteract, getAssetHubChain } from '@/utils/chain'
 import { isNsfwNft } from '~/utils/mint'
+import { parseAssetHubTokenId } from '~/utils/nft'
 
 const props = defineProps<{
-  tokenId: number
-  collectionId: number
+  tokenId: string
+  collectionId: string
   chain: OdaChain
   image?: string | null
   name?: string | null
@@ -18,7 +19,9 @@ const props = defineProps<{
   showRarity?: boolean
   rarity?: NftRarity | null
 }>()
+
 const actionChain = computed(() => getAssetHubChain(props.chain))
+const parsedTokenId = computed(() => parseAssetHubTokenId(props.collectionId, props.tokenId))
 const canInteractOnChain = computed(() => canInteract(props.chain))
 
 const {
@@ -45,10 +48,10 @@ function toggleNsfwContent() {
 function noop() {}
 const falseRef = computed(() => false)
 
-const cartActions = actionChain.value
+const cartActions = actionChain.value && parsedTokenId.value
   ? useCartActions({
-      tokenId: props.tokenId,
-      collectionId: props.collectionId,
+      tokenId: parsedTokenId.value.tokenId,
+      collectionId: parsedTokenId.value.collectionId,
       chain: actionChain.value,
       token,
       collection,
@@ -67,10 +70,10 @@ const cartActions = actionChain.value
       canBuy: falseRef,
     }
 
-const atomicSwapActions = actionChain.value
+const atomicSwapActions = actionChain.value && parsedTokenId.value
   ? useAtomicSwapAction({
-      tokenId: props.tokenId,
-      collectionId: props.collectionId,
+      tokenId: parsedTokenId.value.tokenId,
+      collectionId: parsedTokenId.value.collectionId,
       chain: actionChain.value,
       token,
       collection,

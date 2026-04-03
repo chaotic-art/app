@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
+import type { ExploreNftsData } from '~/graphql/queries/explore'
 import type { OdaChain, OdaToken, OnchainCollection } from '~/services/oda'
+import type { AssetHubChain } from '~/types'
 import { TradeTypes } from '@/components/trade/types'
 import TokenCard from '~/components/common/card/TokenCard.client.vue'
 import TokenActivity from '~/components/gallery/TokenActivity.vue'
-import { tokenEntries } from '~/utils/api/substrate.nft-pallets'
+import { exploreNfts } from '~/graphql/queries/explore'
 
 interface Props {
   tokenData: OdaToken | null
@@ -22,12 +24,21 @@ interface PropertyRow {
   rarity: number
 }
 
+interface RelatedToken {
+  id: string
+  tokenId: string
+  collectionId: string
+  image: string
+  name: string
+}
+
 const props = defineProps<Props>()
+
 const route = useRoute()
 const router = useRouter()
+const { $apolloClient } = useNuxtApp()
 const assetHubChain = computed(() => getAssetHubChain(props.chain))
-
-const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
+const moreFromCollection = ref<RelatedToken[]>([])
 
 const { getAttributeRarity } = useCollectionAttributes({
   collectionId: computed(() => props.collectionId),
@@ -111,23 +122,44 @@ const activeTab = computed({
   },
 })
 
+async function fetchMoreFromCollection(endpoint: AssetHubChain) {
+  try {
+    const { data } = await $apolloClient.query<ExploreNftsData>({
+      query: exploreNfts,
+      variables: {
+        first: 6,
+        collections: [props.collectionId],
+        orderBy: ['blockNumber_DESC', 'sn_DESC'],
+        search: [{ id_not_eq: `${props.collectionId}-${props.tokenId}` }],
+      },
+      context: {
+        endpoint,
+      },
+    })
+
+    moreFromCollection.value = data.tokenEntities.map((nft) => {
+      const [collectionId = '', tokenId = ''] = String(nft.id).split('-')
+
+      return {
+        id: nft.id,
+        collectionId,
+        tokenId,
+        image: nft.meta?.image || nft.image || '',
+        name: nft.name || 'Untitled NFT',
+      }
+    })
+  }
+  catch (error) {
+    console.error('Failed to fetch more from collection:', error)
+  }
+}
+
 onMounted(async () => {
   if (!assetHubChain.value) {
     return
   }
 
-  try {
-    const entries = await tokenEntries({
-      chain: assetHubChain.value,
-      collectionId: Number(props.collectionId),
-      max: 6,
-      excludeTokenId: Number(props.tokenId),
-    })
-    moreFromCollection.value = entries
-  }
-  catch (error) {
-    console.error('Failed to fetch more from collection:', error)
-  }
+  fetchMoreFromCollection(assetHubChain.value)
 })
 </script>
 
@@ -283,12 +315,12 @@ onMounted(async () => {
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
           <TokenCard
             v-for="nft in moreFromCollection"
-            :key="nft.keyArgs[1]"
-            :token-id="nft.keyArgs[1]"
-            :collection-id="nft.keyArgs[0]"
+            :key="nft.id"
+            :token-id="nft.tokenId"
+            :collection-id="nft.collectionId"
             :chain="chain"
-            :image="nft.metadata?.image"
-            :name="nft.metadata?.name"
+            :image="nft.image"
+            :name="nft.name"
           />
         </div>
       </div>

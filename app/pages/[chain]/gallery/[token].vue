@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { t } from 'try'
 import { fetchOdaToken } from '~/services/oda'
+import { parseAssetHubTokenId } from '~/utils/nft'
 
 const CONTAINER_ID = 'nft-img-container'
 
@@ -12,6 +13,7 @@ const [collectionId, tokenId] = token?.toString().split('-') ?? []
 
 const safeCollectionId = computed(() => collectionId?.toString() ?? '')
 const safeTokenId = computed(() => tokenId?.toString() ?? '')
+const parsedTokenId = computed(() => parseAssetHubTokenId(safeCollectionId.value, safeTokenId.value))
 
 const {
   owner,
@@ -26,8 +28,8 @@ const {
   highestOffer,
   rarity,
 } = useToken({
-  tokenId: Number(tokenId),
-  collectionId: Number(collectionId),
+  tokenId: safeTokenId.value,
+  collectionId: safeCollectionId.value,
   chain: currentChain.value,
   fetchRarity: true,
 })
@@ -112,13 +114,13 @@ definePageMeta({
             :can-interact="canInteractOnChain"
           />
           <GalleryItemActions
-            v-if="canInteractOnChain && assetHubChain"
+            v-if="canInteractOnChain && assetHubChain && parsedTokenId"
             class="mt-6"
             :token-data="tokenData"
             :collection="collection"
             :chain="assetHubChain"
-            :collection-id="Number(safeCollectionId)"
-            :token-id="Number(safeTokenId)"
+            :collection-id="parsedTokenId.collectionId"
+            :token-id="parsedTokenId.tokenId"
             :owner="owner"
             :price="BigInt(price ?? '0')"
             :highest-offer="highestOffer"

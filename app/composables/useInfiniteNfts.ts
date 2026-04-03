@@ -73,8 +73,8 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
         return {
           id: item.id,
           name: item.name,
-          tokenId: index,
-          collectionId: index,
+          tokenId: String(index),
+          collectionId: String(index),
           chain: endpoint,
           image: item.image,
           isPlaceholder: true,
@@ -92,14 +92,14 @@ export function useInfiniteNfts(options: UseInfiniteNftsOptions = {}) {
 
       // Real NFT data
       const nft = item as NftEntity & { isPlaceholder: false }
-      const [collectionId, tokenId] = String(nft.id).split('-').map(Number)
+      const [collectionId = '', tokenId = ''] = String(nft.id).split('-')
 
       return {
         ...nft,
         id: nft.id,
         name: nft.name || 'Untitled NFT',
-        tokenId: tokenId || 0,
-        collectionId: collectionId || 0,
+        tokenId,
+        collectionId,
         chain: endpoint,
         image: nft.meta?.image || nft.image,
         isPlaceholder: false,

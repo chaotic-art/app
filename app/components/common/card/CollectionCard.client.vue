@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/types/chain'
+import type { OdaChain } from '~/services/oda'
 import { fetchOdaCollection } from '~/services/oda'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
@@ -7,13 +7,12 @@ type ActionVariant = 'link' | 'studio-mode'
 
 interface Props {
   item: ReturnType<typeof useInfiniteCollections>['collections']['value'][number]
-  chain?: AssetHubChain
+  chain: OdaChain
   volume?: string
   actionVariant?: ActionVariant
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  chain: 'ahp',
   volume: '',
   actionVariant: 'link',
 })

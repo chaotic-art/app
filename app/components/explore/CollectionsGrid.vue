@@ -1,21 +1,22 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/types/chain'
+import type { OdaChain } from '~/services/oda'
+import { getAssetHubChain } from '@/utils/chain'
 
 type CardActionVariant = 'link' | 'studio-mode'
 
 interface Props {
   variables?: Record<string, any>
-  chain?: AssetHubChain
+  chain: OdaChain
   cardActionVariant?: CardActionVariant
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variables: () => ({}),
-  chain: 'ahp',
   cardActionVariant: 'link',
 })
 
 const emit = defineEmits(['totalCountChange'])
+const endpoint = computed(() => getAssetHubChain(props.chain))
 
 // Use the collections infinite query composable
 const {
@@ -29,7 +30,7 @@ const {
   pageSize: 40,
   distance: 300,
   variables: props.variables,
-  endpoint: props.chain,
+  endpoint: endpoint.value,
 })
 
 onMounted(async () => {

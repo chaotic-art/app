@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
-import type { AssetHubChain } from '~/types/chain'
-import { isAssetHubChain } from '~/utils/chain'
+import type { OdaChain } from '~/services/oda'
+import { isChain, isOdaChain } from '~/utils/chain'
 import { STICKY_MOBILE_TOOLBAR_ROW_CLASS, STICKY_MOBILE_TOOLBAR_SEARCH_CLASS } from '~/utils/exploreToolbar'
 import { getSingleQueryValue } from '~/utils/query'
 
@@ -9,7 +9,7 @@ import { getSingleQueryValue } from '~/utils/query'
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && isAssetHubChain(chain)
+    return typeof chain === 'string' && isChain(chain) && isOdaChain(chain)
   },
 })
 
@@ -31,7 +31,7 @@ const {
   resolveSortQuery,
 } = useSortOptions('exploreCollections')
 
-const { chain } = route.params as { chain: AssetHubChain }
+const { chain } = route.params as { chain: OdaChain }
 
 const queryState = computed({
   get: () => ({
