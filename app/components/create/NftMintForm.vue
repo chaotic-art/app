@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { watchDebounced } from '@vueuse/core'
 import { useNftForm } from '~/composables/create/useNftForm'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'

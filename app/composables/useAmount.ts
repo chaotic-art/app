@@ -1,11 +1,11 @@
-import type { Prefix } from '@kodadot1/static'
+import type { Chain } from '@/types'
 import { formatAmountWithRound } from '@/utils/format/balance'
 
 export default function (
   tokenAmount: ComputedRef<number | string | undefined>,
   tokenDecimals: ComputedRef<number>,
   chainSymbol: ComputedRef<string>,
-  { roundBy, withBlank = false }: { roundBy?: ComputedRef<Prefix | number>, withBlank?: boolean } = {},
+  { roundBy, withBlank = false }: { roundBy?: ComputedRef<Chain | number>, withBlank?: boolean } = {},
 ) {
   const { getCurrentTokenValue } = useFiatStore()
 

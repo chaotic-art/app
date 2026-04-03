@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
+
 const swapStore = useAtomicSwapStore()
 const { swap } = storeToRefs(swapStore)
 const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 const surcharge = computed(() => swap.value?.surcharge)
 const desiredNfts = computed(() => swap.value?.desired)
 
@@ -17,7 +20,7 @@ const { collection } = useOdaCollection(computed(() => Number(desiredNfts.value[
       <TokenBasicCard
         v-for="nft in desiredNfts"
         :key="`${currentChain}-${nft.collectionId}-${nft.id}-${nft.meta.image}`"
-        :chain="currentChain"
+        :chain="chain"
         :image="nft.meta.image"
         :name="nft.name"
         :owner="collection?.owner"

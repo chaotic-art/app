@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { OdaChain } from '~/services/oda'
 import type { NftRarity } from '~/types/rarity'
+import { canInteract, getAssetHubChain } from '@/utils/chain'
 import { isNsfwNft } from '~/utils/mint'
+import { parseAssetHubTokenId } from '~/utils/nft'
 
 const props = defineProps<{
-  tokenId: number
-  collectionId: number
-  chain: AssetHubChain
+  tokenId: string
+  collectionId: string
+  chain: OdaChain
   image?: string | null
   name?: string | null
   price?: string | null
@@ -17,6 +19,10 @@ const props = defineProps<{
   showRarity?: boolean
   rarity?: NftRarity | null
 }>()
+
+const actionChain = computed(() => getAssetHubChain(props.chain))
+const parsedTokenId = computed(() => parseAssetHubTokenId(props.collectionId, props.tokenId))
+const canInteractOnChain = computed(() => canInteract(props.chain))
 
 const {
   token,
@@ -38,6 +44,47 @@ function toggleNsfwContent() {
   isBlurred.value = !isBlurred.value
 }
 
+// tmp solution
+function noop() {}
+const falseRef = computed(() => false)
+
+const cartActions = actionChain.value && parsedTokenId.value
+  ? useCartActions({
+      tokenId: parsedTokenId.value.tokenId,
+      collectionId: parsedTokenId.value.collectionId,
+      chain: actionChain.value,
+      token,
+      collection,
+      owner,
+      price: computed(() => BigInt(nativePrice.value ?? '0')),
+      mimeType: computed(() => mimeType.value || ''),
+    })
+  : {
+      addToActionCart: noop,
+      addToShoppingCart: noop,
+      buyNow: noop,
+      createActionCartItem: () => null,
+      isItemInActionCart: falseRef,
+      isItemInShoppingCart: falseRef,
+      isItemInCart: falseRef,
+      canBuy: falseRef,
+    }
+
+const atomicSwapActions = actionChain.value && parsedTokenId.value
+  ? useAtomicSwapAction({
+      tokenId: parsedTokenId.value.tokenId,
+      collectionId: parsedTokenId.value.collectionId,
+      chain: actionChain.value,
+      token,
+      collection,
+      owner,
+    })
+  : {
+      onAtomicSwapSelect: noop,
+      showAtomicSwapAction: falseRef,
+      isItemSelected: falseRef,
+    }
+
 const {
   addToActionCart,
   addToShoppingCart,
@@ -47,29 +94,13 @@ const {
   isItemInShoppingCart,
   isItemInCart,
   canBuy,
-} = useCartActions({
-  tokenId: props.tokenId,
-  collectionId: props.collectionId,
-  chain: props.chain,
-  token,
-  collection,
-  owner,
-  price: computed(() => BigInt(nativePrice.value ?? '0')),
-  mimeType: computed(() => mimeType.value || ''),
-})
+} = cartActions
 
 const {
   onAtomicSwapSelect,
   showAtomicSwapAction,
   isItemSelected: isAtomicSwapItemSelected,
-} = useAtomicSwapAction({
-  tokenId: props.tokenId,
-  collectionId: props.collectionId,
-  chain: props.chain,
-  token,
-  collection,
-  owner,
-})
+} = atomicSwapActions
 
 const actionCartStore = useActionCartStore()
 const route = useRoute()
@@ -79,7 +110,13 @@ const imageStatus = ref<'card' | 'normal' | 'fallback'>('card')
 const dataOwner = computed(() => owner.value || props.currentOwner)
 
 const isActionCartAvailableRoute = computed(() => ['chain-u-id', 'airdrop-select', 'chain-studio-collection_id-tab'].some(r => (route.name?.toString())?.includes(r)))
-const canAddToActionCart = computed(() => isActionCartAvailableRoute.value && dataOwner.value && isCurrentAccount(dataOwner.value) && mimeType.value?.length)
+const canAddToActionCart = computed(() => Boolean(
+  actionChain.value
+  && isActionCartAvailableRoute.value
+  && dataOwner.value
+  && isCurrentAccount(dataOwner.value)
+  && mimeType.value?.length,
+))
 
 const rarity = computed(() => props.rarity ?? null)
 
@@ -95,7 +132,10 @@ const hasRarity = computed(() => {
 
 watchEffect(() => {
   if (token.value && dataOwner.value && canAddToActionCart.value) {
-    actionCartStore.setOwnedItem(createActionCartItem({ token: token.value, owner: dataOwner.value }))
+    const actionCartItem = createActionCartItem({ token: token.value, owner: dataOwner.value })
+    if (actionCartItem) {
+      actionCartStore.setOwnedItem(actionCartItem)
+    }
   }
 })
 </script>
@@ -198,7 +238,7 @@ watchEffect(() => {
             </span>
           </div>
 
-          <div v-if="token && !hideHoverAction && (canAddToActionCart || canBuy || showAtomicSwapAction)" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
+          <div v-if="token && canInteractOnChain && !hideHoverAction && (canAddToActionCart || canBuy || showAtomicSwapAction)" class="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 flex justify-center">
             <UButton
               v-if="showAtomicSwapAction"
               :icon="isAtomicSwapItemSelected ? 'i-heroicons-x-mark-20-solid' : 'i-heroicons-check-20-solid'"

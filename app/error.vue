@@ -4,7 +4,6 @@ import type { NuxtError } from '#app'
 const props = defineProps<{
   error: NuxtError
 }>()
-// const { urlPrefix } = usePrefix()
 const headline = computed(() => {
   switch (props.error?.statusCode) {
     case 404:
@@ -63,13 +62,6 @@ const headline = computed(() => {
         >
           Return to Home
         </UButton>
-
-        <!-- <nuxt-link
-          :to="`/${urlPrefix}/explore/collectibles`"
-          class="text-k-blue hover:text-k-blue-hover"
-        >
-          Explore NFTs and Collections
-        </nuxt-link> -->
       </div>
     </UContainer>
   </div>

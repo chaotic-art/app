@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
 import { formatDetailedTimeToNow } from '~/utils/format/time'
 
 const { drop, amountToMint } = storeToRefs(useDropStore())
 
 const { decimals, chainSymbol, currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 const { usd: usdPrice, formatted: formattedTokenPrice } = useAmount(computed(() => drop.value?.price), decimals, chainSymbol)
 
 const dropStartRelativeTime = computed(() => {
@@ -74,7 +76,7 @@ const dropStartRelativeTime = computed(() => {
             </p>
 
             <DropCollectedBy
-              :chain="currentChain"
+              :chain="chain"
               :collection-id="drop?.collection ?? ''"
               :max-address-count="5"
               size="medium"
@@ -89,7 +91,7 @@ const dropStartRelativeTime = computed(() => {
 
         <div v-if="drop.collection" class="flex w-full justify-end my-4">
           <UButton
-            :to="`/${currentChain}/collection/${drop.collection}`"
+            :to="`/${chain}/collection/${drop.collection}`"
             variant="outline"
           >
             View Collection

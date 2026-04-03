@@ -1,18 +1,26 @@
 <script setup lang="ts">
-const { prefix } = usePrefix()
+import { canInteract } from '@/utils/chain'
+
+const { currentChain } = useChain()
 const router = useRouter()
 
+const canInteractOnChain = computed(() => canInteract(currentChain.value))
+
 const navigationOptions = computed(() => [
-  {
-    label: 'Transfer',
-    value: 'transfer',
-    route: `/${prefix.value}/transfer`,
-  },
-  {
-    label: 'Swap',
-    value: 'swap',
-    route: `/${prefix.value}/swap`,
-  },
+  ...(canInteractOnChain.value
+    ? [
+        {
+          label: 'Transfer',
+          value: 'transfer',
+          route: `/${currentChain.value}/transfer`,
+        },
+        {
+          label: 'Swap',
+          value: 'swap',
+          route: `/${currentChain.value}/swap`,
+        },
+      ]
+    : []),
   {
     label: 'Settings',
     value: 'settings',

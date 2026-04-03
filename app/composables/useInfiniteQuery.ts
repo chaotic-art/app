@@ -1,6 +1,7 @@
 import type { DocumentNode } from 'graphql'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { useInfiniteScroll } from '@vueuse/core'
+import { getGraphqlEndpointChain } from '@/utils/chain'
 
 interface UseInfiniteQueryOptions<TData, TItem> {
   query: DocumentNode
@@ -26,6 +27,7 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
   } = options
 
   const { $apolloClient } = useNuxtApp()
+  const graphqlEndpoint = getGraphqlEndpointChain(endpoint)
 
   // Pagination state
   const currentOffset = ref(0)
@@ -57,6 +59,16 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
 
   // Function to load data
   const loadData = async (offset = 0, append = false) => {
+    if (!graphqlEndpoint) {
+      allItems.value = []
+      totalCount.value = 0
+      currentOffset.value = 0
+      hasMoreData.value = false
+      isInitialLoading.value = false
+      console.warn('No graphql endpoint set')
+      return
+    }
+
     try {
       const { data } = await $apolloClient.query({
         query,
@@ -66,7 +78,7 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
           offset,
         },
         context: {
-          endpoint,
+          endpoint: graphqlEndpoint,
         },
       })
 

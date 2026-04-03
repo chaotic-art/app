@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { TableColumn } from '@nuxt/ui'
 import type { TradeNftItem, TradeType } from '@/components/trade/types'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import TradeActivityTableRowItem from '@/components/trade/ActivityTable/RowItem.vue'
 import { TradeTypes } from '@/components/trade/types'
 import { isTradeSwap } from '@/composables/useTradeType'
@@ -22,12 +22,14 @@ const isTradeModalOpen = ref(false)
 const tradeIds = ref()
 
 const { items: trades, loading } = useTrades({
+  chain: computed(() => props.chain),
   where: computed(() => ({ id_in: tradeIds.value })),
   disabled: computed(() => !Array.isArray(tradeIds.value)),
   type: props.type,
 })
 
 useSubscriptionGraphql({
+  chain: computed(() => props.chain),
   query: {
     [TradeTypes.Offer]: activeOffersIdsByNftId,
     [TradeTypes.Swap]: activeSwapsIdsByNftId,

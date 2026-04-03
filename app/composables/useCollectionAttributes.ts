@@ -1,5 +1,6 @@
 import type { Property } from '@/composables/onchain/useNftPallets'
 import type { NftAttributesListByCollectionData } from '~/graphql/queries/collections'
+import { getGraphqlEndpointChain } from '@/utils/chain'
 import { nftAttributesListByCollection } from '~/graphql/queries/collections'
 
 interface NftWithAttributes {
@@ -20,11 +21,12 @@ interface TraitValueMap {
 export function useCollectionAttributes({ collectionId }: { collectionId: ComputedRef<string | undefined> }) {
   const { $apolloClient } = useNuxtApp()
   const { currentChain } = useChain()
+  const graphqlEndpoint = computed(() => getGraphqlEndpointChain(currentChain.value))
   const nftsList = ref<NftWithAttributes[]>([])
   const loading = ref(false)
 
   async function fetchAttributes(id: string | undefined) {
-    if (!id) {
+    if (!id || !graphqlEndpoint.value) {
       nftsList.value = []
       return
     }
@@ -36,7 +38,7 @@ export function useCollectionAttributes({ collectionId }: { collectionId: Comput
         variables: { id },
         fetchPolicy: 'network-only',
         context: {
-          endpoint: currentChain.value,
+          endpoint: graphqlEndpoint.value,
         },
       })
 

@@ -1,11 +1,12 @@
 import type { ActionAirdrop } from '~/components/airdrop/types'
-import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
+import type { AssetHubChain, SubstrateChain } from '~/types/chain'
 import { cryptoWaitReady } from '@polkadot/util-crypto'
 import { encodeAddress } from 'dedot/utils'
 import { Binary, Enum } from 'polkadot-api'
 import { generateAirdropTxs } from '@/components/airdrop/utils'
 import { generateIdAssethub } from '@/services/dyndata'
+import { substrateChainConfig } from '@/utils/chain'
 import { MultiAddress } from '~/descriptors/dist'
 import { refreshOdaCollection, refreshOdaTokenMetadata } from '~/services/oda'
 import { BLOCKS_PER_DAY, getOfferCollectionId, OFFER_MINT_PRICE } from './utils'
@@ -89,7 +90,6 @@ interface AirdropNftsParams {
   chain: AssetHubChain
   items: ActionAirdrop
   type?: TxType
-
 }
 
 interface TransferNftsParams {
@@ -277,7 +277,7 @@ export function useNftPallets() {
             description: collectionData.description,
             image: collectionData.image,
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -370,7 +370,7 @@ export function useNftPallets() {
             description: '',
             image: '',
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -381,7 +381,7 @@ export function useNftPallets() {
     })
   }
 
-  async function userBalance(chain: SupportedChain) {
+  async function userBalance(chain: SubstrateChain) {
     if (!getConnectedSubAccount.value?.address) {
       // throw new Error('No address found')
       return 0n
@@ -532,7 +532,7 @@ export function useNftPallets() {
               metadata: Array.isArray(metadataUri) ? metadataUri[i]! : metadataUri,
             })),
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -636,7 +636,7 @@ export function useNftPallets() {
             collectionId: String(collectionId),
             itemId,
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -703,7 +703,7 @@ export function useNftPallets() {
             collectionId: String(collectionId),
             itemIds: items.map(i => i.itemId),
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -758,7 +758,7 @@ export function useNftPallets() {
               metadata: nft.metadata,
             })),
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -792,7 +792,7 @@ export function useNftPallets() {
     }
 
     return {
-      recipient: encodeAddress(recipient.value.asText(), chainSpec[chain].ss58Format),
+      recipient: encodeAddress(recipient.value.asText(), substrateChainConfig[chain].ss58Format),
       amount: Number(royalty.value.asText()),
     }
   }
@@ -865,7 +865,7 @@ export function useNftPallets() {
         result.value = {
           type: 'buy',
           hash: hash.value,
-          prefix: chain,
+          chain,
           items: nfts.map(nft => ({
             id: nft.id,
             sn: nft.sn,
@@ -907,7 +907,7 @@ export function useNftPallets() {
         result.value = {
           type: 'airdrop',
           hash: hash.value,
-          prefix: chain,
+          chain,
           items: items.nfts.map(nft => ({
             id: nft.id,
             sn: nft.sn,
@@ -962,7 +962,7 @@ export function useNftPallets() {
           result.value = {
             type: 'burn',
             hash: hash.value,
-            prefix: chain,
+            chain,
             items: itemsToBurn.map(nft => ({
               id: nft.id,
               sn: nft.sn,
@@ -1025,7 +1025,7 @@ export function useNftPallets() {
           result.value = {
             type: 'token_transfer',
             hash: hash.value,
-            prefix: chain,
+            chain,
             items: items.map(nft => ({
               id: nft.id,
               sn: nft.sn,
@@ -1093,7 +1093,7 @@ export function useNftPallets() {
           result.value = {
             type: 'collection_destroy',
             hash: hash.value,
-            prefix: chain,
+            chain,
             collectionId,
           }
         }
@@ -1180,7 +1180,7 @@ export function useNftPallets() {
           result.value = {
             type: 'create_offer',
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -1221,7 +1221,7 @@ export function useNftPallets() {
           result.value = {
             type: 'cancel_offer',
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -1271,7 +1271,7 @@ export function useNftPallets() {
           result.value = {
             type: 'accept_offer',
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -1313,7 +1313,7 @@ export function useNftPallets() {
           result.value = {
             type: 'cancel_swap',
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -1367,7 +1367,7 @@ export function useNftPallets() {
           result.value = {
             type: 'accept_swap',
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },
@@ -1439,7 +1439,7 @@ export function useNftPallets() {
           result.value = {
             type: 'create_swap',
             hash: hash.value,
-            prefix: chain,
+            chain,
             blockNumber: event.block.number,
           }
         }

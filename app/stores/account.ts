@@ -12,8 +12,7 @@ function getDefaultAccount(): AccountVm {
 }
 
 export const useAccountStore = defineStore('account', () => {
-  const { currentChain } = useChain()
-  const { vm } = useVm()
+  const { currentChain, vm } = useChain()
 
   const loading = ref(false)
   const accounts = ref<Record<ChainVM, AccountVm>>({
@@ -31,7 +30,7 @@ export const useAccountStore = defineStore('account', () => {
     }
 
     try {
-      return formatAddress({ address: accounts.value[vm.value].address, prefix: currentChain.value })
+      return formatAddress({ address: accounts.value[vm.value].address, chain: currentChain.value })
     }
     catch {
       return undefined

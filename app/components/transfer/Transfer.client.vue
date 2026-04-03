@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { useClipboard, whenever } from '@vueuse/core'
 import { useBalancesPallets } from '@/composables/onchain/useBalancePallets'
 import useQueryBalance from '~/composables/useQueryBalance'
@@ -18,7 +18,7 @@ const { t } = useI18n()
 const { balance, transferableBalance, isLoading: isBalanceLoading } = useQueryBalance()
 const { chainSymbol, decimals } = useChain()
 const { accountId, isCurrentAccount } = useAuth()
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 const { getCurrentTokenValue } = useFiatStore()
 const router = useRouter()
 const route = useRoute()
@@ -187,7 +187,7 @@ async function handleTransfer() {
     isConfirmModalOpen.value = false
 
     await transfer({
-      chain: prefix.value as AssetHubChain,
+      chain: currentChain.value as AssetHubChain,
       targets: targetAddresses.value.map(address => ({
         address: address.address,
         amount: amountToNative(address.token, decimals.value),
@@ -262,7 +262,7 @@ watch(() => targetAddresses.value.length, async () => {
 
     const fee = await transfer({
       type: 'estimate',
-      chain: prefix.value as AssetHubChain,
+      chain: currentChain.value as AssetHubChain,
       targets: targetAddresses.value.map(() => ({
         address: CHAOTIC_MINTER,
         amount: amountToNative(1, decimals.value),

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watchDebounced } from '@vueuse/core'
 import { isEvmAddress } from 'dedot/utils'
-import { CHAOTIC_CARD_COLLECTION_ID, CHAOTIC_CARD_PREFIX } from '@/components/mintCard/constants'
+import { CHAOTIC_CARD_CHAIN, CHAOTIC_CARD_COLLECTION_ID } from '@/components/mintCard/constants'
 import { makeCardScreenshot, mintXCard } from '@/services/card'
 import { generateMixedImageByFalAi, waitForXRoastGenerationComplete } from '@/services/generate'
 import { accountTokenEntries } from '~/utils/api/substrate.nft-pallets'
@@ -32,10 +32,10 @@ const isMinted = computed(() => !!existingCard.value)
 const screenshotUrl = ref<string | null>(null)
 
 async function fetchOwnedCardNft() {
-  const owner = getss58AddressByPrefix(getConnectedSubAccount.value?.address as string, CHAOTIC_CARD_PREFIX)
+  const owner = getSs58AddressByChain(getConnectedSubAccount.value?.address as string, CHAOTIC_CARD_CHAIN)
 
   const ownedCardNfts = await accountTokenEntries({
-    prefix: CHAOTIC_CARD_PREFIX,
+    chain: CHAOTIC_CARD_CHAIN,
     account: owner,
     collectionId: Number(CHAOTIC_CARD_COLLECTION_ID),
   })
@@ -84,7 +84,7 @@ function handleClaimClick() {
         if (isEvmAddress(getConnectedSubAccount.value?.address as string)) {
           throw new Error('Only Substrate address is supported')
         }
-        const address = formatAddress ({ address: getConnectedSubAccount.value?.address as string, prefix: CHAOTIC_CARD_PREFIX })
+        const address = formatAddress({ address: getConnectedSubAccount.value?.address as string, chain: CHAOTIC_CARD_CHAIN })
 
         window.history.replaceState({}, '', window.location.pathname)
 
@@ -157,7 +157,7 @@ function pollRequestMintedCard() {
 
 function handleViewCardClick() {
   if (existingCard.value) {
-    window.open(`/${CHAOTIC_CARD_PREFIX}/gallery/${existingCard.value.id}`, '_blank')
+    window.open(`/${CHAOTIC_CARD_CHAIN}/gallery/${existingCard.value.id}`, '_blank')
   }
 }
 
@@ -172,7 +172,7 @@ function handleDownloadCard() {
 }
 
 function handleExploreCollectionClick() {
-  window.open(`/${CHAOTIC_CARD_PREFIX}/collection/${CHAOTIC_CARD_COLLECTION_ID}`, '_blank')
+  window.open(`/${CHAOTIC_CARD_CHAIN}/collection/${CHAOTIC_CARD_COLLECTION_ID}`, '_blank')
 }
 
 // only dark mode for this page
@@ -212,7 +212,7 @@ onUnmounted(() => {
     <LazyNavbar />
     <MintCard :screenshot-url="screenshotUrl" :loading="isInitialLoading" :minted="isMinted" @claim="handleClaimClick" @share="handleShareClick" @view-card="handleViewCardClick" @download="handleDownloadCard" @explore-collection="handleExploreCollectionClick" />
     <MintCardLoadingModal v-model:open="isLoading" />
-    <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :prefix="CHAOTIC_CARD_PREFIX" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" @view-card="handleViewCardClick" />
+    <MintCardSuccessModal :id="mintedCard?.id || ''" v-model:open="isSuccessModalOpen" :chain="CHAOTIC_CARD_CHAIN" :is-on-chain="Boolean(existingCard?.id)" :preview-url="mintedCard?.image" :name="mintedCard?.name || ''" @share="handleShareClick" @view-card="handleViewCardClick" />
     <LazyFooter />
   </div>
 </template>

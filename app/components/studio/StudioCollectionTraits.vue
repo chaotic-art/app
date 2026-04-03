@@ -2,6 +2,7 @@
 import type { TableColumn } from '@nuxt/ui'
 import type { NftTraitsEditRow } from '~/components/studio/StudioCollectionTraitsEditSidebar.vue'
 import type { Property } from '~/composables/onchain/useNftPallets'
+import type { AssetHubChain } from '~/types/chain'
 import { h, resolveComponent } from 'vue'
 import {
   bulkTraitRowMatchesQuery,
@@ -44,6 +45,7 @@ const {
 const { onSuccess } = useTransactionModal()
 const { currentChain } = useChain()
 const { getItemMetadataUri, bulkUpdateItemsAttributes } = useNftPallets()
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const sidebarOpen = ref(false)
 const editingRow = ref<NftTraitsEditRow | null>(null)
@@ -179,13 +181,12 @@ async function confirmBulkApply() {
     return
   }
 
-  const chain = currentChain.value
   const collectionId = Number(props.collectionId)
   applyingBulk.value = true
   try {
     const items = await Promise.all(
       toApply.map(async (row) => {
-        const currentUri = await getItemMetadataUri(chain, collectionId, row.sn)
+        const currentUri = await getItemMetadataUri(chain.value, collectionId, row.sn)
         const currentMeta = currentUri ? await fetchTokenMetadata(currentUri) : null
         const nextProps = row.nextProperties ?? []
         const attributesForMeta = nextProps.map(p => ({ trait_type: p.trait, value: p.value }))
@@ -208,7 +209,7 @@ async function confirmBulkApply() {
     )
 
     await bulkUpdateItemsAttributes({
-      chain,
+      chain: chain.value,
       collectionId,
       items,
     })

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
 import { toNative } from '@/utils/format/balance'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import useQueryBalance from '~/composables/useQueryBalance'
@@ -15,6 +16,7 @@ const { open: isTransactionModalOpen } = useTransactionModal()
 const { balance, isLoading: isBalanceLoading } = useQueryBalance({ enabled: listingCartModalOpen })
 const listingFees = ref()
 const { existentialDeposit } = useDeposit(currentChain)
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const { usd: priceUSD, formatted: totalNFTsPrice } = useAmount(
   computed(() =>
@@ -93,7 +95,7 @@ function getListParams() {
       metadata_uri: item.metadata_uri,
       metadata: item.metadata,
     })),
-    chain: currentChain.value,
+    chain: chain.value,
   }
 }
 
@@ -115,10 +117,11 @@ function handleListNfts() {
 watchEffect(async () => {
   // TODO: debounce
   if (accountId.value) {
+    const listParams = getListParams()
     try {
       listingFees.value = Number(
         await listNfts({
-          ...getListParams(),
+          ...listParams,
           type: 'estimate',
         }),
       )

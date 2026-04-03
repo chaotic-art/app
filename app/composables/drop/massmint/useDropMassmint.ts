@@ -1,4 +1,5 @@
 import type { ToMassmintNFT } from './types'
+import type { AssetHubChain } from '~/types/chain'
 import { setDyndataUrl } from '@/services/dyndata'
 import { createLogger } from '@/utils/logger'
 import { useNextItemId } from '~/composables/onchain/useNextItemId'
@@ -13,7 +14,7 @@ export default () => {
   const tokenIds = ref<number[]>([])
   const populateTokenIds = async () => {
     const collectionId = Number.parseInt(drop.value.collection)
-    const nextId = await getNextItemId(currentChain.value, collectionId)
+    const nextId = await getNextItemId(currentChain.value as AssetHubChain, collectionId)
     tokenIds.value = Array.from(
       { length: amountToMint.value },
       (_, i) => nextId + i,

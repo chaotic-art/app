@@ -92,7 +92,7 @@ useHead({
               <span class="font-bold text-muted-foreground">·</span>
               <div v-if="drop?.chain" class="flex items-center gap-1">
                 <ClientOnly><img v-if="chainIcon" :src="chainIcon" class="w-4 h-4" :alt="drop.chain"></ClientOnly>
-                <span class="font-medium text-foreground">{{ chainSpec[drop.chain].tokenSymbol }}</span>
+                <span class="font-medium text-foreground">{{ chainConfig[drop.chain].tokenSymbol }}</span>
               </div>
             </template>
           </div>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { SubstrateChain } from '~/types/chain'
 import { extractHostname, formatLatency, latencyColorClass, measureLatency, SLOW_RPC_THRESHOLD_MS } from '~/composables/useRpcLatency'
 import { PROVIDERS } from '~/config/providers'
-import { chainSpec } from '~/utils/chain'
+import { chainConfig } from '~/utils/chain'
 
-function isSupportedChain(chain: string | undefined): chain is SupportedChain {
+function isSupportedChain(chain: string | undefined): chain is SubstrateChain {
   return !!chain && chain in PROVIDERS
 }
 
@@ -19,7 +19,7 @@ const selectedUrl = computed(() => {
 
 const chainName = computed(() => {
   const chain = currentChain.value
-  return isSupportedChain(chain) ? (chainSpec?.[chain]?.name ?? 'Unknown') : 'Unknown'
+  return isSupportedChain(chain) ? (chainConfig?.[chain]?.name ?? 'Unknown') : 'Unknown'
 })
 
 const providerUrls = computed(() => {

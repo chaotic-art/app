@@ -1,11 +1,11 @@
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { SubstrateChain } from '~/types/chain'
 import { measureLatency, SLOW_RPC_THRESHOLD_MS } from '~/composables/useRpcLatency'
 import { PROVIDERS } from '~/config/providers'
 import { useRpcProviderStore } from '~/stores/rpcProvider'
 
 const AUTO_SWITCH_COOLDOWN_MS = 60_000
 
-function hasRpcProviders(chain: string): chain is SupportedChain {
+function hasRpcProviders(chain: string): chain is SubstrateChain {
   return chain in PROVIDERS
 }
 
@@ -18,10 +18,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     const { currentChain } = useChain()
     const rpcStore = useRpcProviderStore()
     const toast = useToast()
-    const lastAutoSwitchAt = ref<Partial<Record<SupportedChain, number>>>({})
-    const checkingChain = ref<SupportedChain | null>(null)
+    const lastAutoSwitchAt = ref<Partial<Record<SubstrateChain, number>>>({})
+    const checkingChain = ref<SubstrateChain | null>(null)
 
-    async function checkAndSwitch(chain: SupportedChain) {
+    async function checkAndSwitch(chain: SubstrateChain) {
       if (checkingChain.value === chain) {
         return
       }

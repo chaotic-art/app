@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
 import type { SelectedTrait } from '@/components/trait/types'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { OdaChain } from '~/services/oda'
 import { TradeTypes } from '@/components/trade/types'
 import { fetchOdaCollection } from '~/services/oda'
 import { normalizeRarityTotalItems } from '~/types/rarity'
-import { chainSpec } from '~/utils/chain'
 
-const availableTabs = ['items', 'activity', 'offers', 'swaps', 'traits', 'analytics'] as const
-type CollectionTab = typeof availableTabs[number]
+const _availableTabs = ['items', 'activity', 'offers', 'swaps', 'traits', 'analytics'] as const
+type CollectionTab = typeof _availableTabs[number]
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
-const { chain: chainPrefix, collection_id } = route.params
+const { chain: routeChain, collection_id } = route.params
 const { isCurrentAccount, isLogIn } = useAuth()
 const {
   sortOptions,
@@ -23,6 +22,13 @@ const {
 } = useSortOptions('collectionItems')
 const { buildNftSearchConstraints } = useSearchFilters()
 const { listedMode, resolveListedForSort } = useExploreNftStatusFilter('collectionItems')
+const chain = computed(() =>
+  typeof routeChain === 'string' && isChain(routeChain) && isOdaChain(routeChain)
+    ? routeChain
+    : undefined,
+)
+const assetHubChain = computed(() => chain.value ? getAssetHubChain(chain.value) : undefined)
+const canInteractOnChain = computed(() => chain.value ? canInteract(chain.value) : false)
 
 const tabsItems = computed(() => [
   {
@@ -31,18 +37,22 @@ const tabsItems = computed(() => [
     slot: 'items',
     value: 'items',
   },
-  {
-    label: 'Offers',
-    name: 'Offers',
-    slot: 'offers',
-    value: 'offers',
-  },
-  {
-    label: 'Swaps',
-    name: 'Swaps',
-    slot: 'swaps',
-    value: 'swaps',
-  },
+  ...(canInteractOnChain.value
+    ? [
+        {
+          label: 'Offers',
+          name: 'Offers',
+          slot: 'offers',
+          value: 'offers',
+        },
+        {
+          label: 'Swaps',
+          name: 'Swaps',
+          slot: 'swaps',
+          value: 'swaps',
+        },
+      ]
+    : []),
   {
     label: 'Traits',
     name: 'Traits',
@@ -66,7 +76,8 @@ const tabsItems = computed(() => [
 const activeTab = computed({
   get() {
     const tab = route.query.tab?.toString()
-    return (availableTabs.includes(tab as CollectionTab) ? tab : 'items') as CollectionTab
+    const visibleTabs = tabsItems.value.map(item => item.value)
+    return (tab && visibleTabs.includes(tab) ? tab : 'items') as CollectionTab
   },
   set(tab: string) {
     router.replace({
@@ -75,10 +86,13 @@ const activeTab = computed({
   },
 })
 
-const chain = computed(() => chainPrefix as AssetHubChain)
 const { data } = await useLazyAsyncData(
-  `collection:${chain.value}:${collection_id}`,
+  `collection:${chain.value ?? routeChain}:${collection_id}`,
   async () => {
+    if (!chain.value) {
+      return { collection: null, drops: null }
+    }
+
     const [collectionResult, drops] = await Promise.all([
       fetchOdaCollection(chain.value, collection_id?.toString() ?? '').catch(() => null),
       $fetch('/api/genart/list', { query: { collection: collection_id?.toString() ?? '' } }),
@@ -167,10 +181,14 @@ const overlay = useOverlay()
 const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
 
 function handleDestroyCollection() {
+  if (!assetHubChain.value) {
+    return
+  }
+
   destroyCollectionModal.open({
     collectionId: collection_id?.toString() ?? '',
     collectionName: collectionName.value,
-    chain: chain.value,
+    chain: assetHubChain.value,
   })
 }
 
@@ -185,7 +203,7 @@ function handleSelectedTraitsUpdate(traits: SelectedTrait[]) {
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && chain in chainSpec
+    return typeof chain === 'string' && isChain(chain) && isOdaChain(chain)
   },
 })
 
@@ -207,13 +225,12 @@ defineOgImageComponent('Frame', {
   <UContainer class="px-4 md:px-6 pb-6">
     <div>
       <CollectionHeader
+        v-if="chain && assetHubChain"
         :collection="data?.collection ?? null"
         :collection-id="collection_id?.toString() ?? ''"
         :chain="chain"
-        :creator="data?.drops?.data[0]?.creator"
-        :drop-alias="data?.drops?.data[0]?.alias"
-        :show-delete-button="true"
-        :is-owner="Boolean(isOwner)"
+        :drop="{ creator: data?.drops?.data[0]?.creator, alias: data?.drops?.data[0]?.alias }"
+        :actions="{ canDelete: canInteractOnChain, isOwner: Boolean(isOwner) }"
         @delete="handleDestroyCollection"
       />
 
@@ -254,12 +271,14 @@ defineOgImageComponent('Frame', {
 
               <!-- Items Grid -->
               <LazyNftsGrid
+                v-if="assetHubChain"
                 :key="gridKey"
                 :variables="queryVariables"
                 :grid-class="nftGridClass"
                 :view-mode="nftViewMode"
                 no-items-found-message="This collection doesn't have any items yet."
-                :prefix="chain"
+                :chain="chain as OdaChain"
+                :hide-hover-action="!canInteractOnChain"
                 :rarity-total-items="collectionRarityTotalItems"
                 show-rarity
               />
@@ -269,10 +288,10 @@ defineOgImageComponent('Frame', {
         <template #activity>
           <ProfileActivity :collection-id="collection_id?.toString() ?? ''" />
         </template>
-        <template #offers>
+        <template v-if="canInteractOnChain" #offers>
           <CollectionTrades :trade-type="TradeTypes.Offer" />
         </template>
-        <template #swaps>
+        <template v-if="canInteractOnChain" #swaps>
           <CollectionTrades :trade-type="TradeTypes.Swap" />
         </template>
         <template #traits>

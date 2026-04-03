@@ -3,6 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type { DocumentNode } from 'graphql'
 import type { TradeConsidered, TradeNftItem, TradeToken, TradeType } from '@/components/trade/types'
 import type { SwapSurcharge } from '@/composables/onchain/useNftPallets'
+import type { AssetHubChain } from '~/types/chain'
 import TradeActivityTableRowItem from '@/components/trade/ActivityTable/RowItem.vue'
 import TradeActivityTableRowItemCollection from '@/components/trade/ActivityTable/RowItemCollection.vue'
 import { isTradeSwap } from '@/composables/useTradeType'
@@ -20,7 +21,8 @@ const props = defineProps<{
 const route = useRoute()
 const router = useRouter()
 const { $i18n } = useNuxtApp()
-const { decimals, chainSymbol } = useChain()
+const { decimals, chainSymbol, currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const dataKey = TRADES_QUERY_MAP[props.type].dataKey
 
@@ -60,7 +62,12 @@ const where = computed(() => {
   return { id_in: id_in.flat() }
 })
 
-const { items: trades, loading: loadingTrades } = useTrades({ where, disabled: computed(() => !Object.keys(where.value).length), type: props.type })
+const { items: trades, loading: loadingTrades } = useTrades({
+  chain,
+  where,
+  disabled: computed(() => !Object.keys(where.value).length),
+  type: props.type,
+})
 
 function getRowConfig(trade: TradeNftItem): { offered: TradeItem, desired: TradeItem } {
   const direction = trade.surcharge!
@@ -224,6 +231,7 @@ interface TradeItem { item: TradeToken | TradeConsidered, surcharge: SwapSurchar
 watch(activeTab, value => router.replace({ query: { ...route.query, filter: value } }))
 
 useSubscriptionGraphql<DocumentNode, { incoming: { id: string }[], outgoing: { id: string }[] }>({
+  chain,
   query: graphql(`
     query tabsTradeIds {
       incoming: ${dataKey} (

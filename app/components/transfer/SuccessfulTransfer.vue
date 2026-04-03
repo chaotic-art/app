@@ -7,7 +7,7 @@ const props = defineProps<{
 }>()
 
 const txUrl = computed(() =>
-  getSubscanExtrinsicUrl(props.result.hash || '', props.result.prefix),
+  getSubscanExtrinsicUrl(props.result.hash || '', props.result.chain),
 )
 </script>
 

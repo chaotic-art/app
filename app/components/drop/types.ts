@@ -1,3 +1,5 @@
+import type { AssetHubChain } from '~/types/chain'
+
 export interface MinimumFundsProp {
   amount: number
   description: string
@@ -30,7 +32,7 @@ export interface ToMintNft {
 
 export interface MintedNFT {
   id: string
-  chain: string
+  chain: AssetHubChain
   name: string
   image: string
   collection: { id: string, name: string, max?: number }

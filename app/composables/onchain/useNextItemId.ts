@@ -1,4 +1,4 @@
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { CHAOTIC_MINTER } from '~/utils/support'
 
 export function useNextItemId() {

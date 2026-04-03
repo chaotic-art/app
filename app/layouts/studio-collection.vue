@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { StudioNavItem } from '@/components/studio/StudioSidebar.vue'
+import type { AssetHubChain } from '~/types/chain'
 
 useSeoMeta({
   title: 'Manage Collection - Studio',
@@ -8,7 +9,7 @@ useSeoMeta({
 
 const route = useRoute()
 const router = useRouter()
-const { currentChain } = useChain()
+const chain = computed(() => route.params.chain as AssetHubChain)
 
 const validTabs = ['preview', 'details', 'items', 'traits'] as const
 
@@ -34,10 +35,10 @@ const currentTabLabel = computed(() => tabLabels[currentTabId.value] ?? currentT
 const collectionName = computed(() => collection.value?.metadata?.name ?? 'Collection')
 const collectionImage = computed(() => collection.value?.metadata?.image)
 const itemCount = computed(() => collection.value?.claimed ?? '0')
-const studioIndexPath = computed(() => `/${currentChain.value}/studio`)
-const collectionPagePath = computed(() => `/${currentChain.value}/collection/${collectionId.value}`)
-const massMintPath = computed(() => `/${currentChain.value}/studio/${collectionId.value}/massmint`)
-const nftMintPath = computed(() => `/${currentChain.value}/studio/${collectionId.value}/nftmint`)
+const studioIndexPath = computed(() => `/${chain.value}/studio`)
+const collectionPagePath = computed(() => `/${chain.value}/collection/${collectionId.value}`)
+const massMintPath = computed(() => `/${chain.value}/studio/${collectionId.value}/massmint`)
+const nftMintPath = computed(() => `/${chain.value}/studio/${collectionId.value}/nftmint`)
 
 const overlay = useOverlay()
 const destroyCollectionModal = overlay.create(defineAsyncComponent(() => import('@/components/DestroyCollectionModal.vue')))
@@ -46,7 +47,7 @@ function handleDestroyCollection() {
   destroyCollectionModal.open({
     collectionId: collectionId.value,
     collectionName: collectionName.value,
-    chain: currentChain.value,
+    chain: chain.value,
   })
 }
 
@@ -60,7 +61,7 @@ const navItems: StudioNavItem[] = [
 
 function setTab(tab: (typeof validTabs)[number]) {
   router.push({
-    path: `/${currentChain.value}/studio/${collectionId.value}/${tab}`,
+    path: `/${chain.value}/studio/${collectionId.value}/${tab}`,
     query: route.query,
   })
 }

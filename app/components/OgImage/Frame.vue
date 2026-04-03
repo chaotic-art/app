@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { Chain } from '~/types/chain'
+import { isChain } from '~/utils/chain'
 
 // inherited attrs can mess up the satori parser
 defineOptions({
@@ -12,7 +13,7 @@ const props = defineProps<{
   image: string
   items: string
   claimed: string
-  network: string
+  network: Chain | string
 }>()
 
 const cover: CSSProperties = {
@@ -20,7 +21,9 @@ const cover: CSSProperties = {
   objectPosition: 'center',
 }
 
-const networkName = chainSpec[props.network as SupportedChain].name
+const networkName = computed(() =>
+  isChain(props.network) ? chainConfig[props.network].name : props.network,
+)
 </script>
 
 <template>

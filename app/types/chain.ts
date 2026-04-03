@@ -1,37 +1,11 @@
-export const Chains = {
-  Kusama: 'Kusama',
-  AssetHubKusama: 'AssetHubKusama',
-  AssetHubPolkadot: 'AssetHubPolkadot',
-  Polkadot: 'Polkadot',
-  AssetHubWestend: 'AssetHubWestend',
-  Base: 'Base',
-} as const
+import type { SupportedPapiChain as SubstrateChain } from '~/plugins/sdk.client'
 
-export type Chain = typeof Chains[keyof typeof Chains]
+export type { SupportedPapiChain as SubstrateChain } from '~/plugins/sdk.client'
 
-export const prefixToChainMap = {
-  ahk: Chains.AssetHubKusama,
-  ksm: Chains.Kusama,
-  ahp: Chains.AssetHubPolkadot,
-  dot: Chains.Polkadot,
-  ahw: Chains.AssetHubWestend,
-  base: Chains.Base,
-} as const
+export type AssetHubChain = Extract<SubstrateChain, 'ahp' | 'ahk' | 'ahpas'>
 
-export const chainToPrecisionMap: Record<Chain, number> = {
-  [Chains.Kusama]: 4,
-  [Chains.AssetHubKusama]: 6,
-  [Chains.AssetHubPolkadot]: 5,
-  [Chains.Polkadot]: 4,
-  [Chains.AssetHubWestend]: 5,
-  [Chains.Base]: 4,
-}
+export type EvmChain = 'polkadot' | 'kusama' | 'polkadot-testnet'
 
-export const chainToPrefixMap = {
-  [Chains.AssetHubKusama]: 'ahk',
-  [Chains.Kusama]: 'ksm',
-  [Chains.AssetHubPolkadot]: 'ahp',
-  [Chains.Polkadot]: 'dot',
-  [Chains.AssetHubWestend]: 'ahw',
-  [Chains.Base]: 'base',
-} as const
+export type Chain = SubstrateChain | EvmChain
+
+export type ChainVm = 'SUB' | 'EVM'

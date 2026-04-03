@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { AssetHubChain } from '~/plugins/sdk.client'
-import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { ExploreNftsData } from '~/graphql/queries/explore'
+import type { OdaChain, OdaToken, OnchainCollection } from '~/services/oda'
+import type { AssetHubChain } from '~/types'
 import { TradeTypes } from '@/components/trade/types'
 import TokenCard from '~/components/common/card/TokenCard.client.vue'
 import TokenActivity from '~/components/gallery/TokenActivity.vue'
-import { tokenEntries } from '~/utils/api/substrate.nft-pallets'
+import { exploreNfts } from '~/graphql/queries/explore'
 
 interface Props {
   tokenData: OdaToken | null
   collection: OnchainCollection | null
-  chain: AssetHubChain
+  chain: OdaChain
   collectionId: string
   tokenId: string
   mimeType?: string
+  canInteract?: boolean
 }
 
 interface PropertyRow {
@@ -22,22 +24,21 @@ interface PropertyRow {
   rarity: number
 }
 
+interface RelatedToken {
+  id: string
+  tokenId: string
+  collectionId: string
+  image: string
+  name: string
+}
+
 const props = defineProps<Props>()
+
 const route = useRoute()
 const router = useRouter()
-
-const moreFromCollection = ref<Awaited<ReturnType<typeof tokenEntries>>>([])
-
-const activeTab = computed({
-  get() {
-    return (route.query.tab as string) || 'activity'
-  },
-  set(tab) {
-    router.replace({
-      query: { ...route.query, tab },
-    })
-  },
-})
+const { $apolloClient } = useNuxtApp()
+const assetHubChain = computed(() => getAssetHubChain(props.chain))
+const moreFromCollection = ref<RelatedToken[]>([])
 
 const { getAttributeRarity } = useCollectionAttributes({
   collectionId: computed(() => props.collectionId),
@@ -77,25 +78,29 @@ const propertiesColumns: TableColumn<PropertyRow>[] = [
   },
 ]
 
-const tabsItems = ref([
+const tabsItems = computed(() => [
   {
     label: 'Activity',
     name: 'Activity',
     slot: 'activity',
     value: 'activity',
   },
-  {
-    label: 'Offers',
-    name: 'Offers',
-    slot: 'offers',
-    value: 'offers',
-  },
-  {
-    label: 'Swaps',
-    name: 'Swaps',
-    slot: 'swaps',
-    value: 'swaps',
-  },
+  ...(props.canInteract
+    ? [
+        {
+          label: 'Offers',
+          name: 'Offers',
+          slot: 'offers',
+          value: 'offers',
+        },
+        {
+          label: 'Swaps',
+          name: 'Swaps',
+          slot: 'swaps',
+          value: 'swaps',
+        },
+      ]
+    : []),
   {
     label: 'Properties',
     name: 'Properties',
@@ -104,19 +109,57 @@ const tabsItems = ref([
   },
 ])
 
-onMounted(async () => {
-  try {
-    const entries = await tokenEntries({
-      prefix: props.chain,
-      collectionId: Number(props.collectionId),
-      max: 6,
-      excludeTokenId: Number(props.tokenId),
+const activeTab = computed({
+  get() {
+    const visibleTabs = tabsItems.value.map(item => item.value)
+    const tab = route.query.tab as string | undefined
+    return tab && visibleTabs.includes(tab) ? tab : 'activity'
+  },
+  set(tab) {
+    router.replace({
+      query: { ...route.query, tab },
     })
-    moreFromCollection.value = entries
+  },
+})
+
+async function fetchMoreFromCollection(endpoint: AssetHubChain) {
+  try {
+    const { data } = await $apolloClient.query<ExploreNftsData>({
+      query: exploreNfts,
+      variables: {
+        first: 6,
+        collections: [props.collectionId],
+        orderBy: ['blockNumber_DESC', 'sn_DESC'],
+        search: [{ id_not_eq: `${props.collectionId}-${props.tokenId}` }],
+      },
+      context: {
+        endpoint,
+      },
+    })
+
+    moreFromCollection.value = data.tokenEntities.map((nft) => {
+      const [collectionId = '', tokenId = ''] = String(nft.id).split('-')
+
+      return {
+        id: nft.id,
+        collectionId,
+        tokenId,
+        image: nft.meta?.image || nft.image || '',
+        name: nft.name || 'Untitled NFT',
+      }
+    })
   }
   catch (error) {
     console.error('Failed to fetch more from collection:', error)
   }
+}
+
+onMounted(async () => {
+  if (!assetHubChain.value) {
+    return
+  }
+
+  fetchMoreFromCollection(assetHubChain.value)
 })
 </script>
 
@@ -131,22 +174,25 @@ onMounted(async () => {
           <UTabs v-model="activeTab" :items="tabsItems" :ui="{ root: 'gap-6' }" size="sm">
             <template #activity>
               <TokenActivity
-                :chain="chain"
+                v-if="assetHubChain"
+                :chain="assetHubChain"
                 :collection-id="collectionId"
                 :token-id="tokenId"
               />
             </template>
-            <template #offers>
+            <template v-if="canInteract" #offers>
               <TokenTrades
-                :chain="chain"
+                v-if="assetHubChain"
+                :chain="assetHubChain"
                 :collection-id="collectionId"
                 :token-id="tokenId"
                 :type="TradeTypes.Offer"
               />
             </template>
-            <template #swaps>
+            <template v-if="canInteract" #swaps>
               <TokenTrades
-                :chain="chain"
+                v-if="assetHubChain"
+                :chain="assetHubChain"
                 :collection-id="collectionId"
                 :token-id="tokenId"
                 :type="TradeTypes.Swap"
@@ -181,7 +227,7 @@ onMounted(async () => {
                   <!-- Chain -->
                   <div class="flex justify-between items-center">
                     <span class="text-sm text-muted-foreground">Chain</span>
-                    <span class="text-sm font-medium capitalize">{{ chainSpec[chain].name }}</span>
+                    <span class="text-sm font-medium capitalize">{{ chainConfig[chain].name }}</span>
                   </div>
 
                   <!-- Token ID -->
@@ -269,12 +315,12 @@ onMounted(async () => {
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
           <TokenCard
             v-for="nft in moreFromCollection"
-            :key="nft.keyArgs[1]"
-            :token-id="nft.keyArgs[1]"
-            :collection-id="nft.keyArgs[0]"
+            :key="nft.id"
+            :token-id="nft.tokenId"
+            :collection-id="nft.collectionId"
             :chain="chain"
-            :image="nft.metadata?.image"
-            :name="nft.metadata?.name"
+            :image="nft.image"
+            :name="nft.name"
           />
         </div>
       </div>

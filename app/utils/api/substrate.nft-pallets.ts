@@ -1,23 +1,23 @@
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { t } from 'try'
 import { fetchOdaToken } from '~/services/oda'
 
-function getApi(prefix: AssetHubChain) {
+function getApi(chain: AssetHubChain) {
   const { $sdk } = useNuxtApp()
-  return $sdk(prefix)
+  return $sdk(chain)
 }
 
 /**
  * Get the entries for a collection
  * @param params - The parameters object
- * @param params.prefix - The prefix of the chain
+ * @param params.chain - The chain
  * @param params.collectionId - The ID of the collection
  * @param params.max - The maximum number of entries to return
  * @param params.excludeTokenId - The token ID to exclude from the results
  * @returns The entries for the collection
  */
-export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }: { prefix: AssetHubChain, collectionId: number, max?: number, excludeTokenId?: number }) {
-  const api = getApi(prefix).api
+export async function tokenEntries({ chain, collectionId, max, excludeTokenId }: { chain: AssetHubChain, collectionId: number, max?: number, excludeTokenId?: number }) {
+  const api = getApi(chain).api
   const query = await api.query.Nfts.Item.getEntries(collectionId)
 
   // Filter out excluded token ID if provided
@@ -32,7 +32,7 @@ export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }
 
   const items = await Promise.all(entries.map(async (entry) => {
     const [, tokenId] = entry.keyArgs
-    const [ok, err, metadata] = await t(fetchOdaToken(prefix, collectionId.toString(), tokenId.toString()))
+    const [ok, err, metadata] = await t(fetchOdaToken(chain, collectionId.toString(), tokenId.toString()))
 
     if (!ok) {
       console.error('Error fetching token', err)
@@ -44,14 +44,14 @@ export async function tokenEntries({ prefix, collectionId, max, excludeTokenId }
   return items
 }
 
-export async function accountTokenEntries({ prefix, account, collectionId }: { prefix: AssetHubChain, account: string, collectionId: number }) {
-  const api = getApi(prefix).api
+export async function accountTokenEntries({ chain, account, collectionId }: { chain: AssetHubChain, account: string, collectionId: number }) {
+  const api = getApi(chain).api
   const entries = await api.query.Nfts.Account.getEntries(account)
 
   const query = entries.filter(entry => entry.keyArgs[1] === collectionId)
   const items = await Promise.all(query.map(async (entry) => {
     const [,collectionId, tokenId] = entry.keyArgs
-    const [ok, err, metadata] = await t(fetchOdaToken(prefix, collectionId.toString(), tokenId.toString()))
+    const [ok, err, metadata] = await t(fetchOdaToken(chain, collectionId.toString(), tokenId.toString()))
     if (!ok) {
       console.error('Error fetching token', err)
     }
@@ -65,12 +65,12 @@ export async function accountTokenEntries({ prefix, account, collectionId }: { p
 /**
  * Get the last item ID used on a collection
  * @param params - The parameters object
- * @param params.prefix - The prefix of the chain
+ * @param params.chain - The chain
  * @param params.collectionId - The ID of the collection
  * @returns The last item ID used on the collection
  */
-export async function lastItemId({ prefix, collectionId }: { prefix: AssetHubChain, collectionId: number }) {
-  const api = getApi(prefix).api
+export async function lastItemId({ chain, collectionId }: { chain: AssetHubChain, collectionId: number }) {
+  const api = getApi(chain).api
   const collectionItems = await api.query.Nfts.Item.getEntries(collectionId)
   const itemIds = collectionItems.map(item => item.keyArgs[1])
 

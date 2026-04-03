@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
 import { isAddress } from '@polkadot/util-crypto'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
@@ -14,10 +15,11 @@ const address = ref('')
 const isAddressValid = ref(false)
 const acknowledged = ref(false)
 const txFee = ref(0)
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 function getChainAddress(value: string) {
   try {
-    return getss58AddressByPrefix(value, currentChain.value)
+    return getSs58AddressByChain(value, currentChain.value)
   }
   catch {
     return null
@@ -53,7 +55,7 @@ function validateAddress() {
     return
   }
 
-  const chainAddress = getss58AddressByPrefix(address.value, currentChain.value)
+  const chainAddress = getSs58AddressByChain(address.value, currentChain.value)
   isAddressValid.value = !!chainAddress && isAddress(chainAddress)
 }
 
@@ -69,7 +71,7 @@ function transfer() {
 
   transferNfts({
     items,
-    chain: currentChain.value,
+    chain: chain.value,
     targetAddress,
     type: 'submit',
   })
@@ -82,8 +84,8 @@ watch(address, validateAddress)
 onMounted(async () => {
   const fee = await transferNfts({
     items,
-    chain: currentChain.value,
-    targetAddress: getss58AddressByPrefix(CHAOTIC_MINTER, currentChain.value),
+    chain: chain.value,
+    targetAddress: getSs58AddressByChain(CHAOTIC_MINTER, currentChain.value),
     type: 'estimate',
   })
 

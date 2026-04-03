@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
 import { useDebounceFn } from '@vueuse/core'
 import { decodeAddress, encodeAddress, isEvmAddress } from 'dedot/utils'
 import { DistributionMode } from '@/components/airdrop/types'
@@ -12,8 +13,7 @@ const router = useRouter()
 const { $i18n } = useNuxtApp()
 const { isCurrentAccount } = useAuth()
 const airdropStore = useAirdropStore()
-const { currentChain } = useChain()
-const ss58Format = computed(() => chainSpec[currentChain.value].ss58Format)
+const { currentChain, ss58Format } = useChain()
 const { airdropNfts } = useNftPallets()
 const { open: isTransactionModalOpen, close: closeTransactionModal } = useTransactionModal()
 
@@ -27,6 +27,7 @@ const isAirdropModalOpen = ref<boolean>(false)
 const distributionMode = ref<DistributionMode>(DistributionMode.ONE_PER_ADDRESS)
 const fileInput = ref<HTMLInputElement | null>(null)
 const addressPairNeedToBeFixed = ref<[string, string][]>([])
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const DISTRIBUTION_MODES = computed(() => [
   {
@@ -175,7 +176,7 @@ function handleConfirm() {
       nfts: airdropItems.value,
       distributionMode: distributionMode.value,
     },
-    chain: currentChain.value,
+    chain: chain.value,
     type: 'submit',
   })
 }

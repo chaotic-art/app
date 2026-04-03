@@ -2,7 +2,7 @@
 import type { StepConfig } from '~/components/common/Stepper.vue'
 import type { NFT, NFTToMint } from '~/components/massmint/types'
 import type { TemplateFormat } from '~/components/massmint/utils'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { LazyReviewMassMintModal } from '#components'
 import { useQuery } from '@tanstack/vue-query'
 import CommonStepper from '~/components/common/Stepper.vue'
