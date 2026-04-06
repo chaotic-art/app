@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
 import type { OdaChain } from '~/services/oda'
-import { isChain, isOdaChain } from '~/utils/chain'
+import { getExploreCollectionTypes, isChain, isOdaChain } from '~/utils/chain'
 import { STICKY_MOBILE_TOOLBAR_ROW_CLASS, STICKY_MOBILE_TOOLBAR_SEARCH_CLASS } from '~/utils/exploreToolbar'
 import { getSingleQueryValue } from '~/utils/query'
 
@@ -60,10 +60,18 @@ const { input: searchInput, onInput: handleSearchUpdate } = useDebouncedSyncedIn
 
 const queryVariables = computed(() => {
   const keywordFilter = buildKeywordClause(queryState.value.search, { scope: 'collections' })
+  const collectionTypes = getExploreCollectionTypes(chain)
 
   return {
     orderBy: buildOrderBy(queryState.value.sortKeys),
-    search: keywordFilter ? [keywordFilter] : [],
+    search: [
+      ...(keywordFilter ? [keywordFilter] : []),
+      ...(collectionTypes
+        ? [{
+            collectionType_in: collectionTypes,
+          }]
+        : []),
+    ],
   }
 })
 

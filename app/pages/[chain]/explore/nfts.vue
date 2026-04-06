@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { OdaChain } from '~/services/oda'
-import { isChain, isOdaChain } from '~/utils/chain'
+import { getExploreCollectionTypes, isChain, isOdaChain } from '~/utils/chain'
 
 // Validate chain parameter
 definePageMeta({
@@ -27,6 +27,7 @@ const queryVariables = ref<Record<string, any>>({})
 
 const mergedQueryVariables = computed(() => {
   const filters: Record<string, any> = { ...queryVariables.value }
+  const collectionTypes = getExploreCollectionTypes(chain)
 
   const searchFilters = []
 
@@ -42,6 +43,14 @@ const mergedQueryVariables = computed(() => {
   const nftFilters = buildNftSearchFilters({ query: route.query })
 
   searchFilters.push(...nftFilters)
+
+  if (collectionTypes) {
+    searchFilters.push({
+      collection: {
+        collectionType_in: collectionTypes,
+      },
+    })
+  }
 
   if (searchFilters.length > 0) {
     filters.search = searchFilters

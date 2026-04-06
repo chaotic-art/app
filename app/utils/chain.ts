@@ -24,6 +24,11 @@ interface EvmChainConfig extends BaseChainConfig {
 
 type ChainConfig = SubstrateChainConfig | EvmChainConfig
 
+const exploreCollectionTypesByChain = {
+  'ahpas': ['UNIQUES', 'NFTS'],
+  'polkadot-testnet': ['ERC721', 'ERC1155'],
+} as const
+
 export const substrateChainConfig: Record<SubstrateChain, SubstrateChainConfig> = {
   ahp: {
     name: 'Polkadot Asset Hub',
@@ -151,6 +156,15 @@ export function canInteract(chain: Chain): boolean {
 
 export function getGraphqlEndpointChain(chain: Chain): AssetHubChain | undefined {
   return getIndexerChain(chain)
+}
+
+export function getExploreCollectionTypes(chain: Chain) {
+  // tmp solution remove once other indexers have also revm deployed
+  if (!(chain in exploreCollectionTypesByChain)) {
+    return undefined
+  }
+
+  return exploreCollectionTypesByChain[chain as keyof typeof exploreCollectionTypesByChain]
 }
 
 export function getDenyList(chain: AssetHubChain): string[] | undefined {
