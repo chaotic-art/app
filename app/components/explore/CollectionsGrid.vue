@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import type { AssetHubChain } from '~/plugins/sdk.client'
 
+type CardActionVariant = 'link' | 'studio-mode'
+
 interface Props {
   variables?: Record<string, any>
   prefix?: AssetHubChain
+  cardActionVariant?: CardActionVariant
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variables: () => ({}),
   prefix: 'ahp',
+  cardActionVariant: 'link',
 })
 
 const emit = defineEmits(['totalCountChange'])
@@ -46,6 +50,7 @@ watch(totalCount, (newCount) => {
         :key="item.id"
         :item="item"
         :prefix="prefix"
+        :action-variant="cardActionVariant"
         :is-loading="isInitialLoading && collections.length === 0"
       />
     </div>

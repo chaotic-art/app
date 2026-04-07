@@ -59,7 +59,7 @@ const debouncedSearch = useDebounceFn(async (query: string) => {
   try {
     // Search collections using existing GraphQL query
     const { $apolloClient } = useNuxtApp()
-    const collectionKeywordFilter = buildKeywordClause(query)
+    const collectionKeywordFilter = buildKeywordClause(query, { scope: 'collections' })
 
     const [collectionsResult, nftsResult, usersResult] = await Promise.all([
       // Search collections

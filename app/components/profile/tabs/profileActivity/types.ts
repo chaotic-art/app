@@ -1,6 +1,6 @@
-import type { AllEventsByProfileData } from '~/graphql/queries/profiles'
+import type { AllEventsData } from '~/graphql/queries/profiles'
 
-export type EventInteraction = AllEventsByProfileData['events'][number]
+export type EventInteraction = AllEventsData['events'][number]
 
 export const Interaction = {
   ACCEPT: 'ACCEPT',

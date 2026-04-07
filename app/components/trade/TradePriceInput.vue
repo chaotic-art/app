@@ -49,7 +49,7 @@ onMounted(() => {
     fiatStore.fetchFiatPrice()
   }
 
-  getBalance({ address: accountId.value, prefix: currentChain.value })
+  getBalance({ address: accountId.value, chain: currentChain.value })
     .then((data) => {
       balance.value = Number(data.balance)
     })

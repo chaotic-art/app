@@ -28,7 +28,7 @@ const {
   sortOptions,
   normalizeSortKeys,
   buildOrderBy,
-  applySortQuery,
+  resolveSortQuery,
 } = useSortOptions('exploreCollections')
 
 const { chain } = route.params as { chain: AssetHubChain }
@@ -39,8 +39,8 @@ const queryState = computed({
     search: getSingleQueryValue(route.query.search),
   }),
   set: ({ sortKeys, search }: { sortKeys?: string[], search?: string }) => {
-    const query: LocationQueryRaw = { ...route.query }
-    applySortQuery(query, sortKeys ?? route.query.sort)
+    let query: LocationQueryRaw = { ...route.query }
+    query = resolveSortQuery(query, sortKeys ?? route.query.sort).query
 
     if (!search) {
       delete query.search
@@ -53,8 +53,13 @@ const queryState = computed({
   },
 })
 
+const { input: searchInput, onInput: handleSearchUpdate } = useDebouncedSyncedInput(
+  computed(() => queryState.value.search),
+  search => queryState.value = { ...queryState.value, search },
+)
+
 const queryVariables = computed(() => {
-  const keywordFilter = buildKeywordClause(queryState.value.search)
+  const keywordFilter = buildKeywordClause(queryState.value.search, { scope: 'collections' })
 
   return {
     orderBy: buildOrderBy(queryState.value.sortKeys),
@@ -79,11 +84,11 @@ const gridKey = computed(() => `${queryVariables.value.orderBy.join(',')}::${que
           />
 
           <UInput
-            :model-value="queryState.search"
+            :model-value="searchInput"
             placeholder="Search collections..."
             :class="isFixed && isMobileViewport ? STICKY_MOBILE_TOOLBAR_SEARCH_CLASS : 'w-48'"
             icon="i-heroicons-magnifying-glass"
-            @update:model-value="queryState = { ...queryState, search: $event }"
+            @update:model-value="handleSearchUpdate($event)"
           />
 
           <USelectMenu

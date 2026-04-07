@@ -62,12 +62,12 @@ const isFixed = computed(() => hasScrolledPastTarget.value && fitsInViewport.val
 
     <aside
       ref="sidebarRef"
-      class="h-fit overflow-hidden relative z-10"
+      class="h-fit overflow-hidden"
       :class="{
         'bg-background-muted border border-border rounded-xl': !isCollapsed,
         'border-transparent bg-transparent rounded-none pointer-events-none': isCollapsed,
         'sticky top-4': !sticky,
-        'fixed top-[100px]': isFixed,
+        'fixed top-[100px] z-10': isFixed,
       }"
       :style="{
         width: isCollapsed ? collapsedWidth : expandedWidth,

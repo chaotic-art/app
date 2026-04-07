@@ -1,6 +1,19 @@
+import process from 'node:process'
+import { publicEnv } from './env.public'
+
+const posthogProjectId = process.env.POSTHOG_PROJECT_ID || ''
+const posthogPersonalApiKey = process.env.POSTHOG_PERSONAL_API_KEY || ''
+const posthogEnabled = Boolean(publicEnv.posthogPublicKey)
+const posthogSourcemapsEnabled = process.env.NODE_ENV === 'production'
+  && posthogEnabled
+  && Boolean(posthogProjectId)
+  && Boolean(posthogPersonalApiKey)
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  sourcemap: true,
+  sourcemap: {
+    client: 'hidden',
+  },
   experimental: {
     appManifest: false,
   },
@@ -14,23 +27,42 @@ export default defineNuxtConfig({
   },
 
   site: {
-    name: 'Chaotic Labs',
-    indexable: true,
+    name: 'Chaotic',
+    url: publicEnv.siteUrl,
+    indexable: publicEnv.siteIndexable,
+  },
+
+  sitemap: {
+    exclude: ['/settings', '/test-signer'],
+    sitemaps: {
+      pages: {
+        includeAppSources: true,
+      },
+      collections: {
+        sources: ['/api/__sitemap__/collections'],
+      },
+      nfts: {
+        sources: ['/api/__sitemap__/nfts'],
+      },
+      drops: {
+        sources: ['/api/__sitemap__/drops'],
+      },
+    },
   },
 
   seo: {
     meta: {
-      title: 'Chaotic Labs',
-      description: 'Your Polkadot NFT Marketplace',
+      title: 'Chaotic | Polkadot NFT Marketplace for Generative Art',
+      description: 'Create, collect, and sell Polkadot NFTs on Chaotic. Explore curated generative art drops and experimental AI collections.',
       themeColor: [
         { content: '#18181b', media: '(prefers-color-scheme: dark)' },
         { content: 'white', media: '(prefers-color-scheme: light)' },
       ],
-      twitterCreator: '@chaoticlabs',
-      twitterSite: '@chaoticlabs',
-      author: 'Chaotic Labs',
+      twitterCreator: '@ChaoticApp',
+      twitterSite: '@ChaoticApp',
+      author: 'Chaotic',
       colorScheme: 'dark light',
-      applicationName: 'Chaotic Labs',
+      applicationName: 'Chaotic',
     },
   },
 
@@ -54,6 +86,7 @@ export default defineNuxtConfig({
   },
 
   modules: [
+    ...(posthogEnabled ? ['@posthog/nuxt'] : []),
     '@nuxt/ui',
     '@nuxt/eslint',
     '@nuxt/fonts',
@@ -66,11 +99,38 @@ export default defineNuxtConfig({
     'nuxt-svgo',
   ],
 
-  runtimeConfig: {
-    public: {
-      reownProjectId: import.meta.env.REOWN_CONNECT_PROJECT_ID || 'b56e18d47c72ab683b10814fe9495694',
-      falAiApiKey: import.meta.env.FAL_AI_API_KEY,
+  nitro: {
+    rollupConfig: {
+      output: {
+        sourcemapExcludeSources: false,
+      },
     },
+  },
+
+  posthogConfig: posthogEnabled
+    ? {
+        publicKey: publicEnv.posthogPublicKey,
+        host: publicEnv.posthogHost,
+        clientConfig: {
+          capture_exceptions: true,
+        },
+        serverConfig: {
+          enableExceptionAutocapture: true,
+        },
+        sourcemaps: posthogSourcemapsEnabled
+          ? {
+              enabled: true,
+              projectId: posthogProjectId,
+              personalApiKey: posthogPersonalApiKey,
+            }
+          : undefined,
+      }
+    : undefined,
+
+  runtimeConfig: {
+    // Keep private config empty in source and override via NUXT_* at runtime.
+    falAiApiKey: '',
+    public: publicEnv,
   },
 
   pinia: {
