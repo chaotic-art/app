@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
-import type { OdaChain } from '~/services/oda'
 import { getExploreCollectionTypes, isChain, isOdaChain } from '~/utils/chain'
 import { STICKY_MOBILE_TOOLBAR_ROW_CLASS, STICKY_MOBILE_TOOLBAR_SEARCH_CLASS } from '~/utils/exploreToolbar'
 import { getSingleQueryValue } from '~/utils/query'
@@ -31,7 +30,7 @@ const {
   resolveSortQuery,
 } = useSortOptions('exploreCollections')
 
-const { chain } = route.params as { chain: OdaChain }
+const { currentChain: chain } = useChain()
 
 const queryState = computed({
   get: () => ({
@@ -60,7 +59,7 @@ const { input: searchInput, onInput: handleSearchUpdate } = useDebouncedSyncedIn
 
 const queryVariables = computed(() => {
   const keywordFilter = buildKeywordClause(queryState.value.search, { scope: 'collections' })
-  const collectionTypes = getExploreCollectionTypes(chain)
+  const collectionTypes = getExploreCollectionTypes(chain.value)
 
   return {
     orderBy: buildOrderBy(queryState.value.sortKeys),

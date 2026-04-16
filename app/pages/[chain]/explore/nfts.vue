@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { OdaChain } from '~/services/oda'
 import { getExploreCollectionTypes, isChain, isOdaChain } from '~/utils/chain'
 
 // Validate chain parameter
@@ -18,7 +17,7 @@ useSeoMeta({
 
 const { isLogIn } = useAuth()
 const route = useRoute()
-const { chain } = route.params as { chain: OdaChain }
+const { currentChain: chain } = useChain()
 const isMobileFiltersOpen = ref(false)
 const { isMobileViewport } = useViewport()
 const { viewMode: nftViewMode, gridClass: nftGridClass } = useNftViewMode('explore')
@@ -27,7 +26,7 @@ const queryVariables = ref<Record<string, any>>({})
 
 const mergedQueryVariables = computed(() => {
   const filters: Record<string, any> = { ...queryVariables.value }
-  const collectionTypes = getExploreCollectionTypes(chain)
+  const collectionTypes = getExploreCollectionTypes(chain.value)
 
   const searchFilters = []
 
