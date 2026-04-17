@@ -1,6 +1,6 @@
 import type { HighestNftOffer } from '~/components/trade/types'
-import type { NFTMetadata, OdaChain } from '~/services/oda'
-import type { AssetHubChain } from '~/types/chain'
+import type { NFTMetadata } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
 import type { NftRarity } from '~/types/rarity'
 import { formatBalance } from 'dedot/utils'
 import { t } from 'try'
@@ -26,7 +26,7 @@ export async function fetchTokenMetadata(metadataUri: string) {
 export function useToken(props: {
   tokenId: string
   collectionId: string
-  chain: OdaChain
+  chain: AppChain
   image?: string | null
   name?: string | null
   fetchRarity?: boolean
@@ -46,7 +46,7 @@ export function useToken(props: {
   const { $sdk, $apolloClient } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()
   const graphqlEndpoint = getGraphqlEndpointChain(props.chain)
-  const substrateSourceChain = getSubstrateSourceChain(props.chain) as AssetHubChain
+  const substrateSourceChain = getSubstrateSourceChain(props.chain)
   const parsedCollectionId = parseAssetHubId(props.collectionId)
   const parsedTokenId = parseAssetHubId(props.tokenId)
 

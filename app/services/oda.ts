@@ -1,6 +1,4 @@
-import type { AssetHubChain, EvmChain } from '~/types/chain'
-
-export type OdaChain = AssetHubChain | EvmChain
+import type { AppChain } from '~/types/chain'
 
 const api = $fetch.create({ baseURL: URLS.services.oda, retry: 3 })
 
@@ -20,13 +18,13 @@ export interface OnchainCollection {
   uniqueOwnersCount?: number
 }
 
-export function fetchOdaCollection(chain: OdaChain, address: string) {
+export function fetchOdaCollection(chain: AppChain, address: string) {
   return api<OnchainCollection>(`/v1/${chain}/collection/${address}`, {
     timeout: 5000,
   })
 }
 
-export function refreshOdaCollection(chain: OdaChain, address: string) {
+export function refreshOdaCollection(chain: AppChain, address: string) {
   return api(`/v1/${chain}/collection/${address}`, { method: 'DELETE' })
 }
 
@@ -36,7 +34,7 @@ interface OdaCollectionOwners {
   owners: Record<string, number>
 }
 
-export function fetchOdaCollectionOwners(chain: OdaChain, address: string) {
+export function fetchOdaCollectionOwners(chain: AppChain, address: string) {
   return api<OdaCollectionOwners>(`/v1/${chain}/collection/${address}/owners`)
 }
 
@@ -57,19 +55,19 @@ export interface OdaToken {
   owner: string | null
 }
 
-export function fetchOdaToken(chain: OdaChain, address: string, tokenId: string) {
+export function fetchOdaToken(chain: AppChain, address: string, tokenId: string) {
   return api<OdaToken>(`/v1/${chain}/collection/${address}/token/${tokenId}`, {
     timeout: 5000,
   })
 }
 
-export function refreshOdaTokenMetadata(chain: OdaChain, address: string, tokenId: string) {
+export function refreshOdaTokenMetadata(chain: AppChain, address: string, tokenId: string) {
   return api<OdaToken>(`/v1/${chain}/collection/${address}/token/${tokenId}`, {
     method: 'DELETE',
   })
 }
 
-export function refreshOdaCollectionTokensMetadata(chain: OdaChain, address: string) {
+export function refreshOdaCollectionTokensMetadata(chain: AppChain, address: string) {
   return api(`/v1/${chain}/collection/${address}/tokens`, {
     method: 'DELETE',
   })

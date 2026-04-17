@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
 import type { SelectedTrait } from '@/components/trait/types'
-import type { OdaChain } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
 import { TradeTypes } from '@/components/trade/types'
 import { fetchOdaCollection } from '~/services/oda'
 import { normalizeRarityTotalItems } from '~/types/rarity'
@@ -23,7 +23,7 @@ const {
 const { buildNftSearchConstraints } = useSearchFilters()
 const { listedMode, resolveListedForSort } = useExploreNftStatusFilter('collectionItems')
 const chain = computed(() =>
-  typeof routeChain === 'string' && isChain(routeChain) && isOdaChain(routeChain)
+  typeof routeChain === 'string' && isChain(routeChain) && isAppChain(routeChain)
     ? routeChain
     : undefined,
 )
@@ -203,7 +203,7 @@ function handleSelectedTraitsUpdate(traits: SelectedTrait[]) {
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && isChain(chain) && isOdaChain(chain)
+    return typeof chain === 'string' && isChain(chain) && isAppChain(chain)
   },
 })
 
@@ -277,7 +277,7 @@ defineOgImageComponent('Frame', {
                 :grid-class="nftGridClass"
                 :view-mode="nftViewMode"
                 no-items-found-message="This collection doesn't have any items yet."
-                :chain="chain as OdaChain"
+                :chain="chain as AppChain"
                 :hide-hover-action="!canInteractOnChain"
                 :rarity-total-items="collectionRarityTotalItems"
                 show-rarity

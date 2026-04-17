@@ -1,10 +1,10 @@
-import type { AssetHubChain, Chain, ChainVm, EvmChain, SubstrateChain } from '~/types/chain'
+import type { AppChain, AssetHubChain, Chain, ChainVm, EvmChain, SubstrateChain } from '~/types/chain'
 import { dotHubDenyList, ksmHubDenyList } from '@/utils/constants'
 
 interface BaseChainConfig {
   indexerChain?: AssetHubChain
   name: string
-  substrateSourceChain: AssetHubChain
+  substrateSourceChain: SubstrateChain
   tokenSymbol: string
   tokenDecimals: number
   vm: ChainVm
@@ -134,11 +134,13 @@ export function isSubstrateChain(chain: Chain): chain is SubstrateChain {
   return chain in substrateChainConfig
 }
 
-export function isOdaChain(chain: Chain): chain is AssetHubChain | EvmChain {
+export function isAppChain(chain: Chain): chain is AppChain {
   return chain !== 'dot' && chain !== 'ksm'
 }
 
-export function getSubstrateSourceChain(chain: Chain): AssetHubChain {
+export function getSubstrateSourceChain(chain: AppChain): AssetHubChain
+export function getSubstrateSourceChain(chain: Chain): SubstrateChain
+export function getSubstrateSourceChain(chain: Chain): SubstrateChain {
   return chainConfig[chain].substrateSourceChain
 }
 

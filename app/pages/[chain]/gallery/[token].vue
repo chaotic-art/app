@@ -74,7 +74,7 @@ const tokenMetadata = computed(() => {
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && isChain(chain) && isOdaChain(chain)
+    return typeof chain === 'string' && isChain(chain) && isAppChain(chain)
   },
 })
 </script>

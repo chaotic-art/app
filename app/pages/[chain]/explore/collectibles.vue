@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
-import { getExploreCollectionTypes, isChain, isOdaChain } from '~/utils/chain'
+import { getExploreCollectionTypes, isAppChain, isChain } from '~/utils/chain'
 import { STICKY_MOBILE_TOOLBAR_ROW_CLASS, STICKY_MOBILE_TOOLBAR_SEARCH_CLASS } from '~/utils/exploreToolbar'
 import { getSingleQueryValue } from '~/utils/query'
 
@@ -8,7 +8,7 @@ import { getSingleQueryValue } from '~/utils/query'
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && isChain(chain) && isOdaChain(chain)
+    return typeof chain === 'string' && isChain(chain) && isAppChain(chain)
   },
 })
 

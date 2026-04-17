@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from '@nuxt/ui'
 import type { HighestNftOffer } from '../trade/types'
-import type { OdaChain, OdaToken, OnchainCollection } from '~/services/oda'
+import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
 import type { NftRarity } from '~/types/rarity'
 import { t } from 'try'
 import { getAssetHubChain } from '@/utils/chain'
@@ -11,7 +12,7 @@ import { parseAssetHubTokenId } from '~/utils/nft'
 interface Props {
   tokenData: OdaToken | null
   collection: OnchainCollection | null
-  chain: OdaChain
+  chain: AppChain
   collectionId: string
   tokenId: string
   owner?: string

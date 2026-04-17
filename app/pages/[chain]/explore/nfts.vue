@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { getExploreCollectionTypes, isChain, isOdaChain } from '~/utils/chain'
+import { getExploreCollectionTypes, isAppChain, isChain } from '~/utils/chain'
 
 // Validate chain parameter
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && isChain(chain) && isOdaChain(chain)
+    return typeof chain === 'string' && isChain(chain) && isAppChain(chain)
   },
 })
 

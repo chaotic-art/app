@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type { ExploreNftsData } from '~/graphql/queries/explore'
-import type { OdaChain, OdaToken, OnchainCollection } from '~/services/oda'
-import type { AssetHubChain } from '~/types'
+import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { AppChain, AssetHubChain } from '~/types'
 import { TradeTypes } from '@/components/trade/types'
 import TokenCard from '~/components/common/card/TokenCard.client.vue'
 import TokenActivity from '~/components/gallery/TokenActivity.vue'
@@ -11,7 +11,7 @@ import { exploreNfts } from '~/graphql/queries/explore'
 interface Props {
   tokenData: OdaToken | null
   collection: OnchainCollection | null
-  chain: OdaChain
+  chain: AppChain
   collectionId: string
   tokenId: string
   mimeType?: string

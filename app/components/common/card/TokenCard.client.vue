@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { OdaChain } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
 import type { NftRarity } from '~/types/rarity'
 import { canInteract, getAssetHubChain } from '@/utils/chain'
 import { isNsfwNft } from '~/utils/mint'
@@ -8,7 +8,7 @@ import { parseAssetHubTokenId } from '~/utils/nft'
 const props = defineProps<{
   tokenId: string
   collectionId: string
-  chain: OdaChain
+  chain: AppChain
   image?: string | null
   name?: string | null
   price?: string | null

@@ -1,10 +1,10 @@
-import type { OdaChain } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
 import { canInteract, chainConfig, getAssetHubChain } from '@/utils/chain'
 
 export function useChain() {
   const route = useRoute()
 
-  const currentChain = computed(() => (route.params as { chain: OdaChain }).chain || 'ahp')
+  const currentChain = computed(() => (route.params as { chain: AppChain }).chain || 'ahp')
 
   const spec = computed(() => chainConfig[currentChain.value])
   const assetHubChain = computed(() => getAssetHubChain(currentChain.value))

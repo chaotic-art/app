@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { OdaChain } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
 import { getAssetHubChain } from '@/utils/chain'
 
 type CardActionVariant = 'link' | 'studio-mode'
 
 interface Props {
   variables?: Record<string, any>
-  chain: OdaChain
+  chain: AppChain
   cardActionVariant?: CardActionVariant
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { OdaChain } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
 import { fetchOdaCollection } from '~/services/oda'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
@@ -7,7 +7,7 @@ type ActionVariant = 'link' | 'studio-mode'
 
 interface Props {
   item: ReturnType<typeof useInfiniteCollections>['collections']['value'][number]
-  chain: OdaChain
+  chain: AppChain
   volume?: string
   actionVariant?: ActionVariant
 }

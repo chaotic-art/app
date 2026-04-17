@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { OdaChain } from '~/services/oda'
 import type { NftViewMode } from '~/stores/preferences'
+import type { AppChain } from '~/types/chain'
 import type { NftRarity } from '~/types/rarity'
 import { getAssetHubChain } from '@/utils/chain'
 
@@ -8,7 +8,7 @@ interface Props {
   variables?: Record<string, any>
   noItemsFoundMessage?: string
   gridClass?: string
-  chain: OdaChain
+  chain: AppChain
   hideHoverAction?: boolean
   viewMode?: NftViewMode
   showRarity?: boolean

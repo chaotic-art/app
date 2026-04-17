@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { OdaChain, OnchainCollection } from '~/services/oda'
+import type { OnchainCollection } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
 import { getAssetHubChain } from '~/utils/chain'
 import { getSubscanAccountUrl } from '~/utils/format/address'
 import { sanitizeIpfsUrl, toOriginalContentUrl } from '~/utils/ipfs'
@@ -9,7 +10,7 @@ const props = defineProps<{
   collection: OnchainCollection | null
   collectionId: string
   /** Route-facing chain used for links and ODA-backed reads. */
-  chain: OdaChain
+  chain: AppChain
   drop?: {
     /** Optional override for owner (e.g. drops creator). Falls back to collection.owner. */
     creator?: string
