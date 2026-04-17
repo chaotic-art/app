@@ -4,7 +4,7 @@ import { dotHubDenyList, ksmHubDenyList } from '@/utils/constants'
 interface BaseChainConfig {
   indexerChain?: AssetHubChain
   name: string
-  substrateSourceChain: SubstrateChain
+  substrateSourceChain: AssetHubChain
   tokenSymbol: string
   tokenDecimals: number
   vm: ChainVm
@@ -138,7 +138,7 @@ export function isOdaChain(chain: Chain): chain is AssetHubChain | EvmChain {
   return chain !== 'dot' && chain !== 'ksm'
 }
 
-export function getSubstrateSourceChain(chain: Chain): SubstrateChain {
+export function getSubstrateSourceChain(chain: Chain): AssetHubChain {
   return chainConfig[chain].substrateSourceChain
 }
 
