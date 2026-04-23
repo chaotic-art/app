@@ -144,6 +144,8 @@ export function getSubstrateSourceChain(chain: Chain): SubstrateChain {
   return chainConfig[chain].substrateSourceChain
 }
 
+export function getAssetHubChain(chain: AppChain): AssetHubChain
+export function getAssetHubChain(chain: Chain): AssetHubChain | undefined
 export function getAssetHubChain(chain: Chain): AssetHubChain | undefined {
   return chainConfig[chain].indexerChain
 }
