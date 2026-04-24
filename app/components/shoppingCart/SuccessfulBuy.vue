@@ -8,7 +8,6 @@ const props = defineProps<{
 
 const { $i18n } = useNuxtApp()
 const { accountId } = useAuth()
-const { currentChain } = useChain()
 
 const items = computed<ItemMedia[]>(() =>
   props.result.items.map(item => ({
@@ -24,6 +23,7 @@ const items = computed<ItemMedia[]>(() =>
 
 const txHash = computed(() => props.result.hash)
 const singleItem = computed(() => props.result.items.length === 1)
+const resultChain = computed(() => props.result.chain)
 
 const shareText = computed(() => {
   const someNfts = items.value.map(item => item.name)
@@ -33,8 +33,8 @@ const shareText = computed(() => {
 })
 
 const url = computed(() => window.location.origin)
-const userProfilePath = computed(() => `/${currentChain.value}/u/${accountId.value}`)
-const nftPath = computed(() => `/${currentChain.value}/gallery/${items.value[0]?.id}`)
+const userProfilePath = computed(() => `/${resultChain.value}/u/${accountId.value}`)
+const nftPath = computed(() => `/${resultChain.value}/gallery/${items.value[0]?.id}`)
 
 const shareUrl = computed(() =>
   singleItem.value
@@ -120,6 +120,7 @@ const headerContent = computed<{ single: string, multiple: string }>(() => {
     :tx-hash="txHash"
     :share="share"
     :status="status"
+    :chain="resultChain"
     :action-buttons="actionButtons"
   >
     <SuccessfulItemsMedia

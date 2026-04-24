@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
-import { isAssetHubChain } from '~/utils/chain'
+import { getExploreCollectionTypes, isAppChain, isChain } from '~/utils/chain'
 
 // Validate chain parameter
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && isAssetHubChain(chain)
+    return typeof chain === 'string' && isChain(chain) && isAppChain(chain)
   },
 })
 
@@ -18,7 +17,7 @@ useSeoMeta({
 
 const { isLogIn } = useAuth()
 const route = useRoute()
-const { chain } = route.params as { chain: AssetHubChain }
+const { currentChain: chain } = useChain()
 const isMobileFiltersOpen = ref(false)
 const { isMobileViewport } = useViewport()
 const { viewMode: nftViewMode, gridClass: nftGridClass } = useNftViewMode('explore')
@@ -27,6 +26,7 @@ const queryVariables = ref<Record<string, any>>({})
 
 const mergedQueryVariables = computed(() => {
   const filters: Record<string, any> = { ...queryVariables.value }
+  const collectionTypes = getExploreCollectionTypes(chain.value)
 
   const searchFilters = []
 
@@ -42,6 +42,14 @@ const mergedQueryVariables = computed(() => {
   const nftFilters = buildNftSearchFilters({ query: route.query })
 
   searchFilters.push(...nftFilters)
+
+  if (collectionTypes) {
+    searchFilters.push({
+      collection: {
+        collectionType_in: collectionTypes,
+      },
+    })
+  }
 
   if (searchFilters.length > 0) {
     filters.search = searchFilters
@@ -91,7 +99,7 @@ const mergedQueryVariables = computed(() => {
         :variables="mergedQueryVariables"
         :grid-class="nftGridClass"
         :view-mode="nftViewMode"
-        :prefix="chain"
+        :chain="chain"
       />
     </ExploreFilters>
     <ScrollToTop />

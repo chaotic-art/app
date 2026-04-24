@@ -6,7 +6,7 @@ const props = defineProps<{
   previewUrl?: string
   name?: string
   id?: string
-  prefix?: string
+  chain?: string
 }>()
 
 const emit = defineEmits(['share', 'viewCard'])

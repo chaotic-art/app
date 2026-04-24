@@ -21,7 +21,7 @@ export const SIGNATURE_MESSAGE = 'Verify ownership of this account on Chaotic'
 export default function useVerifyAccount() {
   const { accountId } = useAuth()
   const accountStore = useAccountStore()
-  const { vm } = useVm()
+  const { vm } = useChain()
   const authSignature = computed(() => accountStore.getAuthSignature(vm.value))
   const { signMessageAsync } = useSignMessage()
 

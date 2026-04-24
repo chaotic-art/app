@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { isAssetHubChain } from '~/utils/chain'
 
 definePageMeta({
@@ -78,7 +78,7 @@ function goToCreateCollection() {
       <CollectionsGrid
         :key="gridKey"
         :variables="queryVariables"
-        :prefix="chain"
+        :chain="chain"
         card-action-variant="studio-mode"
       />
     </div>

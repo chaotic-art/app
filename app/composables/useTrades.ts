@@ -1,5 +1,6 @@
 import type { BaseTrade, Offer, Swap, TradeNftItem, TradeTarget, TradeType } from '@/components/trade/types'
 import type { OffersListData } from '~/graphql/queries/trades'
+import type { AssetHubChain } from '~/types/chain'
 import { addSeconds, subSeconds } from 'date-fns'
 import {
   TradeDesiredTokenTypes,
@@ -34,6 +35,7 @@ export const TRADES_QUERY_MAP: Record<TradeType, { queryDocument: typeof offersL
 const SECONDS_PER_BLOCK = 3600 / BLOCKS_PER_HOUR
 
 export interface UseTradesParams {
+  chain: MaybeRefOrGetter<AssetHubChain>
   where?: MaybeRef<Record<string, unknown> | string>
   limit?: number
   disabled?: ComputedRef<boolean>
@@ -43,6 +45,7 @@ export interface UseTradesParams {
 }
 
 export default function ({
+  chain,
   where = {},
   limit = 100,
   disabled = computed(() => false),
@@ -57,7 +60,6 @@ export default function ({
   const targetsOfTrades = ref<Map<string, TradeTarget[]>>()
   const ownersSubscription = ref(() => { })
 
-  const { currentChain } = useChain()
   const currentBlock = useCurrentBlock()
   const { relayBlock: relayHeadNow, refresh: refreshRelay } = useRelayBlock()
   const fetching = ref(true)
@@ -74,7 +76,7 @@ export default function ({
         orderBy: orderBy as any,
       },
       context: {
-        endpoint: currentChain.value,
+        endpoint: toValue(chain),
       },
     })
 
@@ -98,6 +100,7 @@ export default function ({
 
   const subscribeToTargetsOfTrades = (trades: BaseTrade[]) => {
     ownersSubscription.value = useSubscriptionGraphql({
+      chain,
       query: collectionsOwnersByIds,
       variables: { ids: trades.map(item => item.considered.id) },
       onChange: ({ data: { collections } }) => {

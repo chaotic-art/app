@@ -1,4 +1,13 @@
 <script setup lang="ts">
+import { isAssetHubChain } from '~/utils/chain'
+
+definePageMeta({
+  validate: async (route) => {
+    const { chain } = route.params
+    return typeof chain === 'string' && isAssetHubChain(chain)
+  },
+})
+
 const { data: dropItems, pending } = await useFetch('/api/genart/list', {
   query: {
     limit: 200,

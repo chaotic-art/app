@@ -1,4 +1,5 @@
 import type { TradeNftItem, TradeToken } from '@/components/trade/types'
+import type { AssetHubChain } from '~/types'
 import { SwapStep } from '@/components/swap/types'
 
 const SWAP_ROUTE_NAME_STEP_MAP = {
@@ -94,7 +95,7 @@ export function counterSwap(trade: TradeNftItem) {
     })
   }
 
-  const swap = useAtomicSwapStore().createSwap(trade.caller, currentChain.value, withFields)
+  const swap = useAtomicSwapStore().createSwap(trade.caller, currentChain.value as AssetHubChain, withFields)
 
   navigateToSwap(swap)
 }

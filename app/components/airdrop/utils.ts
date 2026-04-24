@@ -1,5 +1,5 @@
 import type { ActionAirdrop } from '@/components/airdrop/types'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { isAddress } from '@polkadot/util-crypto'
 import { DistributionMode } from '@/components/airdrop/types'
 import { MultiAddress } from '@/descriptors/dist'

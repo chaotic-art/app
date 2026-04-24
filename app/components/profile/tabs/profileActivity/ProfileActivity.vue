@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { EventInteraction } from './types'
+import type { AssetHubChain } from '~/types'
 import { sortBy } from 'lodash'
 import { allEvents } from '~/graphql/queries/profiles'
 
@@ -12,6 +13,7 @@ const emit = defineEmits(['totalCountChange'])
 const route = useRoute()
 const router = useRouter()
 const { $apolloClient } = useNuxtApp()
+const { currentChain } = useChain()
 const loading = ref(true)
 const events = ref<EventInteraction[]>([])
 
@@ -80,11 +82,14 @@ function selectAll() {
   })
 }
 
-async function fetchProfileActivity() {
+async function fetchProfileActivity(endpoint: AssetHubChain) {
   const response = await $apolloClient.query({
     query: allEvents,
     variables: {
       where: where.value,
+    },
+    context: {
+      endpoint,
     },
   })
 
@@ -107,7 +112,7 @@ onMounted(async () => {
     })
   }
 
-  await fetchProfileActivity()
+  await fetchProfileActivity(currentChain.value as AssetHubChain)
 
   emit('totalCountChange', events.value.length)
 })

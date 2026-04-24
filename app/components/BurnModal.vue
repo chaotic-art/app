@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
 const emit = defineEmits<{ close: [boolean] }>()
@@ -10,16 +11,17 @@ const { burnNfts } = useNftPallets()
 
 const acknowledged = ref(false)
 const txFee = ref(0)
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const eligibleToBurn = computed(() => items.filter(item => !item.mimeType?.includes('html')))
 
 function burn() {
-  burnNfts({ items, chain: currentChain.value, type: 'submit' })
+  burnNfts({ items, chain: chain.value, type: 'submit' })
   emit('close', false)
 }
 
 onMounted(async () => {
-  const fee = await burnNfts({ items, chain: currentChain.value, type: 'estimate' })
+  const fee = await burnNfts({ items, chain: chain.value, type: 'estimate' })
   txFee.value = Number(fee || 0)
 })
 </script>

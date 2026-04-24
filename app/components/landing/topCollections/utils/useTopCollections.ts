@@ -1,7 +1,7 @@
 import type { CollectionsSalesData, TopCollectionsData } from '@/graphql/queries/collections'
 import type { Interaction } from '@/types'
+import type { AssetHubChain } from '~/types/chain'
 import { collectionsSales, topCollections } from '@/graphql/queries/collections'
-
 import { sanitizeIpfsUrl } from '@/utils/ipfs'
 import {
   calculateAvgPrice,
@@ -50,14 +50,14 @@ export function proccessData(
   )
 }
 
-export function useTopCollections(limit: number) {
+export function useTopCollections(limit: number, chain: MaybeRefOrGetter<AssetHubChain>) {
   const { $apolloClient } = useNuxtApp()
-  const { prefix } = usePrefix()
   const topCollectionWithVolumeList = useState<Awaited<ReturnType<typeof proccessData>>>(
     'topCollectionWithVolumeList',
     () => [],
   )
   const collectionsSalesResults = ref<CollectionsSalesData | null>(null)
+  const endpoint = computed(() => toValue(chain))
 
   onMounted(async () => {
     const { data: topCollectionsData } = await $apolloClient.query({
@@ -66,12 +66,12 @@ export function useTopCollections(limit: number) {
         orderBy: 'volume_DESC',
         limit,
         where: {
-          issuer_not_in: getDenyList(prefix.value) || [],
+          issuer_not_in: getDenyList(endpoint.value) || [],
           volume_gt: '0',
         },
       },
       context: {
-        endpoint: prefix.value,
+        endpoint: endpoint.value,
       },
     })
 
@@ -82,7 +82,7 @@ export function useTopCollections(limit: number) {
         query: collectionsSales,
         variables: { ids },
         context: {
-          endpoint: prefix.value,
+          endpoint: endpoint.value,
         },
       })
 

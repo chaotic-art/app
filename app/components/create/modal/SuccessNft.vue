@@ -24,7 +24,7 @@ const modalData = computed(() => {
   return {
     share: {
       text: isSingleItem.value ? 'I successfully created an NFT' : 'I successfully created NFTs',
-      url: isSingleItem.value ? `${window.location.origin}/${props.result?.prefix}/gallery/${props.result.collectionId}-${items[0]?.id}` : `${window.location.origin}/${props.result?.prefix}/collection/${props.result.collectionId}`,
+      url: isSingleItem.value ? `${window.location.origin}/${props.result?.chain}/gallery/${props.result.collectionId}-${items[0]?.id}` : `${window.location.origin}/${props.result?.chain}/collection/${props.result.collectionId}`,
       withCopy: true,
     },
     actionButtons: {
@@ -33,11 +33,11 @@ const modalData = computed(() => {
         onClick: () => {
           close()
 
-          if (props.result.prefix === 'ahpas') {
-            window.open(getSubscanNftUrl(props.result.collectionId, props.result.prefix), '_blank')
+          if (props.result.chain === 'ahpas') {
+            window.open(getSubscanNftUrl(props.result.collectionId, props.result.chain), '_blank')
           }
           else {
-            router.push(`/${props.result?.prefix}/gallery/${props.result.collectionId}-${items[0]?.id}`)
+            router.push(`/${props.result?.chain}/gallery/${props.result.collectionId}-${items[0]?.id}`)
           }
         },
       },
@@ -47,7 +47,7 @@ const modalData = computed(() => {
       multiple: `You successfully created ${props.result.items.length} NFTs`,
     },
     items,
-    chain: props.result.prefix,
+    chain: props.result.chain,
   }
 })
 </script>

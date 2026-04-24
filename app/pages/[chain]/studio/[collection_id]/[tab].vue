@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
 import CollectionHeader from '~/components/collection/CollectionHeader.vue'
 import { isAssetHubChain } from '~/utils/chain'
 
@@ -20,7 +21,7 @@ definePageMeta({
 const route = useRoute()
 const tab = computed(() => route.params.tab as (typeof validTabs)[number])
 const collectionId = computed(() => route.params.collection_id as string)
-const { currentChain } = useChain()
+const chain = computed(() => route.params.chain as AssetHubChain)
 const { collection } = useOdaCollection(collectionId)
 </script>
 
@@ -30,7 +31,7 @@ const { collection } = useOdaCollection(collectionId)
       v-if="tab === 'preview'"
       :collection="collection ?? null"
       :collection-id="collectionId"
-      :chain="currentChain"
+      :chain="chain"
     />
     <StudioCollectionDetails
       v-else-if="tab === 'details'"

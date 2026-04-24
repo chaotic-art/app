@@ -1,6 +1,6 @@
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OnchainCollection } from '~/services/oda'
+import type { AssetHubChain } from '~/types/chain'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { refreshOdaCollection } from '~/services/oda'

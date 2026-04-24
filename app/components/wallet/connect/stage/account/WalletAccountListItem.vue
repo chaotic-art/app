@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { EvmChain } from '~/types/chain'
 import { useQuery } from '@tanstack/vue-query'
 import { shortenAddress } from '@/utils/format/address'
 
@@ -17,23 +17,22 @@ const toast = useToast()
 const { getBalance } = useBalances()
 const { currentChain } = useChain()
 const { selectedAccounts } = useWalletStore()
-const { usePolkaVmTestnet } = useFeatureFlags()
 
-const polkaVmBalanceChain = computed<SupportedChain>(() => {
-  if (usePolkaVmTestnet.value) {
-    return 'ahpas'
+const polkaVmChain = computed<EvmChain>(() => {
+  if (currentChain.value === 'polkadot-testnet') {
+    return 'polkadot-testnet'
   }
 
-  return currentChain.value === 'ahk' ? 'ahk' : 'ahp'
+  return currentChain.value === 'ahk' || currentChain.value === 'kusama' ? 'kusama' : 'polkadot'
 })
 
 const { data: balanceData, isPending: isBalanceLoading } = useQuery({
-  queryKey: ['wallet-balance', props.account.address, props.account.vm, currentChain, usePolkaVmTestnet],
+  queryKey: ['wallet-balance', props.account.address, props.account.vm, currentChain],
   queryFn: async () => {
     if (props.account.vm === 'EVM') {
       const balance = await getBalance({
         address: props.account.address,
-        chain: polkaVmBalanceChain.value,
+        chain: polkaVmChain.value,
       })
 
       return {
@@ -47,7 +46,7 @@ const { data: balanceData, isPending: isBalanceLoading } = useQuery({
     })
 
     return {
-      usdFormatted: tokenToUsd(Number(balance.balance), chainSpec.ahp.tokenDecimals, chainSpec.ahp.tokenSymbol),
+      usdFormatted: tokenToUsd(Number(balance.balance), chainConfig.ahp.tokenDecimals, chainConfig.ahp.tokenSymbol),
     }
   },
   staleTime: 30000,

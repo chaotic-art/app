@@ -1,5 +1,5 @@
 import type { SwapSurcharge } from '~/composables/onchain/useNftPallets'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { defineStore } from 'pinia'
 import { computed } from 'vue'
 import { SwapStep } from '@/components/swap/types'

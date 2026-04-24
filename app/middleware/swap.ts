@@ -1,4 +1,4 @@
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { isAddress } from '@polkadot/util-crypto'
 import { SwapStep } from '@/components/swap/types'
 

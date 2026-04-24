@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { fetchTokenMetadata } from '~/composables/useToken'
 import { pinJson } from '~/services/storage'
@@ -35,6 +36,7 @@ watch(() => props.nft, (nft) => {
 
 const { currentChain } = useChain()
 const { getItemMetadataUri, updateItemAttributes } = useNftPallets()
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const validEditProperties = computed(() =>
   editProperties.value
@@ -61,13 +63,12 @@ async function confirmEdit() {
   }
   submitting.value = true
   try {
-    const chain = currentChain.value
     const collectionId = Number(props.collectionId)
     const itemId = row.sn
     const properties = validEditProperties.value
     const attributesForMeta = properties.map(p => ({ trait_type: p.trait, value: p.value }))
 
-    const currentUri = await getItemMetadataUri(chain, collectionId, itemId)
+    const currentUri = await getItemMetadataUri(chain.value, collectionId, itemId)
     const currentMeta = currentUri ? await fetchTokenMetadata(currentUri) : null
 
     const newMetadata = currentMeta
@@ -83,7 +84,7 @@ async function confirmEdit() {
     const newMetadataUri = `ipfs://${cid}`
 
     await updateItemAttributes({
-      chain,
+      chain: chain.value,
       collectionId,
       itemId,
       properties,

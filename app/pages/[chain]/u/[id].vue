@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { CHAINS } from '@kodadot1/static'
 import { encodeAddress } from 'dedot/utils'
+import { isAssetHubChain } from '@/utils/chain'
 
 // Validate chain parameter
 definePageMeta({
   validate: async (route) => {
     const { chain, id } = route.params
-    const isValidChain = typeof chain === 'string' && chain in CHAINS
+    const isValidChain = typeof chain === 'string' && isAssetHubChain(chain)
 
     try {
       encodeAddress(String(id), 0)
@@ -25,7 +25,7 @@ useSeoMeta({
 
 const route = useRoute()
 const { currentChain } = useChain()
-const address = computed(() => getss58AddressByPrefix(String(route.params.id), currentChain.value))
+const address = computed(() => getSs58AddressByChain(String(route.params.id), currentChain.value))
 const { profile } = useFetchProfile(computed(() => address.value))
 const bannerUrl = computed(() => sanitizeIpfsUrl(profile.value?.banner || ''))
 </script>

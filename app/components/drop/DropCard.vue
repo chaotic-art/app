@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropItem } from '@/types'
+import type { AssetHubChain } from '~/types/chain'
 import type { GenartDropItem } from '~/types/genart'
 import { useMintedDropsStore } from '@/stores/dropsMinted'
 import ImageMedia from '~/components/common/ImageMedia.vue'
@@ -12,6 +13,7 @@ const props = defineProps<{
 
 const formattedDrop = ref<DropItem>()
 const { decimals, chainSymbol, currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const isDropLoading = ref(true)
 const hasDropData = computed(() => formattedDrop.value !== undefined)
@@ -52,12 +54,12 @@ onBeforeMount(async () => {
             <UIcon name="mdi:account-group" class="text-gray-600 dark:text-gray-400 text-sm" />
             <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Collected by</span>
           </div>
-          <DropCollectedBy :chain="currentChain" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
+          <DropCollectedBy :chain="chain" :collection-id="drop.collection" :max-address-count="3" size="small" no-background />
         </div>
       </div>
     </div>
 
-    <NuxtLink :to="`/${currentChain}/drops/${drop.alias}`" class="block">
+    <NuxtLink :to="`/${chain}/drops/${drop.alias}`" class="block">
       <ImageMedia
         :src="sanitizeIpfsUrl(formattedDrop?.image) || '/placeholder.jpg'"
         :alt="formattedDrop?.name || drop.alias"

@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OnchainCollection } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
+import { getAssetHubChain } from '~/utils/chain'
 import { getSubscanAccountUrl } from '~/utils/format/address'
 import { sanitizeIpfsUrl, toOriginalContentUrl } from '~/utils/ipfs'
 import { unlimited } from '~/utils/math'
 
-const props = withDefaults(
-  defineProps<{
-    collection: OnchainCollection | null
-    collectionId: string
-    chain: AssetHubChain
-    /** Optional override for owner (e.g. drops creator). Falls back to collection.owner */
+const props = defineProps<{
+  collection: OnchainCollection | null
+  collectionId: string
+  /** Route-facing chain used for links and ODA-backed reads. */
+  chain: AppChain
+  drop?: {
+    /** Optional override for owner (e.g. drops creator). Falls back to collection.owner. */
     creator?: string
-    /** Optional drop alias for "View Drop" button */
-    dropAlias?: string
-    /** Show delete collection button */
-    showDeleteButton?: boolean
-    /** Current user is collection owner (enables delete) */
+    /** Optional drop alias for "View Drop" button. */
+    alias?: string
+  }
+  actions?: {
+    /** Show delete collection button. */
+    canDelete?: boolean
+    /** Current user is collection owner (enables delete). */
     isOwner?: boolean
-  }>(),
-  {
-    showDeleteButton: false,
-    isOwner: false,
-  },
-)
+  }
+}>()
 
 const emit = defineEmits<{
   delete: []
@@ -38,21 +38,23 @@ const bannerUrl = computed(() => {
   return raw ? toOriginalContentUrl(sanitizeIpfsUrl(raw)) : ''
 })
 
+const assetHubChain = computed(() => getAssetHubChain(props.chain))
+
 const ownerFromProps = computed(
-  () => props.creator || props.collection?.owner,
+  () => props.drop?.creator || props.collection?.owner,
 )
 
 // Fallback: when ODA/drops fail, fetch collection owner from chain so creator + Subscan always show
 const ownerFromChain = ref<string | null>(null)
 onMounted(async () => {
-  if (ownerFromProps.value || !props.collectionId)
+  if (ownerFromProps.value || !props.collectionId || !assetHubChain.value)
     return
   const collectionId = Number(props.collectionId)
   if (Number.isNaN(collectionId))
     return
   try {
     const { $sdk } = useNuxtApp()
-    const api = $sdk(props.chain).api
+    const api = $sdk(assetHubChain.value).api
     const collection = await api.query.Nfts.Collection.getValue(collectionId)
     if (collection?.owner) {
       ownerFromChain.value = collection.owner.toString()
@@ -110,7 +112,7 @@ const ownerAddress = computed(
                 {{ displayName }}
               </div>
               <UButton
-                v-if="showDeleteButton && isOwner"
+                v-if="props.actions?.canDelete && props.actions?.isOwner"
                 color="error"
                 variant="outline"
                 icon="i-heroicons-trash"
@@ -122,15 +124,16 @@ const ownerAddress = computed(
             <div v-if="ownerAddress" class="flex items-center gap-1 text-muted-foreground">
               <UserInfo :avatar-size="26" :address="ownerAddress" class="min-w-0" />
               <UButton
-                :to="getSubscanAccountUrl(ownerAddress, chain)"
+                v-if="assetHubChain"
+                :to="getSubscanAccountUrl(ownerAddress, assetHubChain)"
                 target="_blank"
                 variant="outline"
               >
                 Subscan
               </UButton>
               <UButton
-                v-if="dropAlias"
-                :to="`/${chain}/drops/${dropAlias}`"
+                v-if="props.drop?.alias"
+                :to="`/${chain}/drops/${props.drop.alias}`"
                 icon="i-heroicons-sparkles"
                 variant="outline"
               >

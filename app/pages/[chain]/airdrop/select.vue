@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import ProfileNftsList from '@/components/profile/tabs/ProfileNftsList.vue'
+import { isAssetHubChain } from '~/utils/chain'
+
+definePageMeta({
+  validate: async (route) => {
+    const { chain } = route.params
+    return typeof chain === 'string' && isAssetHubChain(chain)
+  },
+})
 
 const { accountId } = useAuth()
 const { currentChain } = useChain()
-const address = computed(() => getss58AddressByPrefix(accountId.value, currentChain.value))
+const address = computed(() => getSs58AddressByChain(accountId.value, currentChain.value))
 </script>
 
 <template>

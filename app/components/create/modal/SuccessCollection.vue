@@ -18,7 +18,7 @@ const modalData = computed(() => {
   return {
     share: {
       text: 'You successfully created a collection',
-      url: `${window.location.origin}/${props.result?.prefix}/collection/${collectionId}`,
+      url: `${window.location.origin}/${props.result?.chain}/collection/${collectionId}`,
       withCopy: true,
     },
     actionButtons: {
@@ -27,11 +27,11 @@ const modalData = computed(() => {
         onClick: () => {
           close()
 
-          if (props.result.prefix === 'ahpas') {
-            window.open(getSubscanNftUrl(collectionId, props.result.prefix), '_blank')
+          if (props.result.chain === 'ahpas') {
+            window.open(getSubscanNftUrl(collectionId, props.result.chain), '_blank')
           }
           else {
-            router.push(`/${props.result?.prefix}/collection/${collectionId}`)
+            router.push(`/${props.result?.chain}/collection/${collectionId}`)
           }
         },
       },
@@ -48,7 +48,7 @@ const modalData = computed(() => {
       collectionName: props.result?.name,
       metadata: props.result?.description,
     }],
-    chain: props.result.prefix,
+    chain: props.result.chain,
   }
 })
 </script>

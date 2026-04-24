@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { fetchOdaCollectionOwners } from '@/services/oda'
 
 const props = withDefaults(

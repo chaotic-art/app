@@ -1,7 +1,7 @@
 import type { ExploreCollectionsData } from '~/graphql/queries/explore'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { exploreCollections } from '~/graphql/queries/explore'
-import { getDenyList } from '~/utils/prefix'
+import { getDenyList } from '~/utils/chain'
 
 type CollectionEntity = ExploreCollectionsData['collectionEntities'][0]
 

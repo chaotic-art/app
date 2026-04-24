@@ -2,7 +2,7 @@
 import useTheme from '@/composables/useTheme'
 
 const { currentMode } = useTheme()
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 
 const NuxtLink = resolveComponent('NuxtLink')
 </script>
@@ -25,7 +25,7 @@ const NuxtLink = resolveComponent('NuxtLink')
       :label="$t('shoppingCart.exploreNfts')"
       variant="outline"
       :as="NuxtLink"
-      :to="`/${prefix}/explore/nfts?listed=true`"
+      :to="`/${currentChain}/explore/nfts?listed=true`"
     />
   </div>
 </template>

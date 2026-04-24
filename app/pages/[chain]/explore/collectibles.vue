@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { LocationQueryRaw } from 'vue-router'
-import type { AssetHubChain } from '~/plugins/sdk.client'
-import { isAssetHubChain } from '~/utils/chain'
+import { getExploreCollectionTypes, isAppChain, isChain } from '~/utils/chain'
 import { STICKY_MOBILE_TOOLBAR_ROW_CLASS, STICKY_MOBILE_TOOLBAR_SEARCH_CLASS } from '~/utils/exploreToolbar'
 import { getSingleQueryValue } from '~/utils/query'
 
@@ -9,7 +8,7 @@ import { getSingleQueryValue } from '~/utils/query'
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && isAssetHubChain(chain)
+    return typeof chain === 'string' && isChain(chain) && isAppChain(chain)
   },
 })
 
@@ -31,7 +30,7 @@ const {
   resolveSortQuery,
 } = useSortOptions('exploreCollections')
 
-const { chain } = route.params as { chain: AssetHubChain }
+const { currentChain: chain } = useChain()
 
 const queryState = computed({
   get: () => ({
@@ -60,10 +59,18 @@ const { input: searchInput, onInput: handleSearchUpdate } = useDebouncedSyncedIn
 
 const queryVariables = computed(() => {
   const keywordFilter = buildKeywordClause(queryState.value.search, { scope: 'collections' })
+  const collectionTypes = getExploreCollectionTypes(chain.value)
 
   return {
     orderBy: buildOrderBy(queryState.value.sortKeys),
-    search: keywordFilter ? [keywordFilter] : [],
+    search: [
+      ...(keywordFilter ? [keywordFilter] : []),
+      ...(collectionTypes
+        ? [{
+            collectionType_in: collectionTypes,
+          }]
+        : []),
+    ],
   }
 })
 
@@ -111,7 +118,7 @@ const gridKey = computed(() => `${queryVariables.value.orderBy.join(',')}::${que
       <CollectionsGrid
         :key="gridKey"
         :variables="queryVariables"
-        :prefix="chain"
+        :chain="chain"
       />
     </div>
     <ScrollToTop />

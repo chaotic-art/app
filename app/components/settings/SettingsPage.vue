@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { SubstrateChain } from '~/types/chain'
 import { extractHostname, formatLatency, latencyColorClass, measureLatency } from '~/composables/useRpcLatency'
 import { PROVIDERS } from '~/config/providers'
-import { chainSpec } from '~/utils/chain'
+import { chainConfig } from '~/utils/chain'
 
 const rpcStore = useRpcProviderStore()
 
 const latencies = shallowRef(new Map<string, number | null>())
 const isMeasuring = ref(false)
 
-const chainOrder: SupportedChain[] = ['ahp', 'ahk', 'dot', 'ksm', 'ahpas']
+const chainOrder: SubstrateChain[] = ['ahp', 'ahk', 'dot', 'ksm', 'ahpas']
 
-const activeChain = ref<SupportedChain>('ahp')
+const activeChain = ref<SubstrateChain>('ahp')
 
 const chainTabs = computed(() =>
   chainOrder.map(chain => ({
-    label: chainSpec[chain].name,
+    label: chainConfig[chain].name,
     value: chain,
   })),
 )
 
 const chainSelectItems = computed(() =>
   chainOrder.map(chain => ({
-    label: chainSpec[chain].name,
+    label: chainConfig[chain].name,
     value: chain,
   })),
 )
 
-async function testChainProviders(chain: SupportedChain) {
+async function testChainProviders(chain: SubstrateChain) {
   const providers = PROVIDERS[chain]
 
   // Clear previous results for this chain
@@ -56,11 +56,11 @@ async function testAllProviders() {
   isMeasuring.value = false
 }
 
-function selectProvider(chain: SupportedChain, url: string) {
+function selectProvider(chain: SubstrateChain, url: string) {
   rpcStore.setProvider(chain, url)
 }
 
-function isSelected(chain: SupportedChain, url: string): boolean {
+function isSelected(chain: SubstrateChain, url: string): boolean {
   return rpcStore.getProvider(chain) === url
 }
 
@@ -156,7 +156,7 @@ function isProviderError(url: string): boolean {
           <template #content="{ item }">
             <div class="space-y-1 pt-2">
               <button
-                v-for="url in PROVIDERS[item.value as SupportedChain]"
+                v-for="url in PROVIDERS[item.value as SubstrateChain]"
                 :key="url"
                 :aria-label="`Select ${extractHostname(url)} - ${formatLatency(latencies.get(url))}`"
                 :disabled="isProviderError(url)"
@@ -164,11 +164,11 @@ function isProviderError(url: string): boolean {
                 :class="[
                   isProviderError(url)
                     ? 'opacity-40 cursor-not-allowed'
-                    : isSelected(item.value as SupportedChain, url)
+                    : isSelected(item.value as SubstrateChain, url)
                       ? 'bg-primary/10 cursor-pointer'
                       : 'hover:bg-elevated cursor-pointer',
                 ]"
-                @click="selectProvider(item.value as SupportedChain, url)"
+                @click="selectProvider(item.value as SubstrateChain, url)"
               >
                 <UIcon
                   name="i-lucide-circle"
@@ -182,7 +182,7 @@ function isProviderError(url: string): boolean {
                   {{ formatLatency(latencies.get(url)) }}
                 </span>
                 <UIcon
-                  v-if="isSelected(item.value as SupportedChain, url)"
+                  v-if="isSelected(item.value as SubstrateChain, url)"
                   name="i-lucide-check"
                   class="h-4 w-4 text-primary shrink-0"
                 />

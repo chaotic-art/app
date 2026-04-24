@@ -1,4 +1,4 @@
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { getRelayNow } from '@/composables/onchain/utils'
 
 interface UseRelayBlockOptions {
@@ -10,7 +10,7 @@ interface UseRelayBlockOptions {
 
 export default function useRelayBlock(options: UseRelayBlockOptions = {}) {
   const { $sdk } = useNuxtApp()
-  const { currentChain } = useChain()
+  const { assetHubChain: relaySourceChain } = useChain()
 
   const cache = useState<Partial<Record<AssetHubChain, number | null>>>(
     'relay-block-cache',
@@ -22,28 +22,34 @@ export default function useRelayBlock(options: UseRelayBlockOptions = {}) {
   )
 
   const relayBlock = computed<number | null>({
-    get: () => (cache.value[currentChain.value] ?? null) as number | null,
-    set: (v) => { cache.value[currentChain.value] = v },
+    get: () => relaySourceChain.value ? (cache.value[relaySourceChain.value] ?? null) : null,
+    set: (v) => {
+      if (relaySourceChain.value) {
+        cache.value[relaySourceChain.value] = v
+      }
+    },
   })
 
-  const loading = computed<boolean>(() => Boolean(loadingState.value[currentChain.value]))
+  const loading = computed<boolean>(() => relaySourceChain.value ? Boolean(loadingState.value[relaySourceChain.value]) : false)
 
   const refresh = async (force = false) => {
+    if (!relaySourceChain.value)
+      return
     if (loading.value)
       return
     if (relayBlock.value && !force)
       return
 
-    loadingState.value[currentChain.value] = true
+    loadingState.value[relaySourceChain.value] = true
     try {
-      const api = $sdk(currentChain.value).api
+      const api = $sdk(relaySourceChain.value).api
       const relayNow = await getRelayNow(api)
       if (relayNow > 0) {
         relayBlock.value = relayNow
       }
     }
     finally {
-      loadingState.value[currentChain.value] = false
+      loadingState.value[relaySourceChain.value] = false
     }
   }
 
