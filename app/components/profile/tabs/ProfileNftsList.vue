@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
+
 const props = defineProps<{
   extraVariables?: Partial<Record<'owner' | 'issuer' | 'collections', string | string[]>>
   hideChainSwitcher?: boolean
@@ -10,6 +12,7 @@ const queryVariables = ref<Record<string, any>>({})
 const { viewMode: nftViewMode, gridClass: nftGridClass } = useNftViewMode('profile')
 
 const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 </script>
 
 <template>
@@ -31,7 +34,7 @@ const { currentChain } = useChain()
         :variables="queryVariables"
         :grid-class="nftGridClass"
         :view-mode="nftViewMode"
-        :prefix="currentChain"
+        :chain="chain"
         @total-count-change="$emit('totalCountChange', $event)"
       />
     </div>

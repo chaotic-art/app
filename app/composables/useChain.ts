@@ -1,21 +1,28 @@
-import type { AssetHubChain } from '~/plugins/sdk.client'
-import { chainSpec } from '@/utils/chain'
+import type { AppChain } from '~/types/chain'
+import { canInteract, chainConfig, getAssetHubChain } from '@/utils/chain'
 
 export function useChain() {
   const route = useRoute()
 
-  const currentChain = computed(() => (route.params as { chain: AssetHubChain }).chain || 'ahp')
+  const currentChain = computed(() => (route.params as { chain: AppChain }).chain || 'ahp')
 
-  const chainName = computed(() => chainSpec[currentChain.value].name)
-  const chainSymbol = computed(() => chainSpec[currentChain.value].tokenSymbol)
-  const decimals = computed(() => chainSpec[currentChain.value].tokenDecimals)
-  const ss58Format = computed(() => chainSpec[currentChain.value].ss58Format)
+  const spec = computed(() => chainConfig[currentChain.value])
+  const assetHubChain = computed(() => getAssetHubChain(currentChain.value))
+  const canInteractOnChain = computed(() => canInteract(currentChain.value))
+  const chainName = computed(() => spec.value.name)
+  const chainSymbol = computed(() => spec.value.tokenSymbol)
+  const decimals = computed(() => spec.value.tokenDecimals)
+  const ss58Format = computed(() => spec.value.vm === 'SUB' ? spec.value.ss58Format : undefined)
+  const vm = computed(() => spec.value.vm)
 
   return {
+    assetHubChain,
     decimals,
     chainSymbol,
     currentChain,
     chainName,
     ss58Format,
+    vm,
+    canInteract: canInteractOnChain,
   }
 }

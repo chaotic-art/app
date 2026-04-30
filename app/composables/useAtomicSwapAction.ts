@@ -1,5 +1,5 @@
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { AssetHubChain } from '~/types/chain'
 import { SwapStep } from '@/components/swap/types'
 
 export default ({ tokenId, collectionId, token }: {

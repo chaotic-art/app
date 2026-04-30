@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import type { AssetHubChain } from '~/types/chain'
+
 const props = defineProps<{
   collectionId: string
 }>()
 
 const route = useRoute()
 const router = useRouter()
+const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 const {
   sortOptions,
   normalizeSortKeys,
@@ -56,6 +60,7 @@ const queryVariables = computed(() => {
   <LazyNftsGrid
     :key="`${selectedSortKeys.join(',')}::${collectionId}`"
     :variables="queryVariables"
+    :chain="chain"
     class="mt-6 md:mt-10"
     grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
   />

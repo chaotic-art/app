@@ -1,21 +1,22 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AppChain } from '~/types/chain'
+import { getAssetHubChain } from '@/utils/chain'
 
 type CardActionVariant = 'link' | 'studio-mode'
 
 interface Props {
   variables?: Record<string, any>
-  prefix?: AssetHubChain
+  chain: AppChain
   cardActionVariant?: CardActionVariant
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variables: () => ({}),
-  prefix: 'ahp',
   cardActionVariant: 'link',
 })
 
 const emit = defineEmits(['totalCountChange'])
+const endpoint = computed(() => getAssetHubChain(props.chain))
 
 // Use the collections infinite query composable
 const {
@@ -29,7 +30,7 @@ const {
   pageSize: 40,
   distance: 300,
   variables: props.variables,
-  endpoint: props.prefix,
+  endpoint: endpoint.value,
 })
 
 onMounted(async () => {
@@ -49,7 +50,7 @@ watch(totalCount, (newCount) => {
         v-for="item in collections"
         :key="item.id"
         :item="item"
-        :prefix="prefix"
+        :chain="chain"
         :action-variant="cardActionVariant"
         :is-loading="isInitialLoading && collections.length === 0"
       />

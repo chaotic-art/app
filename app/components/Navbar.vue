@@ -6,7 +6,7 @@ import ThemeSwitcher from '@/components/common/ThemeSwitcher.vue'
 import { isProduction } from '@/utils/env'
 
 const { accountId } = useAuth()
-const { prefix } = usePrefix()
+const { currentChain } = useChain()
 const route = useRoute()
 const router = useRouter()
 
@@ -14,7 +14,7 @@ const router = useRouter()
 const isCreateModalOpen = ref(false)
 const isBottomSheetOpen = ref(false)
 
-const routePrefix = computed(() => isProduction ? 'ahp' : prefix.value)
+const routeChain = computed(() => isProduction ? 'ahp' : currentChain.value)
 
 const navItems = computed<NavigationMenuItem[][]>(() => [
   [
@@ -29,15 +29,15 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
     },
     {
       label: 'Explore',
-      to: `/${routePrefix.value}/explore/collectibles`,
+      to: `/${routeChain.value}/explore/collectibles`,
     },
     {
       label: 'Drops',
-      to: `/${routePrefix.value}/drops`,
+      to: `/${routeChain.value}/drops`,
     },
     {
       label: 'Artists',
-      to: `/${routePrefix.value}/artists`,
+      to: `/${routeChain.value}/artists`,
     },
     {
       label: 'Create',
@@ -46,7 +46,7 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
     ...(accountId.value
       ? [{
           label: 'Studio',
-          to: `/${routePrefix.value}/studio`,
+          to: `/${routeChain.value}/studio`,
         }]
       : []),
   ],
@@ -75,7 +75,7 @@ function handleMassMint() {
 
 function handleAirdrop() {
   isCreateModalOpen.value = false
-  router.push(`/${routePrefix.value}/airdrop/select`)
+  router.push(`/${routeChain.value}/airdrop/select`)
 }
 
 function closeModal() {

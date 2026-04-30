@@ -19,7 +19,7 @@ const showFollowing = ref(false)
 const { currentChain } = useChain()
 
 const prefixUserAddress = computed(() =>
-  getss58AddressByPrefix(props.user.address, currentChain.value),
+  getSs58AddressByChain(props.user.address, currentChain.value),
 )
 
 const { data: followersCount, refresh: refreshCount } = useAsyncData(

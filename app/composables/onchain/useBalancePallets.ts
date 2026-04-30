@@ -1,5 +1,5 @@
 import type { TxType } from './useNftPallets'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 
 import { MultiAddress } from '~/descriptors/dist'
 import { useNftPallets } from './useNftPallets'
@@ -55,7 +55,7 @@ export function useBalancesPallets() {
           result.value = {
             type: 'transfer',
             hash: hash.value,
-            prefix: chain,
+            chain,
           }
         }
       },

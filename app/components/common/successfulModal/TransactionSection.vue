@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { useClipboard } from '@vueuse/core'
 import { TransactionStatus } from '@/composables/useTransactionStatus'
 import { getSubscanExtrinsicUrl } from '~/utils/format/address'
@@ -7,14 +7,13 @@ import { getSubscanExtrinsicUrl } from '~/utils/format/address'
 const props = defineProps<{
   txHash?: string
   status: TransactionStatus
-  chain?: SupportedChain
+  chain: AssetHubChain
 }>()
 
 const { add: toast } = useToast()
-const { currentChain } = useChain()
 
 const txUrl = computed(() =>
-  getSubscanExtrinsicUrl(props.txHash || '', props.chain || currentChain.value as SupportedChain),
+  getSubscanExtrinsicUrl(props.txHash || '', props.chain),
 )
 const { copy } = useClipboard({ source: txUrl })
 

@@ -1,22 +1,12 @@
 import type { Address } from 'viem'
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { Chain, EvmChain, SubstrateChain } from '~/types'
 import { isAddress } from 'viem'
-import {
-  CHAIN_KUSAMA_MAINNET,
-  CHAIN_POLKADOT_MAINNET,
-  CHAIN_POLKADOT_TESTNET,
-  getPublicClient,
-} from '~/utils/viem'
-
-const POLKAVM_CHAIN_BY_PREFIX = {
-  ahp: CHAIN_POLKADOT_MAINNET,
-  ahk: CHAIN_KUSAMA_MAINNET,
-  ahpas: CHAIN_POLKADOT_TESTNET,
-} as const
+import { isEvmChain, isSubstrateChain } from '@/utils/chain'
+import { getPublicClient, getViemChainSpec } from '~/utils/viem'
 
 interface GetBalanceParams {
   address: string
-  chain: SupportedChain
+  chain: Chain
 }
 
 interface GetBalanceResult {
@@ -27,49 +17,65 @@ interface GetBalanceResult {
   tokenName: string
 }
 
-export type GetBalancesResult = (GetBalanceResult & { chain: SupportedChain })[]
+export type GetBalancesResult = (GetBalanceResult & { chain: Chain })[]
 
 export default function () {
-  const getSubstrateBalance = async ({ address, chain }: GetBalanceParams): Promise<GetBalanceResult> => {
+  const emptyBalance = ({ address, chain }: GetBalanceParams): GetBalanceResult => ({
+    address,
+    balance: 0n,
+    symbol: chainConfig[chain].tokenSymbol,
+    decimals: chainConfig[chain].tokenDecimals,
+    tokenName: chainConfig[chain].name,
+  })
+
+  const getSubstrateBalance = async ({ address, chain }: { address: string, chain: SubstrateChain }): Promise<GetBalanceResult> => {
     const { $sdk } = useNuxtApp()
 
-    const formattedAddress = formatAddress({ address, prefix: chain })
+    const formattedAddress = formatAddress({ address, chain })
 
     const balance = await $sdk(chain).api.query.System.Account.getValue(formattedAddress)
 
     return {
       address: formattedAddress,
       balance: balance.data.free,
-      symbol: chainSpec[chain].tokenSymbol,
-      decimals: chainSpec[chain].tokenDecimals,
-      tokenName: chainSpec[chain].name,
+      symbol: chainConfig[chain].tokenSymbol,
+      decimals: chainConfig[chain].tokenDecimals,
+      tokenName: chainConfig[chain].name,
     }
   }
 
-  const getEvmBalance = async ({ address, chain }: GetBalanceParams): Promise<GetBalanceResult> => {
-    const chainConfig = POLKAVM_CHAIN_BY_PREFIX[chain as keyof typeof POLKAVM_CHAIN_BY_PREFIX] ?? CHAIN_POLKADOT_MAINNET
-    const client = getPublicClient(chainConfig.id)
+  const getEvmBalance = async ({ address, chain }: { address: string, chain: EvmChain }): Promise<GetBalanceResult> => {
+    const viemChain = getViemChainSpec(chain)
+    const client = getPublicClient(viemChain.id)
     const balance = await client.getBalance({ address: address as Address })
 
     return {
       address,
       balance,
-      symbol: chainConfig.nativeCurrency.symbol,
-      decimals: chainConfig.nativeCurrency.decimals,
-      tokenName: chainConfig.name,
+      symbol: viemChain.nativeCurrency.symbol,
+      decimals: viemChain.nativeCurrency.decimals,
+      tokenName: viemChain.name,
     }
   }
 
   const getBalance = async ({ address, chain }: GetBalanceParams): Promise<GetBalanceResult> => {
-    if (isAddress(address) && ['ahp', 'ahk', 'ahpas'].includes(chain)) {
+    if (isEvmChain(chain)) {
+      if (!isAddress(address)) {
+        return emptyBalance({ address, chain })
+      }
+
       return getEvmBalance({ address, chain })
     }
 
-    if (chain === 'ahp' || chain === 'ahk' || chain === 'dot' || chain === 'ksm' || chain === 'ahpas') {
+    if (isSubstrateChain(chain)) {
+      if (isAddress(address)) {
+        return emptyBalance({ address, chain })
+      }
+
       return getSubstrateBalance({ address, chain })
     }
 
-    return { address, balance: 0n, symbol: '', decimals: 0, tokenName: '' }
+    return emptyBalance({ address, chain })
   }
 
   const getBalances = async (accounts: GetBalanceParams[]): Promise<GetBalancesResult> => {

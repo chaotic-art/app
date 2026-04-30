@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ParaportParams } from '@paraport/vue'
-import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
+import type { AssetHubChain, SubstrateChain } from '~/types/chain'
 import { Paraport } from '@paraport/vue'
 import { isProduction } from '@/utils/env'
 
@@ -25,7 +25,7 @@ const { accountId } = useAuth()
 const { currentChain } = useChain()
 
 const endpoints = computed<ParaportParams['endpoints']>(() => {
-  const selectedProviderEntries = Object.entries(selectedProviders.value) as [SupportedChain, string | undefined][]
+  const selectedProviderEntries = Object.entries(selectedProviders.value) as [SubstrateChain, string | undefined][]
 
   return Object.fromEntries(
     selectedProviderEntries

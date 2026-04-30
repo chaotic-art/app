@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { HighestNftOffer } from '../trade/types'
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OdaToken, OnchainCollection } from '~/services/oda'
+import type { AssetHubChain } from '~/types/chain'
 
 interface Props {
   tokenData: OdaToken | null

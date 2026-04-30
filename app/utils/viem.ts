@@ -1,7 +1,21 @@
 import type { Chain } from 'viem'
+import type { EvmChain } from '~/types'
 import { createPublicClient, defineChain, http as viemHttp } from 'viem'
 
-export const CHAIN_POLKADOT_TESTNET = {
+interface ViemChainSpec {
+  id: number
+  slug: EvmChain
+  name: string
+  rpc: string
+  explorerUrl: string
+  nativeCurrency: {
+    name: string
+    decimals: number
+    symbol: string
+  }
+}
+
+export const CHAIN_POLKADOT_TESTNET: ViemChainSpec = {
   id: 420420417,
   slug: 'polkadot-testnet',
   name: 'Polkadot Hub TestNet',
@@ -12,9 +26,9 @@ export const CHAIN_POLKADOT_TESTNET = {
     decimals: 18,
     symbol: 'PAS',
   },
-} as const
+}
 
-export const CHAIN_POLKADOT_MAINNET = {
+const CHAIN_POLKADOT_MAINNET: ViemChainSpec = {
   id: 420420419,
   slug: 'polkadot',
   name: 'Polkadot Hub',
@@ -25,9 +39,9 @@ export const CHAIN_POLKADOT_MAINNET = {
     decimals: 18,
     symbol: 'DOT',
   },
-} as const
+}
 
-export const CHAIN_KUSAMA_MAINNET = {
+const CHAIN_KUSAMA_MAINNET: ViemChainSpec = {
   id: 420420418,
   slug: 'kusama',
   name: 'Kusama Hub',
@@ -38,32 +52,36 @@ export const CHAIN_KUSAMA_MAINNET = {
     decimals: 18,
     symbol: 'KSM',
   },
-} as const
+}
 
-export const supportedChains = [
-  CHAIN_POLKADOT_TESTNET,
-  CHAIN_POLKADOT_MAINNET,
-  CHAIN_KUSAMA_MAINNET,
-] as const
+export const supportedChains: Record<EvmChain, ViemChainSpec> = {
+  'kusama': CHAIN_KUSAMA_MAINNET,
+  'polkadot': CHAIN_POLKADOT_MAINNET,
+  'polkadot-testnet': CHAIN_POLKADOT_TESTNET,
+}
 
 /** Chains as viem Chain[] for wagmi and getPublicClient. */
-export const chainsForWagmi: Chain[] = supportedChains.map(c =>
+export const chainsForWagmi: Chain[] = Object.values(supportedChains).map(chain =>
   defineChain({
-    id: c.id,
-    name: c.name,
-    nativeCurrency: c.nativeCurrency,
-    rpcUrls: { default: { http: [c.rpc] } },
-    blockExplorers: { default: { name: c.name, url: c.explorerUrl } },
+    id: chain.id,
+    name: chain.name,
+    nativeCurrency: chain.nativeCurrency,
+    rpcUrls: { default: { http: [chain.rpc] } },
+    blockExplorers: { default: { name: chain.name, url: chain.explorerUrl } },
   }),
 )
 
 const publicClientCache = new Map<number, ReturnType<typeof createPublicClient>>()
 
+export function getViemChainSpec(chain: EvmChain): ViemChainSpec {
+  return supportedChains[chain]
+}
+
 /**
  * Public client for a given chain. Cached per chainId.
- * Defaults to testnet when no chainId is passed. For mainnet use getPublicClient(mainnetChainId).
+ * Requires an explicit chainId.
  */
-export function getPublicClient(chainId: number = supportedChains[0].id) {
+export function getPublicClient(chainId: number) {
   let client = publicClientCache.get(chainId)
   if (!client) {
     const chain = chainsForWagmi.find(c => c.id === chainId)

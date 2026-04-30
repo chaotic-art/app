@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ButtonConfig } from '@/components/common/button/FollowButton.client.vue'
 import type { Profile } from '@/services/profile'
+import type { AssetHubChain } from '~/types/chain'
 import { computed } from 'vue'
 import ProfileAvatar from '@/components/common/ProfileAvatar.vue'
 import ProfileShareDropdown from '@/components/profile/ProfileShareDropdown.vue'
@@ -16,45 +17,47 @@ const route = useRoute()
 const router = useRouter()
 const { currentChain } = useChain()
 const swapStore = useAtomicSwapStore()
+const chain = computed(() => currentChain.value as AssetHubChain)
+const tabCounts = ref<Partial<Record<string, number>>>({})
 
 const followButton = ref()
 const followModalTab = ref<'followers' | 'following'>('followers')
 const isFollowModalActive = ref(false)
 const isEditProfileModalActive = ref(false)
 
-const tabsItems = ref([
+const tabsItems = computed(() => [
   {
-    label: 'Owned',
+    label: tabCounts.value.owned ? `Owned (${tabCounts.value.owned})` : 'Owned',
     name: 'Owned',
     slot: 'owned',
     value: 'owned',
   },
   {
-    label: 'Created',
+    label: tabCounts.value.created ? `Created (${tabCounts.value.created})` : 'Created',
     name: 'Created',
     slot: 'created',
     value: 'created',
   },
   {
-    label: 'Collections',
+    label: tabCounts.value.collections ? `Collections (${tabCounts.value.collections})` : 'Collections',
     name: 'Collections',
     slot: 'collections',
     value: 'collections',
   },
   {
-    label: 'Activity',
+    label: tabCounts.value.activity ? `Activity (${tabCounts.value.activity})` : 'Activity',
     name: 'Activity',
     slot: 'activity',
     value: 'activity',
   },
   {
-    label: 'Offers',
+    label: tabCounts.value.offers ? `Offers (${tabCounts.value.offers})` : 'Offers',
     name: 'Offers',
     slot: 'offers',
     value: 'offers',
   },
   {
-    label: 'Swaps',
+    label: tabCounts.value.swaps ? `Swaps (${tabCounts.value.swaps})` : 'Swaps',
     name: 'Swaps',
     slot: 'swaps',
     value: 'swaps',
@@ -101,7 +104,9 @@ const createProfileConfig: ButtonConfig = {
 
 const activeTab = computed({
   get() {
-    return (route.query.tab as string) || 'owned'
+    const tab = route.query.tab as string | undefined
+    const visibleTabs = tabsItems.value.map(item => item.value)
+    return tab && visibleTabs.includes(tab) ? tab : 'owned'
   },
   set(tab) {
     router.replace({
@@ -133,14 +138,11 @@ const followersCount = computed(() => followers.value?.totalCount ?? 0)
 const followingCount = computed(() => following.value?.totalCount ?? 0)
 
 function onTotalCountChange(slot: string, totalCount: number) {
-  const tab = tabsItems.value.find(tab => tab.slot === slot)
-  if (tab) {
-    tab.label = totalCount > 0 ? `${tab.name} (${totalCount})` : tab.name
-  }
+  tabCounts.value[slot] = totalCount
 }
 
 async function onClickSwaps() {
-  const createdId = swapStore.createSwap(props.address, currentChain.value).id
+  const createdId = swapStore.createSwap(props.address, chain.value).id
   await navigateTo({
     name: getSwapStepRouteName(SwapStep.DESIRED),
     params: { id: props.address, chain: currentChain.value },

@@ -1,13 +1,15 @@
 import type { HighestNftOffer } from '~/components/trade/types'
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
+import type { AppChain } from '~/types/chain'
 import type { NftRarity } from '~/types/rarity'
 import { formatBalance } from 'dedot/utils'
 import { t } from 'try'
+import { getGraphqlEndpointChain, getSubstrateSourceChain } from '@/utils/chain'
 import { tokenEntityById } from '~/graphql/queries/token'
 import { highestOfferByNftId } from '~/graphql/queries/trades'
 import { fetchMimeType, fetchOdaCollection, fetchOdaToken } from '~/services/oda'
 import { isRarityTier, normalizeRarityTotalItems } from '~/types/rarity'
+import { parseAssetHubId } from '~/utils/nft'
 
 export async function fetchTokenMetadata(metadataUri: string) {
   const [ok, _, metadataData] = await t($fetch(sanitizeIpfsUrl(metadataUri), {
@@ -22,9 +24,9 @@ export async function fetchTokenMetadata(metadataUri: string) {
 }
 
 export function useToken(props: {
-  tokenId: number
-  collectionId: number
-  chain: AssetHubChain
+  tokenId: string
+  collectionId: string
+  chain: AppChain
   image?: string | null
   name?: string | null
   fetchRarity?: boolean
@@ -43,6 +45,10 @@ export function useToken(props: {
 
   const { $sdk, $apolloClient } = useNuxtApp()
   const { decimals, chainSymbol } = useChain()
+  const graphqlEndpoint = getGraphqlEndpointChain(props.chain)
+  const substrateSourceChain = getSubstrateSourceChain(props.chain)
+  const parsedCollectionId = parseAssetHubId(props.collectionId)
+  const parsedTokenId = parseAssetHubId(props.tokenId)
 
   // Calculate USD price from DOT price
   const { usd: usdPrice } = useAmount(computed(() => {
@@ -55,10 +61,11 @@ export function useToken(props: {
   onMounted(async () => {
     try {
       const rarityPromise = props.fetchRarity
+        && graphqlEndpoint
         ? $apolloClient.query({
             query: tokenEntityById,
             variables: { id: `${props.collectionId}-${props.tokenId}` },
-            context: { endpoint: props.chain },
+            context: { endpoint: graphqlEndpoint },
           }).catch(() => null)
         : Promise.resolve(null)
 
@@ -66,7 +73,13 @@ export function useToken(props: {
       const [tokenData, collectionData, highestOfferData, rarityData] = await Promise.all([
         fetchOdaToken(props.chain, props.collectionId.toString(), props.tokenId.toString()).catch(() => null),
         fetchOdaCollection(props.chain, props.collectionId.toString()).catch(() => null),
-        $apolloClient.query({ query: highestOfferByNftId, variables: { id: `${props.collectionId}-${props.tokenId}` } }).catch(() => null),
+        graphqlEndpoint
+          ? $apolloClient.query({
+              query: highestOfferByNftId,
+              variables: { id: `${props.collectionId}-${props.tokenId}` },
+              context: { endpoint: graphqlEndpoint },
+            }).catch(() => null)
+          : Promise.resolve(null),
         rarityPromise,
       ])
 
@@ -88,8 +101,10 @@ export function useToken(props: {
         }
       }
       if (!collectionCreator.value) {
-        const { api } = $sdk(props.chain)
-        const collectionOnChain = await api.query.Nfts.Collection.getValue(props.collectionId).catch(() => null)
+        const { api } = $sdk(substrateSourceChain)
+        const collectionOnChain = parsedCollectionId === null
+          ? null
+          : await api.query.Nfts.Collection.getValue(parsedCollectionId).catch(() => null)
         if (collectionOnChain?.owner) {
           collectionCreator.value = collectionOnChain.owner.toString()
         }
@@ -118,28 +133,30 @@ export function useToken(props: {
       }
 
       // fetch real-time price and owner
-      const { api } = $sdk(props.chain)
-      const [tokenMetadata, priceData, tokenItem] = await Promise.all([
-        api.query.Nfts.ItemMetadataOf.getValue(props.collectionId, props.tokenId),
-        api.query.Nfts.ItemPriceOf.getValue(props.collectionId, props.tokenId),
-        api.query.Nfts.Item.getValue(props.collectionId, props.tokenId),
-      ])
-      queryPrice.value = priceData?.[0]?.toString() ?? null
+      if (parsedCollectionId !== null && parsedTokenId !== null) {
+        const { api } = $sdk(substrateSourceChain)
+        const [tokenMetadata, priceData, tokenItem] = await Promise.all([
+          api.query.Nfts.ItemMetadataOf.getValue(parsedCollectionId, parsedTokenId),
+          api.query.Nfts.ItemPriceOf.getValue(parsedCollectionId, parsedTokenId),
+          api.query.Nfts.Item.getValue(parsedCollectionId, parsedTokenId),
+        ])
+        queryPrice.value = priceData?.[0]?.toString() ?? null
 
-      if (tokenItem?.owner) {
-        owner.value = tokenItem.owner.toString()
-      }
+        if (tokenItem?.owner) {
+          owner.value = tokenItem.owner.toString()
+        }
 
-      // re-check token metadata if token.value is null
-      const metadataUri = tokenMetadata?.data.asText()
-      if (!token.value && metadataUri) {
-        const metadata = await fetchTokenMetadata(metadataUri)
-        if (metadata) {
-          token.value = {
-            ...tokenData,
-            metadata,
-            price: tokenData?.price ?? null,
-            owner: tokenData?.owner ?? null,
+        // re-check token metadata if token.value is null
+        const metadataUri = tokenMetadata?.data.asText()
+        if (!token.value && metadataUri) {
+          const metadata = await fetchTokenMetadata(metadataUri)
+          if (metadata) {
+            token.value = {
+              ...tokenData,
+              metadata,
+              price: tokenData?.price ?? null,
+              owner: tokenData?.owner ?? null,
+            }
           }
         }
       }

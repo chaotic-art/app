@@ -1,6 +1,6 @@
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import type { MaybeRefOrGetter } from 'vue'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { toValue } from 'vue'
@@ -92,7 +92,7 @@ export function useNftForm(options?: MaybeRefOrGetter<UseNftFormOptions | undefi
       state.collection = ''
 
     try {
-      const { name, tokenDecimals, tokenSymbol } = chainSpec[chain]
+      const { name, tokenDecimals, tokenSymbol } = chainConfig[chain]
       balance.symbol = tokenSymbol
       balance.decimals = tokenDecimals
       balance.name = name
@@ -346,7 +346,7 @@ export function useNftForm(options?: MaybeRefOrGetter<UseNftFormOptions | undefi
         metadataUri: metadataUris,
         supply: formData.supply,
         properties: validProperties,
-        price: formData.listDirectly ? toNative(formData.price, chainSpec[state.blockchain].tokenDecimals) : undefined,
+        price: formData.listDirectly ? toNative(formData.price, chainConfig[state.blockchain].tokenDecimals) : undefined,
         context,
       })
 

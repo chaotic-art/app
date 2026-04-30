@@ -1,4 +1,6 @@
-import type { AssetHubChain, SupportedChain } from '~/plugins/sdk.client'
+import type { Chain } from '~/types'
+import type { AssetHubChain } from '~/types/chain'
+import { isAssetHubChain, isSubstrateChain } from '@/utils/chain'
 
 export async function getAssethubDeposit(chain: AssetHubChain) {
   const { $sdk } = useNuxtApp()
@@ -27,7 +29,7 @@ export async function getAssethubDeposit(chain: AssetHubChain) {
   }
 }
 
-export default function (prefix: Ref<SupportedChain>) {
+export default function (chainRef: Ref<Chain>) {
   const collectionDeposit = ref(0)
   const itemDeposit = ref(0)
   const metadataDeposit = ref(0)
@@ -50,7 +52,7 @@ export default function (prefix: Ref<SupportedChain>) {
       return
     }
 
-    const chain = prefix.value
+    const chain = chainRef.value
     loading.value = true
 
     const updateTotals = () => {
@@ -80,7 +82,7 @@ export default function (prefix: Ref<SupportedChain>) {
           metadataDeposit.value = Number(metadataDepositValue)
           attributeDeposit.value = Number(attributeDepositValue)
         }
-        else {
+        else if (isSubstrateChain(chain)) {
           const { $sdk } = useNuxtApp()
           const api = $sdk(chain).api
           const existential = Number(await api.constants.Balances.ExistentialDeposit())
@@ -90,6 +92,13 @@ export default function (prefix: Ref<SupportedChain>) {
           }
 
           existentialDeposit.value = existential
+          collectionDeposit.value = 0
+          itemDeposit.value = 0
+          metadataDeposit.value = 0
+          attributeDeposit.value = 0
+        }
+        else {
+          existentialDeposit.value = 0
           collectionDeposit.value = 0
           itemDeposit.value = 0
           metadataDeposit.value = 0

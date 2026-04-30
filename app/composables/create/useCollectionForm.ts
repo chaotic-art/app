@@ -1,5 +1,5 @@
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
@@ -63,7 +63,7 @@ export function useCollectionForm() {
     isFetchingBalance.value = true
 
     try {
-      const { name, tokenDecimals, tokenSymbol } = chainSpec[state.blockchain]
+      const { name, tokenDecimals, tokenSymbol } = chainConfig[state.blockchain]
       balance.symbol = tokenSymbol
       balance.decimals = tokenDecimals
       balance.name = name

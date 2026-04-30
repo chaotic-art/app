@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { AssetHubChain } from '~/types/chain'
 import { SwapStep } from '@/components/swap/types'
 import { getSwapStepRouteName } from '@/utils/swap'
 import { graphql } from '~/graphql/client'
@@ -6,6 +7,7 @@ import { graphql } from '~/graphql/client'
 const { isCurrentAccount, accountId } = useAuth()
 const { $i18n, $apolloClient } = useNuxtApp()
 const { currentChain } = useChain()
+const chain = computed(() => currentChain.value as AssetHubChain)
 
 const traderAddress = ref('')
 const isTraderAddressValid = ref(false)
@@ -45,7 +47,7 @@ function handleAddressCheck(isValid: boolean) {
 const swapStore = useAtomicSwapStore()
 
 async function handleSubmit() {
-  const createdId = swapStore.createSwap(traderAddress.value, currentChain.value).id
+  const createdId = swapStore.createSwap(traderAddress.value, chain.value).id
   await navigateTo({
     name: getSwapStepRouteName(SwapStep.DESIRED),
     params: { id: traderAddress.value, chain: currentChain.value },
@@ -57,6 +59,7 @@ watch([ownedCollections, accountId], async ([ownedCollections, account]) => {
   swapOffersCount.value = undefined
 
   if (!account) {
+    isLoadingSwapOffersCount.value = false
     return
   }
 
@@ -80,6 +83,9 @@ watch([ownedCollections, accountId], async ([ownedCollections, account]) => {
             }
           }
         `),
+        context: {
+          endpoint: chain.value,
+        },
       })
 
       swapOffersCount.value = response.data.swapsConnection.totalCount
@@ -91,6 +97,9 @@ watch([ownedCollections, accountId], async ([ownedCollections, account]) => {
     finally {
       isLoadingSwapOffersCount.value = false
     }
+  }
+  else if (ownedCollections !== undefined) {
+    isLoadingSwapOffersCount.value = false
   }
 }, { immediate: true })
 </script>

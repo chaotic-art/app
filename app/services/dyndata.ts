@@ -1,12 +1,12 @@
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { $fetch } from 'ofetch'
 
 const api = $fetch.create({
   baseURL: URLS.services.dyndata,
 })
 
-export async function generateIdAssethub(collectionId: number, prefix?: AssetHubChain) {
-  const id = await api(`/generate-id/${prefix}/${collectionId}`)
+export async function generateIdAssethub(collectionId: number, chain: AssetHubChain) {
+  const id = await api(`/generate-id/${chain}/${collectionId}`)
   return Number(id) + 1
 }
 

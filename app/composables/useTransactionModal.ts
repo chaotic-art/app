@@ -1,6 +1,6 @@
 import type { TxEvent } from 'polkadot-api'
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
+import type { AssetHubChain } from '~/types/chain'
 import type { TransactionError } from '~/utils/transactionError'
 import { whenever } from '@vueuse/core'
 import { resolveTransactionError } from '~/utils/transactionError'
@@ -12,7 +12,7 @@ export interface CollectionCategory {
   description: string
   image: string
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface NftCategory {
@@ -27,7 +27,7 @@ export interface NftCategory {
     price: number
     metadata: string
   }[]
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface ActionTransactionResult {
@@ -44,56 +44,56 @@ export interface ActionTransactionResult {
     }
   }[]
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface TransferTransactionResult {
   type: 'transfer'
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface CreateOfferTransactionResult {
   type: 'create_offer'
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface CreateSwapTransactionResult {
   type: 'create_swap'
   hash: string
   blockNumber: number
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface AcceptOfferTransactionResult {
   type: 'accept_offer'
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface CancelOfferTransactionResult {
   type: 'cancel_offer'
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface AcceptSwapTransactionResult {
   type: 'accept_swap'
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface CancelSwapTransactionResult {
   type: 'cancel_swap'
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface DestroyCollectionTransactionResult {
   type: 'collection_destroy'
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
   collectionId: number
 }
 
@@ -102,7 +102,7 @@ export interface UpdateAttributesTransactionResult {
   collectionId: string
   itemId: number
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 export interface BulkUpdateAttributesTransactionResult {
@@ -110,7 +110,7 @@ export interface BulkUpdateAttributesTransactionResult {
   collectionId: string
   itemIds: number[]
   hash: string
-  prefix: AssetHubChain
+  chain: AssetHubChain
 }
 
 type TransactionResult

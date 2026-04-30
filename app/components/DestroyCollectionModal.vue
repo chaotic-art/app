@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
 interface Props {

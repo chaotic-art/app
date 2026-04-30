@@ -1,4 +1,4 @@
-import type { SupportedChain } from '~/plugins/sdk.client'
+import type { SubstrateChain } from '~/types/chain'
 import { checkAddress } from '@polkadot/util-crypto'
 import { decodeAddress, encodeAddress } from 'dedot/utils'
 
@@ -9,9 +9,9 @@ export function shortenAddress(address: string): string {
 }
 
 /**
- * Generate Subscan URL for a given address and chain prefix
+ * Generate Subscan URL for a given address and chain
  */
-const chainMapping: Record<SupportedChain, string> = {
+const chainMapping: Record<SubstrateChain, string> = {
   dot: 'polkadot',
   ksm: 'kusama',
   ahp: 'assethub-polkadot',
@@ -19,16 +19,16 @@ const chainMapping: Record<SupportedChain, string> = {
   ahpas: 'assethub-paseo',
 }
 
-export function getSubscanAccountUrl(address: string, prefix: SupportedChain) {
-  return `https://${chainMapping[prefix]}.subscan.io/account/${address}`
+export function getSubscanAccountUrl(address: string, chain: SubstrateChain) {
+  return `https://${chainMapping[chain]}.subscan.io/account/${address}`
 }
 
-export function getSubscanExtrinsicUrl(hash: string, prefix: SupportedChain) {
-  return `https://${chainMapping[prefix]}.subscan.io/extrinsic/${hash}`
+export function getSubscanExtrinsicUrl(hash: string, chain: SubstrateChain) {
+  return `https://${chainMapping[chain]}.subscan.io/extrinsic/${hash}`
 }
 
-export function getSubscanNftUrl(id: string, prefix: SupportedChain) {
-  return `https://${chainMapping[prefix]}.subscan.io/nft_collection/${id}`
+export function getSubscanNftUrl(id: string, chain: SubstrateChain) {
+  return `https://${chainMapping[chain]}.subscan.io/nft_collection/${id}`
 }
 
 /**

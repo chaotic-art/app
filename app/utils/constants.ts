@@ -26,6 +26,7 @@ export const URLS = {
   graphql: {
     ahk: 'https://chaotic-ahk.stellate.sh/',
     ahp: 'https://chaotic-ahp.stellate.sh/',
+    ahpas: 'https://chaotic.squids.live/snack@v1/api/graphql',
   },
   providers: {
     coingecko: 'https://api.coingecko.com/api/v3',

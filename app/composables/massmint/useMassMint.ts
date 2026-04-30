@@ -1,5 +1,5 @@
 import type { NFTToMint } from '~/components/massmint/types'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { Binary } from 'polkadot-api'
 import { MultiAddress } from '~/descriptors/dist'
 import { pinDirectory, pinJson } from '~/services/storage'
@@ -133,7 +133,7 @@ export function useMassMint() {
       const nextItemId = Math.max(...queryNextItemId.map(item => Number(item.keyArgs[1])), 0) + 1
 
       const calls = []
-      const decimals = chainSpec[blockchain].tokenDecimals
+      const decimals = chainConfig[blockchain].tokenDecimals
 
       // Create mint transactions for each NFT
       for (let i = 0; i < nfts.length; i++) {
@@ -213,7 +213,7 @@ export function useMassMint() {
                 metadata: metadataResults[index]?.metadataUri || '',
               })),
               hash: hash.value,
-              prefix: blockchain,
+              chain: blockchain,
             }
 
             progress.value = {

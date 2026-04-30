@@ -7,7 +7,6 @@ const props = defineProps<{
 }>()
 
 const { $i18n } = useNuxtApp()
-const { prefix } = usePrefix()
 const { accountId } = useAuth()
 
 const items = computed<ItemMedia[]>(() =>
@@ -24,6 +23,7 @@ const items = computed<ItemMedia[]>(() =>
 
 const txHash = computed(() => props.result.hash)
 const singleListing = computed(() => props.result.items.length === 1)
+const resultChain = computed(() => props.result.chain)
 
 const shareText = computed(() => {
   if (singleListing.value) {
@@ -36,8 +36,8 @@ const shareText = computed(() => {
 })
 
 const url = computed(() => window.location.origin)
-const userProfilePath = computed(() => `/${prefix.value}/u/${accountId.value}`)
-const nftPath = computed(() => `/${prefix.value}/gallery/${items.value[0]?.id}`)
+const userProfilePath = computed(() => `/${resultChain.value}/u/${accountId.value}`)
+const nftPath = computed(() => `/${resultChain.value}/gallery/${items.value[0]?.id}`)
 
 const shareUrl = computed(() =>
   singleListing.value
@@ -68,6 +68,7 @@ const actionButtons = computed(() => ({
     :tx-hash="txHash"
     :share="share"
     :status="status"
+    :chain="resultChain"
     :action-buttons="actionButtons"
   >
     <SuccessfulItemsMedia

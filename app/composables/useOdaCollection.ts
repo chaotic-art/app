@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/vue-query'
+import { isAppChain } from '@/utils/chain'
 import { fetchOdaCollection } from '~/services/oda'
 
 export default function (collectionId: Ref<number | string>) {
@@ -6,7 +7,9 @@ export default function (collectionId: Ref<number | string>) {
 
   const { data: collection } = useQuery({
     queryKey: ['odaCollection', collectionId],
-    queryFn: () => fetchOdaCollection(currentChain.value, String(collectionId.value)).catch(() => null),
+    queryFn: () => isAppChain(currentChain.value)
+      ? fetchOdaCollection(currentChain.value, String(collectionId.value)).catch(() => null)
+      : Promise.resolve(null),
   })
 
   return {

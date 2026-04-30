@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TokenActivityData } from '~/graphql/queries/token'
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 import { encodeAddress, formatBalance } from 'dedot/utils'
 import { t } from 'try'
 import UserInfo from '~/components/common/UserInfo.vue'
@@ -115,8 +115,8 @@ watchEffect(async () => {
               }
 
               const [ok2, _2, format] = t(() => formatBalance(meta, {
-                decimals: chainSpec[chain].tokenDecimals,
-                symbol: chainSpec[chain].tokenSymbol,
+                decimals: chainConfig[chain].tokenDecimals,
+                symbol: chainConfig[chain].tokenSymbol,
               }))
               if (ok2 && format) {
                 return format

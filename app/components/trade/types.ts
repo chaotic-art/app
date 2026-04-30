@@ -1,7 +1,7 @@
 import type { SwapSurchargeDirection } from '@/composables/onchain/useNftPallets'
 import type { HighestOfferByNftIdData } from '~/graphql/queries/trades'
-import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { OnchainCollection } from '~/services/oda'
+import type { AssetHubChain } from '~/types/chain'
 
 export interface MakingOfferItem {
   id: string

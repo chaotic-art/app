@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AppChain } from '~/types/chain'
 import { fetchOdaCollection } from '~/services/oda'
 import { sanitizeIpfsUrl } from '~/utils/ipfs'
 
@@ -7,13 +7,12 @@ type ActionVariant = 'link' | 'studio-mode'
 
 interface Props {
   item: ReturnType<typeof useInfiniteCollections>['collections']['value'][number]
-  prefix?: AssetHubChain
+  chain: AppChain
   volume?: string
   actionVariant?: ActionVariant
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  prefix: 'ahp',
   volume: '',
   actionVariant: 'link',
 })
@@ -26,14 +25,34 @@ const collectionData = reactive({
 
 const imageStatus = ref<'normal' | 'placeholder'>('normal')
 
-const isPlaceholder = computed(() => imageStatus.value === 'placeholder' || !props.item.image)
+const isPlaceholder = computed(() => props.item.isPlaceholder || imageStatus.value === 'placeholder' || !props.item.image)
 
-onMounted(async () => {
-  const collection = await fetchOdaCollection(props.prefix, props.item.id)
-  collectionData.floor = collection.floor ?? 0
-  collectionData.items = Number(collection.claimed)
-  collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
-})
+function reset() {
+  collectionData.floor = 0
+  collectionData.items = 0
+  collectionData.uniqueOwners = 0
+}
+
+watch(
+  () => [props.chain, props.item.id, props.item.isPlaceholder] as const,
+  async ([chain, id, placeholder]) => {
+    if (placeholder) {
+      reset()
+      return
+    }
+
+    try {
+      const collection = await fetchOdaCollection(chain, id)
+      collectionData.floor = collection.floor ?? 0
+      collectionData.items = Number(collection.claimed)
+      collectionData.uniqueOwners = collection.uniqueOwnersCount ?? 0
+    }
+    catch {
+      reset()
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -42,7 +61,7 @@ onMounted(async () => {
   >
     <NuxtLink
       v-if="actionVariant === 'link'"
-      :to="`/${prefix}/collection/${item.id}`"
+      :to="`/${chain}/collection/${item.id}`"
       class="block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-xl"
     >
       <!-- Hero Banner Section -->
@@ -216,7 +235,7 @@ onMounted(async () => {
         </div>
         <div class="px-4 pb-4 flex gap-3">
           <UButton
-            :to="`/${prefix}/collection/${item.id}`"
+            :to="`/${chain}/collection/${item.id}`"
             variant="outline"
             color="neutral"
             class="flex-1 border border-border"
@@ -224,7 +243,7 @@ onMounted(async () => {
             View
           </UButton>
           <UButton
-            :to="`/${prefix}/studio/${item.id}`"
+            :to="`/${chain}/studio/${item.id}`"
             color="neutral"
             class="flex-1"
           >

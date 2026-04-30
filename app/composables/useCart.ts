@@ -1,4 +1,4 @@
-import type { AssetHubChain } from '~/plugins/sdk.client'
+import type { AssetHubChain } from '~/types/chain'
 
 export interface CartItem {
   id: string
@@ -14,8 +14,11 @@ export function useCart<T extends CartItem>({
   chain?: ComputedRef<AssetHubChain>
 } = {}) {
   // Defer useChain() so it doesn't run during middleware execution
-  const chain = computed<AssetHubChain>(() => currentChain?.value || useChain().currentChain.value)
-  const decimals = computed<number>(() => chainSpec[chain.value].tokenDecimals)
+  const chain = computed<AssetHubChain>(() => {
+    const activeChain = currentChain?.value ?? useChain().currentChain.value
+    return activeChain as AssetHubChain
+  })
+  const decimals = computed<number>(() => chainConfig[chain.value].tokenDecimals)
   const allItemsInChain = computed(() => items.value.filter(item => item.chain === chain.value))
   const itemsInChain = computed(() => allItemsInChain.value.filter(item => !item.discarded))
   const count = computed(() => itemsInChain.value.length)
