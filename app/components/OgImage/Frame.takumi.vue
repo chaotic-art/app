@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-// import { KODA_LOGO_URL } from '@/utils/constants'
+import type { SupportedChain } from '~/plugins/sdk.client'
 
-// inherited attrs can mess up the satori parser
+// inherited attrs can interfere with the OG image renderer
 defineOptions({
   inheritAttrs: false,
 })
 
 const props = defineProps<{
   title: string
-  image?: string
-  usd?: string
-  price?: string
-  symbol?: string
+  image: string
+  items: string
+  claimed: string
   network: string
 }>()
 
@@ -21,57 +20,50 @@ const cover: CSSProperties = {
   objectPosition: 'center',
 }
 
-const parseUsd = computed(() =>
-  props.usd && Number.parseFloat(props.usd) ? `$${Number.parseFloat(props.usd)}` : '--',
-)
-
-const parsePrice = computed(() =>
-  props.price && Number.parseFloat(props.price) ? `${Number.parseFloat(props.price)} ${props.symbol}` : '--',
-)
+const networkName = chainSpec[props.network as SupportedChain].name
 </script>
 
 <template>
-  <img v-if="image" :src="image" :alt="title" :style="cover" class="h-full w-full">
+  <img :src="image" :alt="title" :style="cover" class="h-full w-full">
 
   <div
     class="flex flex-col justify-end h-full w-full bg-slate-900/85 text-white p-20 text-2xl font-bold absolute inset-0"
   >
-    <img v-if="image" :src="image" :alt="title" class="w-30 rounded-md border border-white">
+    <img
+      :src="image"
+      :alt="title"
+      class="w-70 rounded-md border border-white"
+    >
     <h1 class="mb-6 font-bold">
       {{ title }}
     </h1>
     <div class="flex flex-row">
       <div>
         <div class="text-2xl font-bold m-0">
-          {{ network }}
+          {{ items }}
+        </div>
+        <div class="text-gray-400 m-0">
+          items
+        </div>
+      </div>
+
+      <div class="ml-16">
+        <div class="text-2xl font-bold m-0">
+          {{ claimed }}
+        </div>
+        <div class="text-gray-400 m-0">
+          claimed
+        </div>
+      </div>
+
+      <div class="ml-16">
+        <div class="text-2xl font-bold m-0">
+          {{ networkName }}
         </div>
         <div class="text-gray-400 m-0">
           network
         </div>
       </div>
-
-      <div v-if="usd" class="ml-20">
-        <div class="text-2xl font-bold m-0">
-          {{ parseUsd }}
-        </div>
-        <div class="text-gray-400 m-0">
-          price (usd)
-        </div>
-      </div>
-
-      <div v-if="price" class="ml-20">
-        <div class="text-2xl font-bold m-0">
-          {{ parsePrice }}
-        </div>
-        <div class="text-gray-400 m-0">
-          price
-        </div>
-      </div>
     </div>
   </div>
-
-  <!-- <img
-    :src="KODA_LOGO_URL" alt="logo"
-    class="absolute top-20 right-20 w-40"
-  > -->
 </template>
