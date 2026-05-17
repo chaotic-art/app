@@ -3,6 +3,7 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 import type { NFTMetadata } from '~/services/oda'
 import type { NftRarity } from '~/types/rarity'
 import { formatBalance } from 'dedot/utils'
+import { Binary } from 'polkadot-api'
 import { t } from 'try'
 import { tokenEntityById } from '~/graphql/queries/token'
 import { highestOfferByNftId } from '~/graphql/queries/trades'
@@ -131,7 +132,7 @@ export function useToken(props: {
       }
 
       // re-check token metadata if token.value is null
-      const metadataUri = tokenMetadata?.data.asText()
+      const metadataUri = tokenMetadata ? Binary.toText(tokenMetadata.data) : null
       if (!token.value && metadataUri) {
         const metadata = await fetchTokenMetadata(metadataUri)
         if (metadata) {
