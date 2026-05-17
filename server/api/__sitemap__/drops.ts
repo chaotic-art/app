@@ -1,5 +1,5 @@
-import type { SitemapUrl } from '#sitemap/types'
 import type { SitemapChain } from '~~/server/utils/sitemap/graphql'
+import type { SitemapUrl } from '#sitemap/types'
 import type { GenartDropItem } from '~/types/genart'
 
 import { $fetch } from 'ofetch'
