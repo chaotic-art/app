@@ -48,7 +48,7 @@
     "gql.tada": "^1.8.11",
     "jdenticon": "^3.3.0",
     "markdown-it": "^14.1.0",
-    "nuxt": "^4.2.0",
+    "nuxt": "^4.4.6",
     "nuxt-svgo": "4.2.6",
     "ofetch": "1.4.1",
     "pinia": "^3.0.3",
