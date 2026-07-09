@@ -35,6 +35,12 @@
   --radius-xl: calc(var(--ui-radius) + 4px);
 }
 
+:root {
+  /* Nuxt UI 4.7 injects its default theme after app CSS in dev/build, so keep this
+     unlayered override to prevent UContainer from falling back to 80rem. */
+  --ui-container: 1680px;
+}
+
 .dark {
   --ui-primary: #ffffff;
 }
