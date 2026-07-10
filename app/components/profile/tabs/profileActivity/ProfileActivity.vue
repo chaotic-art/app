@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { EventInteraction } from './types'
-import { sortBy } from 'lodash'
+import sortBy from 'lodash-es/sortBy'
 import { allEvents } from '~/graphql/queries/profiles'
 
 const props = defineProps<{
