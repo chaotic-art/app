@@ -40,12 +40,15 @@ export default defineNuxtConfig({
         '@kodadot1/static',
         '@tanstack/vue-query',
         'dedot/utils',
+        // Keep explicit so the needsInterop workaround always applies during pre-bundling.
         'eventemitter3',
         'jdenticon',
         'polkadot-api',
         'viem',
         'vue-dompurify-html',
       ],
+      // eventemitter3 ships mixed ESM/CJS entry points; force Vite interop for dev mode.
+      needsInterop: ['eventemitter3'],
     },
   },
   devtools: { enabled: true },
