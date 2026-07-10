@@ -86,8 +86,8 @@ const { canBurn, burnNow, canTransfer, transferNow } = useCartActions({
 const { shareOnX } = useSocialShare()
 
 // Action items for dropdown menu
-const actionItems = computed<DropdownMenuItem[]>(() => {
-  const items: DropdownMenuItem[] = [
+const actionItems = computed<DropdownMenuItem[][]>(() => {
+  const items: DropdownMenuItem[][] = [
     [
       {
         label: 'Share on X',
