@@ -24,11 +24,6 @@
 }
 
 @theme static {
-  --ui-container: 1680px;
-  --ui-primary: #000000;
-
-  /* override nuxt-ui radius */
-  --ui-radius: var(--radius);
   --radius-sm: calc(var(--ui-radius) - 4px);
   --radius-md: calc(var(--ui-radius) - 2px);
   --radius-lg: var(--ui-radius);
@@ -36,9 +31,11 @@
 }
 
 :root {
-  /* Nuxt UI 4.7 injects its default theme after app CSS in dev/build, so keep this
-     unlayered override to prevent UContainer from falling back to 80rem. */
+  /* Nuxt UI runtime tokens belong outside Tailwind's theme layer so its defaults
+     cannot override the app's container width and New York radius scale. */
   --ui-container: 1680px;
+  --ui-primary: #000000;
+  --ui-radius: var(--radius);
 }
 
 .dark {
