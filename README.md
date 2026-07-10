@@ -2,10 +2,10 @@
 
 [chaotic.art](https://chaotic.art) · [Design system](https://www.figma.com/design/XTcZsQREdo9574lTzqkMDL/Chaotic)
 
-![](https://github.com/user-attachments/assets/b2777451-c789-470e-bf9e-45445455204e)
+![Chaotic.art marketplace preview](https://github.com/user-attachments/assets/b2777451-c789-470e-bf9e-45445455204e)
 
 ## Table of Contents
-- [Live Product](#live-product)
+- [Live Product](https://chaotic.art)
 - [Product Highlights](#product-highlights)
 - [Tech Stack](#tech-stack)
 - [Architecture Overview](#architecture-overview)
