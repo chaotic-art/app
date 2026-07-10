@@ -39,6 +39,7 @@
     "@polkadot/util-crypto": "^14.0.3",
     "@posthog/nuxt": "^1.7.31",
     "@takumi-rs/core": "^1.1.2",
+    "@takumi-rs/wasm": "^1.8.7",
     "@tanstack/vue-query": "^5.100.10",
     "@unhead/vue": "^3.1.0",
     "@vueuse/core": "^14.3.0",
