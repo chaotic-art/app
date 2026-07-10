@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SwapSurcharge } from '@/composables/onchain/useNftPallets'
+import { Binary } from 'polkadot-api'
 import { fetchOdaToken } from '~/services/oda'
 import SurchargeTag from './SurchargeTag.vue'
 
@@ -33,7 +34,7 @@ async function getItem(id: string): Promise<ItemMedia> {
   const { api } = $sdk(currentChain.value)
 
   const meta = await api.query.Nfts.ItemMetadataOf.getValue(Number(collectionId), Number(tokenId))
-  const metadataUri = meta?.data.asText()
+  const metadataUri = meta ? Binary.toText(meta.data) : null
 
   if (!metadataUri) {
     return {
