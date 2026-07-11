@@ -49,7 +49,7 @@
 ## Getting Started
 
 ### Prerequisites
-- Node.js 20.x (Nuxt 4 target) and pnpm 9+
+- Node.js 24.x and pnpm 11.1.2
 
 ### Installation
 ```bash
