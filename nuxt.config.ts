@@ -38,12 +38,15 @@ export default defineNuxtConfig({
       include: [
         '@apollo/client',
         '@kodadot1/static',
+        '@polkadot/util-crypto',
         '@tanstack/vue-query',
         'dedot/utils',
         // Keep explicit so the needsInterop workaround always applies during pre-bundling.
         'eventemitter3',
         'jdenticon',
         'polkadot-api',
+        'polkadot-api/pjs-signer',
+        'polkadot-api/ws',
         'viem',
         'vue-dompurify-html',
       ],
