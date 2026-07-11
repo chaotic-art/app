@@ -50,6 +50,10 @@ export default function useSubscriptionGraphql<
         },
       })
 
+      if (!data) {
+        return
+      }
+
       const newResult = data
 
       if (!isEqual(newResult, lastQueryResult)) {

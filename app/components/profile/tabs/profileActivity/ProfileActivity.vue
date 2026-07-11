@@ -88,7 +88,7 @@ async function fetchProfileActivity() {
     },
   })
 
-  events.value = sortBy(response.data.events, 'timestamp')
+  events.value = sortBy(response.data?.events ?? [], 'timestamp')
   loading.value = false
 }
 

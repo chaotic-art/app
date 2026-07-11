@@ -73,7 +73,7 @@ export function useToken(props: {
 
       token.value = tokenData
       collection.value = collectionData
-      highestOffer.value = highestOfferData?.data.offers[0] as HighestNftOffer | null
+      highestOffer.value = highestOfferData?.data?.offers[0] ?? null
 
       owner.value = token.value?.owner ?? null
       collectionCreator.value = collection.value?.owner ?? null
@@ -96,7 +96,7 @@ export function useToken(props: {
         }
       }
 
-      const tokenRarityData = rarityData?.data.token
+      const tokenRarityData = rarityData?.data?.token
       const rarityTotalItems = normalizeRarityTotalItems(collectionData?.supply)
 
       rarity.value = tokenRarityData

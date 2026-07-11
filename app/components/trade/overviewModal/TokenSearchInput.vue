@@ -42,7 +42,7 @@ async function onSearch(searchKey: string = '') {
     context: { endpoint: currentChain.value },
   })
 
-  items.value = data.tokenEntities.map(token => ({
+  items.value = (data?.tokenEntities ?? []).map(token => ({
     label: token.name || '',
     value: token,
   }))
