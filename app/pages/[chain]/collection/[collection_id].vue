@@ -194,7 +194,7 @@ useSeoMeta({
   description: () => data.value?.collection?.metadata?.description?.slice(0, 150),
 })
 
-defineOgImageComponent('Frame', {
+defineOgImageComponent('FrameTakumi', {
   title: collectionName.value,
   image: sanitizeIpfsUrl(data.value?.collection?.metadata?.image),
   items: data.value?.collection?.supply,
