@@ -6,12 +6,19 @@ defineProps<{
 const { chainSymbol } = useChain()
 
 const price = defineModel<number | string>({ required: true, default: '' })
+
+const inputValue = computed({
+  get: () => String(price.value),
+  set: (value: string) => {
+    price.value = value
+  },
+})
 </script>
 
 <template>
   <div class="relative">
     <UInput
-      v-model="price"
+      v-model="inputValue"
       type="number"
       step="0.001"
       min="0"
