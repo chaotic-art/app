@@ -1,5 +1,4 @@
 import process from 'node:process'
-import { fileURLToPath } from 'node:url'
 import { publicEnv } from './env.public'
 
 const posthogProjectId = process.env.POSTHOG_PROJECT_ID || ''
@@ -11,29 +10,7 @@ const posthogSourcemapsEnabled = process.env.NODE_ENV === 'production'
   && Boolean(posthogPersonalApiKey)
 
 export default defineNuxtConfig({
-  alias: {
-    'polkadot-api/polkadot-sdk-compat': fileURLToPath(new URL('./app/utils/polkadotSdkCompat.ts', import.meta.url)),
-    'polkadot-api/ws-provider/node': fileURLToPath(new URL('./app/utils/polkadotWsProvider.ts', import.meta.url)),
-    'polkadot-api/ws-provider/web': fileURLToPath(new URL('./app/utils/polkadotWsProvider.ts', import.meta.url)),
-    'polkadot-api/ws-provider': fileURLToPath(new URL('./app/utils/polkadotWsProvider.ts', import.meta.url)),
-  },
   vite: {
-    resolve: {
-      alias: [
-        {
-          find: /^polkadot-api$/,
-          replacement: fileURLToPath(new URL('./app/utils/polkadotApiCompat.ts', import.meta.url)),
-        },
-        {
-          find: /^polkadot-api\/polkadot-sdk-compat$/,
-          replacement: fileURLToPath(new URL('./app/utils/polkadotSdkCompat.ts', import.meta.url)),
-        },
-        {
-          find: /^polkadot-api\/ws-provider(?:\/(?:web|node))?$/,
-          replacement: fileURLToPath(new URL('./app/utils/polkadotWsProvider.ts', import.meta.url)),
-        },
-      ],
-    },
     optimizeDeps: {
       include: [
         '@apollo/client',
