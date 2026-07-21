@@ -71,7 +71,7 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
       })
 
       if (!data) {
-        return
+        throw new Error('GraphQL query returned no data')
       }
 
       const newItems = extractData(data)
