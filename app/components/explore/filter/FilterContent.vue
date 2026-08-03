@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import type { SelectedTrait } from '~/components/trait/types'
+import type { ListedFilterMode } from '~/composables/useSearchFilters'
 import { formatCompactNumber } from '~/utils/format/balance'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   min: number
   max: number
   loading: boolean
   collectionId?: string
-}>()
+  unlistedDisabled?: boolean
+}>(), {
+  unlistedDisabled: false,
+})
 
 defineEmits<{
   'update:nft-ids': [nftIds: string[]]
@@ -18,6 +22,7 @@ const priceBy = defineModel<'token' | 'usd'>('priceBy', { required: true })
 const priceRange = defineModel<number[]>('priceRange', { required: true })
 const lastSale = defineModel<string>('lastSale', { required: true })
 const rarityPercentileRange = defineModel<number[]>('rarityPercentileRange', { required: true })
+const listedMode = defineModel<ListedFilterMode>('listedMode', { default: 'all' })
 
 const { chainSymbol } = useChain()
 
@@ -56,11 +61,55 @@ function normalizeRarityRange() {
     ? [nextMin, nextMax]
     : [nextMax, nextMin]
 }
+
+function selectListedMode(value: ListedFilterMode) {
+  if (value === 'unlisted' && props.unlistedDisabled) {
+    return
+  }
+
+  listedMode.value = value
+}
 </script>
 
 <template>
   <div class="text-muted-foreground text-sm">
     <div class="flex flex-col">
+      <div class="flex flex-col gap-3">
+        <span>{{ $t('explore.status') }}</span>
+
+        <div class="grid grid-cols-3 gap-2">
+          <UButton
+            size="sm"
+            :variant="listedMode === 'all' ? 'solid' : 'outline'"
+            class="w-full min-w-0 justify-center rounded-full px-3 text-center"
+            @click="selectListedMode('all')"
+          >
+            {{ $t('explore.all') }}
+          </UButton>
+
+          <UButton
+            size="sm"
+            :variant="listedMode === 'listed' ? 'solid' : 'outline'"
+            class="w-full min-w-0 justify-center rounded-full px-3 text-center"
+            @click="selectListedMode('listed')"
+          >
+            {{ $t('explore.buyNow') }}
+          </UButton>
+
+          <UButton
+            size="sm"
+            :variant="listedMode === 'unlisted' ? 'solid' : 'outline'"
+            class="w-full min-w-0 justify-center rounded-full px-3 text-center disabled:cursor-not-allowed"
+            :disabled="props.unlistedDisabled"
+            @click="selectListedMode('unlisted')"
+          >
+            {{ $t('explore.notListed') }}
+          </UButton>
+        </div>
+      </div>
+
+      <USeparator class="my-4" />
+
       <template v-if="collectionId">
         <FilterTraitSection
           :collection-id="collectionId"

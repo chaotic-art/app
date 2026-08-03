@@ -133,8 +133,8 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
 <template>
   <div class="space-y-6">
     <div>
-      <!-- Collection Information -->
-      <div v-if="collection" class="flex items-center gap-2">
+      <!-- Collection Information (always show; use fallback when ODA collection fails) -->
+      <div class="flex items-center gap-2">
         <NuxtLink
           :to="`/${chain}/collection/${collectionId || ''}`"
           class="font-medium transition-colors flex items-center gap-2 text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-500"
@@ -142,7 +142,7 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
           <!-- Collection Image -->
           <div class="size-6 rounded-full overflow-hidden bg-muted flex shrink-0 items-center">
             <img
-              v-if="collection.metadata?.image"
+              v-if="collection?.metadata?.image"
               :src="sanitizeIpfsUrl(collection.metadata.image)"
               :alt="collection.metadata?.name || 'Collection'"
               class="w-full h-full object-cover"
@@ -153,7 +153,7 @@ const actionItems = computed<DropdownMenuItem[]>(() => {
               class="size-4 text-muted-foreground m-auto"
             />
           </div>
-          {{ collection.metadata?.name || `Collection ${collectionId || ''}` }}
+          {{ collection?.metadata?.name || `Collection ${collectionId || ''}` }}
         </NuxtLink>
       </div>
 

@@ -144,7 +144,7 @@ export function useCollectionForm() {
     }
 
     const cidImages = await pinDirectory(filesToPin)
-    const image = `ipfs://${cidImages}/${logoFile.value?.name}`
+    const image = filesToPin.length === 1 ? `ipfs://${cidImages}` : `ipfs://${cidImages}/${logoFile.value?.name}`
     const banner = bannerFile.value ? `ipfs://${cidImages}/${bannerFile.value.name}` : undefined
 
     const metadata: any = {

@@ -7,7 +7,8 @@ import { interactionNameMap } from './utils'
 
 const props = defineProps<{
   events: EventInteraction[]
-  address: string
+  address?: string
+  distinguishBuyAndSell?: boolean
   loading?: boolean
 }>()
 
@@ -104,7 +105,7 @@ function createTable(): void {
         event.to = ''
         break
       case Interaction.BUY:
-        if (newEvent.caller !== props.address) {
+        if (!props.distinguishBuyAndSell || newEvent.caller !== props.address) {
           event.type = 'SELL'
         }
         event.from = newEvent.currentOwner
@@ -219,8 +220,8 @@ watch(() => props.events, () => {
       <template #type-cell="{ row }">
         <EventTag
           :interaction="row.original.type"
-          :interaction-name="(interactionNameMap({ distinguishBuyAndSell: true }) as Record<string, string>)[row.original.type] || ''"
-          distinguish-buy-and-sell
+          :interaction-name="(interactionNameMap({ distinguishBuyAndSell: props.distinguishBuyAndSell ?? true }) as Record<string, string>)[row.original.type] || ''"
+          :distinguish-buy-and-sell="props.distinguishBuyAndSell ?? true"
         />
       </template>
 

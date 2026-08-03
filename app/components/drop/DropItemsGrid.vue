@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { LocationQueryRaw } from 'vue-router'
-
 const props = defineProps<{
   collectionId: string
 }>()
@@ -12,14 +10,13 @@ const {
   normalizeSortKeys,
   buildOrderBy,
   requiresListed,
-  applySortQuery,
+  resolveSortQuery,
 } = useSortOptions('collectionItems')
 
 const selectedSortKeys = computed({
   get: () => normalizeSortKeys(route.query.sort),
   set: (value: string[]) => {
-    const query: LocationQueryRaw = { ...route.query }
-    applySortQuery(query, value)
+    const query = resolveSortQuery({ ...route.query }, value).query
 
     router.replace({ query })
   },

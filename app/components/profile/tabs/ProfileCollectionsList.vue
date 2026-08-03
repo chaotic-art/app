@@ -41,8 +41,13 @@ const queryState = computed({
   },
 })
 
+const { input: searchInput, onInput: handleSearchUpdate } = useDebouncedSyncedInput(
+  computed(() => queryState.value.search),
+  search => queryState.value = { ...queryState.value, search },
+)
+
 const queryVariables = computed(() => {
-  const keywordFilter = buildKeywordClause(queryState.value.search)
+  const keywordFilter = buildKeywordClause(queryState.value.search, { scope: 'collections' })
 
   return {
     orderBy: queryState.value.sort?.value || 'blockNumber_DESC',
@@ -58,11 +63,11 @@ const queryVariables = computed(() => {
   <div>
     <div class="flex items-center gap-2 mt-4">
       <UInput
-        :model-value="queryState.search"
+        :model-value="searchInput"
         placeholder="Search collections..."
         class="w-48"
         icon="i-heroicons-magnifying-glass"
-        @update:model-value="queryState = { ...queryState, search: $event }"
+        @update:model-value="handleSearchUpdate($event)"
       />
       <USelectMenu
         :model-value="queryState.sort"

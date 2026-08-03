@@ -1,27 +1,49 @@
 <script setup lang="ts">
 import type { SupportedChain } from '~/plugins/sdk.client'
-import { getBalance } from '~/utils/api/substrate'
+import { formatBalance } from 'dedot/utils'
 
-const { getConnectedSubAccount } = storeToRefs(useWalletStore())
+interface WalletSidebarBalanceRow {
+  chainId: string
+  freeBalance: string
+  freeBalanceFormatted: string
+  tokenName: string
+  tokenSymbol: string
+  usd: number
+  usdFormatted: string
+}
+
+const { getConnectedEvmAccount, getConnectedSubAccount } = storeToRefs(useWalletStore())
+const { currentChain } = useChain()
+const { usePolkaVmTestnet } = useFeatureFlags()
+const { getBalance } = useBalances()
 
 const mainNet: Exclude<SupportedChain, 'ahpas'>[] = ['dot', 'ksm', 'ahp', 'ahk']
-const balances = ref<Awaited<ReturnType<typeof getBalance>>[]>([])
+const balances = ref<Array<WalletSidebarBalanceRow | null>>([])
 const isLoading = ref(false)
 const fetchRun = ref(0)
 
+const expectedBalanceCount = computed(() =>
+  (getConnectedSubAccount.value ? mainNet.length : 0) + (getConnectedEvmAccount.value ? 1 : 0),
+)
+const polkaVmBalanceChain = computed<SupportedChain>(() => {
+  if (usePolkaVmTestnet.value) {
+    return 'ahpas'
+  }
+
+  return currentChain.value === 'ahk' ? 'ahk' : 'ahp'
+})
+
 const isEmpty = computed(() => !isLoading.value && balances.value.filter(Boolean).length === 0)
 
-// Computed values using real data directly
 const nonZeroBalances = computed(() =>
   balances.value
-    .map((balance, index) => balance ? { ...balance, chainId: mainNet[index] } : null)
     .filter((balance): balance is NonNullable<typeof balance> =>
       balance !== null && Number(balance.freeBalance) > 0,
     ),
 )
 
 const totalUsdValue = computed(() =>
-  nonZeroBalances.value.reduce((acc, balance) => acc + balance.usdNumeric, 0),
+  nonZeroBalances.value.reduce((acc, balance) => acc + balance.usd, 0),
 )
 
 const formattedTotal = computed(() =>
@@ -38,13 +60,32 @@ function handleAddFunds() {
   // Add funds functionality would be implemented here
 }
 
-watch(
-  () => getConnectedSubAccount.value?.address,
-  async (address, _, onCleanup) => {
-    balances.value = []
-    isLoading.value = Boolean(address)
+function toWalletSidebarBalanceRow(
+  chainId: SupportedChain,
+  balance: Awaited<ReturnType<typeof getBalance>>,
+): WalletSidebarBalanceRow {
+  const freeBalance = balance.balance.toString()
+  const usd = tokenToUsdValue(Number(freeBalance), balance.decimals, balance.symbol)
+  const usdFormatted = tokenToUsd(Number(freeBalance), balance.decimals, balance.symbol)
 
-    if (!address) {
+  return {
+    chainId,
+    freeBalance,
+    freeBalanceFormatted: formatBalance(freeBalance, { decimals: balance.decimals, symbol: balance.symbol }),
+    tokenName: balance.tokenName,
+    tokenSymbol: balance.symbol,
+    usd,
+    usdFormatted,
+  }
+}
+
+watch(
+  () => [getConnectedSubAccount.value?.address, getConnectedEvmAccount.value?.address] as const,
+  async ([subAddress, evmAddress], _, onCleanup) => {
+    balances.value = []
+    isLoading.value = Boolean(subAddress || evmAddress)
+
+    if (!subAddress && !evmAddress) {
       return
     }
 
@@ -55,18 +96,42 @@ watch(
       cancelled = true
     })
 
-    const promises = mainNet.map(async (chain, index) => {
-      try {
-        const balance = await getBalance(chain, address)
-        if (cancelled || currentRun !== fetchRun.value) {
+    const promises = [
+      ...mainNet.map(async (chain, index) => {
+        if (!subAddress) {
           return
         }
-        balances.value[index] = balance
-      }
-      catch (error) {
-        console.error(`Failed to load balance for ${chain}:`, error)
-      }
-    })
+
+        try {
+          const balance = await getBalance({ address: subAddress, chain })
+          if (cancelled || currentRun !== fetchRun.value) {
+            return
+          }
+
+          balances.value[index] = toWalletSidebarBalanceRow(chain, balance)
+        }
+        catch (error) {
+          console.error(`Failed to load balance for ${chain}:`, error)
+        }
+      }),
+      (async () => {
+        if (!evmAddress) {
+          return
+        }
+
+        try {
+          const balance = await getBalance({ address: evmAddress, chain: polkaVmBalanceChain.value })
+          if (cancelled || currentRun !== fetchRun.value) {
+            return
+          }
+
+          balances.value[mainNet.length] = toWalletSidebarBalanceRow(polkaVmBalanceChain.value, balance)
+        }
+        catch (error) {
+          console.error('Failed to load PolkaVM balance:', error)
+        }
+      })(),
+    ]
 
     await Promise.allSettled(promises)
 
@@ -112,7 +177,7 @@ watch(
           <!-- Right column: USD value and token amount -->
           <div class="text-right">
             <p class="text-sm font-medium text-foreground">
-              {{ balance.usd || '$0.00' }}
+              {{ balance.usdFormatted || '$0.00' }}
             </p>
             <p class="text-xs text-muted-foreground">
               {{ balance.freeBalanceFormatted }}
@@ -123,7 +188,7 @@ watch(
 
       <!-- Show loading skeletons for remaining items -->
       <div
-        v-for="i in (4 - balances.filter(Boolean).length)"
+        v-for="i in Math.max(expectedBalanceCount - balances.filter(Boolean).length, 0)"
         v-show="isLoading"
         :key="`loading-${i}`"
         class="py-1"

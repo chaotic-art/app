@@ -5,36 +5,48 @@ describe('useSearchFilters', () => {
   const { buildKeywordClause, buildNftSearchConstraints } = useSearchFilters()
 
   it('returns undefined keyword clause for empty phrase', () => {
-    expect(buildKeywordClause('')).toBeUndefined()
+    expect(buildKeywordClause('', { scope: 'collections' })).toBeUndefined()
   })
 
   it('returns undefined keyword clause for whitespace-only phrase', () => {
-    expect(buildKeywordClause('   ')).toBeUndefined()
+    expect(buildKeywordClause('   ', { scope: 'collections' })).toBeUndefined()
   })
 
-  it('builds OR keyword clause across name and metadata description', () => {
-    expect(buildKeywordClause('freak')).toEqual({
+  it('builds OR keyword clause across name, metadata description, and normalized attribute value', () => {
+    expect(buildKeywordClause('freak', { scope: 'nfts' })).toEqual({
       OR: [
         { name_containsInsensitive: 'freak' },
         { meta: { description_containsInsensitive: 'freak' } },
+        { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
       ],
     })
   })
 
   it('keeps phrase search intact without token splitting', () => {
-    expect(buildKeywordClause('blue red')).toEqual({
+    expect(buildKeywordClause('blue red', { scope: 'nfts' })).toEqual({
       OR: [
         { name_containsInsensitive: 'blue red' },
         { meta: { description_containsInsensitive: 'blue red' } },
+        { normalizedAttributes_some: { value_containsInsensitive: 'blue red' } },
       ],
     })
   })
 
   it('trims surrounding whitespace before building keyword clause', () => {
-    expect(buildKeywordClause('  blue red  ')).toEqual({
+    expect(buildKeywordClause('  blue red  ', { scope: 'nfts' })).toEqual({
       OR: [
         { name_containsInsensitive: 'blue red' },
         { meta: { description_containsInsensitive: 'blue red' } },
+        { normalizedAttributes_some: { value_containsInsensitive: 'blue red' } },
+      ],
+    })
+  })
+
+  it('keeps collection search limited to name and metadata description', () => {
+    expect(buildKeywordClause('freak', { scope: 'collections' })).toEqual({
+      OR: [
+        { name_containsInsensitive: 'freak' },
+        { meta: { description_containsInsensitive: 'freak' } },
       ],
     })
   })
@@ -51,6 +63,7 @@ describe('useSearchFilters', () => {
             OR: [
               { name_containsInsensitive: 'freak' },
               { meta: { description_containsInsensitive: 'freak' } },
+              { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
             ],
           },
         ],
@@ -67,6 +80,7 @@ describe('useSearchFilters', () => {
         OR: [
           { name_containsInsensitive: 'freak' },
           { meta: { description_containsInsensitive: 'freak' } },
+          { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
         ],
       },
       price_isNull: true,
@@ -82,6 +96,7 @@ describe('useSearchFilters', () => {
         OR: [
           { name_containsInsensitive: 'freak' },
           { meta: { description_containsInsensitive: 'freak' } },
+          { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
         ],
       },
     })
@@ -132,6 +147,7 @@ describe('useSearchFilters', () => {
             OR: [
               { name_containsInsensitive: 'freak' },
               { meta: { description_containsInsensitive: 'freak' } },
+              { normalizedAttributes_some: { value_containsInsensitive: 'freak' } },
             ],
           },
         ],

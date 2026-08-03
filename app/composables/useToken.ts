@@ -78,6 +78,23 @@ export function useToken(props: {
       collectionCreator.value = collection.value?.owner ?? null
       queryPrice.value = token.value?.price ?? null
 
+      // When ODA collection fails, fall back to genart then on-chain for collection creator
+      if (!collectionCreator.value) {
+        const [genartOk, _, genartRes] = await t($fetch<{ data: Array<{ creator?: string }> }>('/api/genart/list', {
+          query: { collection: props.collectionId.toString() },
+        }))
+        if (genartOk && genartRes?.data?.[0]?.creator) {
+          collectionCreator.value = genartRes.data[0].creator
+        }
+      }
+      if (!collectionCreator.value) {
+        const { api } = $sdk(props.chain)
+        const collectionOnChain = await api.query.Nfts.Collection.getValue(props.collectionId).catch(() => null)
+        if (collectionOnChain?.owner) {
+          collectionCreator.value = collectionOnChain.owner.toString()
+        }
+      }
+
       const tokenRarityData = rarityData?.data.token
       const rarityTotalItems = normalizeRarityTotalItems(collectionData?.supply)
 

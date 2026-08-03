@@ -1,15 +1,21 @@
 import type { SubstrateWalletAccount } from '@/utils/wallet/substrate/types'
 
+export interface EvmWalletAccount {
+  address: string
+}
+
 export function formatEvmAccounts({
   accounts,
-  wallet,
   extension,
-}: { extension: WalletExtension } & UseReownOnAccountChangeParams): WalletAccount[] {
+}: {
+  accounts: EvmWalletAccount[]
+  extension: WalletExtension
+}): WalletAccount[] {
   return accounts.map(account => ({
-    id: `${extension.id}:${wallet.rdns}/${account.address}`,
+    id: `${extension.id}:${account.address}`,
     vm: 'EVM',
     address: account.address,
-    icon: wallet.icon,
+    icon: extension.icon,
   }))
 }
 

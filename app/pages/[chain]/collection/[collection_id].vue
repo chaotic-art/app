@@ -2,13 +2,12 @@
 import type { LocationQueryRaw } from 'vue-router'
 import type { SelectedTrait } from '@/components/trait/types'
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import { CHAINS } from '@kodadot1/static'
 import { TradeTypes } from '@/components/trade/types'
 import { fetchOdaCollection } from '~/services/oda'
 import { normalizeRarityTotalItems } from '~/types/rarity'
-import { getSubscanAccountUrl } from '~/utils/format/address'
+import { chainSpec } from '~/utils/chain'
 
-const availableTabs = ['items', 'offers', 'swaps', 'traits', 'analytics'] as const
+const availableTabs = ['items', 'activity', 'offers', 'swaps', 'traits', 'analytics'] as const
 type CollectionTab = typeof availableTabs[number]
 
 const route = useRoute()
@@ -20,9 +19,10 @@ const {
   sortOptions,
   normalizeSortKeys,
   buildOrderBy,
-  requiresListed,
-  applySortQuery,
+  resolveSortQuery,
 } = useSortOptions('collectionItems')
+const { buildNftSearchConstraints } = useSearchFilters()
+const { listedMode, resolveListedForSort } = useExploreNftStatusFilter('collectionItems')
 
 const tabsItems = computed(() => [
   {
@@ -50,6 +50,12 @@ const tabsItems = computed(() => [
     value: 'traits',
   },
   {
+    label: 'Activity',
+    name: 'Activity',
+    slot: 'activity',
+    value: 'activity',
+  },
+  {
     label: t('analytics.tabs.analytics'),
     name: t('analytics.tabs.analytics'),
     slot: 'analytics',
@@ -73,17 +79,16 @@ const chain = computed(() => chainPrefix as AssetHubChain)
 const { data } = await useLazyAsyncData(
   `collection:${chain.value}:${collection_id}`,
   async () => {
-    const [collection, drops] = await Promise.all([
-      fetchOdaCollection(chain.value, collection_id?.toString() ?? ''),
+    const [collectionResult, drops] = await Promise.all([
+      fetchOdaCollection(chain.value, collection_id?.toString() ?? '').catch(() => null),
       $fetch('/api/genart/list', { query: { collection: collection_id?.toString() ?? '' } }),
     ])
 
-    return { collection, drops }
+    return { collection: collectionResult ?? null, drops }
   },
 )
 
 const collectionName = computed(() => data.value?.collection?.metadata?.name)
-const bannerUrl = computed(() => toOriginalContentUrl(sanitizeIpfsUrl(data.value?.collection?.metadata?.banner || data.value?.collection?.metadata?.image)))
 const collectionRarityTotalItems = computed(() => {
   return normalizeRarityTotalItems(data.value?.collection?.supply)
 })
@@ -91,8 +96,12 @@ const collectionRarityTotalItems = computed(() => {
 const selectedSortKeys = computed({
   get: () => normalizeSortKeys(route.query.sort),
   set: (value: string[]) => {
-    const query: LocationQueryRaw = { ...route.query }
-    applySortQuery(query, value)
+    let query: LocationQueryRaw = { ...route.query }
+    const currentSortKeys = normalizeSortKeys(route.query.sort)
+    const nextSortState = resolveSortQuery(query, value)
+    const nextSortKeys = nextSortState.sortKeys
+
+    query = resolveListedForSort(nextSortState.query, currentSortKeys, nextSortKeys)
 
     router.replace({ query })
   },
@@ -101,6 +110,7 @@ const selectedSortKeys = computed({
 const filteredNftIds = ref<string[]>([])
 const selectedTraits = ref<SelectedTrait[]>([])
 const isCollectionFiltersOpen = ref(false)
+const { viewMode: nftViewMode, gridClass: nftGridClass } = useNftViewMode('collection')
 
 const gridKey = computed(() => {
   const serializedQuery = serializeQueryForKey(route.query, NFT_GRID_NON_FETCH_QUERY_KEYS)
@@ -119,6 +129,9 @@ const queryVariables = computed(() => {
   }
 
   const searchFilters: Record<string, unknown>[] = []
+  const listedConstraints = buildNftSearchConstraints({
+    listedMode: listedMode.value,
+  })
 
   if (selectedTraits.value.length > 0) {
     searchFilters.push({ id_in: filteredNftIds.value })
@@ -127,14 +140,12 @@ const queryVariables = computed(() => {
   const nftFilters = buildNftSearchFilters({ query: route.query })
   searchFilters.push(...nftFilters)
 
-  if (requiresListed(selectedSortKeys.value)) {
-    const hasPriceConstraint = searchFilters.some(
-      filter => Object.hasOwn(filter, 'price_gt') || Object.hasOwn(filter, 'price_gte'),
-    )
+  if (listedConstraints.search) {
+    searchFilters.unshift(listedConstraints.search as Record<string, unknown>)
+  }
 
-    if (!hasPriceConstraint) {
-      searchFilters.unshift({ price_gt: '0' })
-    }
+  if (listedConstraints.price_isNull) {
+    baseVariables.price_isNull = listedConstraints.price_isNull
   }
 
   if (searchFilters.length > 0) {
@@ -174,7 +185,7 @@ function handleSelectedTraitsUpdate(traits: SelectedTrait[]) {
 definePageMeta({
   validate: async (route) => {
     const { chain } = route.params
-    return typeof chain === 'string' && chain in CHAINS
+    return typeof chain === 'string' && chain in chainSpec
   },
 })
 
@@ -195,99 +206,16 @@ defineOgImageComponent('Frame', {
 <template>
   <UContainer class="px-4 md:px-6 pb-6">
     <div>
-      <!-- Banner Section -->
-      <div class="relative w-full min-h-[340px] flex flex-col justify-end rounded-xl overflow-hidden">
-        <div
-          class="absolute inset-0 w-full h-full bg-muted"
-          :style="bannerUrl ? {
-            backgroundImage: `url('${bannerUrl}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          } : {}"
-        />
-
-        <div class="relative flex items-center px-8 py-8 z-10">
-          <div class="flex flex-col items-center">
-            <div class="w-36 h-36 rounded-xl overflow-hidden bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-4 border-white dark:border-gray-900 shadow-xl">
-              <img
-                v-if="data?.collection?.metadata?.image"
-                :src="sanitizeIpfsUrl(data.collection.metadata.image)"
-                :alt="data.collection.metadata.name || 'Collection'"
-                class="w-full h-full object-cover"
-              >
-              <div
-                v-else
-                class="w-full h-full flex items-center justify-center"
-              >
-                <UIcon name="i-heroicons-photo" class="w-12 h-12 text-gray-400" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="w-full">
-        <div class="flex justify-between flex-col md:flex-row gap-12">
-          <div class="flex flex-col flex-1">
-            <div class="my-4">
-              <div class="flex items-center justify-between mb-2">
-                <div class="text-2xl font-bold">
-                  {{ data?.collection?.metadata?.name || `Collection #${collection_id}` }}
-                </div>
-                <UButton
-                  v-if="isOwner"
-                  color="error"
-                  variant="outline"
-                  icon="i-heroicons-trash"
-                  @click="handleDestroyCollection"
-                >
-                  Delete Collection
-                </UButton>
-              </div>
-              <div v-if="data?.drops?.data[0]?.creator || data?.collection?.owner" class="flex items-center gap-1 text-muted-foreground">
-                <UserInfo :avatar-size="26" :address="data?.drops?.data[0]?.creator || data?.collection?.owner" class="min-w-0" />
-                <UButton
-                  :to="getSubscanAccountUrl((data?.drops?.data[0]?.creator || data?.collection?.owner) ?? '', chain)"
-                  target="_blank"
-                  variant="outline"
-                >
-                  Subscan
-                </UButton>
-                <UButton
-                  v-if="data?.drops?.data[0]?.alias"
-                  :to="`/${chain}/drops/${data.drops.data[0].alias}`"
-                  icon="i-heroicons-sparkles"
-                  variant="outline"
-                >
-                  View Drop: {{ data?.collection?.metadata?.name }}
-                </UButton>
-              </div>
-            </div>
-
-            <!-- Description -->
-            <MarkdownPreview
-              v-if="data?.collection?.metadata?.description"
-              :source="data.collection.metadata.description"
-            />
-          </div>
-
-          <!-- Quick Stats -->
-          <div class="pt-4 w-auto md:w-60 space-y-3">
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-500 dark:text-gray-400">Minted</span>
-              <span class="font-medium text-gray-900 dark:text-white">{{ data?.collection?.claimed || 0 }} / {{ unlimited(data?.collection?.supply) ? '∞' : data?.collection?.supply || 0 }}</span>
-            </div>
-
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-500 dark:text-gray-400">Floor Price</span>
-              <span class="font-medium text-gray-900 dark:text-white">
-                <Money v-if="data?.collection?.floor" inline :value="data?.collection?.floor" />
-                <span v-else class="text-gray-400 dark:text-gray-500">–</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CollectionHeader
+        :collection="data?.collection ?? null"
+        :collection-id="collection_id?.toString() ?? ''"
+        :chain="chain"
+        :creator="data?.drops?.data[0]?.creator"
+        :drop-alias="data?.drops?.data[0]?.alias"
+        :show-delete-button="true"
+        :is-owner="Boolean(isOwner)"
+        @delete="handleDestroyCollection"
+      />
 
       <USeparator class="my-12" />
 
@@ -315,12 +243,12 @@ defineOgImageComponent('Frame', {
                 </div>
 
                 <div class="w-auto flex items-center gap-2 ml-auto">
-                  <ArtViewFilter />
                   <SortOptions
                     v-model="selectedSortKeys"
                     :options="sortOptions"
                     class="w-40"
                   />
+                  <NftViewModeSelector scope="collection" />
                 </div>
               </StickyToolbarWrapper>
 
@@ -328,7 +256,8 @@ defineOgImageComponent('Frame', {
               <LazyNftsGrid
                 :key="gridKey"
                 :variables="queryVariables"
-                grid-class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6"
+                :grid-class="nftGridClass"
+                :view-mode="nftViewMode"
                 no-items-found-message="This collection doesn't have any items yet."
                 :prefix="chain"
                 :rarity-total-items="collectionRarityTotalItems"
@@ -336,6 +265,9 @@ defineOgImageComponent('Frame', {
               />
             </div>
           </ExploreFilters>
+        </template>
+        <template #activity>
+          <ProfileActivity :collection-id="collection_id?.toString() ?? ''" />
         </template>
         <template #offers>
           <CollectionTrades :trade-type="TradeTypes.Offer" />

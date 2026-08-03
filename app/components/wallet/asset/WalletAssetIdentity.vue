@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { isEvmAddress } from 'dedot/utils'
 import { copyAddress } from '~/utils/format/address'
 
-const { accountId } = useAuth()
+const { defaultAccount: accountId } = useAuth()
 const { walletConnectModalOpen } = storeToRefs(usePreferencesStore())
 const { walletAssetModal } = useWalletSidebar()
 const { logoutConnectedWallets } = useWalletManager()
+
+const canViewProfile = computed(() => !isEvmAddress(accountId.value))
 
 async function handleCopyAddress() {
   if (accountId.value) {
@@ -25,12 +28,13 @@ function handleWalletSettings() {
 
 <template>
   <div class="flex items-center justify-between">
-    <UserInfo v-if="accountId" :avatar-size="40" :address="accountId" :transparent-background="true" class="min-w-0" custom-name>
+    <UserInfo v-if="accountId" :avatar-size="40" :address="accountId" :transparent-background="true" class="min-w-0" custom-name :open-profile-on-click="canViewProfile">
       <template #name="{ addressName }">
         <div class="flex flex-col">
           <span class="text-sm font-medium text-foreground">{{ addressName }}</span>
           <span
             class="text-xs text-muted-foreground"
+            :class="{ 'cursor-not-allowed': !canViewProfile }"
           >
             View my profile
           </span>

@@ -2,7 +2,15 @@ import type { AssetHubChain } from '~/plugins/sdk.client'
 
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 
-export function useMassMintForm() {
+export interface UseMassMintFormOptions {
+  collectionId?: string
+  blockchain?: AssetHubChain
+}
+
+export function useMassMintForm(options?: Ref<UseMassMintFormOptions | undefined> | UseMassMintFormOptions) {
+  const optionsRef = computed(() => unref(options))
+  const isStudioContext = computed(() => Boolean(optionsRef.value?.collectionId && optionsRef.value?.blockchain))
+
   const { userCollection } = useNftPallets()
 
   // Wallet connection check
@@ -19,17 +27,29 @@ export function useMassMintForm() {
   const collections = ref<Array<{ label: string, value: string, name: string, description: string, image: string }>>([])
   const collectionsLoading = ref(false)
 
+  // Sync initial collection/chain when in studio context
+  watchEffect(() => {
+    const opts = optionsRef.value
+    if (opts?.collectionId && opts?.blockchain) {
+      state.collection = opts.collectionId
+      state.blockchain = opts.blockchain
+    }
+  })
+
   // Fetch collections and user balance on component mount
   watchEffect(async () => {
     if (!isWalletConnected.value)
       return
 
     collectionsLoading.value = true
-    state.collection = ''
+    if (!isStudioContext.value) {
+      state.collection = ''
+    }
 
     try {
+      const blockchain = state.blockchain
       // fetch user collections
-      const userCollections = await userCollection(state.blockchain)
+      const userCollections = await userCollection(blockchain)
 
       collections.value = userCollections
         .filter((collection): collection is NonNullable<typeof collection> => Boolean(collection && collection.id))
@@ -59,12 +79,10 @@ export function useMassMintForm() {
   })
 
   return {
-    // State
     state,
-
     collections,
     collectionsLoading,
     selectedCollection,
-
+    isStudioContext,
   }
 }

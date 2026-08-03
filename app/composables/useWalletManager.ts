@@ -24,22 +24,25 @@ export function useWalletSidebar() {
 
 export default function useWalletManager() {
   const walletStore = useWalletStore()
-  const { accountId } = useAuth()
   const { selectedAccounts, getUserConnectedWallets } = storeToRefs(walletStore)
   const accountStore = useAccountStore()
   const disconnectEvent = createEventHook<void>()
+  const { $wagmi } = useNuxtApp()
 
   async function disconnectWallet(wallet: WalletExtension) {
     const vm = wallet.vm
 
     if (vm === 'EVM' && import.meta.client) {
-      const { disconnect: disconnectReown } = useReown()
-
       try {
-        await disconnectReown()
+        const { disconnect, getConnections } = await import('@wagmi/core')
+        const connection = getConnections($wagmi.config).find(connection => connection.connector.id === wallet.id)
+
+        if (connection) {
+          await disconnect($wagmi.config, { connector: connection.connector })
+        }
       }
       catch (error) {
-        console.error('Error disconnecting reown wallet:', error)
+        console.error('Error disconnecting EVM wallet:', error)
       }
     }
 
@@ -67,7 +70,7 @@ export default function useWalletManager() {
   }
 
   whenever(
-    () => !accountId.value,
+    () => getUserConnectedWallets.value.length === 0,
     () => disconnectEvent.trigger(),
     { flush: 'sync' },
   )

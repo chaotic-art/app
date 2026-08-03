@@ -1,6 +1,4 @@
 export { default as MassMint } from './MassMint.vue'
-export { default as OnBoarding } from './Onboarding.vue'
-export { default as OnBoardingCard } from './OnBoardingCard.vue'
 export { default as OverviewTable } from './OverviewTable.vue'
 export * from './types'
 export { default as UploadPictures } from './upload/UploadCompressedMedia.vue'

@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import type { EventInteraction } from './types'
 import { sortBy } from 'lodash'
-import { allEventsByProfile } from '~/graphql/queries/profiles'
+import { allEvents } from '~/graphql/queries/profiles'
 
 const props = defineProps<{
-  address: string
+  address?: string
+  collectionId?: string
 }>()
 const emit = defineEmits(['totalCountChange'])
-
-const filters = ['sale', 'buy', 'mint', 'transfer', 'list']
 
 const route = useRoute()
 const router = useRouter()
@@ -16,8 +15,13 @@ const { $apolloClient } = useNuxtApp()
 const loading = ref(true)
 const events = ref<EventInteraction[]>([])
 
+const isProfileScope = computed(() => Boolean(props.address))
+const filters = computed(() => isProfileScope.value
+  ? ['sale', 'buy', 'mint', 'transfer', 'list']
+  : ['sale', 'mint', 'transfer', 'list'])
+
 const activeFilters = computed(() =>
-  filters.filter(queryParam => route.query[queryParam] === 'true'),
+  filters.value.filter(queryParam => route.query[queryParam] === 'true'),
 )
 
 const interactionToFilterMap = {
@@ -27,9 +31,37 @@ const interactionToFilterMap = {
   SEND: 'transfer',
 }
 
+const scopeId = computed(() => props.address || props.collectionId || '')
+const where = computed(() => {
+  if (props.address) {
+    return {
+      OR: [
+        { caller_eq: props.address },
+        { currentOwner_eq: props.address },
+      ],
+    }
+  }
+
+  if (props.collectionId) {
+    return {
+      nft: {
+        collection: {
+          id_eq: props.collectionId,
+        },
+      },
+    }
+  }
+
+  return undefined
+})
+
 const filteredEvents = computed(() =>
   events.value.filter(({ interaction, caller }) => {
     if (interaction === 'BUY') {
+      if (!isProfileScope.value) {
+        return activeFilters.value.includes('sale')
+      }
+
       return activeFilters.value.includes(caller === props.address ? 'buy' : 'sale')
     }
     return activeFilters.value.includes(interactionToFilterMap[interaction as keyof typeof interactionToFilterMap])
@@ -40,7 +72,7 @@ function selectAll() {
   router.replace({
     query: {
       ...route.query,
-      ...filters.reduce((acc, filter) => {
+      ...filters.value.reduce((acc, filter) => {
         Object.assign(acc, { [filter]: true })
         return acc
       }, {}),
@@ -50,9 +82,9 @@ function selectAll() {
 
 async function fetchProfileActivity() {
   const response = await $apolloClient.query({
-    query: allEventsByProfile,
+    query: allEvents,
     variables: {
-      id: props.address,
+      where: where.value,
     },
   })
 
@@ -61,12 +93,16 @@ async function fetchProfileActivity() {
 }
 
 onMounted(async () => {
+  if (!scopeId.value) {
+    return
+  }
+
   if (!activeFilters.value.length) {
     router.replace({
       query: {
         ...route.query,
-        buy: String(true),
         sale: String(true),
+        ...(isProfileScope.value ? { buy: String(true) } : {}),
       },
     })
   }
@@ -79,7 +115,7 @@ onMounted(async () => {
 
 <template>
   <div class="my-4">
-    <ProfileActivityTable :loading="loading" :events="filteredEvents" :address>
+    <ProfileActivityTable :loading="loading" :events="filteredEvents" :address="address" :distinguish-buy-and-sell="isProfileScope">
       <div class="flex gap-3">
         <UButton
           variant="ghost"

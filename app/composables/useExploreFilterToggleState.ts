@@ -2,17 +2,19 @@ import type { ExploreFilterScope } from '~/stores/preferences'
 import { hasQueryFilterValue } from '~/utils/query'
 
 interface ExploreActiveFiltersState {
+  hasStatusFilter: boolean
   hasPriceFilter: boolean
   hasLastSaleFilter: boolean
   hasRarityFilter: boolean
 }
 
 export function countExploreActiveFilters({
+  hasStatusFilter,
   hasPriceFilter,
   hasLastSaleFilter,
   hasRarityFilter,
 }: ExploreActiveFiltersState): number {
-  return Number(hasPriceFilter) + Number(hasLastSaleFilter) + Number(hasRarityFilter)
+  return Number(hasStatusFilter) + Number(hasPriceFilter) + Number(hasLastSaleFilter) + Number(hasRarityFilter)
 }
 
 export function useExploreFilterToggleState(scope: ExploreFilterScope) {
@@ -25,6 +27,7 @@ export function useExploreFilterToggleState(scope: ExploreFilterScope) {
 
   const activeFiltersCount = computed(() => {
     return countExploreActiveFilters({
+      hasStatusFilter: hasQueryFilterValue(route.query.listed),
       hasPriceFilter: hasQueryFilterValue(route.query.min_price) || hasQueryFilterValue(route.query.max_price),
       hasLastSaleFilter: hasQueryFilterValue(route.query.last_sale),
       hasRarityFilter: hasQueryFilterValue(route.query.min_rarity_percentile)

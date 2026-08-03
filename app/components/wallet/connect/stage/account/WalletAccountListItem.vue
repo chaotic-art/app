@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { SupportedChain } from '~/plugins/sdk.client'
 import { useQuery } from '@tanstack/vue-query'
 import { shortenAddress } from '@/utils/format/address'
 
@@ -14,22 +15,46 @@ const emit = defineEmits<{
 
 const toast = useToast()
 const { getBalance } = useBalances()
+const { currentChain } = useChain()
 const { selectedAccounts } = useWalletStore()
+const { usePolkaVmTestnet } = useFeatureFlags()
+
+const polkaVmBalanceChain = computed<SupportedChain>(() => {
+  if (usePolkaVmTestnet.value) {
+    return 'ahpas'
+  }
+
+  return currentChain.value === 'ahk' ? 'ahk' : 'ahp'
+})
 
 const { data: balanceData, isPending: isBalanceLoading } = useQuery({
-  queryKey: ['wallet-balance', props.account.address],
-  queryFn: () => {
-    return getBalance({
+  queryKey: ['wallet-balance', props.account.address, props.account.vm, currentChain, usePolkaVmTestnet],
+  queryFn: async () => {
+    if (props.account.vm === 'EVM') {
+      const balance = await getBalance({
+        address: props.account.address,
+        chain: polkaVmBalanceChain.value,
+      })
+
+      return {
+        usdFormatted: tokenToUsd(Number(balance.balance), balance.decimals, balance.symbol),
+      }
+    }
+
+    const balance = await getBalance({
       address: props.account.address,
-      prefix: 'ahp',
+      chain: 'ahp',
     })
+
+    return {
+      usdFormatted: tokenToUsd(Number(balance.balance), chainSpec.ahp.tokenDecimals, chainSpec.ahp.tokenSymbol),
+    }
   },
   staleTime: 30000,
   refetchInterval: 60000,
 })
 
-const balance = computed(() => balanceData.value?.balance?.toString() || '0')
-const usdBalance = computed(() => tokenToUsd(Number(balance.value), chainSpec.ahp.tokenDecimals, chainSpec.ahp.tokenSymbol))
+const usdBalance = computed(() => balanceData.value?.usdFormatted || '')
 
 function selectAccount(account: WalletAccount) {
   emit('select', account.id)
@@ -98,7 +123,7 @@ onMounted(async () => {
               class="h-3 w-12"
             />
             <span
-              v-else-if="account.vm === 'SUB'"
+              v-else-if="usdBalance"
               class="text-xs text-gray-600 dark:text-gray-400"
             >
               {{ usdBalance }}

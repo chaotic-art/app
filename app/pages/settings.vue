@@ -1,6 +1,8 @@
 <script setup lang="ts">
-definePageMeta({ title: 'Settings' })
-useSeoMeta({ title: 'Settings' })
+definePageMeta({
+  title: 'Settings',
+  robots: false,
+})
 </script>
 
 <template>

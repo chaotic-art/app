@@ -22,10 +22,14 @@ export function nativeToAmount(native: number, tokenDecimals: number): number {
 }
 
 export function tokenToUsd(amount: number, tokenDecimals: number, tokenSymbol: string) {
+  const value = tokenToUsdValue(amount, tokenDecimals, tokenSymbol)
+  return typeof value === 'number' && value >= 0 ? `$${value}` : ''
+}
+
+export function tokenToUsdValue(amount: number, tokenDecimals: number, tokenSymbol: string): number {
   const { getCurrentTokenValue } = useFiatStore()
-  const value = calculateUsdFromToken(
+  return calculateUsdFromToken(
     Number(amount) * 10 ** -tokenDecimals,
     Number(getCurrentTokenValue(tokenSymbol as Token)),
   )
-  return typeof value === 'number' && value >= 0 ? `$${value}` : ''
 }

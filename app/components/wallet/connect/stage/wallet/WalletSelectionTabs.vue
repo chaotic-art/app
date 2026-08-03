@@ -10,7 +10,7 @@ const value = defineModel({ type: String })
 const { t } = useI18n()
 
 const tabItems = computed(() => [
-  { label: t('wallet.all'), icon: 'i-lucide-wallet', value: Tabs.All },
+  { label: t('wallet.all'), value: Tabs.All },
   { label: t('wallet.polkadot'), icon: 'i-simple-icons-polkadot', value: Tabs.Polkadot },
   { label: t('wallet.evm'), icon: 'i-simple-icons-ethereum', value: Tabs.EVM },
 ])

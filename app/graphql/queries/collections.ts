@@ -106,7 +106,9 @@ export const nftAttributesListByCollection = graphql(`
   query nftAttributesListByCollection($id: String!) {
     nfts: nftEntities(where: {collection: {id_eq: $id}, burned_eq: false }) {
       id
+      name
       meta {
+        image
         attributes {
           trait
           value

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { SelectedTrait } from '~/components/trait/types'
+import type { ListedFilterMode } from '~/composables/useSearchFilters'
 import type { ExploreFilterScope } from '~/stores/preferences'
 import { whenever } from '@vueuse/core'
-import { countExploreActiveFilters } from '~/composables/useExploreFilterToggleState'
+import { listedModeToQueryValue } from '~/composables/useExploreNftStatusFilter'
 import { amountToNative, calculateTokenFromUsd, calculateUsdFromToken, nativeToAmount } from '~/utils/calculation'
 import { parseQueryNumber } from '~/utils/query'
 
@@ -50,18 +51,13 @@ const max = ref(REASONABLE_MAX_CAP)
 const priceRange = ref<[number, number]>([min.value, max.value])
 const lastSale = ref((route.query.last_sale as string) || '')
 const rarityPercentileRange = ref<[number, number]>(getNormalizedRarityPercentileRange())
-const { sidebarCollapsed } = useExploreFilterToggleState(props.filterScope)
+const listedMode = ref<ListedFilterMode>('all')
+
+const { sidebarCollapsed, activeFiltersCount } = useExploreFilterToggleState(props.filterScope)
+const statusFilter = useExploreNftStatusFilter(props.filterScope === 'collection' ? 'collectionItems' : 'exploreNfts')
 
 const tokenPrice = computed(() => Number(getCurrentTokenValue(chainSymbol.value as Token)) || 0)
 const loading = computed(() => tokenPrice.value === 0)
-
-const activeFiltersCount = computed(() => {
-  return countExploreActiveFilters({
-    hasPriceFilter: priceRange.value[0] !== min.value || priceRange.value[1] !== max.value,
-    hasLastSaleFilter: Boolean(lastSale.value),
-    hasRarityFilter: rarityPercentileRange.value[0] > 0 || rarityPercentileRange.value[1] < 100,
-  })
-})
 
 function updateQueryParams() {
   if (priceBy.value === 'usd' && !tokenPrice.value) {
@@ -85,6 +81,18 @@ function updateQueryParams() {
     min_rarity_percentile: rarityPercentileRange.value[0] > 0 ? String(rarityPercentileRange.value[0]) : undefined,
     max_rarity_percentile: rarityPercentileRange.value[1] < 100 ? String(rarityPercentileRange.value[1]) : undefined,
   }
+  const nextListedMode = statusFilter.unlistedDisabled.value && listedMode.value === 'unlisted'
+    ? 'listed'
+    : listedMode.value
+
+  const listedQueryValue = listedModeToQueryValue(nextListedMode)
+
+  if (listedQueryValue) {
+    query.listed = listedQueryValue
+  }
+  else {
+    delete query.listed
+  }
 
   router.replace({ query })
 }
@@ -99,6 +107,7 @@ function handleApplyFilters() {
 }
 
 function clearFilters() {
+  listedMode.value = 'all'
   priceBy.value = 'token'
   priceRange.value = [min.value, max.value]
   lastSale.value = ''
@@ -173,6 +182,14 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
     max.value = REASONABLE_MAX_CAP
   }
 })
+
+watch(
+  () => statusFilter.listedMode.value,
+  (value) => {
+    listedMode.value = value
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -212,6 +229,7 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
 
           <template #body>
             <FilterContent
+              v-model:listed-mode="listedMode"
               v-model:price-by="priceBy"
               v-model:price-range="priceRange"
               v-model:last-sale="lastSale"
@@ -220,6 +238,7 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
               :max="max"
               :loading="loading"
               :collection-id="props.collectionId"
+              :unlisted-disabled="statusFilter.unlistedDisabled.value"
               @update:nft-ids="(ids: string[]) => emit('update:nft-ids', ids)"
               @update:selected-traits="(traits: SelectedTrait[]) => emit('update:selected-traits', traits)"
             />
@@ -244,12 +263,9 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
           v-model="sidebarCollapsed"
           sticky
         >
-          <div class="p-3 border-b border-border">
-            <FilterHeader />
-          </div>
-
           <div class="p-3 overflow-y-auto max-h-[calc(100vh-300px)]">
             <FilterContent
+              v-model:listed-mode="listedMode"
               v-model:price-by="priceBy"
               v-model:price-range="priceRange"
               v-model:last-sale="lastSale"
@@ -258,6 +274,7 @@ watch(priceBy, (newPriceBy, oldPriceBy) => {
               :max="max"
               :loading="loading"
               :collection-id="props.collectionId"
+              :unlisted-disabled="statusFilter.unlistedDisabled.value"
               @update:nft-ids="(ids: string[]) => emit('update:nft-ids', ids)"
               @update:selected-traits="(traits: SelectedTrait[]) => $emit('update:selected-traits', traits)"
             />

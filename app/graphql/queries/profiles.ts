@@ -1,9 +1,9 @@
 import type { ResultOf } from '../client'
 import { graphql } from '../client'
 
-export const allEventsByProfile = graphql(`
-    query allEventsByProfile($id: String) {
-      events(where: { caller_eq: $id, OR: { currentOwner_eq: $id } }) {
+export const allEvents = graphql(`
+    query allEvents($where: EventWhereInput) {
+      events(where: $where) {
         meta
         interaction
         blockNumber
@@ -31,4 +31,4 @@ export const allEventsByProfile = graphql(`
     }
 `)
 
-export type AllEventsByProfileData = ResultOf<typeof allEventsByProfile>
+export type AllEventsData = ResultOf<typeof allEvents>

@@ -4,7 +4,9 @@ import { nftAttributesListByCollection } from '~/graphql/queries/collections'
 
 interface NftWithAttributes {
   id?: string
+  name?: string | null
   meta?: {
+    image?: string | null
     attributes?: Property[]
   }
 }
@@ -17,11 +19,11 @@ interface TraitValueMap {
 
 export function useCollectionAttributes({ collectionId }: { collectionId: ComputedRef<string | undefined> }) {
   const { $apolloClient } = useNuxtApp()
-
+  const { currentChain } = useChain()
   const nftsList = ref<NftWithAttributes[]>([])
   const loading = ref(false)
 
-  watch(collectionId, async (id) => {
+  async function fetchAttributes(id: string | undefined) {
     if (!id) {
       nftsList.value = []
       return
@@ -32,6 +34,10 @@ export function useCollectionAttributes({ collectionId }: { collectionId: Comput
       const { data } = await $apolloClient.query<NftAttributesListByCollectionData>({
         query: nftAttributesListByCollection,
         variables: { id },
+        fetchPolicy: 'network-only',
+        context: {
+          endpoint: currentChain.value,
+        },
       })
 
       nftsList.value = (data?.nfts || []) as NftWithAttributes[]
@@ -43,7 +49,9 @@ export function useCollectionAttributes({ collectionId }: { collectionId: Comput
     finally {
       loading.value = false
     }
-  }, { immediate: true })
+  }
+
+  watch(collectionId, id => fetchAttributes(id), { immediate: true })
 
   const attributesList = computed<Property[]>(() => {
     return (nftsList.value || []).reduce((acc, nft) => {
@@ -162,8 +170,10 @@ export function useCollectionAttributes({ collectionId }: { collectionId: Comput
   }
 
   return {
+    nftsList,
     getAttributeRarity,
     loading,
+    refetch: () => fetchAttributes(collectionId.value),
     attributesRarityMaps,
     traitCounts,
     totalNfts: computed(() => nftsList.value.length),

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ExploreNftsData } from '~/graphql/queries/explore'
+import { useDebounceFn } from '@vueuse/core'
 import { exploreNfts } from '~/graphql/queries/explore'
 
 const props = defineProps<{
@@ -47,6 +48,8 @@ async function onSearch(searchKey: string = '') {
   }))
 }
 
+const debouncedSearch = useDebounceFn((searchKey: string = '') => onSearch(searchKey), 300)
+
 onBeforeMount(onSearch)
 </script>
 
@@ -57,7 +60,7 @@ onBeforeMount(onSearch)
     open-on-focus
     size="lg"
     placeholder="Search tokens"
-    @update:search-term="onSearch"
+    @update:search-term="debouncedSearch"
     @change="() => {
       if (input?.value) {
         $emit('select', input.value)

@@ -25,6 +25,7 @@ export function interactionNameMap({ distinguishBuyAndSell }: MappingOptions = d
     MINT: 'Mint',
     SEND: 'Transfer',
     Offer: 'Offer',
+    SELL: 'Sale',
   }
 
   if (distinguishBuyAndSell) {
