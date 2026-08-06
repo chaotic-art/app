@@ -71,7 +71,7 @@ watchEffect(async () => {
     },
   })
 
-  tokenActivityData.value = data.events
+  tokenActivityData.value = data?.events ?? []
 })
 </script>
 

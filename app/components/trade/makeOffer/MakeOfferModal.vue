@@ -98,7 +98,7 @@ async function fetchUnusedOfferCollectionTokens(collectionId: string): Promise<s
   const { api } = $sdk(currentChain.value)
 
   try {
-    const { data: { offers: items } } = await $apolloClient.query({
+    const { data } = await $apolloClient.query({
       query: unusedOfferedItemsQuery,
       variables: {
         where: {
@@ -113,6 +113,7 @@ async function fetchUnusedOfferCollectionTokens(collectionId: string): Promise<s
         },
       },
     })
+    const items = data?.offers ?? []
 
     const keys = items.map(({ nft }) => [Number(collectionId), Number(nft.sn)] as [number, number])
 

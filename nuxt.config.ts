@@ -10,6 +10,27 @@ const posthogSourcemapsEnabled = process.env.NODE_ENV === 'production'
   && Boolean(posthogPersonalApiKey)
 
 export default defineNuxtConfig({
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@apollo/client',
+        '@kodadot1/static',
+        '@polkadot/util-crypto',
+        '@tanstack/vue-query',
+        'dedot/utils',
+        // Keep explicit so the needsInterop workaround always applies during pre-bundling.
+        'eventemitter3',
+        'jdenticon',
+        'polkadot-api',
+        'polkadot-api/pjs-signer',
+        'polkadot-api/ws',
+        'viem',
+        'vue-dompurify-html',
+      ],
+      // eventemitter3 ships mixed ESM/CJS entry points; force Vite interop for dev mode.
+      needsInterop: ['eventemitter3'],
+    },
+  },
   devtools: { enabled: true },
   sourcemap: {
     client: 'hidden',
@@ -134,7 +155,7 @@ export default defineNuxtConfig({
   },
 
   pinia: {
-    storesDirs: ['./app/stores/**'],
+    storesDirs: ['stores', 'stores/**'],
   },
 
   i18n: {

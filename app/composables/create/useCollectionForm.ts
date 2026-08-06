@@ -1,7 +1,7 @@
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import { LazyConfirmationModal } from '#components'
 import { formatBalance } from 'dedot/utils'
+import { LazyConfirmationModal } from '#components'
 import { useNftPallets } from '~/composables/onchain/useNftPallets'
 import { getAssethubDeposit } from '~/composables/useDeposit'
 import { pinDirectory, pinJson } from '~/services/storage'

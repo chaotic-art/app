@@ -1,7 +1,7 @@
 import type { DocumentNode } from 'graphql'
 import type { ResultOf, VariablesOf } from '~/graphql/client'
 import type { AssetHubChain } from '~/plugins/sdk.client'
-import isEqual from 'lodash/isEqual'
+import isEqual from 'lodash-es/isEqual'
 
 export default function useSubscriptionGraphql<
   TDoc extends DocumentNode,
@@ -49,6 +49,10 @@ export default function useSubscriptionGraphql<
           endpoint,
         },
       })
+
+      if (!data) {
+        return
+      }
 
       const newResult = data
 

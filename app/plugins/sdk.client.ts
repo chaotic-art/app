@@ -1,7 +1,6 @@
 import type { PolkadotClient, TypedApi } from 'polkadot-api'
 import { createClient } from 'polkadot-api'
-import { withPolkadotSdkCompat } from 'polkadot-api/polkadot-sdk-compat'
-import { getWsProvider } from 'polkadot-api/ws-provider/web'
+import { getWsProvider } from 'polkadot-api/ws'
 import { PROVIDERS } from '~/config/providers'
 import { ahk, ahp, ahpas, dot, ksm } from '~/descriptors'
 import { useRpcProviderStore } from '~/stores/rpcProvider'
@@ -76,9 +75,7 @@ function sdk(chain: Chain = DEFAULT_CHAIN) {
   if (!clients.value[effectiveChain]) {
     const rpcStore = useRpcProviderStore()
     const selectedEndpoint = rpcStore.getProvider(effectiveChain)
-    clients.value[effectiveChain] = createClient(
-      withPolkadotSdkCompat(getWsProvider({ endpoints: [selectedEndpoint] })),
-    )
+    clients.value[effectiveChain] = createClient(getWsProvider(selectedEndpoint))
   }
 
   return {

@@ -31,13 +31,10 @@ useSeoMeta({
   description: () => drop.metadata?.description?.slice(0, 150),
 })
 
-defineOgImage({
-  component: 'Drops',
-  props: {
-    title: drop.metadata.title,
-    image: drop.metadata?.image,
-    items: collectionData.claimed,
-  },
+defineOgImage('Drops', {
+  title: drop.metadata.title,
+  image: drop.metadata?.image,
+  items: collectionData.claimed,
 })
 </script>
 

@@ -2,8 +2,8 @@ import type { ResultOf } from '../client'
 import { graphql } from '../client'
 
 export const offersList = graphql(`
-    query offersList($where: OfferWhereInput!, $orderBy: [OfferOrderByInput!] = [blockNumber_DESC]) {
-        offers(where: $where, orderBy: $orderBy) {
+    query offersList($where: OfferWhereInput!, $limit: Int!, $orderBy: [OfferOrderByInput!] = [blockNumber_DESC]) {
+        offers(where: $where, limit: $limit, orderBy: $orderBy) {
         id
         expiration
         blockNumber
@@ -56,8 +56,8 @@ export const offersList = graphql(`
 export type OffersListData = ResultOf<typeof offersList>
 
 export const swapList = graphql(`
-    query swapsList($where: SwapWhereInput!, $orderBy: [SwapOrderByInput!] = [blockNumber_DESC]) {
-        swaps(where: $where, orderBy: $orderBy) {
+    query swapsList($where: SwapWhereInput!, $limit: Int!, $orderBy: [SwapOrderByInput!] = [blockNumber_DESC]) {
+        swaps(where: $where, limit: $limit, orderBy: $orderBy) {
         id
         expiration
         blockNumber

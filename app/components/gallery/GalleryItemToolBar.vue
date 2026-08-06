@@ -122,7 +122,7 @@ function reloadElement(selector: string) {
       return
     }
     if (mediaTypeElementSelectors[MediaType.IMAGE] === selector) {
-      const timestamp = new Date().getTime()
+      const timestamp = Date.now()
       const url = new URL(element.src)
       url.searchParams.set('t', timestamp.toString())
       element.src = url.toString()

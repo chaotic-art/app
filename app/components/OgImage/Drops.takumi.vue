@@ -9,13 +9,18 @@ defineOptions({
 defineProps<{
   title: string
   image?: string
-  items?: string
+  items?: string | number
 }>()
 
 const cover: CSSProperties = {
   objectFit: 'cover',
   objectPosition: 'center',
 }
+
+// Takumi preserves indentation around static text nodes, so keep labels interpolated.
+const labels = {
+  items: 'items',
+} as const
 </script>
 
 <template>
@@ -28,18 +33,18 @@ const cover: CSSProperties = {
       v-if="image"
       :src="image"
       :alt="title"
-      class="w-30 rounded-md border border-white"
+      class="w-30 h-30 object-cover rounded-md border border-white"
     >
-    <h1 class="mb-6 font-bold">
+    <h1 class="mt-10 mb-8 text-5xl leading-none font-bold">
       {{ title }}
     </h1>
     <div v-if="items" class="flex flex-row">
-      <div>
+      <div class="flex flex-col">
         <div class="text-2xl font-bold m-0">
           {{ items }}
         </div>
         <div class="text-gray-400 m-0">
-          items
+          {{ labels.items }}
         </div>
       </div>
     </div>

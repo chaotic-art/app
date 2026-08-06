@@ -50,14 +50,11 @@ useSeoMeta({
   description: () => item.metadata?.description?.slice(0, 150),
 })
 
-defineOgImage({
-  component: 'Gallery',
-  props: {
-    title: item.metadata?.name,
-    image: item.metadata?.image,
-    network: chainSpec[chainPrefix.value].name,
-    symbol: chainSpec[chainPrefix.value].tokenSymbol,
-  },
+defineOgImage('Gallery', {
+  title: item.metadata?.name,
+  image: item.metadata?.image,
+  network: chainSpec[chainPrefix.value].name,
+  symbol: chainSpec[chainPrefix.value].tokenSymbol,
 })
 
 const tokenMetadata = computed(() => {
