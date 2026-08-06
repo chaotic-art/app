@@ -10,8 +10,8 @@ defineOptions({
 const props = defineProps<{
   title: string
   image: string
-  items: number
-  claimed: number
+  items: string | number
+  claimed: string | number
   network: string
 }>()
 

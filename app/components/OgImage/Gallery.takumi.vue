@@ -10,8 +10,8 @@ defineOptions({
 const props = defineProps<{
   title: string
   image?: string
-  usd?: string
-  price?: string
+  usd?: string | number
+  price?: string | number
   symbol?: string
   network: string
 }>()
@@ -21,13 +21,22 @@ const cover: CSSProperties = {
   objectPosition: 'center',
 }
 
-const parseUsd = computed(() =>
-  props.usd && Number.parseFloat(props.usd) ? `$${Number.parseFloat(props.usd)}` : '--',
-)
+const parseUsd = computed(() => {
+  const usd = Number.parseFloat(String(props.usd ?? ''))
+  return usd ? `$${usd}` : '--'
+})
 
-const parsePrice = computed(() =>
-  props.price && Number.parseFloat(props.price) ? `${Number.parseFloat(props.price)} ${props.symbol}` : '--',
-)
+const parsePrice = computed(() => {
+  const price = Number.parseFloat(String(props.price ?? ''))
+  return price ? `${price} ${props.symbol}` : '--'
+})
+
+// Takumi preserves indentation around static text nodes, so keep labels interpolated.
+const labels = {
+  network: 'network',
+  priceUsd: 'price (usd)',
+  price: 'price',
+} as const
 </script>
 
 <template>
@@ -36,35 +45,35 @@ const parsePrice = computed(() =>
   <div
     class="flex flex-col justify-end h-full w-full bg-slate-900/85 text-white p-20 text-2xl font-bold absolute inset-0"
   >
-    <img v-if="image" :src="image" :alt="title" class="w-30 rounded-md border border-white">
-    <h1 class="mb-6 font-bold">
+    <img v-if="image" :src="image" :alt="title" class="w-30 h-30 object-cover rounded-md border border-white">
+    <h1 class="mt-10 mb-8 text-5xl leading-none font-bold">
       {{ title }}
     </h1>
     <div class="flex flex-row">
-      <div>
+      <div class="flex flex-col">
         <div class="text-2xl font-bold m-0">
           {{ network }}
         </div>
         <div class="text-gray-400 m-0">
-          network
+          {{ labels.network }}
         </div>
       </div>
 
-      <div v-if="usd" class="ml-20">
+      <div v-if="usd" class="flex flex-col ml-20">
         <div class="text-2xl font-bold m-0">
           {{ parseUsd }}
         </div>
         <div class="text-gray-400 m-0">
-          price (usd)
+          {{ labels.priceUsd }}
         </div>
       </div>
 
-      <div v-if="price" class="ml-20">
+      <div v-if="price" class="flex flex-col ml-20">
         <div class="text-2xl font-bold m-0">
           {{ parsePrice }}
         </div>
         <div class="text-gray-400 m-0">
-          price
+          {{ labels.price }}
         </div>
       </div>
     </div>
