@@ -4,12 +4,12 @@ defineProps<{
 }>()
 
 defineEmits<{
-  (e: 'update:query-variables', value: Record<string, any>): void
+  (e: 'update:queryVariables', value: Record<string, any>): void
 }>()
 </script>
 
 <template>
   <NftsToolbar
-    @update:query-variables="$emit('update:query-variables', $event)"
+    @update:query-variables="$emit('update:queryVariables', $event)"
   />
 </template>

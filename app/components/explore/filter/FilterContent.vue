@@ -14,8 +14,8 @@ const props = withDefaults(defineProps<{
 })
 
 defineEmits<{
-  'update:nft-ids': [nftIds: string[]]
-  'update:selected-traits': [selectedTraits: SelectedTrait[]]
+  'update:nftIds': [nftIds: string[]]
+  'update:selectedTraits': [selectedTraits: SelectedTrait[]]
 }>()
 
 const priceBy = defineModel<'token' | 'usd'>('priceBy', { required: true })
@@ -113,8 +113,8 @@ function selectListedMode(value: ListedFilterMode) {
       <template v-if="collectionId">
         <FilterTraitSection
           :collection-id="collectionId"
-          @update:nft-ids="(ids: string[]) => $emit('update:nft-ids', ids)"
-          @update:selected-traits="(traits: SelectedTrait[]) => $emit('update:selected-traits', traits)"
+          @update:nft-ids="(ids: string[]) => $emit('update:nftIds', ids)"
+          @update:selected-traits="(traits: SelectedTrait[]) => $emit('update:selectedTraits', traits)"
         />
 
         <USeparator class="my-4" />
