@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { MarkdownIt as MarkdownItInstance } from 'markdown-it'
 import MarkdownIt from 'markdown-it'
 import Prism from 'prismjs'
 
@@ -6,7 +7,7 @@ defineProps<{
   source: string
 }>()
 
-const markdown: MarkdownIt = new MarkdownIt({
+const markdown: MarkdownItInstance = new MarkdownIt({
   breaks: true,
   linkify: true,
   highlight: (code: string, lang: string): string => {

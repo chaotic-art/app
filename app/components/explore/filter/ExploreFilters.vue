@@ -18,8 +18,8 @@ const props = withDefaults(defineProps<{
 })
 
 const emit = defineEmits<{
-  'update:nft-ids': [nftIds: string[]]
-  'update:selected-traits': [selectedTraits: SelectedTrait[]]
+  'update:nftIds': [nftIds: string[]]
+  'update:selectedTraits': [selectedTraits: SelectedTrait[]]
 }>()
 
 const REASONABLE_MAX_CAP = 100_000
@@ -239,8 +239,8 @@ watch(
               :loading="loading"
               :collection-id="props.collectionId"
               :unlisted-disabled="statusFilter.unlistedDisabled.value"
-              @update:nft-ids="(ids: string[]) => emit('update:nft-ids', ids)"
-              @update:selected-traits="(traits: SelectedTrait[]) => emit('update:selected-traits', traits)"
+              @update:nft-ids="(ids: string[]) => emit('update:nftIds', ids)"
+              @update:selected-traits="(traits: SelectedTrait[]) => emit('update:selectedTraits', traits)"
             />
           </template>
 
@@ -275,8 +275,8 @@ watch(
               :loading="loading"
               :collection-id="props.collectionId"
               :unlisted-disabled="statusFilter.unlistedDisabled.value"
-              @update:nft-ids="(ids: string[]) => emit('update:nft-ids', ids)"
-              @update:selected-traits="(traits: SelectedTrait[]) => $emit('update:selected-traits', traits)"
+              @update:nft-ids="(ids: string[]) => emit('update:nftIds', ids)"
+              @update:selected-traits="(traits: SelectedTrait[]) => $emit('update:selectedTraits', traits)"
             />
           </div>
 

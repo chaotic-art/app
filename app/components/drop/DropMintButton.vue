@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { DropItem } from '@/types'
-import { useNow } from '@vueuse/core'
+import { useIntervalFn, useNow } from '@vueuse/core'
 import { parseCETDate } from '@/components/drop/utils'
 import useDropMint from '~/composables/drop/useDropMint'
 
@@ -19,7 +19,7 @@ const { drop: storeDrop, amountToMint, previewItem } = storeToRefs(useDropStore(
 const { $i18n } = useNuxtApp()
 const { mint } = useDropMint()
 const { isLogIn } = useAuth()
-const now = useNow({ interval: 10_000 })
+const now = useNow({ scheduler: cb => useIntervalFn(cb, 10_000) })
 
 const drop = computed(() => props.isDropPage ? storeDrop.value : props.drop)
 

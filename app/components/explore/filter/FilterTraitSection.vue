@@ -6,8 +6,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'update:nft-ids': [nftIds: string[]]
-  'update:selected-traits': [selectedTraits: SelectedTrait[]]
+  'update:nftIds': [nftIds: string[]]
+  'update:selectedTraits': [selectedTraits: SelectedTrait[]]
 }>()
 
 const { attributesRarityMaps, traitCounts, loading: traitsLoading, getNftIdsByTraits } = useCollectionAttributes({
@@ -79,14 +79,14 @@ function toggleValue(traitType: string, value: string) {
     selectedTraits.value.push({ traitType, value })
   }
 
-  emit('update:selected-traits', selectedTraits.value)
-  emit('update:nft-ids', getNftIdsByTraits(selectedTraits.value))
+  emit('update:selectedTraits', selectedTraits.value)
+  emit('update:nftIds', getNftIdsByTraits(selectedTraits.value))
 }
 
 function clearTraitFilters() {
   selectedTraits.value = []
-  emit('update:nft-ids', [])
-  emit('update:selected-traits', [])
+  emit('update:nftIds', [])
+  emit('update:selectedTraits', [])
 }
 
 function clearTraitSearch() {
