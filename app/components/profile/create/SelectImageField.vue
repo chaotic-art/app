@@ -20,13 +20,13 @@ function clear() {
   emit('clear')
 }
 
-function fileSelected(file: File | null) {
+function fileSelected(file: File | null | undefined) {
   if (file && props.maxSizeInMb && file.size > props.maxSizeInMb * ONE_MB) {
     vSelectedFile.value = null
     errorMessage(`The uploaded file exceeds the ${props.maxSizeInMb}MB size limit.`)
     return
   }
-  vSelectedFile.value = file
+  vSelectedFile.value = file ?? null
 }
 </script>
 
@@ -39,7 +39,7 @@ function fileSelected(file: File | null) {
     expanded
     native
     class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
-    @update:model-value="fileSelected as unknown"
+    @update:model-value="fileSelected"
   >
     <div
       class="flex items-center gap-4 relative"
