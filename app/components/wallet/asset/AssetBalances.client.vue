@@ -33,7 +33,7 @@ const polkaVmBalanceChain = computed<SupportedChain>(() => {
   return currentChain.value === 'ahk' ? 'ahk' : 'ahp'
 })
 
-const isEmpty = computed(() => !isLoading.value && balances.value.filter(Boolean).length === 0)
+const isEmpty = computed(() => !isLoading.value && !balances.value.some(Boolean))
 
 const nonZeroBalances = computed(() =>
   balances.value
