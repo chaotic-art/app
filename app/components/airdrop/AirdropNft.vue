@@ -252,7 +252,7 @@ onBeforeUnmount(() => {
           {{ $t('airdrop.upTo', [totalNftCount]) }}
         </div>
       </div>
-      <UDivider class="my-5" />
+      <USeparator class="my-5" />
 
       <div class="mb-6">
         <div class="font-semibold mb-3">
@@ -412,7 +412,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <UDivider class="my-5" />
+        <USeparator class="my-5" />
 
         <div class="flex items-center gap-2 text-sm mb-4">
           <UIcon
