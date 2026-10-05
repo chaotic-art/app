@@ -7,9 +7,9 @@ const props = withDefaults(defineProps<{
   rowClass: '',
 })
 
-const containerRef = ref<HTMLElement | null>(null)
-const anchorRef = ref<HTMLElement | null>(null)
-const rowRef = ref<HTMLElement | null>(null)
+const containerRef = useTemplateRef<HTMLElement>('containerRef')
+const anchorRef = useTemplateRef<HTMLElement>('anchorRef')
+const rowRef = useTemplateRef<HTMLElement>('rowRef')
 
 const { bottom: anchorBottom } = useElementBounding(anchorRef)
 const { left: containerLeft, width: containerWidth } = useElementBounding(containerRef)

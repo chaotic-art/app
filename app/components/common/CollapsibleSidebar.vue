@@ -16,9 +16,9 @@ const FIXED_BOTTOM_OFFSET = 16
 
 const isCollapsed = defineModel({ type: Boolean })
 
-const target = ref<HTMLElement | null>(null)
-const sidebarRef = ref<HTMLElement | null>(null)
-const containerRef = ref<HTMLElement | null>(null)
+const target = useTemplateRef<HTMLElement>('target')
+const sidebarRef = useTemplateRef<HTMLElement>('sidebarRef')
+const containerRef = useTemplateRef<HTMLElement>('containerRef')
 
 const scrolledPastTop = ref(false)
 const hasScrolledPastTarget = computed(() => props.sticky && scrolledPastTop.value)
