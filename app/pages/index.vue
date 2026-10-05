@@ -3,7 +3,7 @@ useSeoMeta({
   title: 'Polkadot NFT Marketplace for Generative Art',
 })
 
-defineOgImageComponent('OgBase')
+defineOgImage('OgBase')
 </script>
 
 <template>

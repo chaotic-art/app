@@ -11,7 +11,7 @@ const price = defineModel<number | string>({ required: true, default: '' })
 <template>
   <div class="relative">
     <UInput
-      v-model="price"
+      v-model.number="price"
       type="number"
       step="0.001"
       min="0"

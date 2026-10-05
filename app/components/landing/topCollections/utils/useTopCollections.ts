@@ -87,7 +87,7 @@ export function useTopCollections(limit: number) {
       })
 
       topCollectionWithVolumeList.value = []
-      collectionsSalesResults.value = result.data
+      collectionsSalesResults.value = result.data ?? null
 
       if (
         collectionsSalesResults.value

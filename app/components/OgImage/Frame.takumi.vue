@@ -2,7 +2,7 @@
 import type { CSSProperties } from 'vue'
 import type { SupportedChain } from '~/plugins/sdk.client'
 
-// inherited attrs can mess up the satori parser
+// inherited attrs can interfere with the OG image renderer
 defineOptions({
   inheritAttrs: false,
 })
@@ -10,8 +10,8 @@ defineOptions({
 const props = defineProps<{
   title: string
   image: string
-  items: string
-  claimed: string
+  items: string | number
+  claimed: string | number
   network: string
 }>()
 
@@ -21,6 +21,13 @@ const cover: CSSProperties = {
 }
 
 const networkName = chainSpec[props.network as SupportedChain].name
+
+// Takumi preserves indentation around static text nodes, so keep labels interpolated.
+const labels = {
+  items: 'items',
+  claimed: 'claimed',
+  network: 'network',
+} as const
 </script>
 
 <template>
@@ -32,36 +39,36 @@ const networkName = chainSpec[props.network as SupportedChain].name
     <img
       :src="image"
       :alt="title"
-      class="w-70 rounded-md border border-white"
+      class="w-70 h-70 object-cover rounded-md border border-white"
     >
-    <h1 class="mb-6 font-bold">
+    <h1 class="mt-10 mb-2 text-5xl leading-none font-bold">
       {{ title }}
     </h1>
     <div class="flex flex-row">
-      <div>
+      <div class="flex flex-col">
         <div class="text-2xl font-bold m-0">
           {{ items }}
         </div>
         <div class="text-gray-400 m-0">
-          items
+          {{ labels.items }}
         </div>
       </div>
 
-      <div class="ml-16">
+      <div class="flex flex-col ml-16">
         <div class="text-2xl font-bold m-0">
           {{ claimed }}
         </div>
         <div class="text-gray-400 m-0">
-          claimed
+          {{ labels.claimed }}
         </div>
       </div>
 
-      <div class="ml-16">
+      <div class="flex flex-col ml-16">
         <div class="text-2xl font-bold m-0">
           {{ networkName }}
         </div>
         <div class="text-gray-400 m-0">
-          network
+          {{ labels.network }}
         </div>
       </div>
     </div>

@@ -7,7 +7,6 @@ export function useNextItemId() {
 
   async function getNextItemId(chain: AssetHubChain, collectionId: number): Promise<number> {
     const api = $sdk(chain).api
-    await api.compatibilityToken
 
     const [entries, ownerQuery] = await Promise.all([
       api.query.Nfts.Item.getEntries(collectionId),

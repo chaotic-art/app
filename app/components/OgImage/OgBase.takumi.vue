@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
 
-// inherited attrs can mess up the satori parser
+// inherited attrs can interfere with the OG image renderer
 defineOptions({
   inheritAttrs: false,
 })

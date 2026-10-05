@@ -126,7 +126,6 @@ export function useMassMint() {
       }
 
       const api = $sdk(blockchain).api
-      await api.compatibilityToken
 
       // Get next item ID for the collection
       const queryNextItemId = await api.query.Nfts.Item.getEntries(Number.parseInt(collectionId))

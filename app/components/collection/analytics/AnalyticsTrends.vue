@@ -28,7 +28,7 @@ const range = defineModel<AnalyticsRange>('range', {
 
 const { t } = useI18n()
 
-const rangeItems = computed<DropdownMenuItem[]>(() => [
+const rangeItems = computed<DropdownMenuItem[][]>(() => [
   [
     { label: '1h', onSelect: () => (range.value = '1h') },
     { label: '1d', onSelect: () => (range.value = '1d') },

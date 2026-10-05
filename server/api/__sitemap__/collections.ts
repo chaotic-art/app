@@ -1,5 +1,5 @@
-import type { SitemapUrl } from '#sitemap/types'
 import type { SitemapChain } from '~~/server/utils/sitemap/graphql'
+import type { SitemapUrl } from '#sitemap/types'
 
 import { createSitemapUrl, dedupeSitemapUrls, getErrorMessage, SITEMAP_CHAINS } from '~~/server/utils/sitemap'
 import { fetchGraphql, getSitemapDenyList } from '~~/server/utils/sitemap/graphql'

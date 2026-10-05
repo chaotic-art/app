@@ -191,7 +191,6 @@ export function useNftPallets() {
     }
 
     const api = $sdk(chain).api
-    await api.compatibilityToken
 
     // next collection id
     const queryNextId = await api.query.Nfts.NextCollectionId.getValue()
@@ -308,7 +307,6 @@ export function useNftPallets() {
     }
 
     const api = $sdk(chain).api
-    await api.compatibilityToken
 
     const calls = []
 
@@ -403,13 +401,14 @@ export function useNftPallets() {
     const collections = query.map(item => item.keyArgs[1])
     const collectionsData = await Promise.all(collections.map(async (collection) => {
       const query = await api.query.Nfts.CollectionMetadataOf.getValue(collection)
+      const metadataUri = query ? Binary.toText(query.data) : ''
 
-      if (query?.data.asText().length) {
+      if (metadataUri.length) {
         const metadataData = await $fetch<{
           name?: string
           description?: string
           image?: string
-        }>(sanitizeIpfsUrl(query?.data.asText()))
+        }>(sanitizeIpfsUrl(metadataUri))
 
         return {
           id: collection.toString(),
@@ -439,7 +438,6 @@ export function useNftPallets() {
     const { signer, address } = await getAccountSigner()
 
     const api = $sdk(chain).api
-    await api.compatibilityToken
 
     // Get next item ID for the collection
     const queryNextItemId = await api.query.Nfts.Item.getEntries(collectionId)
@@ -580,7 +578,7 @@ export function useNftPallets() {
   async function getItemMetadataUri(chain: AssetHubChain, collectionId: number, itemId: number): Promise<string | null> {
     const api = $sdk(chain).api
     const meta = await api.query.Nfts.ItemMetadataOf.getValue(collectionId, itemId)
-    return meta?.data?.asText() ?? null
+    return meta ? Binary.toText(meta.data) : null
   }
 
   async function updateItemAttributes({
@@ -774,7 +772,7 @@ export function useNftPallets() {
 
     return attributes.map((item) => {
       return {
-        key: item.keyArgs[3].asText(),
+        key: Binary.toText(item.keyArgs[3]),
         value: item.value[0],
       }
     })
@@ -792,8 +790,8 @@ export function useNftPallets() {
     }
 
     return {
-      recipient: encodeAddress(recipient.value.asText(), chainSpec[chain].ss58Format),
-      amount: Number(royalty.value.asText()),
+      recipient: encodeAddress(Binary.toText(recipient.value), chainSpec[chain].ss58Format),
+      amount: Number(Binary.toText(royalty.value)),
     }
   }
 
@@ -929,7 +927,6 @@ export function useNftPallets() {
     const { signer, address } = await getAccountSigner()
 
     const api = $sdk(chain).api
-    await api.compatibilityToken
 
     const calls = []
     const itemsToBurn = items.filter(item => !item.mimeType?.includes('html'))
@@ -990,7 +987,6 @@ export function useNftPallets() {
     await cryptoWaitReady()
     const { signer, address } = await getAccountSigner()
     const api = $sdk(chain).api
-    await api.compatibilityToken
 
     const calls = items.map((item) => {
       return api.tx.Nfts.transfer({
@@ -1057,7 +1053,6 @@ export function useNftPallets() {
     const { signer, address } = await getAccountSigner()
 
     const api = $sdk(chain).api
-    await api.compatibilityToken
 
     // Get witness data from chain
     const witness = await api.query.Nfts.Collection.getValue(collectionId)

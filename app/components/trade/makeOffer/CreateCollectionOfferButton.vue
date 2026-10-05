@@ -23,7 +23,7 @@ const { data: collectionOfferData } = useQuery({
 
 const { collection } = useOdaCollection(collectionId)
 
-const highestOfferPrice = computed(() => (collectionOfferData.value)?.data.offers[0]?.price)
+const highestOfferPrice = computed(() => collectionOfferData.value?.data?.offers[0]?.price)
 
 function openOfferModal() {
   makeOfferStore.clear()

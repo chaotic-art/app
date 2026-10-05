@@ -82,7 +82,7 @@ watch([ownedCollections, accountId], async ([ownedCollections, account]) => {
         `),
       })
 
-      swapOffersCount.value = response.data.swapsConnection.totalCount
+      swapOffersCount.value = response.data?.swapsConnection.totalCount
     }
 
     catch {

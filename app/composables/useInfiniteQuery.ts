@@ -58,7 +58,7 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
   // Function to load data
   const loadData = async (offset = 0, append = false) => {
     try {
-      const { data } = await $apolloClient.query({
+      const { data } = await $apolloClient.query<TData>({
         query,
         variables: {
           ...variables,
@@ -69,6 +69,10 @@ export function useInfiniteQuery<TData = any, TItem = any>(options: UseInfiniteQ
           endpoint,
         },
       })
+
+      if (!data) {
+        throw new Error('GraphQL query returned no data')
+      }
 
       const newItems = extractData(data)
       const total = extractTotal(data)

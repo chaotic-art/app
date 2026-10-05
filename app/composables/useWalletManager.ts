@@ -1,5 +1,5 @@
-import { LazyWalletAssetModal } from '#components'
 import { createEventHook, whenever } from '@vueuse/core'
+import { LazyWalletAssetModal } from '#components'
 
 const overlay = useOverlay()
 const walletAssetModal = overlay.create(LazyWalletAssetModal)
